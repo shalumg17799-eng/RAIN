@@ -1,0 +1,86 @@
+{
+  "_comment": "Worked example: RAIN's 11 source systems mapped to the upper ontology by this skill. This is what a real run's output looks like -- generic nodes/edges, not tied to any one client's table names. Load straight into Neo4j (or Cosmos Gremlin / Fabric graph, whichever gets chosen) as-is.",
+
+  "concepts": [
+    {
+      "concept_id": "C-CONSTITUENT",
+      "name": "Constituent",
+      "definition": "The person or entity the whole system is organized around, tracked across any clinical, claims, financial, or operational system. Domain-specific systems may label this 'Patient' (healthcare), 'Member' (financial services), etc. -- those are specializations of this one concept, not separate concepts.",
+      "synonyms": ["patient", "member", "enrollee", "individual", "account holder"],
+      "status": "approved",
+      "renamed_from": "C-PATIENT (was healthcare-flavored; generalized after the USSFCU genericity test surfaced the bias -- see ussfcu-genericity-test.json)"
+    },
+    {
+      "concept_id": "C-PROVIDER",
+      "name": "Provider",
+      "definition": "A clinician or care team member responsible for a patient's care.",
+      "synonyms": ["clinician", "physician", "rendering provider"],
+      "status": "approved"
+    },
+    {
+      "concept_id": "C-CARE-EPISODE",
+      "name": "Care Episode",
+      "definition": "A bounded period of care for a specific condition or event (e.g. a pregnancy, a chronic-condition enrollment).",
+      "synonyms": ["encounter series", "enrollment"],
+      "status": "approved"
+    },
+    {
+      "concept_id": "C-RISK-SIGNAL",
+      "name": "Risk Signal",
+      "definition": "A computed or observed indicator that a patient's risk has changed (an RPM reading trend, a missed visit, a lab overdue).",
+      "synonyms": ["risk flag", "alert"],
+      "status": "approved"
+    },
+    {
+      "concept_id": "C-ACCESS-BARRIER",
+      "name": "Access Barrier",
+      "definition": "A structural obstacle to care -- distance, transportation, connectivity, or provider availability.",
+      "synonyms": ["SDOH flag", "coverage gap"],
+      "status": "approved"
+    }
+  ],
+
+  "mappings": [
+    {"concept_id": "C-CONSTITUENT", "source_system": "Clinical EHR", "source_field": "patient_id", "confidence_category": "auto-eligible"},
+    {"concept_id": "C-CONSTITUENT", "source_system": "Maternal Health Registry", "source_field": "patient_id", "confidence_category": "auto-eligible"},
+    {"concept_id": "C-CONSTITUENT", "source_system": "Claims & Encounters", "source_field": "member_id", "confidence_category": "needs-review",
+     "note": "field name differs from other sources -- flagged, not auto-merged"},
+
+    {"concept_id": "C-PROVIDER", "source_system": "Clinical EHR", "source_field": "provider_id", "confidence_category": "auto-eligible"},
+    {"concept_id": "C-PROVIDER", "source_system": "Claims & Encounters", "source_field": "rendering_provider_npi", "confidence_category": "auto-eligible"},
+
+    {"concept_id": "C-CARE-EPISODE", "source_system": "Maternal Health Registry", "source_field": "pregnancy_episode_id", "confidence_category": "auto-eligible"},
+    {"concept_id": "C-CARE-EPISODE", "source_system": "RPM Platform", "source_field": "enrollment_id", "confidence_category": "auto-eligible"},
+
+    {"concept_id": "C-RISK-SIGNAL", "source_system": "RPM Platform", "source_field": "reading_trend", "confidence_category": "auto-eligible"},
+    {"concept_id": "C-RISK-SIGNAL", "source_system": "Claims & Encounters", "source_field": "avoidable_ed_flag", "confidence_category": "auto-eligible"},
+
+    {"concept_id": "C-ACCESS-BARRIER", "source_system": "SDOH Data", "source_field": "flag_type", "confidence_category": "auto-eligible"},
+    {"concept_id": "C-ACCESS-BARRIER", "source_system": "State HIE", "source_field": "connectivity_status", "confidence_category": "needs-review",
+     "note": "plausible but not certain -- needs human review before merge"}
+  ],
+
+  "duplicate_candidates": [
+    {
+      "concept_id_a": "C-CARE-EPISODE",
+      "concept_id_b": "C-RISK-SIGNAL",
+      "overlap_category": "low-overlap",
+      "resolution": "not a duplicate -- distinct concepts, kept separate"
+    }
+  ],
+
+  "coverage_gaps_detected": [
+    {
+      "description": "A constituent can hold both a Care Episode (pregnancy) and a separate Care Episode (chronic condition) with no explicit link between them, even though both trace to the same person.",
+      "impact": "Cross-episode risk questions (e.g. 'pregnancy risk cross-referenced with chronic conditions') return incomplete results without an explicit join concept.",
+      "recommendation": "Add a 'Compounding Risk' relationship type between two Care Episode nodes sharing a Constituent, rather than relying on the calling application to infer it.",
+      "status": "human-review-pending"
+    }
+  ],
+
+  "run_metadata": {
+    "mapping_coverage_pct": 91,
+    "hitl_queue_size": 2,
+    "source_systems_processed": 11
+  }
+}

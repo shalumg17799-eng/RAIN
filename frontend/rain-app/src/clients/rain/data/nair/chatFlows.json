@@ -1,0 +1,291 @@
+{
+  "greeting": {
+    "ai_message": "Good morning, Dr. Nair. I have identified 3 population health signals. The most urgent: the Battle Mountain obstetric closure nearly doubled the maternal care desert — the share of childbearing-age women more than 60 miles from obstetric care jumped from 31 to 58 percent, and inadequate prenatal care and ED deliveries are rising in the same ZIP codes. Avoidable ED utilization is also up 19 percent, and 64 percent of those visits trace to patients who lost provider continuity after the closure. Want me to map the downstream impact?",
+    "suggested_chips": [
+      "Map the downstream impact of the closure",
+      "Show me the avoidable ED concentration",
+      "Where are the telehealth equity gaps?"
+    ],
+    "data_sources_used": ["Enterprise Data Warehouse", "Claims", "Public Health Registries", "State HIE", "SDOH Data", "Telehealth (Project ECHO Nevada)", "Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+
+  "turn_1_cascade": {
+    "user_query": "Map the downstream impact of the closure",
+    "ai_message": "The Battle Mountain closure produced a measurable cascade across systems. Maternal access: 58 percent of childbearing-age women are now beyond 60 miles from obstetric care, up from 31 percent, and prenatal completion fell from 84 to 61 percent in the service area, with 3 ED deliveries in 60 days. Chronic disease: provider reassignments to cover the obstetric gap left a cohort without continuity, and avoidable ED visits for CHF, COPD, and diabetes rose 19 percent, with 64 percent of those visits coming from the affected panels. Transport: long-distance medical transport demand rose 210 percent, straining the same corridor that serves dialysis and oncology. Equity: the affected ZIP codes already rank highest on the SDOH transportation-barrier index, and 240 elevated-risk patients there sit in telehealth dead zones, so the virtual fallback does not reach them. One closure, five interconnected effects that no single system would have surfaced.",
+    "suggested_chips": [
+      "Where should we target resources first?",
+      "Model the equity impact of mobile obstetric outreach",
+      "Show me the cost of inaction",
+      "Compare affected vs. unaffected ZIPs"
+    ],
+    "data_sources_used": ["Enterprise Data Warehouse", "Claims", "Clinical EHR", "State HIE", "SDOH Data", "NEMT Logs", "Connectivity Registry", "Maternal Health Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_2_target": {
+    "user_query": "Where should we target resources first?",
+    "ai_message": "I modeled three RHTP-aligned interventions against the cascade. Option A (Mobile Obstetric and Prenatal Outreach): a scheduled mobile clinic to the 4 highest-desert ZIPs would restore prenatal access for an estimated 84 percent of the displaced cohort within 30 days and is fundable under the Flex Fund infrastructure priority. Option B (Telehealth Connectivity Bridge): deploying cellular or satellite telehealth kits to the 5 dead-zone ZIPs would reach the 240 elevated-risk patients currently without a virtual fallback, aligning with the value-based RHOAP priority. Option C (Care Continuity Restoration): re-paneling the disrupted chronic disease cohort and adding community health worker outreach would address the 64 percent of avoidable ED visits, with an estimated 1.0 million dollars in avoided annual cost. Recommendation: Options A and B in parallel for immediate access and equity impact, with C close behind for cost. All three map directly to the Make Rural Nevada Healthy Again initiatives, which strengthens the outcomes narrative for NVHA reporting.",
+    "suggested_chips": [
+      "Generate an equity brief for NVHA",
+      "Build the case for Options A and B",
+      "Show me the RHTP funding alignment",
+      "Model 12-month outcomes"
+    ],
+    "data_sources_used": ["Enterprise Data Warehouse", "Claims", "SDOH Data", "Connectivity Registry", "Telehealth (Project ECHO Nevada)", "RHTP Priority Framework", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_3_brief": {
+    "user_query": "Generate an equity brief for NVHA",
+    "ai_message": "Here is a rural health access and equity brief for the Nevada Health Authority, structured to the RHTP outcome priorities. It covers: (1) Situation: the Battle Mountain obstetric closure expanded the maternal care desert from 31 to 58 percent beyond 60 miles and triggered a measurable cross-system cascade. (2) Cross-system evidence: prenatal completion decline, avoidable ED increase with continuity-loss attribution, transport strain, and the telehealth equity gap, each tied to its data source. (3) Recommended interventions mapped to Make Rural Nevada Healthy Again: mobile obstetric outreach (Flex Fund), telehealth connectivity bridge (RHOAP), and care continuity restoration. (4) Projected 12-month outcomes: prenatal access recovery, avoidable-ED reduction, and equity reach into the dead-zone ZIPs, with estimated cost avoidance. (5) A measurement plan for the people-served, services-delivered, and outcomes reporting NVHA requires. Shall I also produce the supporting data appendix with the county-level charts?",
+    "suggested_chips": [
+      "Produce the data appendix",
+      "Align the brief to the RHTP reporting template",
+      "Add the chronic-disease cost detail",
+      "Share with Dr. Delgado-Reyes and James"
+    ],
+    "data_sources_used": ["Enterprise Data Warehouse", "Claims", "Clinical EHR", "State HIE", "SDOH Data", "Connectivity Registry", "Telehealth (Project ECHO Nevada)", "Maternal Health Registry", "NEMT Logs"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_ed": {
+    "user_query": "Show me the avoidable ED concentration",
+    "ai_message": "Avoidable emergency-department visits in the three-county area rose 19 percent over 90 days, concentrated in chronic disease (CHF, COPD, diabetes) and behavioral health. Cross-referencing the State HIE with claims and provider data, 64 percent of these visits came from patients who lost provider continuity after staff reassignments tied to the obstetric closure — the same disruption visible in Sarah Whitehorse's chronic disease cohort. Estimated avoidable cost: 1.4 million dollars annualized. The concentration maps tightly to the affected provider panels, which makes care-continuity restoration the highest-leverage cost intervention.",
+    "suggested_chips": [
+      "Map the downstream impact of the closure",
+      "Where should we target resources first?",
+      "Show me the cost of inaction",
+      "Next signal"
+    ],
+    "data_sources_used": ["State HIE", "Claims", "Provider Data", "Enterprise Data Warehouse"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_telehealth_equity": {
+    "user_query": "Where are the telehealth equity gaps?",
+    "ai_message": "Project ECHO Nevada telehealth uptake is strong where broadband exists but near zero in 5 frontier ZIP codes with no reliable connectivity. Cross-referencing connectivity data with the elevated-risk cohort, 240 elevated-risk patients live in these telehealth dead zones, meaning the virtual-care fallback that protects the rest of the population does not reach the most isolated. These are the same ZIPs limiting Maria's prenatal telehealth and Sarah's RPM compliance — the connectivity gap is a single equity fault line running through every clinical program. A telehealth connectivity bridge to these 5 ZIPs is the most direct equity intervention.",
+    "suggested_chips": [
+      "Map the downstream impact of the closure",
+      "Which elevated-risk patients are in telehealth dead zones?",
+      "Model the equity impact of mobile obstetric outreach",
+      "Next signal"
+    ],
+    "data_sources_used": ["Telehealth (Project ECHO Nevada)", "Connectivity Registry", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "model_mobile_outreach": {
+    "user_query": "Model the equity impact of mobile obstetric outreach",
+    "ai_message": "Modeling Option A — a scheduled mobile obstetric and prenatal clinic to the 4 highest-desert ZIPs: it would restore prenatal access for an estimated 84 percent of the displaced cohort within 30 days, cutting the share of childbearing-age women beyond 60 miles from obstetric care from 58 percent back toward 40 percent for the targeted population. Modeled downstream effects: prenatal completion recovers, and projected ED deliveries fall by more than half over the following two quarters. Because the 4 ZIPs also rank highest on the SDOH transportation-barrier index, mobile outreach reaches exactly the population least able to travel — the equity return per dollar is the highest of the three options, and it is fundable under the Flex Fund infrastructure priority.",
+    "suggested_chips": [
+      "Where should we target resources first?",
+      "Build the case for Options A and B",
+      "Generate an equity brief for NVHA"
+    ],
+    "data_sources_used": ["Geospatial", "Maternal Health Registry", "SDOH Data", "RHTP Priority Framework"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "cost_inaction": {
+    "user_query": "Show me the cost of inaction",
+    "ai_message": "If nothing changes, the model projects the cascade compounds over the next 12 months. Avoidable ED utilization continues at the elevated rate, holding annual avoidable cost near 1.4 million dollars for the three-county area, with risk of further increase as more chronic patients lose continuity. Maternal risk persists: with 58 percent of childbearing-age women beyond 60 miles from obstetric care, ED deliveries and births before arrival are likely to keep rising from the current 3-in-60-days pace. Equity widens: the 240 elevated-risk patients in dead-zone ZIPs remain unreached by telehealth. The cost of inaction is both financial and an outcomes-reporting liability for the RHTP value-based measures.",
+    "suggested_chips": [
+      "Where should we target resources first?",
+      "Model 12-month outcomes",
+      "Generate an equity brief for NVHA"
+    ],
+    "data_sources_used": ["Claims", "Enterprise Data Warehouse", "RAIN Risk Engine", "Maternal Health Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "compare_zips": {
+    "user_query": "Compare affected vs. unaffected ZIPs",
+    "ai_message": "Comparing the frontier ZIPs affected by the closure against demographically similar unaffected ZIPs isolates the closure's effect. Affected ZIPs: prenatal completion 61 percent, avoidable ED rate elevated 19 percent, telehealth uptake near zero, and the highest SDOH transportation-barrier scores. Unaffected ZIPs over the same window: prenatal completion held near 83 percent, avoidable ED flat, telehealth uptake above 70 percent. The divergence begins precisely at March 1 and concentrates in the same geography, which is the strongest available evidence that the closure — not a secular trend — is the driver. This affected-vs-unaffected contrast is the core of the NVHA outcomes case.",
+    "suggested_chips": [
+      "Map the downstream impact of the closure",
+      "Where should we target resources first?",
+      "Generate an equity brief for NVHA"
+    ],
+    "data_sources_used": ["Enterprise Data Warehouse", "Claims", "Clinical EHR", "Connectivity Registry", "SDOH Data"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "build_case_ab": {
+    "user_query": "Build the case for Options A and B",
+    "ai_message": "Options A and B together address access and equity simultaneously. Option A (Mobile Obstetric Outreach, Flex Fund) restores prenatal access for an estimated 84 percent of the displaced cohort in the 4 highest-desert ZIPs within 30 days. Option B (Telehealth Connectivity Bridge, RHOAP) reaches the 240 elevated-risk patients in the 5 dead-zone ZIPs who currently have no virtual fallback. Run in parallel, they cover both the patients who can be reached by a clinic and those who can only be reached by connectivity. Combined, they touch every high-risk frontier ZIP, map cleanly to two distinct RHTP funding streams, and produce measurable people-served and outcomes metrics for NVHA. I can package this as the recommended funding request.",
+    "suggested_chips": [
+      "Show me the RHTP funding alignment",
+      "Generate an equity brief for NVHA",
+      "Model 12-month outcomes"
+    ],
+    "data_sources_used": ["RHTP Priority Framework", "Geospatial", "Connectivity Registry", "Enterprise Data Warehouse"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "rhtp_funding": {
+    "user_query": "Show me the RHTP funding alignment",
+    "ai_message": "Each option maps to a distinct Rural Health Transformation Program funding priority. Option A (Mobile Obstetric Outreach) aligns to the Flex Fund infrastructure priority. Option B (Telehealth Connectivity Bridge) aligns to the value-based RHOAP priority. Option C (Care Continuity Restoration) aligns to the cost-and-quality priorities through avoidable-ED reduction. All three sit under the Make Rural Nevada Healthy Again umbrella, which lets the brief present a single coherent initiative rather than three disconnected asks. The alignment also pre-structures the NVHA reporting: people served, services delivered, and outcomes achieved map directly onto each option's metrics.",
+    "suggested_chips": [
+      "Build the case for Options A and B",
+      "Generate an equity brief for NVHA",
+      "Align the brief to the RHTP reporting template"
+    ],
+    "data_sources_used": ["RHTP Priority Framework", "Enterprise Data Warehouse"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "model_12mo": {
+    "user_query": "Model 12-month outcomes",
+    "ai_message": "Projecting 12 months with Options A and B in parallel and C close behind: prenatal completion in the affected cohort recovers from 61 percent toward the low-80s as mobile outreach and telehealth restore access; avoidable ED utilization falls an estimated 12 to 15 percent as continuity is restored, recovering a meaningful share of the 1.4 million dollar annual avoidable cost; and telehealth equity reach extends to the 240 dead-zone patients via the connectivity bridge. Each projection carries a confidence range and a measurement plan so NVHA can verify against actuals. The combined narrative — access restored, cost avoided, equity extended — is exactly the outcomes story the RHTP value-based reporting rewards.",
+    "suggested_chips": [
+      "Generate an equity brief for NVHA",
+      "Show me the cost of inaction",
+      "Align the brief to the RHTP reporting template"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "Claims", "Enterprise Data Warehouse", "Maternal Health Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "data_appendix": {
+    "user_query": "Produce the data appendix",
+    "ai_message": "Producing the data appendix now. It includes county-level choropleths of access risk before and after March 1, the affected-vs-unaffected ZIP comparison charts, the prenatal completion and avoidable-ED trend lines with the closure marked, the telehealth uptake map against the connectivity dead zones, and a methods note documenting each data source and the attribution model behind the 64 percent continuity-loss figure. Every chart is sourced and reproducible so NVHA reviewers can trace each number to its system of record. The appendix attaches to the one-page brief as supporting evidence.",
+    "suggested_chips": [
+      "Align the brief to the RHTP reporting template",
+      "Share with Dr. Delgado-Reyes and James",
+      "Next signal"
+    ],
+    "data_sources_used": ["Enterprise Data Warehouse", "Claims", "Geospatial", "Connectivity Registry", "Public Health Registries"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "align_template": {
+    "user_query": "Align the brief to the RHTP reporting template",
+    "ai_message": "Aligned. The brief is now structured to the RHTP reporting template: each section maps to a required reporting domain — people served, services delivered, and outcomes achieved — with the metrics pre-populated from the cross-system data. Option A reports under the Flex Fund infrastructure domain, Option B under the value-based RHOAP domain, and Option C under cost-and-quality. The measurement plan specifies the baseline, the target, and the data source for each metric, so NVHA can audit progress at each reporting cycle without additional data requests. The brief is submission-ready in the template format.",
+    "suggested_chips": [
+      "Produce the data appendix",
+      "Share with Dr. Delgado-Reyes and James",
+      "Next signal"
+    ],
+    "data_sources_used": ["RHTP Priority Framework", "Enterprise Data Warehouse"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "chronic_cost": {
+    "user_query": "Add the chronic-disease cost detail",
+    "ai_message": "Added. The brief now includes the chronic-disease cost detail from Sarah Whitehorse's cohort: the 64 percent of avoidable ED visits attributable to continuity loss, the modeled 1.0 million dollars in avoidable hospitalization cost across the 208-patient elevated-risk cohort, and the projected 40 to 45 percent reduction under care-continuity restoration. Pairing the maternal access narrative with the chronic-disease cost figure strengthens the case for Option C and demonstrates that the closure's impact — and the value of intervention — spans both the maternal and chronic populations. The numbers reconcile to the same provider-panel attribution David Yazzie's reconciliation fix restores.",
+    "suggested_chips": [
+      "Generate an equity brief for NVHA",
+      "Share with Dr. Delgado-Reyes and James",
+      "Next signal"
+    ],
+    "data_sources_used": ["Claims", "RAIN Risk Engine", "Provider Data", "Enterprise Data Warehouse"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "share_team": {
+    "user_query": "Share with Dr. Delgado-Reyes and James",
+    "ai_message": "Shared. Dr. Delgado-Reyes and James Tomley have the brief and appendix, each with the section most relevant to their work flagged: the maternal access desert and prenatal recovery projection for Maria, and the transport-strain and EMS coverage impact for James. Sharing the population-level view back to the front-line personas closes the loop — they see how their individual cohorts roll up into the equity case, and the brief reflects their operational reality. The brief is now ready for NVHA submission with cross-persona sign-off.",
+    "suggested_chips": [
+      "Produce the data appendix",
+      "Generate an equity brief for NVHA",
+      "Next signal"
+    ],
+    "data_sources_used": ["Enterprise Data Warehouse", "Maternal Health Registry", "NEMT Logs"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_access_county": {
+    "user_query": "Show me access disparities by county",
+    "ai_message": "Across the rural and frontier counties — about 10 percent of Nevada's population spread over 90 percent of its land mass — access disparities concentrate sharply in the counties around the Battle Mountain closure. Humboldt and Pershing show the steepest post-closure access loss: the highest share of childbearing-age women beyond 60 miles from obstetric care, the highest avoidable-ED rate, the lowest telehealth uptake, and the highest SDOH transportation-barrier prevalence at 22 percent. Lander and the broader three-county area show secondary effects through the shared transport corridor. DPBH OPHIE serves as the health authority for these counties because they have none of their own, which makes RAIN's cross-county view the only consolidated picture available.",
+    "suggested_chips": [
+      "Map the downstream impact of the closure",
+      "Compare affected vs. unaffected ZIPs",
+      "Where are the telehealth equity gaps?"
+    ],
+    "data_sources_used": ["Enterprise Data Warehouse", "Public Health Registries", "SDOH Data", "Geospatial"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_ed_concentration": {
+    "user_query": "Where did avoidable ED utilization concentrate after the closure?",
+    "ai_message": "Avoidable ED utilization concentrated in the frontier ZIPs tied to the reassigned provider panels, rising 19 percent over 90 days. The visits are dominated by chronic disease — CHF, COPD, and diabetes — and behavioral health, exactly the conditions most sensitive to a loss of continuity. 64 percent of the avoidable visits came from patients on the panels disrupted by the obstetric reassignment, which is the single strongest predictor in the data. The same ZIPs carry the maternal access and telehealth equity burdens, so the avoidable-ED concentration is one facet of the broader closure cascade, not an independent trend.",
+    "suggested_chips": [
+      "Show me the avoidable ED concentration",
+      "Show me the cost of inaction",
+      "Where should we target resources first?"
+    ],
+    "data_sources_used": ["State HIE", "Claims", "Provider Data", "Enterprise Data Warehouse"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_desert_map": {
+    "user_query": "Map the maternal care desert before and after Battle Mountain",
+    "ai_message": "Before March 1, 31 percent of service-area childbearing-age women lived more than 60 miles from obstetric care. After the Battle Mountain closure, that share jumped to 58 percent overnight — nearly doubling the maternal care desert. The expansion is concentrated in 4 frontier ZIPs that lost their nearest obstetric provider, and it aligns with a measurable rise in inadequate prenatal care and 3 ED deliveries or births before arrival in 60 days. The before-and-after map is the single most legible piece of evidence for the NVHA brief: one closure, a visible doubling of the access desert.",
+    "suggested_chips": [
+      "Map the downstream impact of the closure",
+      "Model the equity impact of mobile obstetric outreach",
+      "Compare affected vs. unaffected ZIPs"
+    ],
+    "data_sources_used": ["Geospatial", "Public Health Registries", "Maternal Health Registry", "Claims"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_dead_zones": {
+    "user_query": "Which elevated-risk patients are in telehealth dead zones?",
+    "ai_message": "240 elevated-risk patients live in the 5 frontier ZIP codes with no reliable broadband — the telehealth dead zones. They span every clinical program: third-trimester prenatal patients without a virtual-visit fallback, CHF and COPD patients whose RPM transmissions are dropping, and diabetes patients overdue for care. Because telehealth is the fallback that protects the rest of the rural population, these 240 are the most isolated and the least reached by current interventions. Option B, the telehealth connectivity bridge, targets exactly this group and is the most direct equity lever available.",
+    "suggested_chips": [
+      "Where are the telehealth equity gaps?",
+      "Build the case for Options A and B",
+      "Generate an equity brief for NVHA"
+    ],
+    "data_sources_used": ["Connectivity Registry", "RAIN Risk Engine", "Telehealth (Project ECHO Nevada)"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_compare_outcomes": {
+    "user_query": "Compare outcomes in affected vs. unaffected ZIP codes",
+    "ai_message": "Affected ZIPs versus demographically similar unaffected ZIPs show a clean divergence starting at March 1. Affected: prenatal completion 61 percent, avoidable ED up 19 percent, telehealth uptake near zero, highest transport-barrier scores. Unaffected: prenatal completion held near 83 percent, avoidable ED flat, telehealth uptake above 70 percent. Because the two groups were comparable before the closure and diverge precisely after it, the contrast isolates the closure as the cause and rules out a general regional trend. This is the analytical backbone of the outcomes case for NVHA.",
+    "suggested_chips": [
+      "Compare affected vs. unaffected ZIPs",
+      "Show me the cost of inaction",
+      "Align our outcomes to the RHTP reporting priorities"
+    ],
+    "data_sources_used": ["Enterprise Data Warehouse", "Claims", "Clinical EHR", "Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_align_rhtp": {
+    "user_query": "Align our outcomes to the RHTP reporting priorities",
+    "ai_message": "Our outcomes map cleanly onto the RHTP value-based reporting priorities. People served: the displaced maternal cohort, the 240 dead-zone elevated-risk patients, and the disrupted chronic disease panels. Services delivered: mobile obstetric clinics, telehealth connectivity, and care-continuity restoration. Outcomes achieved: prenatal access recovery, avoidable-ED reduction with dollar savings, and equity reach into the most isolated ZIPs. Each maps to a Make Rural Nevada Healthy Again initiative and to a distinct RHTP funding stream, so the same data set supports both the funding request and the outcomes reporting NVHA requires.",
+    "suggested_chips": [
+      "Show me the RHTP funding alignment",
+      "Generate a population health and equity brief for NVHA",
+      "Model 12-month outcomes"
+    ],
+    "data_sources_used": ["RHTP Priority Framework", "Enterprise Data Warehouse", "Claims"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  }
+}

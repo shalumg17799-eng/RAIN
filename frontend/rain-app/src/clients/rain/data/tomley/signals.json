@@ -1,0 +1,73 @@
+[
+  {
+    "id": "SIG-RAIN-TOMLEY-001",
+    "type": "friction_observability",
+    "title": "Transport Queue Overload (Obstetric Closure Surge)",
+    "description": "NEMT and EMS transport requests to the nearest delivering hospital (115 miles) rose 210 percent since the March 1 Battle Mountain obstetric closure. 22 prenatal patients now need scheduled long-distance transport that did not exist before. Cross-referencing with the chronic disease transport queue, 18 dialysis and oncology transports compete for the same vehicles and drivers on the same corridor, and today the queue exceeds available capacity by 9 trips.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 47,
+    "sources": [
+      "NEMT Logs",
+      "EMS Dispatch",
+      "RAIN Risk Engine"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "requests_today": 47,
+      "capacity": 38,
+      "over_capacity": 9,
+      "surge_pct": 210
+    },
+    "affected_unit": "trips"
+  },
+  {
+    "id": "SIG-RAIN-TOMLEY-002",
+    "type": "friction_observability",
+    "title": "Telehealth Demand Surge Without Room Capacity",
+    "description": "Telehealth visit requests rose 64 percent in 30 days as providers shift maternal and chronic disease visits to virtual. The mobile clinic and two telehealth rooms are booked to capacity through next week. 31 requested visits have no slot, and 12 of those are elevated-risk patients flagged by the risk engine.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 31,
+    "sources": [
+      "Telehealth Demand Queue",
+      "Facility Capacity",
+      "RAIN Risk Engine"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "surge_pct": 64,
+      "unslotted": 31,
+      "elevated_risk": 12,
+      "room_utilization_pct": 98
+    },
+    "affected_unit": "visits"
+  },
+  {
+    "id": "SIG-RAIN-TOMLEY-003",
+    "type": "anomaly_detection",
+    "title": "EMS Response Time Degradation (Weather + Distance)",
+    "description": "Average EMS response time in the northern service area rose to 47 minutes this week, up from a 34-minute baseline, correlating with a winter weather system and crews diverted to long-distance obstetric and dialysis transports. Two ZIP codes currently have no available unit within 60 minutes.",
+    "impact": "medium",
+    "severity": "warning",
+    "affected_count": 2,
+    "sources": [
+      "EMS Dispatch",
+      "Weather Feed",
+      "Vehicle Roster"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "response_min": 47,
+      "baseline_min": 34,
+      "uncovered_zips": 2
+    },
+    "affected_unit": "ZIP codes"
+  }
+]

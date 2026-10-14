@@ -1,0 +1,291 @@
+{
+  "greeting": {
+    "ai_message": "Good morning, David. The RAIN data layer has 3 signals. The most urgent: 1,240 records still reference provider NPIs deactivated when the Battle Mountain obstetric unit closed, and the FHIR Practitioner resource cannot reconcile them, which breaks attribution for the maternal and chronic disease risk scores the clinical teams are using right now. Separately, RPM feed completeness from frontier ZIPs has dropped to 78 percent on connectivity issues, so the deterioration signals for the most isolated patients are running on partial data. Want me to walk you through the reconciliation failure?",
+    "suggested_chips": [
+      "Walk me through the reconciliation failure",
+      "Show me the RPM ingestion gap",
+      "What is the FHIR conformance issue?"
+    ],
+    "data_sources_used": ["FHIR / HL7 Services", "Ingestion Pipelines", "Data Quality Monitor", "RPM Feed Monitor", "Provider Directory"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+
+  "turn_1_reconciliation": {
+    "user_query": "Walk me through the reconciliation failure",
+    "ai_message": "When the Battle Mountain obstetric unit closed on March 1, the provider directory deactivated the affected practitioner records and the panels were reassigned. But 1,240 clinical and claims records — encounters, orders, and pending claims created before the deactivation — still carry the old provider NPIs. The FHIR Practitioner reference on those records now points to an inactive resource, so attribution fails: the maternal risk engine cannot tie 6 of Dr. Delgado-Reyes's high-risk prenatal patients to a responsible provider, and the chronic disease engine drops continuity flags for part of Sarah Whitehorse's cohort because the panel link is broken. I also see 180 records where patients were reassigned to a new provider but the crosswalk was not updated, creating mismatched referring-versus-rendering provider pairs. This is the data-layer signature of the same closure event every clinical persona is seeing. It is fixable with a claims-only active flag on the deactivated NPIs plus a crosswalk update.",
+    "suggested_chips": [
+      "Which risk scores are affected downstream?",
+      "Apply the claims-only active flag",
+      "Update the panel crosswalk",
+      "Generate a remediation plan"
+    ],
+    "data_sources_used": ["FHIR Practitioner Service", "Provider Directory", "Clinical EHR", "Claims", "Panel Crosswalk"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_2_downstream": {
+    "user_query": "Which risk scores are affected downstream?",
+    "ai_message": "I traced the 1,240 unresolved references and 180 crosswalk mismatches into the intelligence layer. Maternal: 6 high-risk prenatal patients lost provider attribution, which suppressed them from Dr. Delgado-Reyes's priority cohort until the engine fell back to facility-level attribution. Chronic disease: 41 diabetes patients and 5 of the CHF/COPD deterioration cluster had continuity flags drop, which understated Sarah Whitehorse's risk counts. Population health: the avoidable-ED attribution that Dr. Nair used — the 64 percent tied to continuity loss — depends on this same provider linkage, so resolving it actually strengthens her evidence. If the reconciliation is not fixed, the risk engines will keep under-counting the highest-risk patients precisely because those patients were tied to the closed unit. Projected: applying the claims-only active flag and crosswalk update restores attribution for all 1,240 records and raises maternal and chronic disease cohort completeness from an estimated 86 percent to 99 percent within one ingestion cycle.",
+    "suggested_chips": [
+      "Generate a remediation plan",
+      "Apply the fix and re-run the engines",
+      "Notify the clinical teams about restored cohorts",
+      "Prioritize the RPM gap next"
+    ],
+    "data_sources_used": ["FHIR Practitioner Service", "RAIN Risk Engine", "Clinical EHR", "Claims", "Maternal Registry", "Provider Directory"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_3_remediation": {
+    "user_query": "Generate a remediation plan",
+    "ai_message": "Here is the data remediation plan. It includes: (1) Provider reconciliation: apply a claims-only active flag to the deactivated Battle Mountain NPIs so the 1,240 historical records resolve, and update the panel crosswalk for the 180 reassigned patients. Estimated effort: one ingestion cycle, low risk. (2) RPM completeness: enable store-and-forward buffering for the frontier device fleet so readings queued during connectivity drops backfill on reconnect, recovering an estimated 17 of the missing 22 percent. (3) FHIR conformance: add a mapping rule for the new rural clinic EHR to default service location from the facility identifier and validate diagnosis codes at ingest, clearing the null-location and malformed-code errors. (4) A downstream re-run that refreshes the maternal, chronic disease, and population health cohorts and notifies each clinical owner that their data is restored, with a note on what changed. (5) A data-quality watch that alerts when any feed degrades after a future facility event. Shall I execute the reconciliation now and schedule the RPM and FHIR fixes?",
+    "suggested_chips": [
+      "Execute the reconciliation now",
+      "Schedule the RPM and FHIR fixes",
+      "Notify the clinical owners",
+      "Generate a data-quality summary for the technical lead"
+    ],
+    "data_sources_used": ["FHIR / HL7 Services", "Ingestion Pipelines", "RPM Feed Monitor", "Data Quality Monitor", "Provider Directory", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_rpm_gap": {
+    "user_query": "Show me the RPM ingestion gap",
+    "ai_message": "Remote patient monitoring transmissions from frontier ZIP codes are arriving incomplete: 22 percent of expected device readings over the last 14 days are missing or delayed beyond the 24-hour window. The gap concentrates in the same low-connectivity ZIPs limiting telehealth, meaning the CHF and COPD deterioration signals Sarah Whitehorse relies on are running on partial data for the most isolated patients. The fix is store-and-forward buffering on the device fleet: readings captured during a connectivity drop queue locally and backfill on reconnect, which recovers an estimated 17 of the missing 22 percent without any change to the devices in the field.",
+    "suggested_chips": [
+      "Walk me through the reconciliation failure",
+      "Show me RPM transmission completeness by ZIP code",
+      "What is the FHIR conformance issue?",
+      "Next signal"
+    ],
+    "data_sources_used": ["RPM Feed Monitor", "Ingestion Pipelines", "Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_fhir": {
+    "user_query": "What is the FHIR conformance issue?",
+    "ai_message": "A newly connected rural clinic EHR is sending HL7 v2 messages that map inconsistently to FHIR: 8 percent of encounters land with a null service location and 4 percent with malformed diagnosis codes. Left unresolved, this degrades the population health and equity analytics that depend on accurate geographic and clinical coding — the same county-level data Dr. Nair uses for the NVHA brief. The fix is two ingest-time mapping rules: default the service location from the facility identifier when the message omits it, and validate diagnosis codes at ingest so malformed codes are caught and quarantined rather than flowing downstream.",
+    "suggested_chips": [
+      "Walk me through the reconciliation failure",
+      "What is our FHIR conformance rate by feed?",
+      "Show me the RPM ingestion gap",
+      "Next signal"
+    ],
+    "data_sources_used": ["FHIR / HL7 Services", "Data Quality Monitor", "Ingestion Pipelines"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "apply_active_flag": {
+    "user_query": "Apply the claims-only active flag",
+    "ai_message": "Staged. The claims-only active flag is configured for the deactivated Battle Mountain NPIs: it lets the 1,240 historical records — encounters, orders, and pending claims created before deactivation — resolve their FHIR Practitioner reference for attribution purposes, without reactivating the providers for any new clinical activity. This is the low-risk, surgical fix: it touches only the historical linkage, not the live provider directory. Applied in the next ingestion cycle, it restores attribution for the 6 maternal and the chronic disease patients whose risk scores dropped. Confirm to execute, or pair it with the crosswalk update.",
+    "suggested_chips": [
+      "Update the panel crosswalk",
+      "Apply the fix and re-run the engines",
+      "Generate a remediation plan"
+    ],
+    "data_sources_used": ["FHIR Practitioner Service", "Provider Directory", "Claims"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "update_crosswalk": {
+    "user_query": "Update the panel crosswalk",
+    "ai_message": "Staged. The panel crosswalk update resolves the 180 records where patients were reassigned to a new provider but the referring-versus-rendering linkage was never updated, creating mismatched provider pairs. Updating the crosswalk re-points those records to the correct active provider, which restores the continuity flags the chronic disease engine dropped for part of Sarah Whitehorse's cohort. Combined with the claims-only active flag, this clears the full reconciliation backlog from the closure. Confirm to execute both as one reconciliation pass.",
+    "suggested_chips": [
+      "Apply the claims-only active flag",
+      "Apply the fix and re-run the engines",
+      "Generate a remediation plan"
+    ],
+    "data_sources_used": ["Panel Crosswalk", "Provider Directory", "Clinical EHR"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "apply_rerun": {
+    "user_query": "Apply the fix and re-run the engines",
+    "ai_message": "Applied and re-running. The claims-only active flag and crosswalk update are committed, and the maternal, chronic disease, and population health risk engines are re-running against the reconciled records. As the re-run completes this ingestion cycle, the 6 maternal high-risk patients return to Dr. Delgado-Reyes's priority cohort, the 41 diabetes and 5 CHF/COPD continuity flags restore for Sarah Whitehorse, and Dr. Nair's avoidable-ED attribution firms up. Cohort completeness rises from an estimated 86 percent to 99 percent. I will notify each clinical owner when their refreshed data is live, with a note on exactly what changed.",
+    "suggested_chips": [
+      "Notify the clinical teams about restored cohorts",
+      "Prioritize the RPM gap next",
+      "Generate a data-quality summary for the technical lead"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "FHIR Practitioner Service", "Clinical EHR", "Claims"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "notify_clinical": {
+    "user_query": "Notify the clinical teams about restored cohorts",
+    "ai_message": "Notifications drafted for each clinical owner. Dr. Delgado-Reyes: 6 high-risk prenatal patients restored to your priority cohort after provider attribution was reconciled. Sarah Whitehorse: 41 diabetes and 5 CHF/COPD continuity flags restored; your risk counts were understated and are now corrected. Dr. Nair: the provider linkage behind your 64 percent continuity-loss attribution is reconciled, which strengthens rather than changes your evidence. Each notice includes what changed, why, and the timestamp of the refreshed data, so the clinical teams trust the correction. Shall I send them?",
+    "suggested_chips": [
+      "Prioritize the RPM gap next",
+      "Generate a data-quality summary for the technical lead",
+      "Next signal"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "Clinical EHR", "Maternal Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "prioritize_rpm": {
+    "user_query": "Prioritize the RPM gap next",
+    "ai_message": "Queued as the next priority. With provider reconciliation applied, the RPM ingestion gap is the highest-impact remaining issue because it directly degrades Sarah Whitehorse's deterioration signals for the most isolated patients. The fix — store-and-forward buffering on the frontier device fleet — recovers an estimated 17 of the missing 22 percent of readings by backfilling on reconnect. It requires a configuration push to the device fleet, not a device swap, so it can ship within the next maintenance window. I will schedule it alongside the FHIR conformance mapping rules and report the recovered completeness once it lands.",
+    "suggested_chips": [
+      "Schedule the RPM and FHIR fixes",
+      "Generate a remediation plan",
+      "Generate a data-quality summary for the technical lead"
+    ],
+    "data_sources_used": ["RPM Feed Monitor", "Ingestion Pipelines", "Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "execute_reconciliation": {
+    "user_query": "Execute the reconciliation now",
+    "ai_message": "Executing. The claims-only active flag on the deactivated Battle Mountain NPIs and the 180-record crosswalk update are committed to this ingestion cycle, resolving all 1,240 unresolved provider references. The downstream re-run of the maternal, chronic disease, and population health engines is triggered, and cohort completeness is climbing from the estimated 86 percent toward 99 percent. I have logged the change with full provenance and queued the clinical-owner notifications. The RPM store-and-forward and FHIR mapping fixes remain scheduled for the next maintenance window. Reconciliation is in flight.",
+    "suggested_chips": [
+      "Schedule the RPM and FHIR fixes",
+      "Notify the clinical owners",
+      "Generate a data-quality summary for the technical lead"
+    ],
+    "data_sources_used": ["FHIR Practitioner Service", "Ingestion Pipelines", "RAIN Risk Engine", "Provider Directory"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "schedule_fixes": {
+    "user_query": "Schedule the RPM and FHIR fixes",
+    "ai_message": "Scheduled for the next maintenance window. RPM: enable store-and-forward buffering on the frontier device fleet to recover an estimated 17 of the missing 22 percent of readings. FHIR: add the two ingest-time mapping rules for the new rural clinic EHR — default service location from the facility identifier, and validate diagnosis codes at ingest. Both are configuration changes, low risk, with no field device swaps required. I have also enabled the data-quality watch so that if any feed degrades after a future facility event, you get an alert before the clinical signals run on bad data. The full remediation is now staged end to end.",
+    "suggested_chips": [
+      "Execute the reconciliation now",
+      "Notify the clinical owners",
+      "Generate a data-quality summary for the technical lead"
+    ],
+    "data_sources_used": ["RPM Feed Monitor", "FHIR / HL7 Services", "Ingestion Pipelines", "Data Quality Monitor"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "notify_owners": {
+    "user_query": "Notify the clinical owners",
+    "ai_message": "Clinical owners notified. Each of Dr. Delgado-Reyes, Sarah Whitehorse, and Dr. Nair has a message confirming that the data behind their signals is reconciled and refreshed, with a plain-language summary of what changed and a timestamp. The note explicitly states that no clinical facts changed — only the linkage that attributes records to the correct provider was repaired — so the corrected counts reflect reality more accurately, not a new event. Closing this loop is what lets the clinical teams trust RAIN's numbers after a disruptive facility change like the Battle Mountain closure.",
+    "suggested_chips": [
+      "Generate a data-quality summary for the technical lead",
+      "Schedule the RPM and FHIR fixes",
+      "Next signal"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "Clinical EHR", "Provider Directory"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "dq_summary": {
+    "user_query": "Generate a data-quality summary for the technical lead",
+    "ai_message": "Here is the data-quality summary for the technical lead. (1) Root cause — the Battle Mountain obstetric closure deactivated providers and reassigned panels, leaving 1,240 unresolved FHIR Practitioner references and 180 crosswalk mismatches. (2) Downstream impact — maternal, chronic disease, and population health cohort completeness fell to an estimated 86 percent before remediation. (3) Remediation — claims-only active flag plus crosswalk update (executed), RPM store-and-forward buffering and FHIR mapping rules (scheduled). (4) Result — completeness restored to 99 percent, RPM completeness projected from 78 toward 95 percent, FHIR conformance from 94 percent upward. (5) Prevention — a data-quality watch now alerts on feed degradation after any future facility event. Net: the data layer the clinical teams depend on is trustworthy again. Shall I file it and attach the change log?",
+    "suggested_chips": [
+      "Execute the reconciliation now",
+      "Schedule the RPM and FHIR fixes",
+      "Next signal"
+    ],
+    "data_sources_used": ["Data Quality Monitor", "FHIR / HL7 Services", "Ingestion Pipelines", "RPM Feed Monitor", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_dq_all": {
+    "user_query": "Show me data quality across all connected sources",
+    "ai_message": "Across the 11 connected sources, most feeds are healthy: Claims, State HIE, Telehealth, SDOH, Public Health Registries, and the Enterprise Data Warehouse are green on conformance and freshness. Two are degraded and one is on watch. Provider Directory is red — the 1,240 unresolved references from the Battle Mountain deactivation. RPM Platform is red — 78 percent transmission completeness from frontier connectivity drops. Clinical EHR is yellow — the new rural clinic connector's 8 percent null-service-location and 4 percent malformed-code FHIR drift. 14,800 records sit in data-quality quarantine pending these fixes. Overall FHIR conformance is 94 percent and average pipeline lag is 3.2 hours.",
+    "suggested_chips": [
+      "Walk me through the reconciliation failure",
+      "Show me the RPM ingestion gap",
+      "Show me pipeline freshness and ingestion lag"
+    ],
+    "data_sources_used": ["Data Quality Monitor", "Integration Monitor", "FHIR / HL7 Services", "RPM Feed Monitor"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_unresolved_refs": {
+    "user_query": "Which records have unresolved provider references?",
+    "ai_message": "1,240 records carry an unresolved FHIR Practitioner reference, all tied to the Battle Mountain deactivation: roughly 620 encounters, 410 orders, and 210 pending claims created before the providers were deactivated. A separate 180 records have a crosswalk mismatch — patients reassigned to a new provider without the referring-versus-rendering linkage updated. Together these break attribution for 6 maternal high-risk patients, 41 diabetes patients, and 5 of the CHF/COPD cluster. The claims-only active flag resolves the 1,240, and the crosswalk update resolves the 180.",
+    "suggested_chips": [
+      "Walk me through the reconciliation failure",
+      "Apply the claims-only active flag",
+      "Which risk scores are affected downstream?"
+    ],
+    "data_sources_used": ["FHIR Practitioner Service", "Provider Directory", "Claims", "Panel Crosswalk"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_rpm_by_zip": {
+    "user_query": "Show me RPM transmission completeness by ZIP code",
+    "ai_message": "RPM transmission completeness is 78 percent network-wide against a 95 percent target, but the shortfall is entirely geographic. Well-connected ZIPs run above 92 percent. The 5 frontier dead-zone ZIPs — the same ones limiting telehealth and maternal virtual visits — run between 50 and 65 percent, dragging the average down. 22 percent of expected readings in those ZIPs are missing or delayed past 24 hours. Because the gap is connectivity, not patient behavior, store-and-forward buffering recovers most of it by backfilling queued readings on reconnect, lifting those ZIPs toward the network norm.",
+    "suggested_chips": [
+      "Show me the RPM ingestion gap",
+      "Prioritize the RPM gap next",
+      "Show me data quality across all connected sources"
+    ],
+    "data_sources_used": ["RPM Feed Monitor", "Connectivity Registry", "Geospatial"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_fhir_by_feed": {
+    "user_query": "What is our FHIR conformance rate by feed?",
+    "ai_message": "Overall FHIR conformance is 94 percent, but it varies by feed. The established hospital and State HIE feeds run 98 to 99 percent. Claims and telehealth feeds are above 96 percent. The outlier is the newly connected rural clinic EHR at roughly 88 percent: 8 percent of its encounters arrive with a null service location and 4 percent with malformed diagnosis codes from inconsistent HL7 v2-to-FHIR mapping. Two ingest-time rules — default service location from the facility identifier, and validate diagnosis codes at ingest — bring that feed in line with the others and lift the overall rate.",
+    "suggested_chips": [
+      "What is the FHIR conformance issue?",
+      "Schedule the RPM and FHIR fixes",
+      "Show me data quality across all connected sources"
+    ],
+    "data_sources_used": ["FHIR / HL7 Services", "Data Quality Monitor", "Ingestion Pipelines"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_downstream_dq": {
+    "user_query": "Which downstream risk scores are affected by data-quality issues?",
+    "ai_message": "Three engines are affected, all by the provider reconciliation gap. Maternal: 6 high-risk prenatal patients lost attribution and were suppressed from Dr. Delgado-Reyes's priority cohort until facility-level fallback. Chronic disease: 41 diabetes patients and 5 of the CHF/COPD cluster had continuity flags drop, understating Sarah Whitehorse's counts. Population health: Dr. Nair's 64 percent continuity-loss ED attribution depends on the same linkage. The RPM gap separately weakens the deterioration signal for frontier patients on partial data. Reconciliation restores cohort completeness from 86 to 99 percent; the RPM fix firms up the remaining frontier signal.",
+    "suggested_chips": [
+      "Which risk scores are affected downstream?",
+      "Apply the fix and re-run the engines",
+      "Generate a remediation plan"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "FHIR Practitioner Service", "Clinical EHR", "Claims"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_pipeline_freshness": {
+    "user_query": "Show me pipeline freshness and ingestion lag",
+    "ai_message": "Average pipeline freshness is 3.2 hours of lag across the 11 sources, well within the 6-hour SLA, on 9.2 million records ingested in the last 30 days. Most feeds land within 1 to 3 hours. The two laggards are the RPM feed from frontier ZIPs, where connectivity drops delay readings past the 24-hour window for 22 percent of devices, and the new rural clinic EHR, where malformed messages route to quarantine and add processing time. 14,800 records currently sit in data-quality quarantine. Once store-and-forward and the FHIR mapping rules land, both laggards return to the network norm and quarantine volume falls.",
+    "suggested_chips": [
+      "Show me data quality across all connected sources",
+      "Show me the RPM ingestion gap",
+      "Generate a data-quality summary for the technical lead"
+    ],
+    "data_sources_used": ["Ingestion Pipelines", "Data Quality Monitor", "RPM Feed Monitor"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_degraded_closure": {
+    "user_query": "What degraded after the Battle Mountain closure?",
+    "ai_message": "The closure left a clear data-layer signature. Provider Directory: 1,240 records orphaned to deactivated NPIs plus 180 crosswalk mismatches, breaking attribution for the maternal and chronic risk engines. RPM Platform: completeness fell to 78 percent as displaced and reassigned patients in frontier ZIPs lost connectivity continuity. Risk-engine completeness: dropped to an estimated 86 percent because the highest-risk patients were precisely those tied to the closed unit. The FHIR conformance drift on the new clinic connector is unrelated to the closure but compounds the load. In short: the same event driving every clinical persona's signals also degraded the data layer those signals depend on — which is why fixing the data layer is what makes the rest trustworthy.",
+    "suggested_chips": [
+      "Walk me through the reconciliation failure",
+      "Which risk scores are affected downstream?",
+      "Generate a remediation plan"
+    ],
+    "data_sources_used": ["Provider Directory", "RPM Feed Monitor", "RAIN Risk Engine", "Data Quality Monitor"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  }
+}

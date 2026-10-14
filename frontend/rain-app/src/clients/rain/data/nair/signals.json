@@ -1,0 +1,71 @@
+[
+  {
+    "id": "SIG-RAIN-NAIR-001",
+    "type": "predictive_intelligence",
+    "title": "Maternal Access Desert Expansion",
+    "description": "The March 1 Battle Mountain obstetric closure expanded the maternal care desert: the share of service-area women of childbearing age living more than 60 miles from obstetric care rose from 31 percent to 58 percent overnight. Cross-referencing claims, public health registries, and the EHR, this aligns with a measurable rise in inadequate prenatal care and 3 ED deliveries or births before arrival in 60 days. The affected ZIP codes also rank highest on the SDOH transportation-barrier index.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 58,
+    "sources": [
+      "Geospatial",
+      "Public Health Registries",
+      "Claims"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "desert_now_pct": 58,
+      "desert_prior_pct": 31,
+      "ed_deliveries_60d": 3
+    },
+    "affected_unit": "percent of women"
+  },
+  {
+    "id": "SIG-RAIN-NAIR-002",
+    "type": "anomaly_detection",
+    "title": "Avoidable ED Utilization Concentration",
+    "description": "Avoidable emergency-department visits in the three-county area rose 19 percent over 90 days, concentrated in chronic disease (CHF, COPD, diabetes) and behavioral health. Cross-referencing the State HIE with claims and provider data, 64 percent of these visits came from patients who lost provider continuity after staff reassignments tied to the obstetric closure. Estimated avoidable cost: 1.4 million dollars annualized.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 19,
+    "sources": [
+      "State HIE",
+      "Claims",
+      "Provider Data"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "ed_increase_pct": 19,
+      "continuity_loss_pct": 64,
+      "avoidable_cost_usd": 1400000
+    },
+    "affected_unit": "percent increase"
+  },
+  {
+    "id": "SIG-RAIN-NAIR-003",
+    "type": "anomaly_detection",
+    "title": "Telehealth Equity Gap",
+    "description": "Project ECHO Nevada telehealth uptake is strong where broadband exists but near zero in 5 frontier ZIP codes with no reliable connectivity. Cross-referencing connectivity data with the elevated-risk cohort, 240 elevated-risk patients live in these telehealth dead zones, meaning the virtual-care fallback that protects the rest of the population does not reach the most isolated.",
+    "impact": "medium",
+    "severity": "warning",
+    "affected_count": 240,
+    "sources": [
+      "Telehealth (Project ECHO Nevada)",
+      "Connectivity Registry",
+      "RAIN Risk Engine"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "stable",
+    "related_segment": null,
+    "metrics": {
+      "dead_zone_zips": 5,
+      "elevated_in_dead_zones": 240,
+      "uptake_connected_pct": 71
+    },
+    "affected_unit": "patients"
+  }
+]

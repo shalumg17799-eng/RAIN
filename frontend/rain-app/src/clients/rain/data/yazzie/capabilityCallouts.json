@@ -1,0 +1,26 @@
+[
+  {
+    "trigger": "home_load",
+    "capabilityName": "Proactive Intelligence",
+    "description": "RAIN monitors the FHIR/HL7 services, ingestion pipelines, and governed lakehouse overnight and surfaces data-layer signals before you ask — unresolved provider references, RPM ingestion gaps, and FHIR conformance drift — so the clinical teams can trust what RAIN tells them.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_1",
+    "capabilityName": "Anomaly Detection",
+    "description": "Detects data-layer outliers no single pipeline monitor catches — like 1,240 records orphaned to NPIs deactivated by the Battle Mountain closure, visible only when the FHIR Practitioner service, provider directory, claims, and panel crosswalk are reconciled together.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_2",
+    "capabilityName": "Predictive Intelligence",
+    "description": "Traces a data-quality break into the intelligence layer, forecasting which maternal, chronic disease, and population health risk scores are affected and how reconciliation restores cohort completeness from an estimated 86 percent to 99 percent within one ingestion cycle.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_3",
+    "capabilityName": "Automated Action",
+    "description": "Generates a remediation plan — provider reconciliation, RPM store-and-forward buffering, FHIR mapping rules, a downstream re-run with clinical-owner notifications, and a data-quality watch — directly from the conversation, each fix scoped with effort, risk, and projected recovery.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  }
+]

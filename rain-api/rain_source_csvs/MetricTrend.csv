@@ -1,0 +1,8 @@
+metric_id,metric_name,before_value,after_value,unit,before_date,after_date,note
+prenatal_completion_rate,Prenatal visit completion rate,84,61,%,2026-01-30,2026-05-15,"Service-area prenatal completion, pre- vs post-closure"
+battle_mountain_corridor_daily_transports,Battle Mountain corridor daily transports,5,18,trips/day,2026-01-30,2026-05-15,NEMT+EMS trips to the delivering hospital
+longdistance_transport_demand_index,Long-distance medical transport demand,100,310,index,2026-01-30,2026-05-15,"210% rise, same corridor serving dialysis/oncology"
+maternal_care_desert_pct,Women of childbearing age >60mi from OB care,31,58,%,2026-01-30,2026-05-15,Maternal access desert expansion
+hypertension_rpm_compliance,Hypertension RPM transmission compliance,79,58,%,2026-01-30,2026-05-15,"Device transmission compliance, frontier ZIPs concentrated"
+ems_avg_response_time_min,EMS average response time,34,47,minutes,2026-01-30,2026-05-15,"Northern service area, weather + long-distance diversions"
+telehealth_demand_index,Telehealth visit request volume,100,164,index,2026-01-30,2026-05-15,64% rise in 30 days as visits shift virtual

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "SIG-RAIN-WHITEHORSE-001",
+    "type": "predictive_intelligence",
+    "title": "CHF / COPD Deterioration Cluster",
+    "description": "RPM data shows 17 CHF and COPD patients with worsening readings over the last 14 days: rising weight and falling SpO2 trends that historically precede hospitalization. Cross-referencing pharmacy claims, 9 of the 17 have not filled a maintenance medication in over 30 days. 5 of the 9 lost their regular provider when staff were reassigned to cover the Battle Mountain obstetric gap.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 17,
+    "sources": [
+      "RPM Platform",
+      "Pharmacy Claims",
+      "Clinical EHR"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "cluster": 17,
+      "chf_rising_weight": 11,
+      "copd_falling_spo2": 6,
+      "med_gap": 9,
+      "reassigned": 5
+    },
+    "affected_unit": "patients"
+  },
+  {
+    "id": "SIG-RAIN-WHITEHORSE-002",
+    "type": "anomaly_detection",
+    "title": "Diabetes Control Gap (Provider Continuity Loss)",
+    "description": "112 diabetes patients in the network have no documented A1c in the last 9 months. Cross-referencing the EHR with claims, 41 of them were paneled to the two providers reassigned after the obstetric closure. Their telehealth and in-person visit rates dropped 38 percent since March. SDOH data shows 18 of the 41 also have a transportation barrier flag.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 112,
+    "sources": [
+      "Clinical EHR",
+      "Claims",
+      "Provider Panel Data"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "overdue_a1c": 112,
+      "reassigned_panel": 41,
+      "visit_drop_pct": 38,
+      "transport_barrier": 18
+    },
+    "affected_unit": "patients"
+  },
+  {
+    "id": "SIG-RAIN-WHITEHORSE-003",
+    "type": "anomaly_detection",
+    "title": "Hypertension RPM Non-Adherence Trend",
+    "description": "Among 240 hypertension patients enrolled in remote blood-pressure monitoring, device transmission compliance fell from 79 percent to 58 percent over 60 days. The drop concentrates in frontier ZIP codes with intermittent broadband, the same connectivity dead zones limiting maternal telehealth.",
+    "impact": "medium",
+    "severity": "warning",
+    "affected_count": 240,
+    "sources": [
+      "RPM Platform",
+      "Broadband / Connectivity Registry"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "enrolled": 240,
+      "compliance_now_pct": 58,
+      "compliance_prior_pct": 79,
+      "window_days": 60
+    },
+    "affected_unit": "patients"
+  }
+]

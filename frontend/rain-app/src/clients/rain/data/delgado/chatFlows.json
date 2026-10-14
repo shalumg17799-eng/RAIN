@@ -1,0 +1,305 @@
+{
+  "greeting": {
+    "ai_message": "Good morning, Dr. Delgado-Reyes. I have flagged 3 maternal health signals that need your attention. The most urgent: since the Battle Mountain labor and delivery closure on March 1, 38 pregnant patients now travel over 100 miles to deliver, and 14 are third-trimester with 6 already missing prenatal visits. Prenatal completion in the service area has fallen from 84 percent to 61 percent. I also see 3 emergency-department deliveries or births before arrival in the last 60 days, up from zero. Want me to walk you through the at-risk cohort?",
+    "suggested_chips": [
+      "Walk me through the high-risk cohort",
+      "Show me the prenatal care gaps",
+      "Which patients have no transport scheduled?"
+    ],
+    "data_sources_used": ["Clinical EHR", "Maternal Health Registry", "RAIN Risk Engine", "NEMT / Transport Logs", "Telehealth Platform"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+
+  "turn_1_cohort": {
+    "user_query": "Walk me through the high-risk cohort",
+    "ai_message": "Of the 38 pregnant patients now beyond 100 miles from delivery, 14 are third-trimester. Cross-referencing the clinical EHR, maternal health registry, and claims, 9 carry high-risk diagnoses: 4 preeclampsia, 3 gestational diabetes, 2 prior preterm birth. The anomaly only becomes visible across systems: 6 of these 9 have missed a prenatal visit since March 1, and all 6 live in frontier ZIP codes where the closed Battle Mountain unit was their nearest obstetric provider. Three of the 6 also have an open chronic-condition flag (hypertension or diabetes) in the same EHR that Sarah Whitehorse is tracking on the chronic disease side, meaning their pregnancy and chronic disease risks compound. Their last documented blood-pressure readings trend upward across the RPM feed.",
+    "suggested_chips": [
+      "Which patients need telehealth prenatal visits?",
+      "Generate a priority outreach list",
+      "Show me the compounding chronic-disease cases",
+      "What transport options exist?"
+    ],
+    "data_sources_used": ["Clinical EHR", "Maternal Health Registry", "Claims", "RPM Feed", "Geospatial"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_2_telehealth": {
+    "user_query": "Which patients need telehealth prenatal visits?",
+    "ai_message": "I analyzed the 14 third-trimester patients against telehealth eligibility and broadband availability. 8 can be served by Project ECHO Nevada telehealth prenatal visits immediately: they have adequate connectivity and a care plan that supports virtual monitoring between in-person visits. 3 need a hybrid model — virtual check-ins plus one scheduled in-person visit at the nearest delivering hospital, with NEMT transport. The remaining 3 live in broadband-dead ZIP codes (no telehealth fallback) and are the highest priority for in-person coordination and possible temporary relocation closer to term. If you activate telehealth for the 8 and hybrid for the 3, projected prenatal completion for the cohort recovers from 61 percent to an estimated 88 percent within 30 days. I can also forecast ED-delivery risk reduction.",
+    "suggested_chips": [
+      "Generate a priority outreach list",
+      "Activate telehealth for the 8 patients",
+      "Schedule hybrid visits for the 3",
+      "Flag the 3 broadband-dead patients for in-person coordination",
+      "Forecast ED-delivery risk reduction"
+    ],
+    "data_sources_used": ["Telehealth Platform", "Clinical EHR", "Broadband / Connectivity Registry", "NEMT Logs", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_3_outreach": {
+    "user_query": "Generate a priority outreach list",
+    "ai_message": "Here is a priority maternal outreach package for your care coordinators. It includes: (1) The 14 third-trimester patients ranked by composite risk, each with prenatal history from the clinical EHR, risk diagnosis from the registry, last RPM readings, and distance to nearest delivery. (2) A recommended intervention per patient: telehealth (8), hybrid with NEMT transport (3), in-person coordination (3). (3) Pre-drafted NEMT transport requests for the 3 hybrid patients and 22 patients with no scheduled transport. (4) Project ECHO Nevada telehealth referral drafts for the 8 telehealth-eligible patients. (5) A note flagging the 3 patients whose pregnancy and chronic disease risks compound, shared with the chronic disease care team. Shall I route the telehealth referrals and transport requests, or would you prefer to review first?",
+    "suggested_chips": [
+      "Route the referrals and transport requests",
+      "Review the list first",
+      "Share the compounding-risk cases with the chronic disease team",
+      "Generate a maternal access brief for the board"
+    ],
+    "data_sources_used": ["Clinical EHR", "Maternal Health Registry", "RPM Feed", "NEMT Logs", "Telehealth Platform", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_prenatal_gap": {
+    "user_query": "Show me the prenatal care gaps",
+    "ai_message": "Prenatal visit completion in the service area dropped from 84 percent to 61 percent in the 90 days following the Battle Mountain closure. Cross-referencing transportation logs with appointment data, 22 patients have no NEMT trip scheduled for their upcoming prenatal appointments, and 11 live in ZIP codes with no telehealth-capable broadband, which removes the virtual-visit fallback. The decline is steepest in the frontier ZIPs that lost their nearest obstetric provider — the same ZIPs where the high-risk cohort concentrates. Closing the gap means pairing transport for the 22 with telehealth for those who have connectivity.",
+    "suggested_chips": [
+      "Walk me through the high-risk cohort",
+      "Which patients have no transport scheduled?",
+      "Which patients need telehealth prenatal visits?",
+      "Next signal"
+    ],
+    "data_sources_used": ["Clinical EHR", "Scheduling", "NEMT / Transport Logs", "Broadband / Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_ed_delivery": {
+    "user_query": "Show me the ED delivery risk trend",
+    "ai_message": "Two births before arrival and one emergency-department delivery occurred in the service area in the 60 days since the closure, compared to zero in the prior six months. The pattern correlates with increased travel distance and rising prenatal gaps — the documented downstream effects of rural obstetric unit closures. All 3 events involved patients living more than 100 miles from the nearest delivering hospital, and 2 of the 3 had a missed prenatal visit in the 30 days prior. Without intervention, the forecast trend continues upward as more of the cohort reaches term.",
+    "suggested_chips": [
+      "Walk me through the high-risk cohort",
+      "Show me the prenatal care gaps",
+      "Forecast ED-delivery risk reduction",
+      "Next signal"
+    ],
+    "data_sources_used": ["Clinical EHR", "EMS Dispatch", "Maternal Health Registry", "Geospatial"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "compounding_cases": {
+    "user_query": "Show me the compounding chronic-disease cases",
+    "ai_message": "3 of the 6 high-risk prenatal patients who missed visits also carry an open chronic-condition flag in the same EHR Sarah Whitehorse's chronic disease team tracks: 2 with hypertension and 1 with type 2 diabetes. For these patients, pregnancy and chronic disease risks compound — rising blood pressure on the RPM feed is both a preeclampsia marker and a hypertension-control marker. Because the two risk engines look at the same patient through different lenses, coordinating a single combined outreach avoids duplicate contacts and ensures the maternal and chronic-care plans do not conflict. I can package these 3 as a shared cross-team handoff.",
+    "suggested_chips": [
+      "Share the compounding-risk cases with the chronic disease team",
+      "Generate a priority outreach list",
+      "Which patients need telehealth prenatal visits?"
+    ],
+    "data_sources_used": ["Clinical EHR", "RPM Feed", "RAIN Risk Engine", "Maternal Health Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "transport_options": {
+    "user_query": "What transport options exist?",
+    "ai_message": "For the cohort that needs in-person care, three transport pathways exist. (1) Scheduled NEMT trips to the nearest delivering hospital 115 miles away — available but constrained, because James Tomley's transport queue is already over capacity by 9 trips on that corridor since the closure. (2) Hybrid scheduling that batches the 3 hybrid-model patients into shared trips to reduce vehicle load. (3) For the 22 patients with no scheduled transport, I can pre-draft NEMT requests now so they enter the queue before the morning collision window. Pairing transport with telehealth for the connected patients is the only way to clear the gap without overwhelming the corridor.",
+    "suggested_chips": [
+      "Which patients have no transport scheduled?",
+      "Generate a priority outreach list",
+      "Schedule hybrid visits for the 3"
+    ],
+    "data_sources_used": ["NEMT / Transport Logs", "EMS Dispatch", "Telehealth Platform", "Scheduling"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "activate_telehealth": {
+    "user_query": "Activate telehealth for the 8 patients",
+    "ai_message": "Done. I have drafted Project ECHO Nevada telehealth prenatal referrals for the 8 connectivity-eligible patients, each pre-populated with prenatal history from the clinical EHR, current risk diagnosis from the registry, and the recommended virtual-monitoring cadence between in-person visits. The referrals are staged in your care-coordination queue and not yet transmitted. Activating these 8 alone lifts projected prenatal completion for the cohort from 61 percent toward 80 percent; adding the 3 hybrid visits reaches the full 88 percent estimate. Shall I also schedule the hybrid visits for the 3?",
+    "suggested_chips": [
+      "Schedule hybrid visits for the 3",
+      "Generate a priority outreach list",
+      "Forecast ED-delivery risk reduction"
+    ],
+    "data_sources_used": ["Telehealth Platform", "Clinical EHR", "Maternal Health Registry", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "schedule_hybrid": {
+    "user_query": "Schedule hybrid visits for the 3",
+    "ai_message": "I have drafted hybrid care plans for the 3 patients who need a mix of virtual and in-person care: a telehealth check-in cadence plus one scheduled in-person visit at the nearest delivering hospital, each paired with a pre-drafted NEMT transport request so the trip is booked before the corridor fills. To minimize vehicle load on the over-capacity Battle Mountain corridor, I batched the 3 trips where dates align. The plans are staged for your review. Combined with the 8 telehealth activations, this is the intervention that recovers prenatal completion to the projected 88 percent.",
+    "suggested_chips": [
+      "Generate a priority outreach list",
+      "Flag the 3 broadband-dead patients for in-person coordination",
+      "What transport options exist?"
+    ],
+    "data_sources_used": ["Telehealth Platform", "NEMT Logs", "Clinical EHR", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "flag_broadband_dead": {
+    "user_query": "Flag the 3 broadband-dead patients for in-person coordination",
+    "ai_message": "Flagged. The 3 patients in broadband-dead ZIP codes have no telehealth fallback, so I have escalated them as the highest-priority cohort for in-person coordination. Each record now carries a recommendation for proactive scheduling of in-person prenatal visits with NEMT transport, and — for those approaching term — an option for temporary relocation closer to the delivering hospital, consistent with rural high-risk obstetric protocols. I have also added these 3 to Dr. Nair's telehealth equity tracking, since they sit in the same connectivity dead zones driving the population-level equity gap. Shall I generate the outreach package?",
+    "suggested_chips": [
+      "Generate a priority outreach list",
+      "What transport options exist?",
+      "Generate a maternal access brief for the board"
+    ],
+    "data_sources_used": ["Broadband / Connectivity Registry", "Clinical EHR", "NEMT Logs", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "forecast_ed_reduction": {
+    "user_query": "Forecast ED-delivery risk reduction",
+    "ai_message": "Modeling the telehealth-plus-hybrid intervention against the current trajectory: restoring prenatal completion from 61 percent to an estimated 88 percent within 30 days reduces modeled emergency-department delivery and birth-before-arrival risk for the cohort by an estimated 55 percent over the following 90 days. The largest single driver is closing the missed-visit gap for the 6 high-risk patients, because missed third-trimester visits are the strongest predictor of an unplanned ED delivery in this population. The 3 broadband-dead patients retain residual risk until in-person coordination is confirmed, which is why they remain the top priority.",
+    "suggested_chips": [
+      "Generate a priority outreach list",
+      "Flag the 3 broadband-dead patients for in-person coordination",
+      "Generate a maternal access brief for the board"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "Clinical EHR", "Maternal Health Registry", "EMS Dispatch"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "route_referrals": {
+    "user_query": "Route the referrals and transport requests",
+    "ai_message": "Routing now. The 8 Project ECHO Nevada telehealth referrals are transmitted to the telehealth scheduling team, and the NEMT transport requests for the 3 hybrid patients and the 22 with no scheduled transport are submitted to dispatch — sequenced to avoid the 8-to-11 a.m. collision window on the Battle Mountain corridor. Each action is logged with its evidence chain so the source record for every figure is traceable. The compounding-risk note is queued for the chronic disease team. I will track completion and alert you to any referral or transport that is not confirmed within 48 hours.",
+    "suggested_chips": [
+      "Share the compounding-risk cases with the chronic disease team",
+      "Generate a maternal access brief for the board",
+      "Next signal"
+    ],
+    "data_sources_used": ["Telehealth Platform", "NEMT Logs", "Clinical EHR", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "review_first": {
+    "user_query": "Review the list first",
+    "ai_message": "Understood. The outreach package is saved to your care-coordination workspace as a draft, with every figure linked to its source record — prenatal history from the EHR, risk diagnosis from the registry, last RPM readings, and distance to delivery — so you can verify each patient before anything is transmitted. Nothing has been routed. When you are ready, you can approve the whole package or any individual referral or transport request, and I will transmit and start tracking from there.",
+    "suggested_chips": [
+      "Route the referrals and transport requests",
+      "Share the compounding-risk cases with the chronic disease team",
+      "Next signal"
+    ],
+    "data_sources_used": ["Clinical EHR", "Maternal Health Registry", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "share_chronic_team": {
+    "user_query": "Share the compounding-risk cases with the chronic disease team",
+    "ai_message": "Shared. The 3 compounding-risk cases are routed to Sarah Whitehorse's chronic disease care team as a cross-team handoff note, each with the maternal risk context, the open chronic-condition flag, and the upward RPM blood-pressure trend that both teams are watching. The handoff includes a single recommended combined outreach so the patient receives one coordinated contact rather than separate maternal and chronic-care calls. Sarah's team is notified, and the case linkage is recorded so both risk engines reflect the shared status.",
+    "suggested_chips": [
+      "Generate a maternal access brief for the board",
+      "Route the referrals and transport requests",
+      "Next signal"
+    ],
+    "data_sources_used": ["Clinical EHR", "RPM Feed", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "board_brief": {
+    "user_query": "Generate a maternal access brief for the board",
+    "ai_message": "Here is a one-page maternal access brief for the Rural Health System Board. (1) Situation — the March 1 Battle Mountain labor and delivery closure put 38 pregnant patients more than 100 miles from delivery and dropped prenatal completion from 84 to 61 percent. (2) Risk — 14 third-trimester patients, 9 high-risk, 6 with missed visits, and 3 ED deliveries or births before arrival in 60 days, up from zero. (3) Cross-system evidence — registry risk scores, EHR visit history, RPM trends, transport gaps, and connectivity dead zones, each tied to its source. (4) Intervention — telehealth for 8, hybrid for 3, in-person coordination for 3, projected to recover completion to 88 percent and cut ED-delivery risk by an estimated 55 percent. (5) Ask — sustained telehealth funding and a mobile obstetric outreach option for the broadband-dead ZIPs. Shall I add the county-level access map as an appendix?",
+    "suggested_chips": [
+      "Route the referrals and transport requests",
+      "Which ZIP codes have the highest maternal access risk?",
+      "Next signal"
+    ],
+    "data_sources_used": ["Maternal Health Registry", "Clinical EHR", "RPM Feed", "NEMT Logs", "Geospatial", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_all_elevated": {
+    "user_query": "Show me all elevated-risk pregnancies in the service area",
+    "ai_message": "There are 38 elevated-risk pregnancies in the service area, out of 126 active pregnancies. The maternal health registry and RAIN risk engine rank them by composite risk: 14 are third-trimester, 9 carry high-risk diagnoses (4 preeclampsia, 3 gestational diabetes, 2 prior preterm birth), and all 38 now travel more than 100 miles to the nearest delivering hospital since the Battle Mountain closure. 6 of the highest-risk have missed a prenatal visit since March 1. The cohort concentrates in the frontier ZIP codes that lost their nearest obstetric provider.",
+    "suggested_chips": [
+      "Walk me through the high-risk cohort",
+      "Which patients need telehealth prenatal visits?",
+      "Which ZIP codes have the highest maternal access risk?"
+    ],
+    "data_sources_used": ["Maternal Health Registry", "RAIN Risk Engine", "Clinical EHR", "Geospatial"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_missed_prenatal": {
+    "user_query": "Which patients have missed prenatal visits since the Battle Mountain closure?",
+    "ai_message": "Since March 1, prenatal visit completion fell from 84 to 61 percent, and 6 of the 9 high-risk third-trimester patients have missed at least one visit — all 6 in frontier ZIP codes where the closed Battle Mountain unit was their nearest obstetric provider. Across the broader cohort, the missed-visit pattern tracks two barriers: no scheduled NEMT transport (22 patients) and no telehealth-capable broadband (11 patients). The 6 high-risk missed-visit patients are the priority for combined transport-and-telehealth outreach.",
+    "suggested_chips": [
+      "Walk me through the high-risk cohort",
+      "Which patients have no transport scheduled?",
+      "Show me the prenatal care gaps"
+    ],
+    "data_sources_used": ["Clinical EHR", "Scheduling", "NEMT / Transport Logs", "Broadband / Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_cross_chronic": {
+    "user_query": "Cross-reference pregnancy risk with chronic conditions",
+    "ai_message": "Cross-referencing the maternal cohort against the chronic disease registry, 3 of the 6 high-risk missed-visit patients carry an open chronic-condition flag — 2 hypertension, 1 type 2 diabetes — that compounds their pregnancy risk. Their RPM blood-pressure readings trend upward, a marker both the maternal and chronic disease engines watch. These 3 are the same patients flagged in Sarah Whitehorse's deterioration view, so a single coordinated outreach serves both care plans. No single system surfaces this overlap; it only appears when the maternal and chronic registries are read together.",
+    "suggested_chips": [
+      "Show me the compounding chronic-disease cases",
+      "Share the compounding-risk cases with the chronic disease team",
+      "Walk me through the high-risk cohort"
+    ],
+    "data_sources_used": ["Maternal Health Registry", "Clinical EHR", "RPM Feed", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_no_transport": {
+    "user_query": "Which patients have no transport scheduled to their next appointment?",
+    "ai_message": "22 patients have an upcoming prenatal appointment with no NEMT trip scheduled. Cross-referencing transportation logs with the appointment calendar, all 22 live more than 60 miles from the nearest delivering hospital, and 11 are also in broadband-dead ZIPs, so telehealth is not a fallback for them. These 22 are the most likely to miss their next visit. I can pre-draft NEMT transport requests for all 22 now so they enter James Tomley's dispatch queue before the morning collision window fills.",
+    "suggested_chips": [
+      "What transport options exist?",
+      "Generate a priority outreach list",
+      "Show me the prenatal care gaps"
+    ],
+    "data_sources_used": ["NEMT / Transport Logs", "Scheduling", "Geospatial", "Broadband / Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_telehealth_connectivity": {
+    "user_query": "Show me telehealth-eligible prenatal patients by connectivity",
+    "ai_message": "Of the 14 third-trimester patients, connectivity sorts them three ways: 8 have adequate home broadband and are immediately telehealth-eligible, 3 have marginal connectivity suited to a hybrid model (virtual check-ins plus one in-person visit), and 3 live in broadband-dead ZIP codes with no virtual fallback. Across all 126 active pregnancies, 47 telehealth-eligible prenatal visits are already booked. The dead-zone ZIPs match the same connectivity gaps limiting chronic disease RPM and Dr. Nair's population-level telehealth equity signal.",
+    "suggested_chips": [
+      "Which patients need telehealth prenatal visits?",
+      "Activate telehealth for the 8 patients",
+      "Flag the 3 broadband-dead patients for in-person coordination"
+    ],
+    "data_sources_used": ["Telehealth Platform", "Broadband / Connectivity Registry", "Clinical EHR"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_prenatal_trend": {
+    "user_query": "What is our prenatal completion rate trend?",
+    "ai_message": "Prenatal visit completion in the service area was steady at 84 percent through February, then dropped to 61 percent over the 90 days following the March 1 Battle Mountain closure — a 23-point decline concentrated entirely in the frontier ZIPs that lost their nearest obstetric provider. Unaffected ZIPs held near 83 percent over the same window, which isolates the closure as the driver. The modeled telehealth-plus-hybrid intervention recovers the cohort to an estimated 88 percent within 30 days.",
+    "suggested_chips": [
+      "Show me the prenatal care gaps",
+      "Forecast ED-delivery risk reduction",
+      "Generate a maternal access brief for the board"
+    ],
+    "data_sources_used": ["Clinical EHR", "Scheduling", "Maternal Health Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_zip_risk": {
+    "user_query": "Which ZIP codes have the highest maternal access risk?",
+    "ai_message": "Ranking service-area ZIP codes by a composite of distance-to-delivery, elevated-risk pregnancy count, missed-visit rate, and SDOH transportation-barrier prevalence, the 4 frontier ZIPs around the closed Battle Mountain unit carry the highest maternal access risk — they hold the majority of the 14 third-trimester high-risk patients and 3 of them are broadband-dead. These same 4 ZIPs rank highest on Dr. Nair's access-desert and transportation-barrier indices, which is why a targeted mobile obstetric outreach to these ZIPs would have the largest equity impact.",
+    "suggested_chips": [
+      "Show me all elevated-risk pregnancies in the service area",
+      "Generate a maternal access brief for the board",
+      "Flag the 3 broadband-dead patients for in-person coordination"
+    ],
+    "data_sources_used": ["Geospatial", "Maternal Health Registry", "SDOH Data", "Broadband / Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  }
+}

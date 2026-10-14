@@ -1,0 +1,292 @@
+{
+  "greeting": {
+    "ai_message": "Good morning, James. Your operations have 3 signals today. The most urgent: transport demand to the delivering hospital is up 210 percent since the Battle Mountain obstetric closure, and your queue is over capacity by 9 trips because prenatal transports now compete with dialysis and oncology runs on the same corridor. Telehealth requests are up 64 percent with 31 visits unslotted, 12 of them elevated-risk. EMS response time is also degraded to 47 minutes with a weather system moving in. Want me to walk you through the transport queue?",
+    "suggested_chips": [
+      "Walk me through the transport queue",
+      "Show me the telehealth capacity gap",
+      "Where are the EMS coverage holes?"
+    ],
+    "data_sources_used": ["EMS Dispatch", "NEMT Logs", "Telehealth Demand Queue", "RAIN Risk Engine", "Facility Capacity", "Weather Feed"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+
+  "turn_1_queue": {
+    "user_query": "Walk me through the transport queue",
+    "ai_message": "Today's queue has 47 transport requests against capacity for 38. The 9-trip overflow traces directly to the obstetric closure. Before March 1, the Battle Mountain corridor carried 4 to 6 transports a day. Now it carries 18, because 22 prenatal patients need scheduled trips to the delivering hospital 115 miles away, and those trips take a vehicle and driver out of rotation for most of a day. Cross-referencing the chronic disease transport queue from Sarah Whitehorse's team, 18 dialysis and oncology transports run the same corridor on overlapping schedules. The collision point is between 8 and 11 a.m., when 14 trips are requested but only 6 vehicles are available. I also see 3 patients double-booked across EMS and NEMT because the systems do not share a queue. Consolidating the overlapping trips and shifting 5 non-urgent transports to afternoon clears the morning bottleneck.",
+    "suggested_chips": [
+      "Can telehealth replace any of these trips?",
+      "Consolidate the overlapping trips",
+      "Shift non-urgent transports to afternoon",
+      "Which patients are double-booked?"
+    ],
+    "data_sources_used": ["NEMT Logs", "EMS Dispatch", "Clinical EHR", "Vehicle Roster", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_2_telehealth": {
+    "user_query": "Can telehealth replace any of these trips?",
+    "ai_message": "Yes. Of the 47 transport requests today, I cross-referenced each against the care plan and visit type. 13 are clinically appropriate for a telehealth visit instead of in-person transport: 8 chronic disease follow-ups and 5 prenatal check-ins that do not require hands-on assessment this week. Converting those 13 removes the 9-trip overflow and frees 2 vehicles for the afternoon dialysis runs. The constraint is telehealth room capacity, which is already at 98 percent. But 7 of the 13 patients have adequate home broadband and can take the visit from home, requiring no room at all. The remaining 6 need a mobile-clinic or telehealth-room slot. If you convert the 7 home-capable visits and schedule the 6 into freed afternoon slots, today's queue clears and EMS crews return to emergency coverage, which also helps the 47-minute response-time problem in the north. Projected: response time back under 38 minutes by afternoon.",
+    "suggested_chips": [
+      "Generate today's operations plan",
+      "Convert the 7 home-capable visits",
+      "Schedule the 6 into afternoon slots",
+      "Reassign freed crews to the northern coverage hole"
+    ],
+    "data_sources_used": ["Clinical EHR", "Telehealth Platform", "NEMT Logs", "Broadband Registry", "EMS Dispatch", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_3_plan": {
+    "user_query": "Generate today's operations plan",
+    "ai_message": "Here is today's operations plan, optimized for the device you carry in the field. It includes: (1) A consolidated transport schedule that merges the prenatal and chronic disease corridors, resolves the 3 double-bookings, and shifts 5 non-urgent trips to afternoon. (2) 13 trips converted to telehealth: 7 home visits sent directly to patients with a join link, 6 scheduled into freed afternoon rooms. (3) An EMS crew reassignment that restores a unit to the northern ZIP codes with no current coverage, addressing the weather-driven response gap. (4) A daily risk panel of the 16 elevated-risk patients awaiting transport, so field teams know who is highest priority. (5) An offline copy cached to the mobile app in case connectivity drops on the corridor. Shall I publish the plan to dispatch and the field teams?",
+    "suggested_chips": [
+      "Publish to dispatch and field teams",
+      "Cache offline for the field",
+      "Notify Sarah's team about the consolidated chronic-disease trips",
+      "Generate an operations summary for the administrator"
+    ],
+    "data_sources_used": ["EMS Dispatch", "NEMT Logs", "Telehealth Platform", "RAIN Risk Engine", "Facility Capacity", "Mobile App Cache"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_telehealth_capacity": {
+    "user_query": "Show me the telehealth capacity gap",
+    "ai_message": "Telehealth visit requests rose 64 percent in 30 days as providers shift maternal and chronic disease visits to virtual. The mobile clinic and two telehealth rooms are booked to capacity through next week. 31 requested visits have no slot, and 12 of those are elevated-risk patients flagged by the risk engine. The gap is a room-capacity problem, not a demand problem: 7 of the unslotted patients have home broadband and could take the visit from home, freeing rooms for the 12 elevated-risk patients who need a supervised setting. The same connectivity dead zones limiting Sarah's RPM and Maria's prenatal telehealth are what force the rest into scarce rooms.",
+    "suggested_chips": [
+      "Walk me through the transport queue",
+      "Can telehealth replace any of these trips?",
+      "Where are the EMS coverage holes?",
+      "Next signal"
+    ],
+    "data_sources_used": ["Telehealth Demand Queue", "Facility Capacity", "RAIN Risk Engine", "Broadband Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_ems": {
+    "user_query": "Where are the EMS coverage holes?",
+    "ai_message": "Average EMS response time in the northern service area rose to 47 minutes this week, up from a 34-minute baseline, correlating with a winter weather system and crews diverted to long-distance obstetric and dialysis transports. Two ZIP codes currently have no available unit within 60 minutes. The root cause is the same corridor collision: when crews are tied up on 115-mile obstetric and dialysis runs, they are not available for emergency response in the north. Converting the 13 telehealth-eligible trips frees 2 vehicles and returns crews to emergency coverage, which the model projects brings response time back under 38 minutes by afternoon.",
+    "suggested_chips": [
+      "Walk me through the transport queue",
+      "Reassign freed crews to the northern coverage hole",
+      "Show me the telehealth capacity gap",
+      "Next signal"
+    ],
+    "data_sources_used": ["EMS Dispatch", "Weather Feed", "Vehicle Roster", "Geospatial"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "consolidate_trips": {
+    "user_query": "Consolidate the overlapping trips",
+    "ai_message": "Consolidated-as-draft. I merged the prenatal and chronic disease trips that share the Battle Mountain corridor and overlapping departure windows into shared vehicle runs, which removes 6 redundant single-passenger trips and resolves the 3 EMS/NEMT double-bookings. The morning 8-to-11 collision drops from 14 requested trips to 8, within the 6-to-8 vehicle range once the afternoon shift is applied. Sarah's dialysis and oncology patients keep their required timing; only the routing is shared. Confirm and I will lock the consolidated schedule into dispatch.",
+    "suggested_chips": [
+      "Shift non-urgent transports to afternoon",
+      "Generate today's operations plan",
+      "Can telehealth replace any of these trips?"
+    ],
+    "data_sources_used": ["NEMT Logs", "EMS Dispatch", "Vehicle Roster"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "shift_afternoon": {
+    "user_query": "Shift non-urgent transports to afternoon",
+    "ai_message": "Done — 5 non-urgent transports moved to the afternoon window. I selected trips with no clinical time-sensitivity (routine follow-ups and non-dialysis appointments) so nothing time-critical is delayed. That clears the morning collision: the 8-to-11 window now fits within available vehicles, and the freed morning capacity covers the prenatal and dialysis runs that must go early. Combined with consolidation, the morning bottleneck is resolved without adding a single vehicle.",
+    "suggested_chips": [
+      "Consolidate the overlapping trips",
+      "Generate today's operations plan",
+      "Reassign freed crews to the northern coverage hole"
+    ],
+    "data_sources_used": ["NEMT Logs", "Clinical EHR", "Vehicle Roster"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "double_booked": {
+    "user_query": "Which patients are double-booked?",
+    "ai_message": "3 patients are double-booked across EMS and NEMT because the two systems do not share a queue: each was scheduled a trip in NEMT and separately flagged for an EMS inter-facility transport on the same day. Left unresolved, that ties up two vehicles for one patient and inflates the apparent queue. I have flagged all 3 for a single consolidated trip in the merged schedule, freeing the duplicate vehicle assignments. This double-booking is invisible to either system alone — it only surfaces when the EMS and NEMT queues are read together.",
+    "suggested_chips": [
+      "Consolidate the overlapping trips",
+      "Generate today's operations plan",
+      "Walk me through the transport queue"
+    ],
+    "data_sources_used": ["EMS Dispatch", "NEMT Logs", "Clinical EHR"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "convert_home": {
+    "user_query": "Convert the 7 home-capable visits",
+    "ai_message": "Converted-as-draft. The 7 patients with adequate home broadband are switched from in-person transport to a home telehealth visit, each sent a join link for their scheduled time. That removes 7 trips from today's queue and requires no telehealth room, which preserves all room capacity for the 6 patients who need a supervised slot. These 7 conversions alone clear the 9-trip overflow with margin. Confirm and I will notify the patients and update dispatch.",
+    "suggested_chips": [
+      "Schedule the 6 into afternoon slots",
+      "Generate today's operations plan",
+      "Reassign freed crews to the northern coverage hole"
+    ],
+    "data_sources_used": ["Telehealth Platform", "Broadband Registry", "Clinical EHR", "NEMT Logs"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "schedule_6": {
+    "user_query": "Schedule the 6 into afternoon slots",
+    "ai_message": "Scheduled. The 6 patients who need a supervised telehealth setting are booked into the afternoon room slots freed by the morning consolidation and the 7 home conversions. Each keeps a clinically appropriate same-day visit without an in-person transport, and the mobile clinic stays reserved for the visits that truly need it. With the 7 home visits and these 6 scheduled, all 13 convertible trips are off the road, the 2 freed vehicles cover the afternoon dialysis runs, and EMS crews return to emergency coverage.",
+    "suggested_chips": [
+      "Convert the 7 home-capable visits",
+      "Generate today's operations plan",
+      "Reassign freed crews to the northern coverage hole"
+    ],
+    "data_sources_used": ["Telehealth Platform", "Facility Capacity", "NEMT Logs"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "reassign_crews": {
+    "user_query": "Reassign freed crews to the northern coverage hole",
+    "ai_message": "Reassigned-as-draft. With 13 trips converted to telehealth and 2 vehicles freed, I reassigned one crew to the two northern ZIP codes that currently have no available unit within 60 minutes. That restores emergency coverage to the area most exposed by the weather system. The model projects average northern response time falls from 47 minutes back under 38 by afternoon. The reassignment is staged in the operations plan so dispatch and the field team see it together.",
+    "suggested_chips": [
+      "Generate today's operations plan",
+      "Publish to dispatch and field teams",
+      "Where are the EMS coverage holes?"
+    ],
+    "data_sources_used": ["EMS Dispatch", "Vehicle Roster", "Weather Feed", "Geospatial"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "publish_dispatch": {
+    "user_query": "Publish to dispatch and field teams",
+    "ai_message": "Published. The operations plan is live to dispatch and the field teams: the consolidated transport schedule, the 13 telehealth conversions with patient join links, the EMS crew reassignment to the north, and the daily risk panel of the 16 elevated-risk patients awaiting transport. An offline copy is cached to each field device so the plan stays available if connectivity drops on the corridor. I will monitor execution and alert you if any trip, conversion, or crew assignment slips, and I have queued a note to Sarah's team about the shared chronic-disease trips.",
+    "suggested_chips": [
+      "Cache offline for the field",
+      "Notify Sarah's team about the consolidated chronic-disease trips",
+      "Generate an operations summary for the administrator",
+      "Next signal"
+    ],
+    "data_sources_used": ["EMS Dispatch", "NEMT Logs", "Telehealth Platform", "Mobile App Cache"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "cache_offline": {
+    "user_query": "Cache offline for the field",
+    "ai_message": "Cached. The full operations plan — consolidated schedule, telehealth join links, EMS reassignment, and the elevated-risk daily panel — is stored to the mobile app on each field device, timestamped and available without a connection. When a crew enters one of the corridor dead zones, the plan, the patient priorities, and the contact details remain on-screen, and any status updates they enter queue locally and sync when the signal returns. This is the offline-tolerant workflow the field needs across 10,200 square miles of intermittent coverage.",
+    "suggested_chips": [
+      "Publish to dispatch and field teams",
+      "Generate an operations summary for the administrator",
+      "Next signal"
+    ],
+    "data_sources_used": ["Mobile App Cache", "EMS Dispatch", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "notify_sarah": {
+    "user_query": "Notify Sarah's team about the consolidated chronic-disease trips",
+    "ai_message": "Notified. Sarah Whitehorse's chronic disease team has the updated schedule for their 18 dialysis and oncology patients on the Battle Mountain corridor: which trips were consolidated into shared runs, which moved to afternoon, and the unchanged timing for the time-sensitive dialysis runs. The note flags that no clinical timing changed — only routing was shared to clear the morning collision — and links each affected patient so her coordinators can confirm. Closing the loop with her team keeps the chronic-care transports protected while the corridor recovers.",
+    "suggested_chips": [
+      "Publish to dispatch and field teams",
+      "Generate an operations summary for the administrator",
+      "Next signal"
+    ],
+    "data_sources_used": ["NEMT Logs", "Clinical EHR", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "ops_summary": {
+    "user_query": "Generate an operations summary for the administrator",
+    "ai_message": "Here is today's operations summary for the hospital administrator. (1) Demand — 47 transport requests against 38 capacity, a 9-trip overflow driven by the 210 percent post-closure surge on the Battle Mountain corridor. (2) Resolution — consolidated overlapping trips, shifted 5 non-urgent to afternoon, and converted 13 to telehealth (7 home, 6 room), clearing the queue with no added vehicles. (3) EMS — one crew reassigned to the northern coverage hole; projected response time back under 38 minutes from 47. (4) Telehealth — 31 unslotted requests reduced; room capacity preserved for the 12 elevated-risk patients. (5) Resilience — plan cached offline to field devices for the corridor dead zones. Net: today's operations are within capacity. Shall I send it to the administrator and the Rural Health System Board?",
+    "suggested_chips": [
+      "Publish to dispatch and field teams",
+      "Cache offline for the field",
+      "Next signal"
+    ],
+    "data_sources_used": ["EMS Dispatch", "NEMT Logs", "Telehealth Platform", "RAIN Risk Engine", "Facility Capacity"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_queue_capacity": {
+    "user_query": "Show me today's transport queue and capacity",
+    "ai_message": "Today's queue holds 47 transport requests against capacity for 38 — a 9-trip overflow. The pressure concentrates in the 8-to-11 a.m. window, when 14 trips are requested but only 6 vehicles are available, almost all on the 115-mile Battle Mountain corridor. 18 trips are obstetric/prenatal (up from 4 to 6 before the closure), 18 are dialysis and oncology on overlapping schedules, and 3 patients are double-booked across EMS and NEMT. Consolidation plus an afternoon shift plus 13 telehealth conversions clears the overflow without adding vehicles.",
+    "suggested_chips": [
+      "Walk me through the transport queue",
+      "Which transports can be converted to telehealth?",
+      "Which patients are double-booked?"
+    ],
+    "data_sources_used": ["NEMT Logs", "EMS Dispatch", "Vehicle Roster"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_ems_holes": {
+    "user_query": "Where are the EMS coverage holes right now?",
+    "ai_message": "Two northern ZIP codes currently have no available EMS unit within 60 minutes, and average northern response time is 47 minutes against a 34-minute baseline. The cause is crews tied up on long-distance obstetric and dialysis transports during a winter weather system. Freeing 2 vehicles by converting 13 trips to telehealth lets one crew return to the north; the model projects response time back under 38 minutes by afternoon. This is the clearest example of how the obstetric closure's transport surge degrades emergency coverage two counties away.",
+    "suggested_chips": [
+      "Where are the EMS coverage holes?",
+      "Reassign freed crews to the northern coverage hole",
+      "Can telehealth replace any of these trips?"
+    ],
+    "data_sources_used": ["EMS Dispatch", "Weather Feed", "Geospatial", "Vehicle Roster"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_convert_telehealth": {
+    "user_query": "Which transports can be converted to telehealth?",
+    "ai_message": "13 of today's 47 transport requests are clinically appropriate for telehealth: 8 chronic disease follow-ups and 5 prenatal check-ins that need no hands-on assessment this week. 7 of the 13 patients have home broadband and can take the visit from home with no room required; the other 6 need a mobile-clinic or telehealth-room slot. Converting all 13 removes the 9-trip overflow, frees 2 vehicles for afternoon dialysis runs, and returns EMS crews to emergency coverage. The only constraint is room capacity, which the home conversions sidestep.",
+    "suggested_chips": [
+      "Can telehealth replace any of these trips?",
+      "Convert the 7 home-capable visits",
+      "Show me the telehealth demand against room capacity"
+    ],
+    "data_sources_used": ["Clinical EHR", "Telehealth Platform", "Broadband Registry", "NEMT Logs"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_telehealth_rooms": {
+    "user_query": "Show me the telehealth demand against room capacity",
+    "ai_message": "Telehealth demand is up 64 percent over 30 days; the mobile clinic and two telehealth rooms are at 98 percent utilization and booked to capacity through next week. 31 requested visits have no slot, 12 of them elevated-risk. The mismatch is room supply, not demand: 7 of the unslotted patients have home broadband and can be served from home, which frees rooms for the 12 elevated-risk patients who need a supervised setting. Shifting connected patients to home visits is the fastest way to relieve the room bottleneck.",
+    "suggested_chips": [
+      "Show me the telehealth capacity gap",
+      "Which transports can be converted to telehealth?",
+      "Generate today's operations plan"
+    ],
+    "data_sources_used": ["Telehealth Demand Queue", "Facility Capacity", "Broadband Registry", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_awaiting_transport": {
+    "user_query": "Which elevated-risk patients are awaiting transport?",
+    "ai_message": "16 elevated-risk patients are awaiting transport today, flagged by the risk engine across maternal and chronic disease cohorts: third-trimester prenatal patients needing the delivering hospital, dialysis patients who cannot miss a session, and two CHF patients from Sarah's deterioration cluster. They populate the daily risk panel in the field app so crews know who is highest priority if the schedule tightens. All 16 are prioritized in the consolidated plan, and the 4 with a transport barrier are paired with NEMT requests so none fall through.",
+    "suggested_chips": [
+      "Generate today's operations plan",
+      "Walk me through the transport queue",
+      "Where are the EMS coverage holes?"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "NEMT Logs", "Clinical EHR"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_demand_change": {
+    "user_query": "How has transport demand changed since the Battle Mountain closure?",
+    "ai_message": "Before March 1, the Battle Mountain corridor carried 4 to 6 transports a day. Since the obstetric closure it carries 18 — a 210 percent increase — because 22 prenatal patients now need scheduled trips to the delivering hospital 115 miles away, each tying up a vehicle and driver for most of a day. That surge collides with the 18 dialysis and oncology transports already on the corridor, producing today's 9-trip overflow and the morning bottleneck. The single closure event is the direct driver of the transport strain, the EMS coverage holes, and the telehealth demand surge.",
+    "suggested_chips": [
+      "Show me today's transport queue and capacity",
+      "Can telehealth replace any of these trips?",
+      "Generate an operations summary for the administrator"
+    ],
+    "data_sources_used": ["NEMT Logs", "EMS Dispatch", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  }
+}

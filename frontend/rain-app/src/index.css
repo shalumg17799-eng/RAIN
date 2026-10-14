@@ -1,0 +1,80 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #003087;
+  --color-red-brand: #CC0000;
+  --color-surface: #F4F5F7;
+  --color-body: #333333;
+  --color-green: #00897B;
+  --color-amber: #F59E0B;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: #333333;
+  background: #F4F5F7;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ── Global scrollbar — ghost thin, appears on hover ─────────────── */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+*:hover {
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 99px;
+  transition: background 0.25s ease;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ── Sleek scrollbar utility — for explicit scroll containers ──────── */
+/* Shows a thin navy-tinted thumb only when the container is hovered    */
+.scrollbar-sleek {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.25s ease;
+}
+.scrollbar-sleek:hover {
+  scrollbar-color: rgba(0, 48, 135, 0.18) transparent;
+}
+.scrollbar-sleek::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+.scrollbar-sleek::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-sleek::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 99px;
+  transition: background 0.25s ease;
+}
+.scrollbar-sleek:hover::-webkit-scrollbar-thumb {
+  background: rgba(0, 48, 135, 0.18);
+}
+.scrollbar-sleek:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 48, 135, 0.35);
+}
+.scrollbar-sleek::-webkit-scrollbar-corner {
+  background: transparent;
+}

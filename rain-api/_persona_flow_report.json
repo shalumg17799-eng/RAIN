@@ -1,0 +1,865 @@
+[
+  {
+    "persona": "maria",
+    "question": "Walk me through the high-risk cohort",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "14 patients in the elevated-risk cohort are in their third trimester."
+  },
+  {
+    "persona": "maria",
+    "question": "Which patients need telehealth prenatal visits?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "574 patients live in a ZIP code with no reliable telehealth connectivity."
+  },
+  {
+    "persona": "maria",
+    "question": "Generate a priority outreach list",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "Priority outreach list: 14 third-trimester elevated-risk patients, ranked by risk factors met (of 5). Recommended intervention: 8 telehealth, 3 hybrid, 3 in-person. 25 transport drafts: the 3 hybrid patients plus 22 pregnancies with no scheduled transport. 3 of the 14 are also in a chronic program. PT-00002, PT-00001 -- 4 of 5; PT-00006, PT-00003 -- 3 of 5; PT-00004, PT-00007, PT-00005, PT-00008 -- 2 of 5; PT-00010, PT-00014, PT-00012, PT-00009 -- 1 of 5; PT-00011, PT-00013 -- 0 of 5."
+  },
+  {
+    "persona": "maria",
+    "question": "Show me the prenatal care gaps",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "Prenatal completion in the elevated-risk cohort is 84%. 6 of those patients have missed a prenatal visit since the closure, and 22 active pregnancy patients have no transport scheduled."
+  },
+  {
+    "persona": "maria",
+    "question": "Show me the ED delivery risk trend",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "Avoidable ED visits are trending up from 100 to 119 after March 1, 2026, coinciding with 76 provider deactivations that could be driving increased delivery risk."
+  },
+  {
+    "persona": "maria",
+    "question": "Show me the compounding chronic-disease cases",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "Among compounding chronic-disease cases, hypertension affects 2 chronic patients across 2 pregnancy episodes, while diabetes affects 1 chronic patient across 1 pregnancy episode."
+  },
+  {
+    "persona": "maria",
+    "question": "What transport options exist?",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "Today there are 73 total transport requests, with 64 scheduled, 9 in an over-capacity queue, 22 patients with no transport scheduled, and 186 patients facing social determinants of health transport barriers."
+  },
+  {
+    "persona": "maria",
+    "question": "Activate telehealth for the 8 patients",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "maria",
+    "question": "Schedule hybrid visits for the 3",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "maria",
+    "question": "Flag the 3 broadband-dead patients for in-person coordination",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "maria",
+    "question": "Forecast ED-delivery risk reduction",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "Before closure there were 100 avoidable ED visits, rising 19% to 119 after closure, but deactivating the provider reduces that to 76 visits (a 63.9% reduction), with 3 ED delivery BBA events flagged for risk."
+  },
+  {
+    "persona": "maria",
+    "question": "Route the referrals and transport requests",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "maria",
+    "question": "Review the list first",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "maria",
+    "question": "Share the compounding-risk cases with the chronic disease team",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "maria",
+    "question": "Generate a maternal access brief for the board",
+    "bucket": "database",
+    "kind": "KnownSummaryResult",
+    "source": "known_summary_lookup",
+    "message": "There are 126 active pregnancies in the service area. There are 38 elevated-risk pregnancies in the service area (distance to delivering hospital = 115 miles). 6 patients in the elevated-risk cohort have missed a prenatal visit since the closure. Prenatal completion in the elevated-risk cohort is 84%. 22 active pregnancy patients have no transport scheduled for an upcoming appointment."
+  },
+  {
+    "persona": "maria",
+    "question": "Show me all elevated-risk pregnancies in the service area",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "There are 38 elevated-risk pregnancies in the service area (distance to delivering hospital = 115 miles)."
+  },
+  {
+    "persona": "maria",
+    "question": "Which patients have missed prenatal visits since the Battle Mountain closure?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "6 patients in the elevated-risk cohort have missed a prenatal visit since the closure."
+  },
+  {
+    "persona": "maria",
+    "question": "Cross-reference pregnancy risk with chronic conditions",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "3 patients carry both an elevated-risk pregnancy and an active chronic condition (1 with diabetes, 2 with hypertension), and 3 of them are assigned to a provider who was deactivated in the closure."
+  },
+  {
+    "persona": "maria",
+    "question": "Which patients have no transport scheduled to their next appointment?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "22 active pregnancy patients have no transport scheduled for an upcoming appointment."
+  },
+  {
+    "persona": "maria",
+    "question": "Show me telehealth-eligible prenatal patients by connectivity",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "Of the 14 third-trimester elevated-risk patients, 15 telehealth sessions are booked: 9 eligible, 3 hybrid, 3 dead-zone (one patient has two sessions). By ZIP broadband records, though, 9 of the 14 patients live in a ZIP with no broadband, more than the session eligibility labels suggest."
+  },
+  {
+    "persona": "maria",
+    "question": "What is our prenatal completion rate trend?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "Prenatal completion in the elevated-risk cohort is 84%."
+  },
+  {
+    "persona": "maria",
+    "question": "Which ZIP codes have the highest maternal access risk?",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "Elevated-risk pregnancies are most concentrated in ZIP 89828 (7); ZIP 89810 (6); ZIPs 89816, 89818, 89825 (4 each, tied)."
+  },
+  {
+    "persona": "sarah",
+    "question": "Walk me through the deterioration cluster",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "The deterioration cluster breaks down into five components: 225 patients with hypertension RPM noncompliance, 219 with avoidable ED events (excluding deliveries), 94 with medication nonadherence gaps, 49 who lost provider continuity as chronic patients, and 17 with worsening CHF/COPD under RPM."
+  },
+  {
+    "persona": "sarah",
+    "question": "Generate an outreach list ranked by risk",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "Highest-priority outreach list (worsening RPM readings, medication gap over 30 days, deactivated provider, transportation barrier): PT-00127, PT-00128, PT-00129, PT-00130 -- 4 of 4; PT-00131 -- 3 of 4."
+  },
+  {
+    "persona": "sarah",
+    "question": "Activate Tier 1 outreach",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "sarah",
+    "question": "Show me the diabetes control gaps",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "There are 112 diabetes patients overdue for A1c testing, 42 who have lost provider continuity, 42 with elevated risk pregnancy and chronic condition, and none flagged for medication non-adherence."
+  },
+  {
+    "persona": "sarah",
+    "question": "What is happening with RPM adherence?",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "RPM adherence is perfect (100%) for CHF and COPD patients, but hypertension patients are lagging significantly with only a 61% transmission compliance rate across 240 patients."
+  },
+  {
+    "persona": "sarah",
+    "question": "Which patients have a transport barrier?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "22 active pregnancy patients have no transport scheduled for an upcoming appointment."
+  },
+  {
+    "persona": "sarah",
+    "question": "Show me the silent patient's history",
+    "bucket": "knowledge_graph",
+    "kind": "OntologyMappingResult",
+    "source": "live_neo4j_llm",
+    "message": "The silent patient's history is tracked through a Patient ID that appears across three key areas: the Patient record, Pregnancy Episode, and RPM Reading \u2014 all within the RAIN domain. This identifier links together the patient's core profile, any pregnancy-related episodes, and remote patient monitoring readings."
+  },
+  {
+    "persona": "sarah",
+    "question": "Reassign these patients to an available provider",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "sarah",
+    "question": "Re-panel the 5 reassigned patients",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "sarah",
+    "question": "Model the avoidable-hospitalization savings",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "Avoidable ED visits rose from 100 to 119 since the closure, a 19% increase, and 76 of those 119 (64%) were seen by a provider who was deactivated in the closure."
+  },
+  {
+    "persona": "sarah",
+    "question": "Schedule telehealth for Tier 3",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "sarah",
+    "question": "Route all Tier 1 actions",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "sarah",
+    "question": "Hold for my review",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "sarah",
+    "question": "Dispatch the CHW for the silent patient",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "sarah",
+    "question": "Generate a chronic disease status report for Dr. Delgado-Reyes",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "The query ran successfully but returned no matching rows."
+  },
+  {
+    "persona": "sarah",
+    "question": "Show me chronic disease patients with worsening RPM readings",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "17 CHF/COPD patients are showing worsening RPM readings."
+  },
+  {
+    "persona": "sarah",
+    "question": "Which patients have a medication gap over 30 days?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "94 patients have gone more than 30 days since their last medication fill."
+  },
+  {
+    "persona": "sarah",
+    "question": "Cross-reference deterioration with transportation barriers",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "4 of the patients with worsening RPM readings also have a documented transportation barrier on file."
+  },
+  {
+    "persona": "sarah",
+    "question": "Which patients lost their provider after the Battle Mountain closure?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "49 chronic-disease patients are currently assigned to a provider who was deactivated in the closure."
+  },
+  {
+    "persona": "sarah",
+    "question": "Show me diabetes patients overdue for an A1c",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "112 diabetes patients are overdue for an A1c."
+  },
+  {
+    "persona": "sarah",
+    "question": "What is our RPM transmission compliance trend?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "Hypertension RPM transmission compliance is 61%."
+  },
+  {
+    "persona": "sarah",
+    "question": "Model avoidable hospitalizations for the elevated-risk cohort",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "Avoidable ED visits rose from 100 to 119 since the closure, a 19% increase, and 76 of those 119 (64%) were seen by a provider who was deactivated in the closure."
+  },
+  {
+    "persona": "sarah",
+    "question": "Generate a risk-ranked outreach list",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "Highest-priority outreach list (worsening RPM readings, medication gap over 30 days, deactivated provider, transportation barrier): PT-00127, PT-00128, PT-00129, PT-00130 -- 4 of 4; PT-00131 -- 3 of 4."
+  },
+  {
+    "persona": "james",
+    "question": "Walk me through the transport queue",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "9 transport requests are currently unscheduled, over capacity."
+  },
+  {
+    "persona": "james",
+    "question": "Can telehealth replace any of these trips?",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "Potentially yes \u2014 all 20 trips on the list have broadband available and are marked telehealth-capable, though clinical suitability (especially for the 3 EMS cases) would need to be confirmed before substituting a virtual visit."
+  },
+  {
+    "persona": "james",
+    "question": "Generate today's operations plan",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "james",
+    "question": "Show me the telehealth capacity gap",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "There are 574 patients living in telehealth dead zones across 5 ZIP codes without broadband access, while 1,303 patients have no scheduled transport and 9 unscheduled transport requests are sitting in an over-capacity queue, revealing a significant gap in remote care reach."
+  },
+  {
+    "persona": "james",
+    "question": "Where are the EMS coverage holes?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "2 ZIP codes have no EMS unit available within 60 minutes."
+  },
+  {
+    "persona": "james",
+    "question": "Consolidate the overlapping trips",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "james",
+    "question": "Shift non-urgent transports to afternoon",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "9 non-urgent NEMT transports (TR-TODAY-038 through TR-TODAY-046) scheduled for May 15, 2026 have been shifted to afternoon time slots."
+  },
+  {
+    "persona": "james",
+    "question": "Which patients are double-booked?",
+    "bucket": "knowledge_graph",
+    "kind": "OntologyMappingResult",
+    "source": "live_neo4j_llm",
+    "message": "The knowledge graph does not contain any information about double-booking or scheduling conflicts. Patient ID appears across the Patient, PregnancyEpisode, and RPMReading records in the RAIN domain, but none of these connections capture appointment or booking data. To identify double-booked patients, a data source that includes scheduling information would be needed."
+  },
+  {
+    "persona": "james",
+    "question": "Convert the 7 home-capable visits",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "james",
+    "question": "Schedule the 6 into afternoon slots",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "james",
+    "question": "Reassign freed crews to the northern coverage hole",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "james",
+    "question": "Publish to dispatch and field teams",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "james",
+    "question": "Cache offline for the field",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "james",
+    "question": "Notify Sarah's team about the consolidated chronic-disease trips",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "james",
+    "question": "Generate an operations summary for the administrator",
+    "bucket": "database",
+    "kind": "KnownSummaryResult",
+    "source": "known_summary_lookup",
+    "message": "There are 73 transport requests today. 64 of today's transport requests are scheduled. 9 transport requests are currently unscheduled, over capacity."
+  },
+  {
+    "persona": "james",
+    "question": "Show me today's transport queue and capacity",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "9 transport requests are currently unscheduled, over capacity."
+  },
+  {
+    "persona": "james",
+    "question": "Where are the EMS coverage holes right now?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "2 ZIP codes have no EMS unit available within 60 minutes."
+  },
+  {
+    "persona": "james",
+    "question": "Which transports can be converted to telehealth?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "The data has no flag marking a transport as convertible to telehealth. As a proxy, 3 of today's 64 scheduled transports are for patients who also have an eligible telehealth session booked."
+  },
+  {
+    "persona": "james",
+    "question": "Show me the telehealth demand against room capacity",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "60 telehealth sessions are booked (52 prenatal, 8 chronic-care), 17 of them today. The data holds no room or bandwidth capacity figure, so demand can't be compared against capacity."
+  },
+  {
+    "persona": "james",
+    "question": "Which elevated-risk patients are awaiting transport?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "9 transport requests are unscheduled, for 9 different patients. Of them, 0 are elevated-risk pregnancy patients and 0 have worsening RPM readings; 9 are enrolled in chronic-condition care."
+  },
+  {
+    "persona": "james",
+    "question": "How has transport demand changed since the Battle Mountain closure?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "Transport records cover 2026-05-15 to 2026-05-25 (169 requests); 0 are dated before the 2026-03-01 closure, so there is no earlier baseline to compare demand against."
+  },
+  {
+    "persona": "james",
+    "question": "Cache today's plan offline for the field",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "priya",
+    "question": "Map the downstream impact of the closure",
+    "bucket": "knowledge_graph",
+    "kind": "OntologyMappingResult",
+    "source": "live_neo4j_llm",
+    "message": "Closing a provider cascades across several downstream systems and data entities. The provider's ID appears as the Rendering Provider ID in ClaimEncounter and as the Old Provider ID in ProviderReferenceIssue within the RAIN domain, meaning claims history and provider reference records will be directly affected. Additionally, the Assigned Provider ID is referenced in both ChronicConditionEnrollment and PregnancyEpisode, and the Care Coordinator ID is tied to ChronicConditionEnrollment, so members in chronic condition programs and active pregnancy episodes will also require reassignment."
+  },
+  {
+    "persona": "priya",
+    "question": "Where should we target resources first?",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "priya",
+    "question": "Generate an equity brief for NVHA",
+    "bucket": "database",
+    "kind": "KnownSummaryResult",
+    "source": "known_summary_lookup",
+    "message": "30% of active pregnancies are in a maternal care desert (more than 100 miles from delivery care). There are 219 avoidable ED events total. 574 patients live in a ZIP code with no reliable telehealth connectivity."
+  },
+  {
+    "persona": "priya",
+    "question": "Show me the avoidable ED concentration",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "Since the 2026-03-01 closure, avoidable ED visits are concentrated in ZIP 89828 (26), ZIP 89823 (16), ZIP 89821 (15)."
+  },
+  {
+    "persona": "priya",
+    "question": "Where are the telehealth equity gaps?",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "Telehealth equity gaps are concentrated in 5 dead-zone zip codes affecting 574 patients without adequate broadband, compounded by transport barriers flagging 186 patients and 9 unscheduled rides among the 1,303 patients who need transport."
+  },
+  {
+    "persona": "priya",
+    "question": "Model the equity impact of mobile obstetric outreach",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "Mobile obstetric outreach would directly address the 48 active pregnancies (15 of them elevated-risk) that live in a ZIP code with no broadband; 574 patients in total live in those ZIPs."
+  },
+  {
+    "persona": "priya",
+    "question": "Show me the cost of inaction",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "priya",
+    "question": "Compare affected vs. unaffected ZIPs",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "574 patients live in ZIP codes with no broadband, versus 889 in ZIP codes with broadband. This compares patient counts by connectivity -- the data holds no outcome measures for these two groups."
+  },
+  {
+    "persona": "priya",
+    "question": "Build the case for Options A and B",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "priya",
+    "question": "Show me the RHTP funding alignment",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "priya",
+    "question": "Model 12-month outcomes",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "priya",
+    "question": "Produce the data appendix",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "priya",
+    "question": "Align the brief to the RHTP reporting template",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "priya",
+    "question": "Add the chronic-disease cost detail",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "priya",
+    "question": "Share with Dr. Delgado-Reyes and James",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "priya",
+    "question": "Show me access disparities by county",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "By the numbers -- Humboldt: 480, Lander: 494, Pershing: 489."
+  },
+  {
+    "persona": "priya",
+    "question": "Where did avoidable ED utilization concentrate after the closure?",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "Since the 2026-03-01 closure, avoidable ED visits are concentrated in ZIP 89828 (26), ZIP 89823 (16), ZIP 89821 (15)."
+  },
+  {
+    "persona": "priya",
+    "question": "Map the maternal care desert before and after Battle Mountain",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "30% of active pregnancies are in a maternal care desert (more than 100 miles from delivery care)."
+  },
+  {
+    "persona": "priya",
+    "question": "Which elevated-risk patients are in telehealth dead zones?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "574 patients live in a ZIP code with no reliable telehealth connectivity."
+  },
+  {
+    "persona": "priya",
+    "question": "Compare outcomes in affected vs. unaffected ZIP codes",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "574 patients live in ZIP codes with no broadband, versus 889 in ZIP codes with broadband. This compares patient counts by connectivity -- the data holds no outcome measures for these two groups."
+  },
+  {
+    "persona": "priya",
+    "question": "Align our outcomes to the RHTP reporting priorities",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "priya",
+    "question": "Generate a population health and equity brief for NVHA",
+    "bucket": "database",
+    "kind": "KnownSummaryResult",
+    "source": "known_summary_lookup",
+    "message": "30% of active pregnancies are in a maternal care desert (more than 100 miles from delivery care). There are 219 avoidable ED events total. 574 patients live in a ZIP code with no reliable telehealth connectivity."
+  },
+  {
+    "persona": "david",
+    "question": "Walk me through the reconciliation failure",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "There are two reconciliation failure categories: 180 mismatched records spanning 2 providers across 1 source table, and 1,240 unresolved records involving 2 providers across 3 source tables."
+  },
+  {
+    "persona": "david",
+    "question": "Which risk scores are affected downstream?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "The provider-reconciliation issue directly touches 49 chronic-disease patients assigned to the two deactivated providers; 0 pregnancy episodes are still assigned to one, and 1,240 unresolved references plus 180 crosswalk mismatches remain. The data holds no stored link from these issues to specific risk scores, so the affected scores can't be listed from data alone."
+  },
+  {
+    "persona": "david",
+    "question": "Generate a remediation plan",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "david",
+    "question": "Show me the RPM ingestion gap",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "Across all RPM readings from May 6\u201315, 2026, the only ingestion gap detected was on May 11 for hypertension (BP), where 81 out of 240 readings were missing, resulting in a 33.75% ingestion gap, while CHF (weight) and COPD (SpO2) maintained a perfect 100% transmission rate throughout."
+  },
+  {
+    "persona": "david",
+    "question": "What is the FHIR conformance issue?",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "Two data sources are flagging FHIR conformance concerns as of May 15, 2026: the New Rural Clinic EHR Connector at 88% and the RPM Platform at 91%, both of which are also experiencing delayed ingestion pipelines."
+  },
+  {
+    "persona": "david",
+    "question": "Apply the claims-only active flag",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "david",
+    "question": "Update the panel crosswalk",
+    "bucket": "knowledge_graph",
+    "kind": "OntologyMappingResult",
+    "source": "live_neo4j_llm",
+    "message": "To update the panel crosswalk, you'll need to work within the ProviderReferenceIssue entity in the RAIN domain, which holds the key fields involved in this process. Specifically, the Old Provider ID, Status, and Source Table all live there and should be reviewed and updated as part of any crosswalk refresh."
+  },
+  {
+    "persona": "david",
+    "question": "Apply the fix and re-run the engines",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "david",
+    "question": "Notify the clinical teams about restored cohorts",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "david",
+    "question": "Prioritize the RPM gap next",
+    "bucket": "database",
+    "kind": "SQLQueryResult",
+    "source": "live_sql_execution",
+    "message": "Both PT-00127 and PT-00128 have consistent daily weight readings received through May 15, 2026, so there are no RPM transmission gaps to prioritize for either CHF patient."
+  },
+  {
+    "persona": "david",
+    "question": "Execute the reconciliation now",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "david",
+    "question": "Schedule the RPM and FHIR fixes",
+    "bucket": "scripted",
+    "kind": "",
+    "message": ""
+  },
+  {
+    "persona": "david",
+    "question": "Notify the clinical owners",
+    "bucket": "not_found",
+    "kind": "NotFound",
+    "source": "live_not_found",
+    "message": "I didn't find that in the knowledge graph or the database."
+  },
+  {
+    "persona": "david",
+    "question": "Generate a data-quality summary for the technical lead",
+    "bucket": "database",
+    "kind": "KnownSummaryResult",
+    "source": "known_summary_lookup",
+    "message": "There are 1240 unresolved provider reference records. There are 180 provider crosswalk mismatches. There are 4 open data-quality events."
+  },
+  {
+    "persona": "david",
+    "question": "Show me data quality across all connected sources",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "Across the connected sources: 1,240 unresolved provider references, 180 crosswalk mismatches, and 4 open data-quality events."
+  },
+  {
+    "persona": "david",
+    "question": "Which records have unresolved provider references?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "There are 1240 unresolved provider reference records."
+  },
+  {
+    "persona": "david",
+    "question": "Show me RPM transmission completeness by ZIP code",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "The weakest RPM transmission completeness is in ZIP 89825 (42%); ZIP 89823 (45%); ZIPs 89820, 89821 (49% each, tied)."
+  },
+  {
+    "persona": "david",
+    "question": "What is our FHIR conformance rate by feed?",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "FHIR conformance is weakest for New Rural Clinic EHR Connector (88%); RPM Platform (91%); NEMT / Transportation Logs (95%)."
+  },
+  {
+    "persona": "david",
+    "question": "Which downstream risk scores are affected by data-quality issues?",
+    "bucket": "database",
+    "kind": "KnownMetricResult",
+    "source": "known_metric_lookup",
+    "message": "The provider-reconciliation issue directly touches 49 chronic-disease patients assigned to the two deactivated providers; 0 pregnancy episodes are still assigned to one, and 1,240 unresolved references plus 180 crosswalk mismatches remain. The data holds no stored link from these issues to specific risk scores, so the affected scores can't be listed from data alone."
+  },
+  {
+    "persona": "david",
+    "question": "Show me pipeline freshness and ingestion lag",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "2 feeds are running delayed: RPM Platform (14 hours), New Rural Clinic EHR Connector (12 hours). The other 10 are on time, at most 6 hours behind."
+  },
+  {
+    "persona": "david",
+    "question": "What degraded after the Battle Mountain closure?",
+    "bucket": "database",
+    "kind": "KnownBreakdownResult",
+    "source": "known_breakdown_lookup",
+    "message": "Providers PRV-001 and PRV-002 were deactivated on 2026-03-01. Since then the data shows: 1240 unresolved provider references (FHIR Practitioner Service, 2026-03-06); missing RPM transmissions (RPM Feed Monitor, 2026-05-01); FHIR conformance errors (New Rural Clinic EHR Connector, 2026-05-08); a patient with no contact in 24 days (Clinical EHR/RPM/Pharmacy, 2026-05-15). Provider-crosswalk mismatches carry no date in the data, so their timing can't be confirmed."
+  }
+]

@@ -1,0 +1,75 @@
+{
+  "_comment": "Genericity test run #2. This follows ONLY the SKILL.md process against USSFCU's 7 source systems (Jack Henry/Symitar, MeridianLink, HUNA, SharePoint, Medallia, Member Communications, Regulatory Rules Engine) -- a compliance/financial domain, not healthcare. Compared against the existing upper-ontology concept list produced by the RAIN run, per Step 3 (duplicate detection).",
+
+  "existing_concepts_checked_against": ["C-CONSTITUENT", "C-PROVIDER", "C-CARE-EPISODE", "C-RISK-SIGNAL", "C-ACCESS-BARRIER"],
+
+  "reused_from_existing": [
+    {
+      "concept_id": "C-CONSTITUENT",
+      "matched_to": "Jack Henry / Symitar (Core).member_id, Medallia.member_id",
+      "confidence_category": "auto-eligible",
+      "note": "RESOLVED FINDING: this run originally proposed a new 'Constituent' concept here, flagged for human review because it structurally duplicated C-PATIENT without being the same real-world thing. That review concluded C-PATIENT was itself too domain-flavored -- it has since been renamed to C-CONSTITUENT (see rain-worked-example.json), with 'Patient' and 'Member' both now synonyms of the same neutral concept. Re-running this mapping after the rename produces a direct match instead of a flagged proposal."
+    },
+    {
+      "concept_id": "C-CARE-EPISODE",
+      "matched_to": "Mortgage application-to-closing lifecycle (HUNA), loan origination lifecycle (MeridianLink)",
+      "confidence_category": "needs-review",
+      "note": "Structural definition ('a bounded period for a specific event') genuinely fits a loan/mortgage lifecycle. Held to needs-review because the concept's NAME still carries a healthcare flavor -- flagged for human review rather than silently reused as-is. (Same class of naming issue as C-PATIENT -- worth reviewing 'Care Episode' next.)"
+    },
+    {
+      "concept_id": "C-RISK-SIGNAL",
+      "matched_to": "Fair-lending disparity index, TRID on-time disclosure rate, complaint trend (QoQ)",
+      "confidence_category": "auto-eligible",
+      "note": "Clean fit -- the definition itself was never healthcare-specific, so this one genuinely generalizes."
+    }
+  ],
+
+  "correctly_not_mapped": [
+    {"concept_id": "C-PROVIDER", "reason": "No analog found in USSFCU's schema. Not force-mapped."},
+    {"concept_id": "C-ACCESS-BARRIER", "reason": "No analog found. Not force-mapped."}
+  ],
+
+  "new_concepts_proposed": [
+    {
+      "concept_id": "C-REGULATORY-TEST",
+      "name": "Regulatory Test",
+      "definition": "A codified compliance check applied against a population or record (e.g. TRID, ECOA, ESIGN, GLBA).",
+      "source_system_examples": [
+        {"source_system": "Regulatory Rules Engine", "source_field": "rule_id / test_definition"}
+      ],
+      "confidence_category": "auto-eligible",
+      "flagged_for_human_review": false,
+      "review_reason": "Genuinely new -- no equivalent existed in the ontology before this run. Clean, unambiguous addition."
+    },
+    {
+      "concept_id": "C-COMPLAINT",
+      "name": "Complaint",
+      "definition": "A recorded or inferred expression of dissatisfaction from the person being served.",
+      "source_system_examples": [
+        {"source_system": "SharePoint", "source_field": "complaint_id"},
+        {"source_system": "Medallia", "source_field": "sentiment_score"},
+        {"source_system": "Member Communications", "source_field": "trigger_words"}
+      ],
+      "confidence_category": "needs-review",
+      "flagged_for_human_review": true,
+      "review_reason": "Overlaps partially with C-RISK-SIGNAL (a complaint IS a kind of risk signal). Is this a subtype of Risk Signal or a sibling concept? Left for a human to decide rather than guessed."
+    }
+  ],
+
+  "coverage_gap_detected": {
+    "description": "The signature USSFCU use case ('how many members carry a specific set of characteristics') requires joining age + geography (Core) with loan pricing (MeridianLink) with a protected-basis determination -- but no single source field represents 'protected basis assessment.' It only exists as a computed join across three sources.",
+    "impact": "Same shape of gap as the RAIN compounding-risk finding: a cross-source relationship the raw schema never states explicitly, that the calling application would otherwise have to infer on its own.",
+    "recommendation": "Add an explicit 'Regulatory Test Result' relationship connecting Constituent + Regulatory Test + the source records it was evaluated against, rather than leaving the join implicit.",
+    "status": "human-review-pending"
+  },
+
+  "run_metadata": {
+    "domain": "credit union risk & compliance (vs. RAIN's rural healthcare)",
+    "source_systems_processed": 7,
+    "concepts_reused_without_edits_to_skill_instructions": 3,
+    "concepts_correctly_declined": 2,
+    "new_concepts_proposed": 2,
+    "items_sent_to_hitl_queue": 2,
+    "note": "Re-run after the C-PATIENT -> C-CONSTITUENT rename. Original run (see git history / prior version) sent 3 items to HITL and proposed 3 new concepts; the Constituent finding is now resolved."
+  }
+}

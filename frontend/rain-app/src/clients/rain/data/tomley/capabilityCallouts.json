@@ -1,0 +1,26 @@
+[
+  {
+    "trigger": "home_load",
+    "capabilityName": "Proactive Intelligence",
+    "description": "RAIN assembles a daily operational picture across EMS dispatch, NEMT logs, the telehealth demand queue, facility capacity, the risk engine, and the weather feed — surfacing transport backlogs, telehealth demand surges, and EMS coverage gaps before you ask, on the device you carry in the field.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_1",
+    "capabilityName": "Friction Observability",
+    "description": "Identifies friction in rural care delivery that no single operational system shows: the 8-to-11 a.m. corridor collision between prenatal and dialysis transports, EMS/NEMT double-bookings from unshared queues, and the vehicle bottleneck driving both delays.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_2",
+    "capabilityName": "Predictive Intelligence",
+    "description": "Forecasts how converting eligible trips to telehealth frees vehicles and crews, projecting the downstream effect on the queue overflow and on EMS response time across the frontier service area.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_3",
+    "capabilityName": "Automated Action",
+    "description": "Generates a consolidated transport schedule, telehealth conversions, EMS crew reassignment, and a daily risk panel — published to dispatch and cached offline to field devices for the corridor's connectivity dead zones.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  }
+]

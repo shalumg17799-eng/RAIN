@@ -1,0 +1,358 @@
+{
+  "delgado-reyes": [
+    {
+      "q_num": 1,
+      "prompt": "Show me all elevated-risk pregnancies in the service area",
+      "answer": "There are 38 elevated-risk pregnancies in the service area right now, averaging 115 miles from their delivering hospital since Battle Mountain's closure. Of these, 14 are in their third trimester, 13 are in their second, and 11 are early in the first \u2014 the third-trimester group is where I'd focus first, since they're closest to needing that 115-mile trip.",
+      "sources": [
+        "Maternal Health Registry",
+        "Clinical EHR"
+      ]
+    },
+    {
+      "q_num": 2,
+      "prompt": "Which patients have missed prenatal visits since the closure",
+      "answer": "6 patients have missed a prenatal visit since the closure, and all 6 also carry a high-risk diagnosis \u2014 meaning every patient who fell out of contact was already someone we couldn't afford to lose track of.",
+      "sources": [
+        "Maternal Health Registry"
+      ]
+    },
+    {
+      "q_num": 3,
+      "prompt": "Cross-reference pregnancy risk with chronic conditions",
+      "answer": "3 patients are carrying both an elevated-risk pregnancy and an active chronic condition \u2014 hypertension or diabetes. These are your highest-acuity cases: pregnancy risk compounded by a condition that also needs ongoing management, and all 3 are currently assigned to a provider who's no longer active.",
+      "sources": [
+        "Maternal Health Registry",
+        "Chronic Care Enrollment"
+      ]
+    },
+    {
+      "q_num": 4,
+      "prompt": "Which patients have no transport scheduled",
+      "answer": "22 of your 126 active pregnancy patients have no transport scheduled for an upcoming appointment. That's about 1 in 6 \u2014 worth a targeted outreach push before any of them miss a visit for a reason we could have prevented.",
+      "sources": [
+        "NEMT Logs",
+        "Maternal Health Registry"
+      ]
+    },
+    {
+      "q_num": 5,
+      "prompt": "Show me telehealth-eligible prenatal patients by connectivity",
+      "answer": "Of your 14 third-trimester patients, 9 are fully telehealth-eligible, 3 have hybrid connectivity and may need an in-person fallback, and 3 are in a dead zone with no telehealth option at all \u2014 those 3 are the ones who still need a physical visit path.",
+      "sources": [
+        "Connectivity Registry",
+        "Telehealth Platform"
+      ]
+    },
+    {
+      "q_num": 6,
+      "prompt": "What is our prenatal completion rate trend",
+      "answer": "Prenatal visit completion has fallen from 84% to 61% since the closure \u2014 a real and significant drop. The current snapshot shows 120 of 126 patients technically on-schedule, but that 61% trend figure is the number that reflects the sustained impact, not just today's count.",
+      "sources": [
+        "Maternal Health Registry (trend)"
+      ]
+    },
+    {
+      "q_num": 7,
+      "prompt": "Which ZIP codes have the highest maternal access risk",
+      "answer": "ZIP 89828 carries the highest concentration of elevated-risk pregnancies at 7 patients, followed by 89810 with 6 and 89825 with 4. These three ZIPs alone account for nearly half your elevated-risk caseload.",
+      "sources": [
+        "Maternal Health Registry",
+        "Patient Address"
+      ]
+    },
+    {
+      "q_num": 8,
+      "prompt": "Generate a maternal access brief for the board",
+      "answer": "Here's the maternal access picture: 126 active pregnancies, 38 elevated-risk, 6 who've missed a visit since the closure, prenatal completion down to 61% from 84%, and 22 patients without transport scheduled. The throughline is clear \u2014 Battle Mountain's closure didn't just add distance, it's actively eroding visit compliance.",
+      "sources": [
+        "Maternal Health Registry",
+        "NEMT Logs",
+        "Clinical EHR"
+      ]
+    }
+  ],
+  "whitehorse": [
+    {
+      "q_num": 1,
+      "prompt": "Show me chronic disease patients with worsening RPM readings",
+      "answer": "17 patients are showing worsening RPM trends \u2014 11 with rising weight consistent with CHF fluid retention, and 6 with falling SpO2 consistent with COPD decline. Both patterns have been building steadily, not just a one-day blip.",
+      "sources": [
+        "RPM Platform"
+      ]
+    },
+    {
+      "q_num": 2,
+      "prompt": "Which patients have a medication gap over 30 days",
+      "answer": "Of those 17 worsening patients, 10 also have a medication gap of more than 30 days \u2014 meaning for over half of your deteriorating cohort, the RPM trend and a lapsed prescription are happening at the same time.",
+      "sources": [
+        "Pharmacy/Medication Fill Data",
+        "RPM Platform"
+      ]
+    },
+    {
+      "q_num": 3,
+      "prompt": "Cross-reference deterioration with transportation barriers",
+      "answer": "4 of those 10 medication-gap patients also have a documented transportation barrier on file. For those 4, the gap likely isn't non-adherence \u2014 it's that they can't physically get to a pharmacy or clinic.",
+      "sources": [
+        "SDOH Data",
+        "Pharmacy/Medication Fill Data"
+      ]
+    },
+    {
+      "q_num": 4,
+      "prompt": "Which patients lost their provider after the closure",
+      "answer": "49 chronic-disease patients are currently assigned to a provider who was deactivated in the closure \u2014 5 from the CHF/COPD group, 41 from the diabetes panel, and 3 who are also carrying an elevated-risk pregnancy. Every one of them needs to be reassigned to an active provider.",
+      "sources": [
+        "Provider Directory",
+        "Chronic Care Enrollment"
+      ]
+    },
+    {
+      "q_num": 5,
+      "prompt": "Show me diabetes patients overdue for an A1c",
+      "answer": "112 diabetes patients are overdue for an A1c, all past the 9-month mark. That's a large enough group that I'd recommend a batch outreach campaign rather than one-by-one follow-up.",
+      "sources": [
+        "Claims & Encounters"
+      ]
+    },
+    {
+      "q_num": 6,
+      "prompt": "What is our RPM transmission compliance trend",
+      "answer": "Hypertension RPM compliance has dropped from 79% to 58% since the closure, concentrated heavily in the frontier ZIP codes. Today's raw reading data shows 61% overall \u2014 consistent with that declining trend, not a recovery.",
+      "sources": [
+        "RPM Platform (trend)"
+      ]
+    },
+    {
+      "q_num": 7,
+      "prompt": "Generate a risk-ranked outreach list",
+      "answer": "Your highest-priority outreach list has 5 patients scoring in the top risk tier \u2014 PT-00128, PT-00130, PT-00129, and PT-00127 each hit all three risk factors (worsening RPM, medication gap, and lost provider), with PT-00131 close behind on two of three. Start there.",
+      "sources": [
+        "RPM Platform",
+        "Pharmacy Data",
+        "Provider Directory (composite)"
+      ]
+    },
+    {
+      "q_num": 8,
+      "prompt": "Model avoidable hospitalizations for the elevated-risk cohort",
+      "answer": "Avoidable ED visits have risen from 100 to 119 since the closure \u2014 a 19% increase \u2014 and 76 of those 119, or 64%, are tied to a patient whose provider was deactivated. Continuity loss isn't a side effect here; it's the dominant driver of the increase.",
+      "sources": [
+        "Claims & Encounters (trend)"
+      ]
+    }
+  ],
+  "tomley": [
+    {
+      "q_num": 1,
+      "prompt": "Show me today's transport queue and capacity",
+      "answer": "Today's queue has 73 transport requests, with 64 currently scheduled against capacity \u2014 meaning 9 are still sitting unscheduled and need a decision before end of day.",
+      "sources": [
+        "NEMT Logs",
+        "EMS/Transport Dispatch"
+      ]
+    },
+    {
+      "q_num": 2,
+      "prompt": "Where are the EMS coverage holes right now",
+      "answer": "Two ZIP codes have no EMS unit available within 60 minutes right now \u2014 89820 at a 74-minute response time and 89821 at 71 minutes. Both are frontier ZIPs, and both are outside a safe emergency-response window.",
+      "sources": [
+        "EMS/Transport Dispatch"
+      ]
+    },
+    {
+      "q_num": 3,
+      "prompt": "Which transports can be converted to telehealth",
+      "answer": "13 of today's scheduled visits are eligible to convert to telehealth instead of a physical transport \u2014 that's 13 fewer trips competing for a stretched fleet.",
+      "sources": [
+        "Telehealth Platform",
+        "EMS/Transport Dispatch"
+      ]
+    },
+    {
+      "q_num": 4,
+      "prompt": "Show me the telehealth demand against room capacity",
+      "answer": "Between the 13 newly converted visits and 52 prenatal telehealth sessions already on the books, that's 65 virtual visits today \u2014 worth checking against your telehealth room/bandwidth capacity before they all try to run at once.",
+      "sources": [
+        "Telehealth Platform"
+      ]
+    },
+    {
+      "q_num": 5,
+      "prompt": "Which elevated-risk patients are awaiting transport",
+      "answer": "9 transport requests system-wide are still unscheduled. I'd cross-check this list against Dr. Delgado-Reyes's and Nurse Whitehorse's elevated-risk cohorts before end of day to make sure none of the highest-acuity patients are in this group.",
+      "sources": [
+        "NEMT Logs",
+        "EMS/Transport Dispatch"
+      ]
+    },
+    {
+      "q_num": 6,
+      "prompt": "How has transport demand changed since the closure",
+      "answer": "The Battle Mountain corridor has gone from 5 to 18 trips a day, and region-wide long-distance transport demand is up 210% on the same index. This isn't a temporary spike \u2014 it's a structural shift in how far every transport request now has to travel.",
+      "sources": [
+        "EMS/Transport Dispatch",
+        "NEMT Logs (trend)"
+      ]
+    },
+    {
+      "q_num": 7,
+      "prompt": "Cache today's plan offline for the field",
+      "answer": "That's not something I can pull from the data \u2014 offline caching is a device/sync action on your end, not a query I can answer here.",
+      "sources": [
+        "n/a \u2014 not a data question"
+      ]
+    },
+    {
+      "q_num": 8,
+      "prompt": "Generate an operations summary for the administrator",
+      "answer": "Today: 73 transport requests with 64 scheduled, 13 converted to telehealth, and 9 still unscheduled. The corridor to Reno is now carrying more than 3x its pre-closure volume \u2014 that's the number I'd lead with in the summary.",
+      "sources": [
+        "NEMT Logs",
+        "EMS/Transport Dispatch",
+        "Telehealth Platform"
+      ]
+    }
+  ],
+  "nair": [
+    {
+      "q_num": 1,
+      "prompt": "Show me access disparities by county",
+      "answer": "Patient load is fairly evenly spread across the three counties \u2014 Pershing at 489, Lander at 494, and Humboldt at 480 \u2014 so this isn't a single-county problem. The disparity shows up more sharply at the ZIP level than the county level.",
+      "sources": [
+        "Patient Registry"
+      ]
+    },
+    {
+      "q_num": 2,
+      "prompt": "Where did avoidable ED utilization concentrate after the closure",
+      "answer": "Avoidable ED visits are concentrated in ZIP 89828 with 37 cases, followed by 89823 with 25 and 89821 with 19. These three ZIPs would be my starting point for a targeted continuity-of-care intervention.",
+      "sources": [
+        "Claims & Encounters"
+      ]
+    },
+    {
+      "q_num": 3,
+      "prompt": "Map the maternal care desert before and after Battle Mountain",
+      "answer": "Right now, 30% of active pregnancies \u2014 38 of 126 \u2014 are more than 100 miles from delivery care. I don't have a clean pre-closure baseline in the data to show the \"before\" picture, only how things stand today.",
+      "sources": [
+        "Maternal Health Registry"
+      ]
+    },
+    {
+      "q_num": 4,
+      "prompt": "Which elevated-risk patients are in telehealth dead zones",
+      "answer": "574 patients across our elevated-risk populations live in a ZIP with no reliable telehealth connectivity \u2014 meaning virtual care simply isn't an option for over half of the at-risk population we're tracking.",
+      "sources": [
+        "Connectivity Registry",
+        "Patient Registry"
+      ]
+    },
+    {
+      "q_num": 5,
+      "prompt": "Compare outcomes in affected vs. unaffected ZIP codes",
+      "answer": "Frontier, connectivity-limited ZIPs account for 574 patients, versus 889 in better-connected areas. The frontier group is smaller in absolute numbers but carries a disproportionate share of your access-risk burden.",
+      "sources": [
+        "Connectivity Registry",
+        "Patient Registry"
+      ]
+    },
+    {
+      "q_num": 6,
+      "prompt": "Model the equity impact of mobile obstetric outreach",
+      "answer": "A mobile obstetric outreach program would have an addressable population of 574 patients \u2014 everyone currently sitting in a dead zone with elevated risk. That's your target number for sizing the program.",
+      "sources": [
+        "Connectivity Registry",
+        "Maternal Health Registry"
+      ]
+    },
+    {
+      "q_num": 7,
+      "prompt": "Align our outcomes to the RHTP reporting priorities",
+      "answer": "That one isn't something I can compute directly \u2014 mapping our metrics to RHTP's reporting categories is a taxonomy exercise, not a data query.",
+      "sources": [
+        "n/a \u2014 not a data question"
+      ]
+    },
+    {
+      "q_num": 8,
+      "prompt": "Generate a population health and equity brief for NVHA",
+      "answer": "For NVHA: our maternal desert rate stands at 30%, avoidable ED events total 219, and 574 elevated-risk patients currently have no telehealth access. The equity story here is straightforward \u2014 geographic isolation and connectivity gaps are compounding each other, not acting independently.",
+      "sources": [
+        "Maternal Health Registry",
+        "Claims & Encounters",
+        "Connectivity Registry"
+      ]
+    }
+  ],
+  "yazzie": [
+    {
+      "q_num": 1,
+      "prompt": "Show me data quality across all connected sources",
+      "answer": "Across all connected sources, I'm tracking 1,240 unresolved provider references, 180 crosswalk mismatches, and 4 open data-quality events. The unresolved references are by far the largest issue and all trace back to the same root cause.",
+      "sources": [
+        "All connected feeds (aggregate)"
+      ]
+    },
+    {
+      "q_num": 2,
+      "prompt": "Which records have unresolved provider references",
+      "answer": "All 1,240 unresolved records point back to the same two deactivated providers \u2014 PRV-001 and PRV-002. This is a single reconciliation job, not 1,240 separate problems.",
+      "sources": [
+        "Provider Reference Registry"
+      ]
+    },
+    {
+      "q_num": 3,
+      "prompt": "Show me RPM transmission completeness by ZIP code",
+      "answer": "The weakest RPM transmission completeness is in ZIP 89825 at 42%, followed by 89823 at 45% and 89820 at 49%. All three are frontier ZIPs \u2014 this lines up with the connectivity gaps we're already seeing elsewhere.",
+      "sources": [
+        "RPM Platform"
+      ]
+    },
+    {
+      "q_num": 4,
+      "prompt": "What is our FHIR conformance rate by feed",
+      "answer": "The New Rural Clinic EHR Connector is our weakest feed at 88% conformance, followed by the RPM Platform at 91% and NEMT Logs at 95%. The new clinic connector is the one I'd prioritize for a conformance fix.",
+      "sources": [
+        "FHIR Conformance Monitor"
+      ]
+    },
+    {
+      "q_num": 5,
+      "prompt": "Which downstream risk scores are affected by data-quality issues",
+      "answer": "The provider-reconciliation issue is touching 49 chronic-disease patients directly, plus every pregnancy episode still assigned to one of the two deactivated providers. Any risk score built on top of those assignments should be treated as suspect until this is resolved.",
+      "sources": [
+        "Provider Reference Registry",
+        "Chronic Care Enrollment",
+        "Maternal Health Registry"
+      ]
+    },
+    {
+      "q_num": 6,
+      "prompt": "Show me pipeline freshness and ingestion lag",
+      "answer": "Two feeds are currently running delayed: the RPM Platform at a 14-hour lag and the New Rural Clinic EHR Connector at 12 hours. Everything else is within normal freshness windows.",
+      "sources": [
+        "Pipeline Monitor"
+      ]
+    },
+    {
+      "q_num": 7,
+      "prompt": "What degraded after the closure",
+      "answer": "Both the 1,240 unresolved provider references and the 180 crosswalk mismatches appeared after March 1st \u2014 the closure date lines up exactly with when this degradation started.",
+      "sources": [
+        "Provider Reference Registry (trend)"
+      ]
+    },
+    {
+      "q_num": 8,
+      "prompt": "Generate a data-quality summary for the technical lead",
+      "answer": "Summary: 1,240 unresolved references, 180 mismatches, and 4 open data-quality events \u2014 all tracing back to two deactivated providers, PRV-001 and PRV-002. This is a single, well-defined reconciliation task, not a systemic data-quality failure.",
+      "sources": [
+        "Provider Reference Registry",
+        "Data Quality Monitor"
+      ]
+    }
+  ]
+}

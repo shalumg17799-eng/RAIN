@@ -1,0 +1,13 @@
+provider_id,npi,name,specialty,facility_id,status,deactivation_date,reassigned_to_provider_id
+PRV-001,1000000001,Dr. A. Lindqvist,OB/Family Medicine,FAC-001,deactivated,2026-03-01,PRV-010
+PRV-002,1000000002,Dr. R. Okafor,Family Medicine/Chronic Care,FAC-001,deactivated,2026-03-01,PRV-011
+PRV-010,1000000010,Dr. Provider 10,Cardiology,FAC-003,active,,
+PRV-011,1000000011,Dr. Provider 11,OB,FAC-003,active,,
+PRV-012,1000000012,Dr. Provider 12,Family Medicine,FAC-002,active,,
+PRV-013,1000000013,Dr. Provider 13,Endocrinology,FAC-002,active,,
+PRV-014,1000000014,Dr. Provider 14,Family Medicine,FAC-002,active,,
+PRV-015,1000000015,Dr. Provider 15,OB,FAC-003,active,,
+PRV-016,1000000016,Dr. Provider 16,Family Medicine,FAC-003,active,,
+PRV-017,1000000017,Dr. Provider 17,Endocrinology,FAC-003,active,,
+PRV-018,1000000018,Dr. Provider 18,Endocrinology,FAC-004,active,,
+PRV-019,1000000019,Dr. Provider 19,Family Medicine,FAC-003,active,,

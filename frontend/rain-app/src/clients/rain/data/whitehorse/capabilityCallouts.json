@@ -1,0 +1,26 @@
+[
+  {
+    "trigger": "home_load",
+    "capabilityName": "Proactive Intelligence",
+    "description": "RAIN watches RPM, pharmacy, clinical, and SDOH feeds overnight and surfaces chronic disease deterioration before you ask: CHF/COPD decompensation trends, medication gaps, diabetes control loss, and the continuity breaks created by the Battle Mountain provider reassignment.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_1",
+    "capabilityName": "Converged Conversation",
+    "description": "A single conversational interface reasoning across the RPM platform, pharmacy claims, clinical EHR, provider panels, and SDOH data at once — connecting a worsening RPM trend, a lapsed refill, a reassigned provider, and a transport barrier into one patient story no single system tells.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_2",
+    "capabilityName": "Predictive Intelligence",
+    "description": "Forecasts 30-day hospitalization risk from RPM trends, medication gaps, and SDOH barriers, ranking the cohort into risk tiers and projecting how same-day pharmacy, transport, and telehealth outreach reduces avoidable admissions.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_3",
+    "capabilityName": "Automated Action",
+    "description": "Generates the Tier 1 outreach package — pre-populated care summaries, pharmacy outreach, NEMT requests, telehealth visits with re-paneling, and a community health worker task — directly from the conversation, with the cross-system evidence chain assembled per patient.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  }
+]

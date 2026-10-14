@@ -1,0 +1,26 @@
+[
+  {
+    "trigger": "home_load",
+    "capabilityName": "Proactive Intelligence",
+    "description": "RAIN correlates utilization, clinical outcomes, social barriers, and telehealth reach across the rural counties overnight and surfaces population-level equity signals before you ask — the expanding maternal care desert, avoidable-ED concentration, and the telehealth equity gap left by the Battle Mountain closure.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_1",
+    "capabilityName": "Converged Conversation",
+    "description": "A single interface reasoning across the data warehouse, claims, EHR, State HIE, SDOH, connectivity, and telehealth records at once — mapping one closure into five interconnected effects (maternal access, chronic continuity, ED utilization, transport strain, telehealth equity) that no single system would surface.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_2",
+    "capabilityName": "Predictive Intelligence",
+    "description": "Models RHTP-aligned interventions against the cascade — mobile obstetric outreach, a telehealth connectivity bridge, and care-continuity restoration — projecting reach, timeline, cost, and outcome for each, and recommending the parallel path with the highest access and equity return.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_3",
+    "capabilityName": "Automated Action",
+    "description": "Generates a Nevada Health Authority equity brief structured to the RHTP outcome priorities — situation, cross-system evidence, recommended interventions, projected 12-month outcomes, and a measurement plan — with a sourced county-level data appendix assembled from every contributing system.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  }
+]

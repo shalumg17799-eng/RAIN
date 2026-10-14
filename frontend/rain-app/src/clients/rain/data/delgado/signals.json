@@ -1,0 +1,74 @@
+[
+  {
+    "id": "SIG-RAIN-DELGADO-001",
+    "type": "predictive_intelligence",
+    "title": "Elevated-Risk Pregnancy Cohort Without Local Delivery Access",
+    "description": "Since the March 1 Battle Mountain labor and delivery closure, 38 pregnant patients in the service area now travel more than 100 miles to the nearest delivering hospital. Cross-referencing the clinical EHR with the maternal health registry, 14 are third-trimester and 9 carry high-risk diagnoses (preeclampsia, gestational diabetes, prior preterm birth). 6 of the 14 have missed at least one prenatal visit since the closure, correlating with the loss of local obstetric care.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 38,
+    "sources": [
+      "Clinical EHR",
+      "Maternal Health Registry",
+      "RAIN Risk Engine"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "cohort": 38,
+      "third_trimester": 14,
+      "high_risk_dx": 9,
+      "missed_visits": 6,
+      "distance_miles": 115
+    },
+    "affected_unit": "patients"
+  },
+  {
+    "id": "SIG-RAIN-DELGADO-002",
+    "type": "anomaly_detection",
+    "title": "Prenatal Care Gap Acceleration",
+    "description": "Prenatal visit completion in the service area dropped from 84 percent to 61 percent in the 90 days following the closure. Cross-referencing transportation logs with appointment data, 22 patients have no NEMT trip scheduled for upcoming prenatal appointments, and 11 live in ZIP codes with no telehealth-capable broadband, removing the virtual-visit fallback.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 22,
+    "sources": [
+      "Clinical EHR",
+      "Scheduling",
+      "NEMT / Transport Logs"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "completion_now_pct": 61,
+      "completion_prior_pct": 84,
+      "no_transport": 22,
+      "broadband_dead": 11
+    },
+    "affected_unit": "patients"
+  },
+  {
+    "id": "SIG-RAIN-DELGADO-003",
+    "type": "predictive_intelligence",
+    "title": "Emergency Department Delivery Risk Trend",
+    "description": "Two births before arrival and one emergency-department delivery occurred in the service area in the 60 days since the closure, compared to zero in the prior six months. The pattern correlates with increased travel distance and rising prenatal gaps, the documented downstream effects of rural obstetric unit closures.",
+    "impact": "medium",
+    "severity": "warning",
+    "affected_count": 3,
+    "sources": [
+      "Clinical EHR",
+      "EMS Dispatch",
+      "Maternal Health Registry"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "ed_deliveries_60d": 3,
+      "prior_6mo": 0,
+      "distance_miles": 115
+    },
+    "affected_unit": "events"
+  }
+]

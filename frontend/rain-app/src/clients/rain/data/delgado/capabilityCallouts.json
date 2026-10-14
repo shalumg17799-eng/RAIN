@@ -1,0 +1,26 @@
+[
+  {
+    "trigger": "home_load",
+    "capabilityName": "Proactive Intelligence",
+    "description": "RAIN reviews rural Nevada's clinical, telehealth, RPM, claims, transport, and SDOH systems overnight and surfaces maternal priority signals before you ask: elevated-risk pregnancies, prenatal care gaps, and emergency-delivery risk after the Battle Mountain obstetric closure.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_1",
+    "capabilityName": "Anomaly Detection",
+    "description": "Detects statistical outliers across cohorts and access metrics that no single rural system can identify — like the 6 high-risk patients whose missed visits, frontier ZIPs, and rising RPM blood-pressure trends only line up when the EHR, registry, claims, and RPM feed are read together.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_2",
+    "capabilityName": "Predictive Intelligence",
+    "description": "Forecasts maternal risk escalation and recovery using cross-system longitudinal data — projecting how telehealth and hybrid interventions move prenatal completion from 61 percent back toward 88 percent and cut emergency-delivery risk.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_3",
+    "capabilityName": "Automated Action",
+    "description": "Generates outreach lists, telehealth referrals, NEMT transport requests, cross-team handoffs, and board-ready briefs directly from the conversation — with the evidence chain from each contributing system assembled per patient.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  }
+]

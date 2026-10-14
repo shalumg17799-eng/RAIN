@@ -1,0 +1,71 @@
+[
+  {
+    "id": "SIG-RAIN-YAZZIE-001",
+    "type": "anomaly_detection",
+    "title": "Provider Identity Reconciliation Failure (Closure Ripple)",
+    "description": "The Battle Mountain obstetric closure deactivated provider records and reassigned panels, but 1,240 clinical and claims records still reference the deactivated provider NPIs. The FHIR Practitioner resource cannot reconcile these against the active provider directory, generating unresolved-reference errors that break attribution for maternal and chronic disease risk scoring. The same closure driving every clinical persona's signals is now degrading the data layer those signals depend on.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 1240,
+    "sources": [
+      "FHIR Practitioner Service",
+      "Provider Directory",
+      "Claims"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "stable",
+    "related_segment": null,
+    "metrics": {
+      "unresolved_refs": 1240,
+      "crosswalk_mismatches": 180,
+      "completeness_pct": 86
+    },
+    "affected_unit": "records"
+  },
+  {
+    "id": "SIG-RAIN-YAZZIE-002",
+    "type": "anomaly_detection",
+    "title": "RPM Feed Ingestion Gap (Connectivity)",
+    "description": "Remote patient monitoring transmissions from frontier ZIP codes are arriving incomplete: 22 percent of expected device readings over the last 14 days are missing or delayed beyond the 24-hour window. The gap concentrates in the same low-connectivity ZIPs limiting telehealth, meaning the CHF and COPD deterioration signals Sarah Whitehorse relies on are running on partial data for the most isolated patients.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 22,
+    "sources": [
+      "RPM Feed Monitor",
+      "Ingestion Pipelines",
+      "Connectivity Registry"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": {
+      "missing_pct": 22,
+      "completeness_pct": 78,
+      "target_pct": 95
+    },
+    "affected_unit": "percent of readings"
+  },
+  {
+    "id": "SIG-RAIN-YAZZIE-003",
+    "type": "anomaly_detection",
+    "title": "FHIR Conformance Drift on New EHR Connector",
+    "description": "A newly connected rural clinic EHR is sending HL7 v2 messages that map inconsistently to FHIR: 8 percent of encounters land with a null service location and 4 percent with malformed diagnosis codes. Left unresolved, this degrades the population health and equity analytics that depend on accurate geographic and clinical coding.",
+    "impact": "medium",
+    "severity": "warning",
+    "affected_count": 8,
+    "sources": [
+      "FHIR / HL7 Services",
+      "Data Quality Monitor",
+      "Ingestion Pipelines"
+    ],
+    "timestamp": "2026-06-26T06:14:00",
+    "trend": "stable",
+    "related_segment": null,
+    "metrics": {
+      "null_location_pct": 8,
+      "malformed_dx_pct": 4,
+      "conformance_pct": 94
+    },
+    "affected_unit": "percent of encounters"
+  }
+]

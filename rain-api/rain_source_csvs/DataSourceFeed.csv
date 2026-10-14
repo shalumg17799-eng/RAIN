@@ -1,0 +1,13 @@
+source_name,fhir_conformance_pct,pipeline_freshness_hours,ingestion_lag_status,detected_date
+Clinical EHR,97,1.5,on-time,2026-05-15
+Maternal Health Registry,98,2.0,on-time,2026-05-15
+RPM Platform,91,14.0,delayed,2026-05-15
+Claims & Encounters,99,3.0,on-time,2026-05-15
+Telehealth (Project ECHO Nevada),97,2.5,on-time,2026-05-15
+EMS / Transport Dispatch,96,1.0,on-time,2026-05-15
+NEMT / Transportation Logs,95,4.0,on-time,2026-05-15
+SDOH Data,98,6.0,on-time,2026-05-15
+Public Health Registries,96,5.0,on-time,2026-05-15
+State HIE,97,2.0,on-time,2026-05-15
+Enterprise Data Warehouse (GCP),99,0.5,on-time,2026-05-15
+New Rural Clinic EHR Connector,88,12.0,delayed,2026-05-15

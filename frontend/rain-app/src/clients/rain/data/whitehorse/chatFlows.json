@@ -1,0 +1,304 @@
+{
+  "greeting": {
+    "ai_message": "Good morning, Sarah. I have identified 3 chronic disease signals. The most urgent: 17 CHF and COPD patients show worsening remote-monitoring readings that historically precede hospitalization, and 9 of them have a medication gap over 30 days. 5 of those 9 lost their regular provider when staff were pulled to cover the Battle Mountain obstetric closure, so the same event affecting maternal care is now creating chronic-care gaps. I also see 112 diabetes patients overdue for an A1c. Want me to walk you through the deterioration cluster?",
+    "suggested_chips": [
+      "Walk me through the deterioration cluster",
+      "Show me the diabetes control gaps",
+      "What is happening with RPM adherence?"
+    ],
+    "data_sources_used": ["RPM Platform", "Clinical EHR", "Pharmacy Claims", "SDOH Data", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+
+  "turn_1_cluster": {
+    "user_query": "Walk me through the deterioration cluster",
+    "ai_message": "17 CHF and COPD patients show RPM trends that precede hospitalization: 11 with rising daily weight (a CHF decompensation marker) and 6 with falling SpO2 (a COPD exacerbation marker). Cross-referencing pharmacy claims, 9 have not filled a maintenance medication — diuretics, beta-blockers, or inhaled corticosteroids — in over 30 days. Here is what no single system showed: 5 of the 9 were paneled to the two providers reassigned after the Battle Mountain obstetric closure on March 1. Their visit and refill activity dropped sharply that week. SDOH data adds another layer: 4 of the 5 have a transportation barrier, so even when a refill or visit is ordered, they may not reach the pharmacy or clinic. One patient has had no recorded contact of any kind — clinical, pharmacy, or RPM transmission — in 24 days.",
+    "suggested_chips": [
+      "Generate an outreach list ranked by risk",
+      "Which patients have a transport barrier?",
+      "Show me the silent patient's history",
+      "Reassign these patients to an available provider"
+    ],
+    "data_sources_used": ["RPM Platform", "Pharmacy Claims", "Clinical EHR", "Provider Panel Data", "SDOH Data"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_2_outreach": {
+    "user_query": "Generate an outreach list ranked by risk",
+    "ai_message": "I ranked the 17 patients by 30-day hospitalization risk using RPM trends, medication gaps, and SDOH barriers. Tier 1 (5 patients) have a modeled hospitalization probability above 60 percent: all have both a medication gap and worsening RPM, and 4 have a transport barrier. Tier 2 (7 patients) are 30 to 60 percent: worsening RPM but medications current. Tier 3 (5 patients) are under 30 percent: early trend, worth a telehealth check-in. For Tier 1, projected impact: same-day pharmacy outreach plus NEMT transport plus a telehealth visit within 48 hours reduces modeled hospitalization risk by 45 percent. The 5 patients tied to the provider reassignment should be re-paneled to an available provider to restore continuity. I can model the avoidable-hospitalization cost savings if you want the financial view for the RHTP value-based reporting.",
+    "suggested_chips": [
+      "Activate Tier 1 outreach",
+      "Re-panel the 5 reassigned patients",
+      "Model the avoidable-hospitalization savings",
+      "Schedule telehealth for Tier 3"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "RPM Platform", "Pharmacy Claims", "SDOH Data", "NEMT Logs", "Telehealth Platform"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_3_activate": {
+    "user_query": "Activate Tier 1 outreach",
+    "ai_message": "I have generated the Tier 1 outreach package for your 5 highest-risk patients. Each record includes: (1) A pre-populated care summary with RPM trends, the specific medication gap, last clinical contact, and SDOH barriers, so your coordinator does not have to toggle between systems. (2) A drafted pharmacy outreach for the lapsed medication, routed to the patient's pharmacy of record. (3) An NEMT transport request for the 4 patients with a transportation barrier. (4) A telehealth visit request to an available provider within 48 hours, with re-paneling for the patients who lost continuity after the obstetric closure. (5) A community health worker home-visit task for the silent patient with no contact in 24 days. Shall I route these now, or hold for your review?",
+    "suggested_chips": [
+      "Route all Tier 1 actions",
+      "Hold for my review",
+      "Dispatch the CHW for the silent patient",
+      "Generate a chronic disease status report for Dr. Delgado-Reyes"
+    ],
+    "data_sources_used": ["Clinical EHR", "RPM Platform", "Pharmacy Claims", "NEMT Logs", "Telehealth Platform", "SDOH Data", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_diabetes": {
+    "user_query": "Show me the diabetes control gaps",
+    "ai_message": "112 diabetes patients in the network have no documented A1c in the last 9 months. Cross-referencing the EHR with claims, 41 of them were paneled to the two providers reassigned after the obstetric closure. Their telehealth and in-person visit rates dropped 38 percent since March. SDOH data shows 18 of the 41 also have a transportation barrier flag. The overdue-A1c gap is largest in the same frontier ZIP codes where maternal prenatal gaps and RPM dropouts concentrate — the closure's footprint shows up identically across every chronic and maternal cohort.",
+    "suggested_chips": [
+      "Walk me through the deterioration cluster",
+      "Which patients lost their provider after the Battle Mountain closure?",
+      "Generate an outreach list ranked by risk",
+      "Next signal"
+    ],
+    "data_sources_used": ["Clinical EHR", "Claims", "Provider Panel Data", "SDOH Data"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_hypertension": {
+    "user_query": "What is happening with RPM adherence?",
+    "ai_message": "Among 240 hypertension patients enrolled in remote blood-pressure monitoring, device transmission compliance fell from 79 percent to 58 percent over 60 days. The drop concentrates in frontier ZIP codes with intermittent broadband — the same connectivity dead zones limiting maternal telehealth and David Yazzie's RPM ingestion completeness. When transmissions stop, the deterioration engine runs on partial data, so a patient can be silently worsening without triggering an alert. Restoring store-and-forward buffering on the device fleet would recover most of the lost transmissions.",
+    "suggested_chips": [
+      "Walk me through the deterioration cluster",
+      "Show me the diabetes control gaps",
+      "What is our RPM transmission compliance trend?",
+      "Next signal"
+    ],
+    "data_sources_used": ["RPM Platform", "Broadband / Connectivity Registry", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "transport_barrier": {
+    "user_query": "Which patients have a transport barrier?",
+    "ai_message": "Of the 17 deterioration-cluster patients, 7 carry an SDOH transportation-barrier flag, and 4 of those are in Tier 1. A transport barrier compounds clinical risk two ways: the patient may miss an in-person visit and may not reach the pharmacy for a refill, which is exactly the pattern in the 4 Tier 1 cases. For these 4, pairing a pharmacy mail-order or delivery option with an NEMT request removes the barrier on both fronts. Network-wide, 186 chronic disease patients have a transport-barrier flag, concentrated in the same corridor James Tomley's transport queue is straining to serve.",
+    "suggested_chips": [
+      "Generate an outreach list ranked by risk",
+      "Show me the silent patient's history",
+      "Activate Tier 1 outreach"
+    ],
+    "data_sources_used": ["SDOH Data", "NEMT Logs", "RPM Platform", "Pharmacy Claims"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "silent_patient": {
+    "user_query": "Show me the silent patient's history",
+    "ai_message": "This patient — a 71-year-old with CHF and COPD — has had no recorded contact of any kind in 24 days: no clinical visit, no pharmacy fill, and no RPM transmission. Their last readings before going dark showed rising weight and falling SpO2, both decompensation markers. They were paneled to one of the two providers reassigned after the Battle Mountain closure, and they live in a broadband-dead frontier ZIP, which explains the RPM silence. This is the highest-concern profile in the cohort: deteriorating on last contact, then no signal at all. A community health worker home visit is the only reliable way to re-establish contact and assess them in person.",
+    "suggested_chips": [
+      "Dispatch the CHW for the silent patient",
+      "Generate an outreach list ranked by risk",
+      "Reassign these patients to an available provider"
+    ],
+    "data_sources_used": ["Clinical EHR", "RPM Platform", "Pharmacy Claims", "Provider Panel Data", "Broadband / Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "reassign_provider": {
+    "user_query": "Reassign these patients to an available provider",
+    "ai_message": "The 5 patients who lost continuity after the obstetric reassignment can be re-paneled to an available provider this week. I checked provider capacity across the network: two providers have panel room, and matching by location keeps each patient with the clinic nearest them. Re-paneling restores the continuity link the risk engine uses for attribution — which also resolves part of the data-layer reconciliation issue David Yazzie is tracking, where these same patients' records still reference the deactivated provider. I can stage the re-panel with the Tier 1 outreach so the new provider receives a complete handoff for each patient.",
+    "suggested_chips": [
+      "Activate Tier 1 outreach",
+      "Generate an outreach list ranked by risk",
+      "Generate a chronic disease status report for Dr. Delgado-Reyes"
+    ],
+    "data_sources_used": ["Provider Panel Data", "Clinical EHR", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "repanel_5": {
+    "user_query": "Re-panel the 5 reassigned patients",
+    "ai_message": "Done — staged. The 5 patients are matched to two available providers by location, each with a complete handoff package: RPM history, medication gap, last contact, and SDOH barriers. Restoring continuity is the single highest-leverage step for this subgroup, because every one of them shows the same post-March-1 drop in visits and refills tied to losing their provider. The re-panel is held with the Tier 1 outreach so the new provider sees the outreach actions already in flight. Confirm and I will notify the receiving providers.",
+    "suggested_chips": [
+      "Activate Tier 1 outreach",
+      "Model the avoidable-hospitalization savings",
+      "Generate a chronic disease status report for Dr. Delgado-Reyes"
+    ],
+    "data_sources_used": ["Provider Panel Data", "Clinical EHR", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "model_savings": {
+    "user_query": "Model the avoidable-hospitalization savings",
+    "ai_message": "Modeling the Tier 1 intervention against the do-nothing trajectory: the 5 Tier 1 patients carry a combined modeled hospitalization probability that, unaddressed, projects to roughly 3 avoidable admissions over 90 days at an average rural inpatient cost of about 14,000 dollars each — approximately 42,000 dollars. Same-day pharmacy outreach plus transport plus a 48-hour telehealth visit reduces that risk by an estimated 45 percent, avoiding an estimated 19,000 dollars for this group alone. Extended across the full 208-patient elevated-risk cohort, the modeled annual avoidable-cost reduction is roughly 1.0 million dollars — the figure Dr. Nair uses in the RHTP value-based reporting.",
+    "suggested_chips": [
+      "Activate Tier 1 outreach",
+      "Model avoidable hospitalizations for the elevated-risk cohort",
+      "Generate a chronic disease status report for Dr. Delgado-Reyes"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "Claims", "RPM Platform"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "schedule_tier3": {
+    "user_query": "Schedule telehealth for Tier 3",
+    "ai_message": "Scheduled-as-draft. The 5 Tier 3 patients are under 30 percent modeled risk but show an early worsening trend, so a telehealth check-in within the week is the right-sized intervention before they escalate. I drafted Project ECHO Nevada telehealth visits for the 4 with adequate connectivity; the 1 in a broadband-dead ZIP is flagged for a phone outreach instead. Catching Tier 3 early is what keeps them from becoming next month's Tier 1. The drafts are staged in your queue for confirmation.",
+    "suggested_chips": [
+      "Activate Tier 1 outreach",
+      "Generate an outreach list ranked by risk",
+      "Generate a chronic disease status report for Dr. Delgado-Reyes"
+    ],
+    "data_sources_used": ["Telehealth Platform", "RAIN Risk Engine", "Broadband / Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "route_tier1": {
+    "user_query": "Route all Tier 1 actions",
+    "ai_message": "Routing now. The 5 pharmacy outreaches are sent to each patient's pharmacy of record, the 4 NEMT transport requests are submitted to dispatch, the 5 telehealth visit requests are routed to available providers with re-paneling attached, and the community health worker home-visit task for the silent patient is dispatched. Each action carries its cross-system evidence chain so the receiving coordinator sees the full picture. I will track confirmations and alert you to any pharmacy, transport, or visit that is not acknowledged within 24 hours.",
+    "suggested_chips": [
+      "Dispatch the CHW for the silent patient",
+      "Generate a chronic disease status report for Dr. Delgado-Reyes",
+      "Next signal"
+    ],
+    "data_sources_used": ["Pharmacy Claims", "NEMT Logs", "Telehealth Platform", "Clinical EHR", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "hold_review": {
+    "user_query": "Hold for my review",
+    "ai_message": "Held. The full Tier 1 package is saved to your care-coordination workspace as a draft, with every figure linked to its source — RPM trend, medication gap, last contact, and SDOH barrier per patient — so you can verify each before anything is sent. Nothing has been routed. You can approve the whole package or any single action, and I will transmit and begin tracking from there.",
+    "suggested_chips": [
+      "Route all Tier 1 actions",
+      "Dispatch the CHW for the silent patient",
+      "Next signal"
+    ],
+    "data_sources_used": ["Clinical EHR", "RPM Platform", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "dispatch_chw": {
+    "user_query": "Dispatch the CHW for the silent patient",
+    "ai_message": "Community health worker dispatched. The home-visit task for the silent CHF/COPD patient is assigned to the community health worker covering that frontier ZIP, with the patient's last-known decompensation readings, the 24-day contact gap, and a note that they are in a broadband-dead zone so RPM cannot be relied on. The CHW will assess in person, re-establish contact, and report back vitals and medication status the same day. If they find acute decompensation, the task escalates to an EMS evaluation through James Tomley's dispatch. This is the fastest safe path to re-establishing eyes on the highest-concern patient.",
+    "suggested_chips": [
+      "Route all Tier 1 actions",
+      "Generate a chronic disease status report for Dr. Delgado-Reyes",
+      "Next signal"
+    ],
+    "data_sources_used": ["SDOH Data", "Clinical EHR", "EMS Dispatch", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "status_report": {
+    "user_query": "Generate a chronic disease status report for Dr. Delgado-Reyes",
+    "ai_message": "Here is a chronic disease status report for Dr. Delgado-Reyes. (1) Deterioration cluster — 17 CHF/COPD patients with worsening RPM, 9 with a medication gap, 5 tied to the Battle Mountain provider reassignment. (2) Diabetes — 112 overdue for an A1c, 41 on the reassigned panels. (3) Actions — Tier 1 outreach activated for 5, CHW dispatched for the silent patient, 5 re-paneled. (4) Cross-team link — the 3 compounding maternal-and-chronic patients she flagged are in our Tier 1, handled in a single coordinated outreach. (5) Projected impact — 45 percent Tier 1 risk reduction, roughly 1.0 million dollars annualized avoidable cost across the elevated-risk cohort. Shall I send it to her and copy the chronic disease team?",
+    "suggested_chips": [
+      "Route all Tier 1 actions",
+      "Model avoidable hospitalizations for the elevated-risk cohort",
+      "Next signal"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "RPM Platform", "Clinical EHR", "Claims", "Care Plan Templates"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_worsening_rpm": {
+    "user_query": "Show me chronic disease patients with worsening RPM readings",
+    "ai_message": "17 patients show worsening remote-monitoring trends right now: 11 CHF patients with rising daily weight and 6 COPD patients with falling SpO2 — both established pre-hospitalization markers. They are the core deterioration cluster. Layering pharmacy claims and SDOH data on top, 9 also have a 30-day medication gap and 7 have a transport barrier, which is what elevates them from 'watch' to 'act.' I can rank all 17 by 30-day hospitalization risk whenever you want the outreach list.",
+    "suggested_chips": [
+      "Walk me through the deterioration cluster",
+      "Generate an outreach list ranked by risk",
+      "Which patients have a medication gap over 30 days?"
+    ],
+    "data_sources_used": ["RPM Platform", "Pharmacy Claims", "SDOH Data"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_med_gap": {
+    "user_query": "Which patients have a medication gap over 30 days?",
+    "ai_message": "94 chronic disease patients have a maintenance-medication gap over 30 days network-wide. Within the deterioration cluster, 9 of the 17 have a gap on a critical medication — diuretics, beta-blockers, or inhaled corticosteroids. The most actionable insight: 5 of those 9 lost their provider after the Battle Mountain reassignment, and their refill activity dropped the same week. A medication gap plus worsening RPM is the combination that defines Tier 1, so these patients are the priority for same-day pharmacy outreach.",
+    "suggested_chips": [
+      "Walk me through the deterioration cluster",
+      "Which patients lost their provider after the Battle Mountain closure?",
+      "Generate an outreach list ranked by risk"
+    ],
+    "data_sources_used": ["Pharmacy Claims", "RPM Platform", "Provider Panel Data"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_deterioration_transport": {
+    "user_query": "Cross-reference deterioration with transportation barriers",
+    "ai_message": "Cross-referencing the deterioration cluster with SDOH data: 7 of the 17 worsening patients have a transportation barrier, and 4 of those are in Tier 1. The barrier matters clinically because it blocks both the pharmacy run and the in-person visit, so a refill order alone does not reach the patient. Network-wide, 186 chronic disease patients carry a transport-barrier flag, and they cluster in the same frontier corridor that James Tomley's transport queue is over capacity to serve. Pairing pharmacy delivery with batched NEMT is the intervention that addresses both the clinical and the logistics side.",
+    "suggested_chips": [
+      "Which patients have a transport barrier?",
+      "Generate an outreach list ranked by risk",
+      "Walk me through the deterioration cluster"
+    ],
+    "data_sources_used": ["SDOH Data", "RPM Platform", "NEMT Logs", "Pharmacy Claims"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_lost_provider": {
+    "user_query": "Which patients lost their provider after the Battle Mountain closure?",
+    "ai_message": "When two providers were pulled to cover the Battle Mountain obstetric gap on March 1, their panels were reassigned — and the continuity break is now visible across the chronic disease cohort. 5 of the 9 deterioration-cluster patients with a medication gap were on those panels, and 41 of the 112 overdue-A1c diabetes patients were too. All show a sharp drop in visit and refill activity that week. Their records also still reference the deactivated providers, which is the same reconciliation issue David Yazzie is fixing in the data layer. Re-paneling them to an available provider restores continuity and the risk-engine attribution at the same time.",
+    "suggested_chips": [
+      "Reassign these patients to an available provider",
+      "Walk me through the deterioration cluster",
+      "Show me the diabetes control gaps"
+    ],
+    "data_sources_used": ["Provider Panel Data", "Clinical EHR", "Claims", "RAIN Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_diabetes_a1c": {
+    "user_query": "Show me diabetes patients overdue for an A1c",
+    "ai_message": "112 diabetes patients have no documented A1c in the last 9 months. 41 were on the two reassigned panels and have seen a 38 percent drop in visits since March; 18 of those 41 also have a transportation barrier. The overdue cohort concentrates in the frontier ZIPs hit hardest by the closure. A batched outreach — telehealth where connectivity allows, mobile point-of-care A1c where it does not — would close the largest share of the gap, and the 41 continuity-loss patients should be re-paneled as part of it.",
+    "suggested_chips": [
+      "Show me the diabetes control gaps",
+      "Which patients lost their provider after the Battle Mountain closure?",
+      "Generate an outreach list ranked by risk"
+    ],
+    "data_sources_used": ["Clinical EHR", "Claims", "SDOH Data", "Provider Panel Data"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_rpm_trend": {
+    "user_query": "What is our RPM transmission compliance trend?",
+    "ai_message": "RPM transmission compliance across the hypertension monitoring program fell from 79 percent to 58 percent over 60 days. The decline is not uniform — it concentrates almost entirely in frontier ZIP codes with intermittent broadband, the same dead zones limiting maternal telehealth. In well-connected ZIPs, compliance held above 75 percent. This tells us the drop is a connectivity problem, not a patient-engagement problem, so the fix is technical: store-and-forward buffering on the device fleet to backfill readings when the connection returns, which David Yazzie estimates would recover most of the lost transmissions.",
+    "suggested_chips": [
+      "What is happening with RPM adherence?",
+      "Walk me through the deterioration cluster",
+      "Generate a chronic disease status report for Dr. Delgado-Reyes"
+    ],
+    "data_sources_used": ["RPM Platform", "Broadband / Connectivity Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_model_hosp": {
+    "user_query": "Model avoidable hospitalizations for the elevated-risk cohort",
+    "ai_message": "Across the full 208-patient elevated-risk cohort, the model projects roughly 26 avoidable hospitalizations over the next 12 months on the current trajectory. A standardized intervention — RPM-triggered outreach, medication-gap closure, transport support, and continuity restoration — reduces that by an estimated 40 to 45 percent, avoiding 11 to 12 admissions. At an average rural inpatient cost near 14,000 dollars, that is approximately 1.0 million dollars in annualized avoidable cost, the value-based figure for the RHTP reporting Dr. Nair compiles. The Tier 1 subgroup delivers the highest return per outreach and should be activated first.",
+    "suggested_chips": [
+      "Model the avoidable-hospitalization savings",
+      "Generate an outreach list ranked by risk",
+      "Generate a chronic disease status report for Dr. Delgado-Reyes"
+    ],
+    "data_sources_used": ["RAIN Risk Engine", "Claims", "RPM Platform"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  }
+}
