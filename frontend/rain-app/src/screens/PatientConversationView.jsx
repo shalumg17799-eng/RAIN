@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { HeartPulse, CalendarCheck, Video, Bus, Pill, Bot } from 'lucide-react';
 import MobilePhoneFrame from '../components/layout/MobilePhoneFrame';
 import ChatInput from '../components/chat/ChatInput';
+import { logStatic } from '../utils/dataLog';
 
 const NAVY = '#003366';
 const PATIENT = { name: 'Elena', firstName: 'Elena' };
@@ -104,6 +105,7 @@ function Bubble({ role, text }) {
 }
 
 export default function PatientConversationView() {
+  useEffect(() => logStatic('Patient app conversation, reminders and replies', 'PatientConversationView.jsx'), []);
   const [messages, setMessages] = useState([{ role: 'ai', text: FLOWS.greeting.ai }]);
   const [chips, setChips] = useState(FLOWS.greeting.chips);
   const [started, setStarted] = useState(false);

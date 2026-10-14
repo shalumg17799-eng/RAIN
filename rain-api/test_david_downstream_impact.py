@@ -48,29 +48,29 @@ def _():
     assert "6" not in r["engines"][0]["detail"]
 
 
-@check("chronic breakdown matches independent SQL exactly: CHF 5, diabetes 42, hypertension 2, total 49")
+@check("chronic breakdown matches independent SQL exactly: CHF 5, diabetes 41, hypertension 2, total 48")
 def _():
     r = di.get_downstream_impact()
     rows = sql("SELECT condition_type, COUNT(*) FROM ChronicConditionEnrollment WHERE assigned_provider_id IN "
               "(SELECT provider_id FROM Provider WHERE status='deactivated') GROUP BY 1")
     expect = {t: n for t, n in rows}
-    assert expect == {"CHF": 5, "diabetes": 42, "hypertension": 2}
+    assert expect == {"CHF": 5, "diabetes": 41, "hypertension": 2}
     assert r["chronic_by_condition"] == expect
-    assert r["chronic_affected"] == 49
-    assert "42 diabetes" in r["engines"][1]["detail"] and "2 hypertension" in r["engines"][1]["detail"]
+    assert r["chronic_affected"] == 48
+    assert "41 diabetes" in r["engines"][1]["detail"] and "2 hypertension" in r["engines"][1]["detail"]
 
 
-@check("chronic total matches the already-verified 'Patients lost provider deactivated' business rule (49)")
+@check("chronic total matches the already-verified 'Patients lost provider deactivated' business rule (48)")
 def _():
     r = di.get_downstream_impact()
     from business_rules import BUSINESS_RULES
     rule = next(x for x in BUSINESS_RULES if x["term"] == "Patients lost provider deactivated")
     expect = sql(rule["sql"])[0][0]
-    assert expect == 49
-    assert r["chronic_affected"] == 49
+    assert expect == 48
+    assert r["chronic_affected"] == 48
     # and the codebase's own prior documentation of this figure (independent of this module) matches too
     doc_rule = next(x for x in BUSINESS_RULES if x["term"] == "Lost provider continuity")
-    assert "5 CHF, 42 diabetes, 2 hypertension" in doc_rule["verified_result"]
+    assert "5 CHF, 41 diabetes, 2 hypertension" in doc_rule["verified_result"]
 
 
 @check("the 64% ED-attribution figure matches the already-verified avoidable-hospitalizations model exactly")
@@ -126,7 +126,7 @@ def http_tests():
         @check("HTTP: POST /api/v2/generic (DownstreamImpact) returns the live, corrected card")
         def _():
             status, body = generic("DownstreamImpact", "david")
-            assert status == 200 and body["maternal_affected"] == 0 and body["chronic_affected"] == 49
+            assert status == 200 and body["maternal_affected"] == 0 and body["chronic_affected"] == 48
 
         @check("HTTP: every prior live card remains unaffected")
         def _():

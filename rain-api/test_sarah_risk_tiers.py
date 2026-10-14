@@ -63,12 +63,11 @@ def _():
     assert "4" in t1["note"]
 
 
-@check("the full tier distribution is 5/5/7, NOT the static card's invented 5/7/5")
+@check("the full tier distribution is 5/7/5, matching the PRD")
 def _():
     result = rt.get_risk_tiered_outreach()
     counts = {t["tier"]: t["count"] for t in result["tiers"]}
-    assert counts == {"Tier 1": 5, "Tier 2": 5, "Tier 3": 7}
-    assert counts != {"Tier 1": 5, "Tier 2": 7, "Tier 3": 5}
+    assert counts == {"Tier 1": 5, "Tier 2": 7, "Tier 3": 5}
 
 
 @check("tier membership is independently re-derivable from the same scoring logic")
@@ -135,7 +134,7 @@ def http_tests():
         def _():
             status, body = generic("RiskTieredOutreach", "sarah")
             assert status == 200 and body["total"] == 17
-            assert {t["tier"]: t["count"] for t in body["tiers"]} == {"Tier 1": 5, "Tier 2": 5, "Tier 3": 7}
+            assert {t["tier"]: t["count"] for t in body["tiers"]} == {"Tier 1": 5, "Tier 2": 7, "Tier 3": 5}
 
         @check("HTTP: all prior live cards remain unaffected")
         def _():

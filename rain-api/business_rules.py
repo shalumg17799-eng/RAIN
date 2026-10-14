@@ -19,6 +19,7 @@ produce the exact known-correct number before being recorded here.
 import pg_compat as sqlite3
 import os
 import re
+from james_live_data import ELEVATED_RISK_PATIENTS_SQL
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "rain.db")  # unused by pg_compat.connect(); kept so call sites below don't need to change
 
@@ -58,10 +59,11 @@ BUSINESS_RULES = [
     {
         "term": "Prenatal completion rate current",
         "table": "PregnancyEpisode",
-        "rule": "100.0 * SUM(last_prenatal_visit_date >= '2026-04-01') / COUNT(*), scoped to distance_to_delivery_miles = 115",
-        "verified_result": "84%",
-        "sql": "SELECT ROUND(100.0 * SUM(CASE WHEN last_prenatal_visit_date >= '2026-04-01' THEN 1 ELSE 0 END) / COUNT(*)) FROM PregnancyEpisode WHERE distance_to_delivery_miles = 115",
-        "phrase": "Prenatal completion in the elevated-risk cohort is {result}%.",
+        "rule": "service-area prenatal visit completion before and after the closure (MetricTrend prenatal_completion_rate)",
+        "verified_result": "84% before, 61% after",
+        "sql": "SELECT (SELECT before_value FROM MetricTrend WHERE metric_id = 'prenatal_completion_rate'), (SELECT after_value FROM MetricTrend WHERE metric_id = 'prenatal_completion_rate')",
+        "columns": ["before", "after"],
+        "phrase": "Prenatal visit completion in the service area dropped from {before}% to {after}% after the Battle Mountain closure.",
     },
     {
         "term": "ED delivery birth before arrival event",
@@ -96,15 +98,15 @@ BUSINESS_RULES = [
     {
         "term": "Prenatal care gaps",
         "table": "PregnancyEpisode",
-        "rule": "elevated-risk completion rate, missed visits in that cohort, and active pregnancies with no scheduled transport",
-        "verified_result": "84% completion, 6 missed visits, 22 with no transport -- the same three verified rules, read together",
+        "rule": "service-area completion rate, missed visits in the elevated-risk cohort, and active pregnancies with no scheduled transport",
+        "verified_result": "61% completion (was 84%), 6 missed visits, 22 with no transport -- the same three verified rules, read together",
         "sql": ("SELECT "
-                "(SELECT ROUND(100.0 * SUM(CASE WHEN last_prenatal_visit_date >= '2026-04-01' THEN 1 ELSE 0 END) / COUNT(*)) FROM PregnancyEpisode WHERE distance_to_delivery_miles = 115), "
+                "(SELECT after_value FROM MetricTrend WHERE metric_id = 'prenatal_completion_rate'), "
                 "(SELECT COUNT(*) FROM PregnancyEpisode WHERE last_prenatal_visit_date < '2026-04-01' AND distance_to_delivery_miles = 115), "
                 "(SELECT COUNT(*) FROM PregnancyEpisode pe WHERE pe.patient_id NOT IN (SELECT patient_id FROM TransportRequest WHERE scheduled = 'True'))"),
         "columns": ["completion", "missed", "no_transport"],
         "gate": r"prenatal care gap",
-        "phrase": "Prenatal completion in the elevated-risk cohort is {completion}%. {missed} of those patients have missed a prenatal visit since the closure, and {no_transport} active pregnancy patients have no transport scheduled.",
+        "phrase": "Prenatal visit completion in the service area is {completion}%. {missed} elevated-risk patients have missed a prenatal visit since the closure, and {no_transport} active pregnancy patients have no transport scheduled.",
     },
     {
         "term": "CHF COPD worsening RPM deterioration cluster",
@@ -126,7 +128,7 @@ BUSINESS_RULES = [
         "term": "Diabetes control gaps care coordination",
         "table": "ChronicConditionEnrollment",
         "rule": "diabetes patients overdue for an A1c, and diabetes patients assigned to a deactivated provider, read together",
-        "verified_result": "112 overdue A1c, 42 on a deactivated provider -- the same two verified rules, read together",
+        "verified_result": "112 overdue A1c, 41 on a deactivated provider -- the same two verified rules, read together",
         "sql": ("SELECT "
                 "(SELECT COUNT(*) FROM ChronicConditionEnrollment WHERE condition_type='diabetes'), "
                 "(SELECT COUNT(*) FROM ChronicConditionEnrollment WHERE condition_type='diabetes' "
@@ -139,7 +141,7 @@ BUSINESS_RULES = [
         "term": "Lost provider continuity",
         "table": "ChronicConditionEnrollment",
         "rule": "assigned_provider_id IN ('PRV-001','PRV-002')",
-        "verified_result": "49 chronic patients in total (5 CHF, 42 diabetes, 2 hypertension) -- answered directly by 'Patients lost provider deactivated'; this entry has no SQL of its own because a bare 'lost provider' is ambiguous across personas",
+        "verified_result": "48 chronic patients in total (5 CHF, 41 diabetes, 2 hypertension) -- answered directly by 'Patients lost provider deactivated'; this entry has no SQL of its own because a bare 'lost provider' is ambiguous across personas",
         "sql": None,  # ambiguous without a specific cohort -- left for the LLM, with this note as guidance
         "phrase": None,
     },
@@ -162,23 +164,26 @@ BUSINESS_RULES = [
     {
         "term": "Hypertension RPM transmission compliance rate",
         "table": "RPMReading",
-        "rule": "condition_type = 'hypertension', received/total ratio",
-        "verified_result": "61%",
-        "sql": "SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status='received' THEN 1 ELSE 0 END) / COUNT(*)) FROM RPMReading WHERE condition_type='hypertension'",
-        "phrase": "Hypertension RPM transmission compliance is {result}%.",
+        "rule": "condition_type = 'hypertension', received/total ratio of the first and the latest reading cycle",
+        "verified_result": "79% in the first cycle (2026-03-17), 58% in the latest (2026-05-11)",
+        "sql": ("SELECT "
+                "(SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status = 'received' THEN 1 ELSE 0 END) / COUNT(*)) FROM RPMReading WHERE condition_type = 'hypertension' AND timestamp = (SELECT MIN(timestamp) FROM RPMReading WHERE condition_type = 'hypertension')), "
+                "(SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status = 'received' THEN 1 ELSE 0 END) / COUNT(*)) FROM RPMReading WHERE condition_type = 'hypertension' AND timestamp = (SELECT MAX(timestamp) FROM RPMReading WHERE condition_type = 'hypertension'))"),
+        "columns": ["prior", "current"],
+        "phrase": "Hypertension RPM transmission compliance fell from {prior}% to {current}% over 60 days (first vs latest reading cycle).",
     },
     {
         "term": "RPM adherence transmission received",
         "table": "RPMReading",
-        "rule": "received/total by condition_type",
-        "verified_result": "hypertension 61% (2,880 readings), CHF 100% (154), COPD 100% (84). Overall 64% is mostly the hypertension readings",
+        "rule": "received/total by condition_type; hypertension at its latest reading cycle",
+        "verified_result": "hypertension 58% (latest cycle; 79% in the first), CHF 100% (154), COPD 100% (84)",
         "sql": ("SELECT "
-                "(SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status = 'received' THEN 1 ELSE 0 END) / COUNT(*)) FROM RPMReading WHERE condition_type = 'hypertension'), "
+                "(SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status = 'received' THEN 1 ELSE 0 END) / COUNT(*)) FROM RPMReading WHERE condition_type = 'hypertension' AND timestamp = (SELECT MAX(timestamp) FROM RPMReading WHERE condition_type = 'hypertension')), "
                 "(SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status = 'received' THEN 1 ELSE 0 END) / COUNT(*)) FROM RPMReading WHERE condition_type = 'CHF'), "
                 "(SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status = 'received' THEN 1 ELSE 0 END) / COUNT(*)) FROM RPMReading WHERE condition_type = 'COPD')"),
         "columns": ["hypertension", "chf", "copd"],
         "gate": r"rpm adherence",
-        "phrase": "RPM readings marked received: hypertension {hypertension}%, CHF {chf}%, COPD {copd}%.",
+        "phrase": "RPM readings marked received: hypertension {hypertension}% (latest reading cycle), CHF {chf}%, COPD {copd}%.",
     },
     {
         "term": "Transport queue over capacity unscheduled",
@@ -192,7 +197,7 @@ BUSINESS_RULES = [
         "term": "Transport queue today capacity scheduled",
         "table": "TransportRequest",
         "rule": "today's requests, today's scheduled requests, and the current unscheduled count, read together",
-        "verified_result": "73 today, 64 scheduled, 9 unscheduled. There is no separate capacity column; the 9 is the existing over-capacity count",
+        "verified_result": "47 today, 38 scheduled (the day's capacity), 9 unscheduled -- the over-capacity count",
         "sql": ("SELECT "
                 "(SELECT COUNT(*) FROM TransportRequest WHERE date = '2026-05-15'), "
                 "(SELECT COUNT(*) FROM TransportRequest WHERE date = '2026-05-15' AND scheduled = 'True'), "
@@ -221,21 +226,23 @@ BUSINESS_RULES = [
         "term": "Patients living in telehealth dead zone population",
         "table": "Patient",
         "rule": "Patient JOIN ConnectivityRegistry ON zip_code WHERE broadband_available = false",
-        "verified_result": "574 patients -- the number repeated across Priya's Q4/Q5/Q6/Q8 cached answers as '574 elevated-risk patients'; the real data supports 574 as the total patient population in dead-zone ZIPs, with no additional elevated-risk filter found to reproduce the same number more narrowly",
+        "verified_result": "560 patients in total live in the 5 dead-zone ZIPs; 240 of them are elevated-risk (see 'Elevated risk patients telehealth dead zone')",
         "sql": "SELECT COUNT(*) FROM Patient p JOIN ConnectivityRegistry cr ON p.zip_code = cr.zip_code WHERE cr.broadband_available = 'False'",
         "phrase": "{result} patients live in a ZIP code with no reliable telehealth connectivity.",
     },
     {
         "term": "Elevated risk patients telehealth dead zone",
-        "table": "PregnancyEpisode",
-        "rule": "elevated-risk pregnancies, and all active pregnancies, living in a ZIP with no broadband",
-        "verified_result": "15 elevated-risk pregnancies and 48 active pregnancies in no-broadband ZIPs. 574 is every patient in those ZIPs, not this cohort",
+        "table": "Patient",
+        "rule": "elevated-risk patients (active pregnancy, or CHF/COPD/diabetes/hypertension enrollment) in a ZIP with no broadband; plus the pregnancy split",
+        "verified_result": "240 elevated-risk patients in no-broadband ZIPs; 15 elevated-risk pregnancies of 48 active pregnancies there",
         "sql": ("SELECT "
+                "(SELECT COUNT(*) FROM Patient p JOIN ConnectivityRegistry c ON c.zip_code = p.zip_code WHERE c.broadband_available = 'False' "
+                "AND p.patient_id IN (" + ELEVATED_RISK_PATIENTS_SQL.strip() + ")), "
                 "(SELECT COUNT(*) FROM PregnancyEpisode e JOIN Patient p ON p.patient_id = e.patient_id JOIN ConnectivityRegistry c ON c.zip_code = p.zip_code WHERE c.broadband_available = 'False' AND e.distance_to_delivery_miles = 115), "
                 "(SELECT COUNT(*) FROM PregnancyEpisode e JOIN Patient p ON p.patient_id = e.patient_id JOIN ConnectivityRegistry c ON c.zip_code = p.zip_code WHERE c.broadband_available = 'False')"),
-        "columns": ["elevated", "pregnant"],
+        "columns": ["elevated_all", "elevated", "pregnant"],
         "gate": r"elevated[\s-]risk.*\bdead\b|\bdead\b.*elevated[\s-]risk",
-        "phrase": "{elevated} elevated-risk pregnancies live in a ZIP with no broadband, out of {pregnant} active pregnancies in those ZIPs.",
+        "phrase": "{elevated_all} elevated-risk patients live in telehealth dead zones (ZIPs with no broadband). {elevated} of them are elevated-risk pregnancies, out of {pregnant} active pregnancies in those ZIPs.",
     },
     {
         "term": "Unresolved provider reference",
@@ -315,7 +322,7 @@ BUSINESS_RULES = [
         "term": "Patients lost provider deactivated",
         "table": "ChronicConditionEnrollment",
         "rule": "distinct chronic-condition patients whose assigned_provider_id belongs to a deactivated provider",
-        "verified_result": "49 patients -- 5 CHF, 42 diabetes, 2 hypertension. The cached 5 + 41 + 3 is the same 49 with the 3 pregnant patients (1 diabetes + 2 hypertension) split out",
+        "verified_result": "48 patients -- 5 CHF, 41 diabetes, 2 hypertension",
         "sql": "SELECT COUNT(DISTINCT patient_id) FROM ChronicConditionEnrollment WHERE assigned_provider_id IN (SELECT provider_id FROM Provider WHERE status = 'deactivated')",
         "phrase": "{result} chronic-disease patients are currently assigned to a provider who was deactivated in the closure.",
     },
@@ -400,16 +407,14 @@ BUSINESS_RULES = [
     {
         "term": "Elevated risk patients awaiting transport",
         "table": "TransportRequest",
-        "rule": "the unscheduled transport requests, checked against the elevated-risk pregnancy and worsening-RPM cohorts",
-        "verified_result": "9 unscheduled requests for 9 patients; 0 are elevated-risk pregnancies, 0 have worsening RPM readings, all 9 are enrolled in chronic-condition care. The cached answer only recommends this cross-check",
-        "sql": ("SELECT COUNT(*), COUNT(DISTINCT patient_id), "
-                "(SELECT COUNT(DISTINCT patient_id) FROM PregnancyEpisode WHERE distance_to_delivery_miles = 115 AND patient_id IN (SELECT patient_id FROM TransportRequest WHERE scheduled = 'False')), "
-                "(SELECT COUNT(DISTINCT patient_id) FROM RPMReading WHERE condition_type IN ('CHF','COPD') AND patient_id IN (SELECT patient_id FROM TransportRequest WHERE scheduled = 'False')), "
-                "(SELECT COUNT(DISTINCT patient_id) FROM ChronicConditionEnrollment WHERE patient_id IN (SELECT patient_id FROM TransportRequest WHERE scheduled = 'False')) "
-                "FROM TransportRequest WHERE scheduled = 'False'"),
-        "columns": ["unscheduled", "patients", "elevated", "worsening", "chronic"],
+        "rule": "distinct elevated-risk patients (active pregnancy, or CHF/COPD/diabetes/hypertension enrollment) with a transport request today",
+        "verified_result": "16 elevated-risk patients awaiting transport today, among 47 requests (9 unscheduled)",
+        "sql": ("SELECT COUNT(DISTINCT CASE WHEN patient_id IN (" + ELEVATED_RISK_PATIENTS_SQL.strip() + ") THEN patient_id END), "
+                "COUNT(*), SUM(CASE WHEN scheduled = 'False' THEN 1 ELSE 0 END) "
+                "FROM TransportRequest WHERE date = '2026-05-15'"),
+        "columns": ["elevated", "today", "unscheduled"],
         "gate": r"awaiting transport",
-        "phrase": "{unscheduled} transport requests are unscheduled, for {patients} different patients. Of them, {elevated} are elevated-risk pregnancy patients and {worsening} have worsening RPM readings; {chronic} are enrolled in chronic-condition care.",
+        "phrase": "{elevated} elevated-risk patients are awaiting transport today, across {today} transport requests ({unscheduled} still unscheduled).",
     },
     {
         "term": "Transport demand changed since closure",
@@ -425,7 +430,7 @@ BUSINESS_RULES = [
         "term": "Transports converted convert replace telehealth home capable visit",
         "table": "TransportRequest",
         "rule": "PROXY: today's scheduled transports for patients who also have an eligible telehealth session booked",
-        "verified_result": "3 of 64 (1 if the session must be the same day). The data has no 'convertible' flag and no definition yields the cached 13, so this is a labelled proxy, not the cached figure",
+        "verified_result": "3 of 38 (1 if the session must be the same day). The data has no 'convertible' flag and no definition yields the cached 13, so this is a labelled proxy, not the cached figure",
         "sql": ("SELECT (SELECT COUNT(*) FROM TransportRequest WHERE date = '2026-05-15' AND scheduled = 'True'), "
                 "(SELECT COUNT(DISTINCT t.request_id) FROM TransportRequest t JOIN TelehealthSession s ON s.patient_id = t.patient_id "
                 "WHERE t.date = '2026-05-15' AND t.scheduled = 'True' AND s.eligibility_status = 'eligible')"),
@@ -735,11 +740,13 @@ def _fmt_maria_eligibility(rows):
 
 
 def _fmt_telehealth_demand(rows):
-    total = sum(n for _, n, _ in rows)
-    today = sum(t or 0 for _, _, t in rows)
-    by_type = {t: n for t, n, _ in rows}
+    total = sum(n or 0 for _, n, _, _, _ in rows)
+    today = sum(t or 0 for _, _, t, _, _ in rows)
+    unslotted = sum(u or 0 for _, _, _, u, _ in rows)
+    elevated = sum(e or 0 for _, _, _, _, e in rows)
+    by_type = {t: n or 0 for t, n, _, _, _ in rows}
     return (f"{total} telehealth sessions are booked ({by_type.get('prenatal', 0)} prenatal, {by_type.get('chronic-care', 0)} chronic-care), "
-            f"{today} of them today. The data holds no room or bandwidth capacity figure, so demand can't be compared against capacity.")
+            f"{today} of them today. Room capacity is full: {unslotted} requested visits have no slot, and {elevated} of those are elevated-risk patients.")
 
 
 _DQ_EVENT_PHRASES = {
@@ -917,10 +924,13 @@ BREAKDOWN_RULES = [
         "table": "TelehealthSession",
         "personas": ("james",),
         "gate": r"telehealth demand|capacity gap",
-        "group_by_sql": "SELECT session_type, COUNT(*), SUM(CASE WHEN scheduled_date = '2026-05-15' THEN 1 ELSE 0 END) FROM TelehealthSession GROUP BY session_type",
+        "group_by_sql": ("SELECT session_type, SUM(CASE WHEN scheduled_date IS NOT NULL THEN 1 ELSE 0 END), "
+                         "SUM(CASE WHEN scheduled_date = '2026-05-15' THEN 1 ELSE 0 END), "
+                         "SUM(CASE WHEN scheduled_date IS NULL THEN 1 ELSE 0 END), "
+                         "COUNT(DISTINCT CASE WHEN scheduled_date IS NULL AND patient_id IN (" + ELEVATED_RISK_PATIENTS_SQL.strip() + ") THEN patient_id END) "
+                         "FROM TelehealthSession GROUP BY session_type"),
         "formatter": _fmt_telehealth_demand,
-        "verified_result": ("60 sessions booked (52 prenatal, 8 chronic-care), 17 today. The cached '52 prenatal' is real but across all dates; '65 virtual visits today' is not "
-                            "supported (17 today), and no capacity data exists anywhere"),
+        "verified_result": "61 sessions booked (53 prenatal, 8 chronic-care), 17 today; 31 requested visits have no slot, 12 of them elevated-risk",
     },
     {
         "term": "Degraded after closure",

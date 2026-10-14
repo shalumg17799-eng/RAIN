@@ -11,10 +11,8 @@ Confirmed exact:
   distance) -- see priya_equity_brief.py, where both figures are shown
   together. A single compact KPI tile can't carry that nuance, so this
   tile uses the documented-trend figure its own label already names.
-- dead_zones (KPI) = COUNT(Patient in a no-broadband ZIP) = 574 -- corrects
-  the static card's wrong 240 (previously tested and found not to match;
-  574 is the same, already-verified population behind Priya's "574
-  patients live in a ZIP with no reliable telehealth connectivity" rule)
+- dead_zones (KPI) = elevated-risk patients (james_live_data.ELEVATED_RISK_PATIENTS_SQL)
+  living in a no-broadband ZIP = 240 (of 560 patients in those ZIPs)
 - SIG-RAIN-PRIYA-001 desert_pct / prior_desert_pct: the same MetricTrend
   figure as the desert KPI above (31 -> 58)
 - SIG-RAIN-PRIYA-001 ed_deliveries_60d = COUNT(ClaimEncounter WHERE
@@ -41,6 +39,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv(override=True)  # reads .env in this folder, sets ANTHROPIC_API_KEY / PG_* / NEO4J_* automatically
 import psycopg2
+from james_live_data import ELEVATED_RISK_PATIENTS_SQL
 
 PG_CONFIG = {
     "host": os.environ.get("PG_HOST", "localhost"),
@@ -60,21 +59,23 @@ def _query_one(sql: str):
     return result
 
 
+DEAD_ZONE_ELEVATED_SQL = f"""
+    SELECT COUNT(*) FROM "Patient" p JOIN "ConnectivityRegistry" c ON c.zip_code = p.zip_code
+    WHERE c.broadband_available = false AND p.patient_id IN ({ELEVATED_RISK_PATIENTS_SQL})
+"""
+
+
 def get_priya_live_kpis() -> dict:
     desert_after = _query_one("""SELECT after_value::int FROM "MetricTrend" WHERE metric_id='maternal_care_desert_pct'""")
     return {
         "desert": f"{desert_after}%",
-        "dead_zones": _query_one(
-            """SELECT COUNT(*) FROM "Patient" p JOIN "ConnectivityRegistry" c ON c.zip_code = p.zip_code WHERE c.broadband_available = false"""
-        ),
+        "dead_zones": _query_one(DEAD_ZONE_ELEVATED_SQL),
     }
 
 
 def get_priya_live_signals() -> dict:
     dead_zone_zips = _query_one("""SELECT COUNT(*) FROM "ConnectivityRegistry" WHERE broadband_available=false""")
-    dead_zone_patients = _query_one(
-        """SELECT COUNT(*) FROM "Patient" p JOIN "ConnectivityRegistry" c ON c.zip_code = p.zip_code WHERE c.broadband_available = false"""
-    )
+    dead_zone_patients = _query_one(DEAD_ZONE_ELEVATED_SQL)
     desert_before, desert_after = (_query_one("""SELECT before_value::int FROM "MetricTrend" WHERE metric_id='maternal_care_desert_pct'"""),
                                    _query_one("""SELECT after_value::int FROM "MetricTrend" WHERE metric_id='maternal_care_desert_pct'"""))
     ed_deliveries = _query_one("""SELECT COUNT(*) FROM "ClaimEncounter" WHERE encounter_type='ED_delivery_or_BBA'""")
@@ -101,8 +102,8 @@ def get_priya_live_signals() -> dict:
         "SIG-RAIN-PRIYA-003": {
             "affected_count": dead_zone_patients,
             "description": (
-                f"{int(dead_zone_patients)} patients live in a ZIP with no broadband, "
-                f"across {int(dead_zone_zips)} ZIP codes."
+                f"{int(dead_zone_patients)} elevated-risk patients live in telehealth dead zones "
+                f"({int(dead_zone_zips)} ZIP codes with no reliable broadband)."
             ),
             "metrics": {"dead_zone_zips": dead_zone_zips, "dead_zone_patients": dead_zone_patients},
         },
@@ -111,7 +112,7 @@ def get_priya_live_signals() -> dict:
 
 if __name__ == "__main__":
     kpis = get_priya_live_kpis()
-    expected_kpis = {"desert": "58%", "dead_zones": 574}
+    expected_kpis = {"desert": "58%", "dead_zones": 240}
     print("Priya live PostgreSQL results:")
     for key, val in kpis.items():
         status = "OK" if val == expected_kpis[key] else "MISMATCH"

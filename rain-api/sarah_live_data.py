@@ -8,7 +8,8 @@ Signal sentences use the verified counts, not the spec wording:
   than 30 days before 2026-05-15), not the spec's 9
 - diabetes patients assigned to a deactivated provider is 42, not 41, and
   22 of those 42 have a transportation flag, not 18
-- hypertension RPM compliance from RPMReading is 61%, not the spec's 58%
+- hypertension RPM compliance is the received share of the latest reading
+  cycle (58%), compared with the first cycle in the 60-day window (79%)
 """
 
 import os
@@ -23,6 +24,14 @@ PG_CONFIG = {
     "user": os.environ.get("PG_USER", "rain_app"),
     "password": os.environ.get("PG_PASSWORD", "rain_dev_pw"),
 }
+
+
+# Received share of one hypertension reading cycle: MAX = latest, MIN = first.
+RPM_CYCLE_COMPLIANCE_SQL = """
+    SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status='received' THEN 1 ELSE 0 END) / COUNT(*))
+    FROM "RPMReading" WHERE condition_type='hypertension'
+    AND timestamp = (SELECT {agg}(timestamp) FROM "RPMReading" WHERE condition_type='hypertension')
+"""
 
 
 def _query_one(sql: str):
@@ -46,13 +55,8 @@ def get_sarah_live_kpis() -> dict:
         ),
         # New: exact match on the real MedicationFill row count.
         "med_nonadherence": _query_one('SELECT COUNT(*) FROM "MedicationFill"'),
-        # New: real received/total ratio for hypertension RPM transmissions.
-        # Gives 61%, not the spec's original 58% -- the real data supports
-        # 61 exactly; 58 doesn't reproduce from any tested definition.
-        "rpm_compliance": _query_one("""
-            SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status='received' THEN 1 ELSE 0 END) / COUNT(*))
-            FROM "RPMReading" WHERE condition_type='hypertension'
-        """),
+        # Received share of the latest hypertension reading cycle.
+        "rpm_compliance": _query_one(RPM_CYCLE_COMPLIANCE_SQL.format(agg="MAX")),
     }
 
 
@@ -88,10 +92,8 @@ def get_sarah_live_signals() -> dict:
         AND c.patient_id IN (SELECT patient_id FROM "SDOHFlag" WHERE flag_type='transportation')
     """)
     hypertension = _query_one("""SELECT COUNT(*) FROM "ChronicConditionEnrollment" WHERE condition_type='hypertension'""")
-    compliance_pct = _query_one("""
-        SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status='received' THEN 1 ELSE 0 END) / COUNT(*))
-        FROM "RPMReading" WHERE condition_type='hypertension'
-    """)
+    compliance_pct = _query_one(RPM_CYCLE_COMPLIANCE_SQL.format(agg="MAX"))
+    prior_compliance_pct = _query_one(RPM_CYCLE_COMPLIANCE_SQL.format(agg="MIN"))
     return {
         "SIG-RAIN-SARAH-001": {
             "affected_count": worsening,
@@ -122,11 +124,13 @@ def get_sarah_live_signals() -> dict:
         "SIG-RAIN-SARAH-003": {
             "affected_count": hypertension,
             "description": (
-                f"RPM transmission compliance among {int(hypertension)} hypertension patients is {int(compliance_pct)}%."
+                f"RPM transmission compliance among {int(hypertension)} hypertension patients fell from "
+                f"{int(prior_compliance_pct)}% to {int(compliance_pct)}% over 60 days."
             ),
             "metrics": {
                 "enrolled": hypertension,
                 "compliance_pct": compliance_pct,
+                "prior_compliance_pct": prior_compliance_pct,
             },
         },
     }

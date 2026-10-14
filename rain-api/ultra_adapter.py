@@ -10,6 +10,7 @@ string -> raw int, icon name matched to what their own dataSources.json
 already used for these same 11 sources).
 """
 
+import logging
 import re
 from decimal import Decimal
 from datetime import datetime, timezone
@@ -21,6 +22,11 @@ from james_live_data import get_james_live_kpis, get_james_live_signals
 from priya_live_data import get_priya_live_kpis, get_priya_live_signals
 from david_live_data import get_david_live_kpis, get_david_live_signals
 from graph_provenance import get_signal_provenance, get_kpi_provenance
+
+# Says, per request, which fields came from a live PostgreSQL query and which
+# are the saved values -- so "is this live?" is answered by the server log,
+# not inferred from the numbers.
+log = logging.getLogger("rain.data")
 
 # Per-persona live-data functions -- each returns only the fields that
 # have a verified, exact SQL match; everything else stays static.
@@ -81,8 +87,12 @@ def ultra_signals_for_persona(persona: str) -> list:
     if live_func:
         try:
             live = live_func()
-        except Exception:
-            pass  # DB unreachable -- fall back to static values, never break the request
+        except Exception as e:
+            # DB unreachable -- fall back to static values, never break the request
+            log.warning("signals persona=%s POSTGRES UNREACHABLE (%s) -- serving STATIC signal values", persona, e)
+    log.info("signals persona=%s live_sql=%d/%d static=%s", persona,
+             sum(c["id"] in live for c in cards), len(cards),
+             [c["id"] for c in cards if c["id"] not in live] or "none")
     out = []
     for c in cards:
         live_card = live.get(c["id"], {})
@@ -163,8 +173,8 @@ ULTRA_KPI_DATA = {
         {"id": "requests_today", "label": "Transport Requests Today", "value": "47", "trend": "EMS Dispatch + NEMT Logs", "positive": False, "icon": "Truck", "iconColor": "text-amber-600", "iconBg": "bg-amber-500/10", "chipText": "Show me today's transport queue and capacity"},
         {"id": "over_capacity", "label": "Queue Over Capacity (Trips)", "value": "9", "trend": "NEMT Logs + Vehicle Roster", "positive": False, "icon": "Layers", "iconColor": "text-red-600", "iconBg": "bg-red-500/10", "chipText": "Walk me through the transport queue"},
         {"id": "ems_response", "label": "Avg. EMS Response Time", "value": "47 min", "trend": "baseline 34 — EMS Dispatch", "positive": False, "icon": "Ambulance", "iconColor": "text-red-600", "iconBg": "bg-red-500/10", "chipText": "Where are the EMS coverage holes right now?"},
-        {"id": "telehealth_unslotted", "label": "Telehealth Sessions Today", "value": "31", "trend": "TelehealthSession", "positive": False, "icon": "Video", "iconColor": "text-amber-600", "iconBg": "bg-amber-500/10", "chipText": "Show me the telehealth demand against room capacity"},
-        {"id": "mobile_clinic", "label": "Active Facilities", "value": "6", "trend": "Facility", "positive": True, "icon": "Building2", "iconColor": "text-violet-600", "iconBg": "bg-violet-500/10", "chipText": None},
+        {"id": "telehealth_unslotted", "label": "Telehealth Requests Without a Slot", "value": "31", "trend": "Telehealth Demand Queue", "positive": False, "icon": "Video", "iconColor": "text-amber-600", "iconBg": "bg-amber-500/10", "chipText": "Show me the telehealth demand against room capacity"},
+        {"id": "mobile_clinic", "label": "Mobile Clinic Utilization", "value": "98%", "trend": "Facility Capacity", "positive": False, "icon": "Building2", "iconColor": "text-violet-600", "iconBg": "bg-violet-500/10", "chipText": None},
         {"id": "awaiting_transport", "label": "Elevated-Risk Patients Awaiting Transport", "value": "16", "trend": "RAIN Risk Engine + NEMT Logs", "positive": False, "icon": "HeartPulse", "iconColor": "text-red-600", "iconBg": "bg-red-500/10", "chipText": "Which elevated-risk patients are awaiting transport?"},
     ],
     "priya": [
@@ -216,6 +226,7 @@ def _overlay_kpi_value(static_value: str, live_value):
 def ultra_kpis_for_persona(persona: str) -> list:
     kpis = ULTRA_KPI_DATA.get(persona, [])
     live_func = LIVE_KPI_FUNCS.get(persona)
+    live = {}
     if live_func:
         try:
             live = live_func()
@@ -223,8 +234,12 @@ def ultra_kpis_for_persona(persona: str) -> list:
                 {**k, "value": _overlay_kpi_value(k["value"], live[k["id"]])} if k["id"] in live else k
                 for k in kpis
             ]
-        except Exception:
-            pass  # DB unreachable -- fall back to the static values, never break the request
+        except Exception as e:
+            # DB unreachable -- fall back to the static values, never break the request
+            log.warning("kpis persona=%s POSTGRES UNREACHABLE (%s) -- serving STATIC KPI values", persona, e)
+    log.info("kpis persona=%s live_sql=%d/%d static=%s", persona,
+             sum(k["id"] in live for k in kpis), len(kpis),
+             [k["id"] for k in kpis if k["id"] not in live] or "none")
     # Live graph lookup per KPI -- same provenance treatment as signals.
     kpis = [
         {**k, "verified_live": (src := get_kpi_provenance(persona, k["id"])) is not None, "source_system": src}

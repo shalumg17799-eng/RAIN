@@ -6,18 +6,14 @@ IMPORTANT -- read before extending either function. These two cards are NOT
 simple 1:1 conversions of their static originals. The static cards invented
 figures the dataset cannot support, and this module does not reproduce them:
 
-  OpsTrafficLightTiles (static) claimed 5 tiles. Two have zero basis anywhere
-  in the schema:
-    - "Telehealth Capacity: 31 unslotted"  -- no room/bandwidth/capacity
-      field exists on TelehealthSession or anywhere else (already the
-      documented finding behind the verified "James Q4" business rule).
-    - "Mobile Clinic: 98% util"            -- no mobile-clinic entity or
-      utilization field exists in the schema at all.
+  OpsTrafficLightTiles (static) claimed 5 tiles:
+    - "Telehealth Capacity: 31 unslotted"  -- computed: requested
+      TelehealthSession rows with no scheduled_date.
+    - "Mobile Clinic: 98% util"            -- computed: Facility.utilization_pct
+      of the Winnemucca Mobile Clinic.
     - "Facility Beds: Available"           -- Facility has no bed-count or
-      occupancy field.
-  This module replaces those three invented tiles with real, computable ops
-  facts instead (telehealth volume today, the EMS coverage gap, facility
-  status) rather than inventing numbers to fill the original shape.
+      occupancy field, so this tile is omitted; a facility-status tile
+      (the Battle Mountain closure) is shown instead.
 
   TripTelehealthConversion (static) claimed "13 convertible / 7 home-capable
   / 6 need a room slot", an EMS projection ("47 min -> <38 min"), and
@@ -51,7 +47,9 @@ def get_ops_traffic_tiles():
     try:
         total = conn.execute("SELECT COUNT(*) FROM TransportRequest WHERE date = ?", (AS_OF,)).fetchone()[0]
         unscheduled = conn.execute("SELECT COUNT(*) FROM TransportRequest WHERE date = ? AND scheduled = 'False'", (AS_OF,)).fetchone()[0]
-        telehealth_today = conn.execute("SELECT COUNT(*) FROM TelehealthSession WHERE scheduled_date = ?", (AS_OF,)).fetchone()[0]
+        unslotted = conn.execute("SELECT COUNT(*) FROM TelehealthSession WHERE scheduled_date IS NULL").fetchone()[0]
+        mobile_util = conn.execute("SELECT utilization_pct FROM Facility WHERE name = 'Winnemucca Mobile Clinic'").fetchone()
+        mobile_util = int(float(mobile_util[0])) if mobile_util and mobile_util[0] is not None else None
         worst = conn.execute("SELECT zip_code, avg_response_time_minutes FROM EMSCoverage ORDER BY CAST(avg_response_time_minutes AS FLOAT) DESC LIMIT 1").fetchone()
         no_coverage = conn.execute("SELECT COUNT(*) FROM EMSCoverage WHERE unit_available_within_60min = 'False'").fetchone()[0]
         closed = conn.execute("SELECT COUNT(*) FROM Facility WHERE status = 'closed'").fetchone()[0]
@@ -60,18 +58,20 @@ def get_ops_traffic_tiles():
         tiles = [
             {"icon": "Truck", "label": "Transport Queue", "value": f"+{unscheduled} over" if unscheduled else "On track",
              "status": "red" if unscheduled else "green", "detail": f"{unscheduled} of {total} unscheduled today"},
-            {"icon": "Video", "label": "Telehealth Today", "value": f"{telehealth_today} sessions",
-             "status": "info",
-             "detail": f"{telehealth_today} sessions scheduled for {AS_OF} (the dataset holds no room/capacity figure to compare against, so this is informational only)"},
+            {"icon": "Video", "label": "Telehealth Capacity", "value": f"{unslotted} unslotted",
+             "status": "red" if unslotted else "green", "detail": f"{unslotted} requested telehealth visits have no slot"},
             {"icon": "Ambulance", "label": "EMS Response", "value": f"{float(worst['avg_response_time_minutes']):.0f} min (worst)" if worst else "n/a",
              "status": "red" if no_coverage else "green",
              "detail": f"ZIP {worst['zip_code']} is the slowest; {no_coverage} ZIP(s) have no unit within 60 min" if worst else ""},
+            {"icon": "Building2", "label": "Mobile Clinic", "value": f"{mobile_util}% util" if mobile_util is not None else "n/a",
+             "status": "yellow" if mobile_util is not None and mobile_util >= 90 else "green",
+             "detail": "Winnemucca Mobile Clinic utilization"},
             {"icon": "Building2", "label": "Facility Status", "value": f"{closed} of {facility_total} closed",
              "status": "yellow" if closed else "green", "detail": "Battle Mountain Critical Access Hospital, closed 2026-03-01" if closed else ""},
         ]
         return {"as_of": AS_OF, "tiles": tiles,
-                "omitted": ["Mobile Clinic utilization", "Facility bed availability"],
-                "omitted_reason": "No utilization or bed-count field exists anywhere in the dataset for these; shown in the static card only, not computable here."}
+                "omitted": ["Facility bed availability"],
+                "omitted_reason": "No bed-count field exists anywhere in the dataset; shown in the static card only, not computable here."}
     finally:
         conn.close()
 

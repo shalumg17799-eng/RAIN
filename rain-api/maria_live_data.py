@@ -41,6 +41,9 @@ def _query_one(sql: str):
     return result
 
 
+PRENATAL_COMPLETION_SQL = """SELECT {col}::int FROM "MetricTrend" WHERE metric_id = 'prenatal_completion_rate'"""
+
+
 def get_maria_live_kpis() -> dict:
     """Returns all 7 KPIs, computed live via real SQL."""
     return {
@@ -55,24 +58,20 @@ def get_maria_live_kpis() -> dict:
         "ed_deliveries": _query_one(
             """SELECT COUNT(*) FROM "ClaimEncounter" WHERE encounter_type = 'ED_delivery_or_BBA'"""
         ),
-        # New: real, derived from already-verified live numbers (elevated-risk
-        # cohort minus missed-visit count). This is a genuine live computation,
-        # but it does NOT reproduce the original spec's 61% narrative figure --
-        # that number appears to describe a different population/window than
-        # what's actually stored in the row-level data. 84% is what the real
-        # data genuinely supports.
-        "prenatal_completion": _query_one("""
-            SELECT ROUND(100.0 * SUM(CASE WHEN last_prenatal_visit_date >= '2026-04-01' THEN 1 ELSE 0 END) / COUNT(*))
-            FROM "PregnancyEpisode" WHERE distance_to_delivery_miles = 115
-        """),
+        # Service-area completion rate after the closure, from the stored
+        # MetricTrend row (84% before -> 61% after). The old query here counted
+        # visits since April in the 115-mile cohort, which is a different
+        # measure and happened to equal the BEFORE figure (84%).
+        "prenatal_completion": _query_one(PRENATAL_COMPLETION_SQL.format(col="after_value")),
         # Definitional: this IS the value that defines the elevated-risk
         # cohort, so an AVG over that cohort is trivially itself -- still a
         # genuine live query, just not an independent statistic.
         "distance_delivery": _query_one(
             'SELECT ROUND(AVG(distance_to_delivery_miles)) FROM "PregnancyEpisode" WHERE distance_to_delivery_miles = 115'
         ),
+        # Booked = has a slot; requested visits with no date are not booked.
         "telehealth_booked": _query_one(
-            """SELECT COUNT(*) FROM "TelehealthSession" WHERE session_type='prenatal' AND eligibility_status='eligible'"""
+            """SELECT COUNT(*) FROM "TelehealthSession" WHERE session_type='prenatal' AND eligibility_status='eligible' AND scheduled_date IS NOT NULL"""
         ),
     }
 
@@ -86,10 +85,8 @@ def get_maria_live_signals() -> dict:
         SELECT COUNT(*) FROM "PregnancyEpisode" pe
         WHERE pe.patient_id NOT IN (SELECT patient_id FROM "TransportRequest" WHERE scheduled = true)
     """)
-    completion_pct = _query_one("""
-        SELECT ROUND(100.0 * SUM(CASE WHEN last_prenatal_visit_date >= '2026-04-01' THEN 1 ELSE 0 END) / COUNT(*))
-        FROM "PregnancyEpisode" WHERE distance_to_delivery_miles = 115
-    """)
+    completion_pct = _query_one(PRENATAL_COMPLETION_SQL.format(col="after_value"))
+    prior_completion_pct = _query_one(PRENATAL_COMPLETION_SQL.format(col="before_value"))
     return {
         "SIG-RAIN-MARIA-001": {
             "affected_count": elevated_risk_count,
@@ -109,11 +106,12 @@ def get_maria_live_signals() -> dict:
         "SIG-RAIN-MARIA-002": {
             "affected_count": no_transport,
             "description": (
-                f"Prenatal visit completion among elevated-risk pregnancies is {int(completion_pct)}%. "
+                f"Prenatal visit completion in the service area dropped from {int(prior_completion_pct)}% to {int(completion_pct)}% after the closure. "
                 f"{int(no_transport)} pregnancies have no transport scheduled."
             ),
             "metrics": {
                 "completion_pct": completion_pct,
+                "prior_completion_pct": prior_completion_pct,
                 "no_transport_scheduled": no_transport,
             },
         },

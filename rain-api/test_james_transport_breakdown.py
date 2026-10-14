@@ -46,21 +46,21 @@ def columns_of(table):
     )]
 
 
-@check("total/scheduled/unscheduled match the verified 73/64/9 figures, independently re-queried")
+@check("total/scheduled/unscheduled match the verified 47/38/9 figures, independently re-queried")
 def _():
     r = jo.get_transport_queue_breakdown()
     total = sql("SELECT COUNT(*) FROM TransportRequest WHERE date='2026-05-15'")[0][0]
     sched = sql("SELECT COUNT(*) FROM TransportRequest WHERE date='2026-05-15' AND scheduled='True'")[0][0]
-    assert (total, sched, total - sched) == (73, 64, 9)
-    assert (r["total"], r["scheduled"], r["unscheduled"]) == (73, 64, 9)
+    assert (total, sched, total - sched) == (47, 38, 9)
+    assert (r["total"], r["scheduled"], r["unscheduled"]) == (47, 38, 9)
 
 
-@check("by_type matches independent SQL exactly: EMS 10, NEMT 63")
+@check("by_type matches independent SQL exactly: EMS 10, NEMT 37")
 def _():
     r = jo.get_transport_queue_breakdown()
     rows = sql("SELECT request_type, COUNT(*) FROM TransportRequest WHERE date='2026-05-15' GROUP BY request_type")
     expect = {t: n for t, n in rows}
-    assert expect == {"EMS": 10, "NEMT": 63}
+    assert expect == {"EMS": 10, "NEMT": 37}
     by_label = {x["label"]: x["count"] for x in r["by_type"]}
     assert by_label == expect
     assert sum(by_label.values()) == r["total"]
@@ -117,7 +117,7 @@ def http_tests():
         @check("HTTP: POST /api/v2/generic (TransportQueueBreakdown) returns the live, real breakdown")
         def _():
             status, body = generic("TransportQueueBreakdown", "james")
-            assert status == 200 and body["total"] == 73 and body["scheduled"] == 64
+            assert status == 200 and body["total"] == 47 and body["scheduled"] == 38
 
         @check("HTTP: every prior live card across all five modules remains unaffected")
         def _():

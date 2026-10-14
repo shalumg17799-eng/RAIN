@@ -74,26 +74,27 @@ def _():
     assert a["draft"]["crosswalk_fixes"] == sql("SELECT COUNT(*) FROM ProviderReferenceIssue WHERE status='mismatched'")[0][0] == 180
 
 
-@check("RPM completeness action shows the real 61%, NOT the static card's wrong 78% starting point")
+@check("RPM completeness action shows 78% of all device readings received, the same figure as David's KPI tile")
 def _():
     pkg = rp.build_remediation_plan(log_path=fresh_log())
     a = next(x for x in pkg["actions"] if x["type"] == "rpm_completeness")
-    total, received = sql("SELECT COUNT(*), SUM(transmission_status='received') FROM RPMReading WHERE condition_type='hypertension'")[0]
+    total, received = sql("SELECT COUNT(*), SUM(transmission_status='received') FROM RPMReading")[0]
     expect_pct = round(100 * received / total)
-    assert expect_pct == 61
-    assert a["draft"]["current_pct"] == 61
-    assert "78" not in json.dumps(a["draft"])
+    assert expect_pct == 78
+    assert a["draft"]["current_pct"] == 78
+    assert "95" not in json.dumps(a["draft"])  # no projected outcome: no buffering model exists
 
 
-@check("weakest ZIPs match independent SQL, 89825 among them (the already-verified weakest ZIP)")
+@check("weakest ZIPs match independent SQL, and all of them are no-broadband (frontier) ZIPs")
 def _():
     pkg = rp.build_remediation_plan(log_path=fresh_log())
     a = next(x for x in pkg["actions"] if x["type"] == "rpm_completeness")
     rows_ = sql("SELECT p.zip_code, ROUND(100.0*SUM(r.transmission_status='received')/COUNT(*)) FROM RPMReading r "
-               "JOIN Patient p ON p.patient_id=r.patient_id WHERE r.condition_type='hypertension' GROUP BY p.zip_code ORDER BY 2 ASC LIMIT 3")
+               "JOIN Patient p ON p.patient_id=r.patient_id GROUP BY p.zip_code ORDER BY 2 ASC LIMIT 3")
     expect = [z for z, _ in rows_]
     assert [z["zip"] for z in a["draft"]["weakest_zips"]] == expect
-    assert "89825" in expect
+    dead = {z for (z,) in sql("SELECT zip_code FROM ConnectivityRegistry WHERE broadband_available='False'")}
+    assert set(expect) <= dead, expect
 
 
 @check("FHIR mapping action ties to the real weakest feed (New Rural Clinic EHR Connector, 88%), no fabricated 'clears X/Y' numbers")

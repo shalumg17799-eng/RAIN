@@ -5,7 +5,9 @@
 // instead of growing a new endpoint each time.
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
 
-export async function fetchGenericComponent(component, persona, variant) {
+import { logBackend, logFallback } from '../../utils/dataLog';
+
+async function requestComponent(component, persona, variant) {
   const res = await fetch(`${API_BASE}/api/v2/generic`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -19,4 +21,17 @@ export async function fetchGenericComponent(component, persona, variant) {
   const entry = body.visualization && body.visualization.find((v) => v.type === component);
   if (!entry || !entry.data || entry.data.error) throw new Error(entry && entry.data ? entry.data.error : 'no resolver');
   return entry.data;
+}
+
+// Every caller renders its bundled STATIC_* card when this throws, so the
+// fallback is logged here once for all of them.
+export async function fetchGenericComponent(component, persona, variant) {
+  try {
+    const data = await requestComponent(component, persona, variant);
+    logBackend(`${component} card rendered from POST /api/v2/generic (persona ${persona})`);
+    return data;
+  } catch (err) {
+    logFallback(`${component} card`, 'the card\'s own STATIC_* constants', err.message);
+    throw err;
+  }
 }

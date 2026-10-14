@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { logStatic } from '../../../../utils/dataLog';
 
 const RAIN_NAVY = '#003366';
 // Simplified Nevada silhouette (stylized — not survey-accurate).
@@ -12,6 +14,7 @@ const clusters = [
 ];
 
 export default function NevadaAccessMap() {
+  useEffect(() => logStatic('Maternal access map (115 mi, 58%/31%, ZIP clusters)', 'NevadaAccessMap.jsx'), []);
   return (
     <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3 }}
       className="bg-gray-50 rounded-xl p-4 border border-gray-100">

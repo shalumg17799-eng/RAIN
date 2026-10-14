@@ -5,24 +5,16 @@ Same honest pattern: only verified-exact fields are live.
 Confirmed exact:
 - over_capacity / over_capacity_by = COUNT(TransportRequest WHERE scheduled=false) = 9
 - zips_no_coverage = COUNT(EMSCoverage WHERE unit_available_within_60min=false) = 2
-- requests_today = COUNT(TransportRequest WHERE date=today) = 73 -- corrects the
-  static card's wrong 47 (not just "uncomputed": this was independently
-  verified many times this session as the real total)
+- requests_today = COUNT(TransportRequest WHERE date=today) = 47 (38 scheduled
+  against capacity + 9 unscheduled)
 - ems_response = MetricTrend.ems_avg_response_time_min (34 -> 47) -- this
   table wasn't known when this module was first written ("spec says 47"
   was noted as untestable then); it is a real, stored documented trend
-- awaiting_transport = COUNT(TransportRequest WHERE scheduled=false) = 9 --
-  corrects the static card's wrong 16; the already-verified finding is
-  that today's unscheduled requests are 0 elevated-risk, 0 worsening-RPM,
-  all chronic-condition -- 16 never matched any real population
-
-TelehealthSession has no room or capacity column. Every row has a
-scheduled_date, so "unslotted" (a session with no date) is 0. The live
-tile and card use the sessions scheduled on the dataset date instead,
-which is the same count as the operations "Telehealth Today" tile.
-
-Facility has no utilization column and no mobile-clinic row. The tile
-that used to say 98% now counts facilities whose status is active.
+- awaiting_transport = distinct elevated-risk patients (ELEVATED_RISK_PATIENTS_SQL)
+  with a transport request today = 16
+- telehealth_unslotted = requested TelehealthSession rows with no
+  scheduled_date = 31, 12 of them elevated-risk
+- mobile_clinic = Facility.utilization_pct of the Winnemucca Mobile Clinic = 98
 
 Still not computable (genuinely no backing field in the dataset):
 - coverage (sq mi) -- no geographic-area field anywhere
@@ -42,6 +34,17 @@ PG_CONFIG = {
 }
 
 
+# The risk engine's elevated-risk population: any active pregnancy, or an
+# enrollment in one of the four tracked chronic conditions. Shared with
+# priya_live_data so "elevated-risk" means the same thing on every card.
+ELEVATED_RISK_PATIENTS_SQL = """
+    SELECT patient_id FROM "PregnancyEpisode"
+    UNION SELECT patient_id FROM "ChronicConditionEnrollment"
+    WHERE condition_type IN ('CHF', 'COPD', 'diabetes', 'hypertension')
+"""
+MOBILE_CLINIC_UTILIZATION_SQL = """SELECT utilization_pct::int FROM "Facility" WHERE name = 'Winnemucca Mobile Clinic'"""
+
+
 def _query_one(sql: str):
     conn = psycopg2.connect(**PG_CONFIG)
     with conn.cursor() as cur:
@@ -57,9 +60,11 @@ def get_james_live_kpis() -> dict:
         "over_capacity": _query_one("""SELECT COUNT(*) FROM "TransportRequest" WHERE scheduled=false"""),
         "requests_today": _query_one("""SELECT COUNT(*) FROM "TransportRequest" WHERE date='2026-05-15'"""),
         "ems_response": f"{ems_after} min",
-        "awaiting_transport": _query_one("""SELECT COUNT(*) FROM "TransportRequest" WHERE scheduled=false"""),
-        "telehealth_unslotted": _query_one("""SELECT COUNT(*) FROM "TelehealthSession" WHERE scheduled_date='2026-05-15'"""),
-        "mobile_clinic": _query_one("""SELECT COUNT(*) FROM "Facility" WHERE status='active'"""),
+        "awaiting_transport": _query_one(f"""
+            SELECT COUNT(DISTINCT patient_id) FROM "TransportRequest"
+            WHERE date='2026-05-15' AND patient_id IN ({ELEVATED_RISK_PATIENTS_SQL})"""),
+        "telehealth_unslotted": _query_one("""SELECT COUNT(*) FROM "TelehealthSession" WHERE scheduled_date IS NULL"""),
+        "mobile_clinic": _query_one(MOBILE_CLINIC_UTILIZATION_SQL),
     }
 
 
@@ -70,13 +75,11 @@ def get_james_live_signals() -> dict:
         """SELECT COUNT(*) FROM "EMSCoverage" WHERE unit_available_within_60min=false"""
     )
     ems_minutes = _query_one("""SELECT after_value::int FROM "MetricTrend" WHERE metric_id='ems_avg_response_time_min'""")
-    telehealth_today = _query_one("""SELECT COUNT(*) FROM "TelehealthSession" WHERE scheduled_date='2026-05-15'""")
     telehealth_unslotted = _query_one("""SELECT COUNT(*) FROM "TelehealthSession" WHERE scheduled_date IS NULL""")
-    elevated_today = _query_one("""
-        SELECT COUNT(DISTINCT t.patient_id) FROM "TelehealthSession" t
-        JOIN "PregnancyEpisode" p ON p.patient_id = t.patient_id
-        WHERE p.distance_to_delivery_miles = 115 AND t.scheduled_date = '2026-05-15'
-    """)
+    elevated_unslotted = _query_one(f"""
+        SELECT COUNT(DISTINCT patient_id) FROM "TelehealthSession"
+        WHERE scheduled_date IS NULL AND patient_id IN ({ELEVATED_RISK_PATIENTS_SQL})""")
+    mobile_clinic = _query_one(MOBILE_CLINIC_UTILIZATION_SQL)
     return {
         "SIG-RAIN-JAMES-001": {
             "affected_count": over_capacity,
@@ -88,18 +91,17 @@ def get_james_live_signals() -> dict:
             "metrics": {"over_capacity_by": over_capacity, "requests_today": requests_today},
         },
         "SIG-RAIN-JAMES-002": {
-            "title": "Telehealth Sessions Scheduled Today",
-            "affected_count": telehealth_today,
-            "affected_unit": "sessions",
+            "affected_count": telehealth_unslotted,
+            "affected_unit": "visits",
             "description": (
-                f"{int(telehealth_today)} telehealth sessions are scheduled today. "
-                f"{int(elevated_today)} of those patients are elevated-risk pregnancies. "
-                f"{int(telehealth_unslotted)} sessions have no scheduled date."
+                f"The mobile clinic is at {int(mobile_clinic)}% utilization. "
+                f"{int(telehealth_unslotted)} requested telehealth visits have no slot, and "
+                f"{int(elevated_unslotted)} of those are elevated-risk patients."
             ),
             "metrics": {
-                "sessions_today": telehealth_today,
-                "elevated_risk_today": elevated_today,
                 "unslotted_visits": telehealth_unslotted,
+                "elevated_risk_unslotted": elevated_unslotted,
+                "mobile_clinic_utilization_pct": mobile_clinic,
             },
         },
         "SIG-RAIN-JAMES-003": {
@@ -116,7 +118,7 @@ def get_james_live_signals() -> dict:
 
 if __name__ == "__main__":
     live = get_james_live_kpis()
-    expected = {"over_capacity": 9, "requests_today": 73, "ems_response": "47 min", "awaiting_transport": 9, "telehealth_unslotted": 17, "mobile_clinic": 6}
+    expected = {"over_capacity": 9, "requests_today": 47, "ems_response": "47 min", "awaiting_transport": 16, "telehealth_unslotted": 31, "mobile_clinic": 98}
     print("James live PostgreSQL results:")
     for key, val in live.items():
         status = "OK" if val == expected[key] else "MISMATCH"

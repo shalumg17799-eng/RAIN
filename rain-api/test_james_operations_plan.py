@@ -59,14 +59,14 @@ def raises(exc, fn, *a, **k):
     raise AssertionError(f"expected {exc.__name__}")
 
 
-@check("transport schedule action matches the verified 9-unscheduled-of-73 figure exactly")
+@check("transport schedule action matches the verified 9-unscheduled-of-47 figure exactly")
 def _():
     pkg = op.build_operations_plan(log_path=fresh_log())
     a = next(x for x in pkg["actions"] if x["type"] == "transport_schedule")
     total = sql("SELECT COUNT(*) FROM TransportRequest WHERE date='2026-05-15'")[0][0]
     unsch = sql("SELECT COUNT(*) FROM TransportRequest WHERE date='2026-05-15' AND scheduled='False'")[0][0]
-    assert (total, unsch) == (73, 9)
-    assert (a["draft"]["total"], a["draft"]["unscheduled"]) == (73, 9)
+    assert (total, unsch) == (47, 9)
+    assert (a["draft"]["total"], a["draft"]["unscheduled"]) == (47, 9)
     assert "no hour-of-day field exists" in json.dumps(a["draft"]).lower()  # the real disclosure, not a double-booking count claim
     assert "3 double-bookings" not in json.dumps(a["draft"]) and "shifts 5" not in json.dumps(a["draft"])  # the static card's fabricated claim
 

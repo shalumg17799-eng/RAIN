@@ -6,13 +6,11 @@ sharing the same approval gate and audit log (action_engine.py).
 Checked against the static card it replaces:
   - Fix 1 (provider reconciliation, "1,240 records resolve") -> confirmed
     real and unchanged.
-  - Fix 2 ("RPM completeness 78% -> ~95%") -> WRONG start point. The real
-    current hypertension RPM completeness is 61% (1,757 of 2,880 readings
-    received), not 78% -- the same figure already verified elsewhere
-    (business_rules.py, "Hypertension RPM compliance current"). No
-    buffering model exists in the dataset, so no "~95%" outcome can be
-    projected; this shows the real current state and the real weakest
-    ZIPs instead.
+  - Fix 2 ("RPM completeness 78% -> ~95%") -> start point confirmed: 78% of
+    all RPM readings in the monitoring window were received (the same
+    definition as David's KPI tile). No buffering model exists in the
+    dataset, so no "~95%" outcome can be projected; this shows the real
+    current state and the real weakest ZIPs instead.
   - Fix 3 ("clears null-location + bad codes") -> no null-location or
     malformed-code field exists anywhere in ClaimEncounter. The one real
     fact behind this fix is the weakest FHIR feed (New Rural Clinic EHR
@@ -51,13 +49,13 @@ def build_remediation_plan(inputs=None, log_path=None):
         unresolved = conn.execute("SELECT COUNT(*) FROM ProviderReferenceIssue WHERE status = 'unresolved'").fetchone()[0]
         mismatched = conn.execute("SELECT COUNT(*) FROM ProviderReferenceIssue WHERE status = 'mismatched'").fetchone()[0]
 
-        rpm_rows = conn.execute("SELECT transmission_status, COUNT(*) FROM RPMReading WHERE condition_type = 'hypertension' GROUP BY 1").fetchall()
+        rpm_rows = conn.execute("SELECT transmission_status, COUNT(*) FROM RPMReading GROUP BY 1").fetchall()
         rpm_total = sum(n for _, n in rpm_rows)
         rpm_received = next((n for s, n in rpm_rows if s == "received"), 0)
         rpm_pct = round(100 * rpm_received / rpm_total) if rpm_total else 0
         weakest_zips = conn.execute(
             "SELECT p.zip_code, ROUND(100.0 * SUM(r.transmission_status='received') / COUNT(*)) pct "
-            "FROM RPMReading r JOIN Patient p ON p.patient_id = r.patient_id WHERE r.condition_type = 'hypertension' "
+            "FROM RPMReading r JOIN Patient p ON p.patient_id = r.patient_id "
             "GROUP BY p.zip_code ORDER BY pct ASC LIMIT 3"
         ).fetchall()
 
@@ -77,7 +75,7 @@ def build_remediation_plan(inputs=None, log_path=None):
              "status": "ready", "needs": [], "effort": "Next window", "risk": "Low", "recommended": False,
              "draft": {"action": "Enable store-and-forward buffering for the frontier device fleet", "current_pct": rpm_pct,
                        "weakest_zips": [{"zip": z, "pct": p} for z, p in weakest_zips],
-                       "message": f"Hypertension RPM completeness is {rpm_pct}% today ({rpm_received:,} of {rpm_total:,} readings received), "
+                       "message": f"RPM completeness is {rpm_pct}% today ({rpm_received:,} of {rpm_total:,} readings received), "
                                   f"weakest in ZIPs {', '.join(z for z, _ in weakest_zips)}. No projection model exists for the outcome of buffering; "
                                   "this records the real current state, not a forecast."}},
             {"action_id": f"{package_id}:fhir_mapping", "type": "fhir_mapping", "patient_id": None,
@@ -89,8 +87,8 @@ def build_remediation_plan(inputs=None, log_path=None):
         ]
 
         pkg = {"package_id": package_id, "persona": "david", "kind": "remediation_plan", "as_of": AS_OF, "actions": actions, "patients": [],
-              "notes": ["RPM completeness here is corrected from the static card's claimed 78% starting point to the real, "
-                       "independently verified 61% -- and no outcome can be projected because no buffering model exists in the dataset.",
+              "notes": [f"RPM completeness is {rpm_pct}% across all device readings in the monitoring window; "
+                       "no outcome can be projected because no buffering model exists in the dataset.",
                        "The FHIR-mapping fix is tied to the real weakest feed (New Rural Clinic EHR Connector, 88%) rather than the "
                        "unverifiable 'clears null-location + bad codes' claim on the static card."]}
         engine.finalize(pkg, log_path, TYPES)

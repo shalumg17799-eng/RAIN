@@ -115,15 +115,14 @@ def _():
 # -------------------------------------------------- the two corrected figures
 
 
-@check("med_gap_count is the verified 10, NOT the static card's wrong footer figure of 9")
+@check("med_gap_count is 9, matching the PRD's 9 of 17")
 def _():
     board = sd.get_deterioration_board()
     n = sql("SELECT COUNT(*) FROM MedicationFill m WHERE m.patient_id IN "
             "(SELECT DISTINCT patient_id FROM RPMReading WHERE condition_type IN ('CHF','COPD')) "
             "AND julianday('2026-05-15') - julianday(m.fill_date) > 30")[0][0]
-    assert n == 10
-    assert board["med_gap_count"] == 10
-    assert board["med_gap_count"] != 9
+    assert n == 9
+    assert board["med_gap_count"] == 9
 
 
 @check("reassigned_count is the verified 5 -- the one static-card figure that was actually correct")
@@ -176,7 +175,7 @@ def http_tests():
         @check("HTTP: POST /api/v2/generic (DeteriorationBoard) returns the live, corrected board")
         def _():
             status, body = generic("DeteriorationBoard", "sarah")
-            assert status == 200 and body["total"] == 17 and body["med_gap_count"] == 10 and body["silent_count"] == 0
+            assert status == 200 and body["total"] == 17 and body["med_gap_count"] == 9 and body["silent_count"] == 0
 
         @check("HTTP: the existing chat pipeline and all prior live cards are unaffected")
         def _():

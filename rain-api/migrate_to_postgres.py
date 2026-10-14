@@ -55,7 +55,7 @@ COLUMN_TYPES = {
     "EMSCoverage": {"avg_response_time_minutes": "NUMERIC", "unit_available_within_60min": "BOOLEAN", "detected_date": "DATE"},
     "MetricTrend": {"before_value": "NUMERIC", "after_value": "NUMERIC", "before_date": "DATE", "after_date": "DATE"},
     "Provider": {"deactivation_date": "DATE"},
-    "Facility": {"closure_date": "DATE"},
+    "Facility": {"closure_date": "DATE", "utilization_pct": "NUMERIC"},
 }
 
 

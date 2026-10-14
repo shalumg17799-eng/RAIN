@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { logBackend, logFallback } from '../../../../utils/dataLog';
 import { motion } from 'framer-motion';
 import { ClipboardList, Pill, Bus, Video, Home, ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -96,8 +97,8 @@ export default function Tier1ActionPackage({ initialPackage = null }) {
     if (initialPackage) return;
     fetch(PACKAGE_URL)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('unavailable'))))
-      .then((p) => { setPkg(p); setFormPkg(p); setPhase('live'); })
-      .catch(() => setPhase('offline'));
+      .then((p) => { logBackend('Sarah Tier 1 action package from GET /ultra/rain/sarah/actionPackage'); setPkg(p); setFormPkg(p); setPhase('live'); })
+      .catch((e) => { logFallback('Sarah Tier 1 action package', 'STATIC_ACTIONS in Tier1ActionPackage.jsx', e.message); setPhase('offline'); });
   }, [initialPackage]);
 
   if (phase === 'offline') return <StaticTier1Card />;

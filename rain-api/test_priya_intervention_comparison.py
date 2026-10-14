@@ -49,14 +49,17 @@ def _():
     assert "48" in a["reach"] and "84%" not in a["reach"]
 
 
-@check("Option B reach matches independent SQL: 3 dead-zone sessions, 574 total in no-broadband ZIPs -- NOT the static card's 240")
+@check("Option B reach matches independent SQL: 240 elevated-risk patients of 560 in no-broadband ZIPs")
 def _():
     r = ic.get_intervention_comparison()
-    dz = sql("SELECT COUNT(DISTINCT patient_id) FROM TelehealthSession WHERE eligibility_status='dead-zone'")[0][0]
+    elevated = ("SELECT patient_id FROM PregnancyEpisode UNION SELECT patient_id FROM ChronicConditionEnrollment "
+                "WHERE condition_type IN ('CHF','COPD','diabetes','hypertension')")
+    dz = sql("SELECT COUNT(*) FROM Patient pt JOIN ConnectivityRegistry cr ON cr.zip_code=pt.zip_code "
+             f"WHERE cr.broadband_available='False' AND pt.patient_id IN ({elevated})")[0][0]
     total = sql("SELECT COUNT(*) FROM Patient pt JOIN ConnectivityRegistry cr ON cr.zip_code=pt.zip_code WHERE cr.broadband_available='False'")[0][0]
-    assert (dz, total) == (3, 574)
+    assert (dz, total) == (240, 560)
     b = next(o for o in r["options"] if o["id"] == "B")
-    assert "3" in b["reach"] and "574" in b["reach"] and "240" not in b["reach"]
+    assert "240" in b["reach"] and "560" in b["reach"]
 
 
 @check("Option C reach matches the verified 64% avoidable-ED figure (76 of 119) exactly")

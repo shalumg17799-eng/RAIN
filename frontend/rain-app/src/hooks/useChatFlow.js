@@ -1,6 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { getPersonaFlowConfigs } from '../data/personaFlowConfigs';
 import { useBranding } from '../context/BrandingContext';
+import { logBackend, logFallback, logStatic } from '../utils/dataLog';
 
 // Backend base URL -- set VITE_API_BASE in .env for a deployed backend;
 // defaults to the local dev server.
@@ -180,6 +181,9 @@ export default function useChatFlow(personaId) {
   const showDatabaseAnswer = useCallback(async (question, flowKey) => {
     const backendResult = await askBackend(personaId, question);
     if (!backendResult) return false;
+    logBackend(`Chat answer for "${question}" from POST /api/v2/ask -- answered by ${
+      (backendResult.visualization || []).map((v) => v.type).join(', ') || 'narrative only'
+    }; sources: ${(backendResult.data_sources_used || []).join(', ') || 'none'}`);
     if (flowKey) {
       const sigIdx = signalSequence.indexOf(flowKey);
       if (sigIdx >= 0) signalIndexRef.current = sigIdx + 1;
@@ -204,6 +208,7 @@ export default function useChatFlow(personaId) {
       if (nextKey) {
         const question = chatFlows[nextKey]?.user_query || chipText;
         if (await showDatabaseAnswer(question, nextKey)) return;
+        logFallback(`Chat answer for "${question}"`, `chatFlows.json [${nextKey}]`, '/api/v2/ask returned no answer');
         signalIndexRef.current += 1;
         addAIMessage(nextKey);
         return;
@@ -211,9 +216,15 @@ export default function useChatFlow(personaId) {
     }
 
     const flowKey = findFlowKey(chipText);
-    if (isDataQuestion(chipText) && await showDatabaseAnswer(chipText, flowKey)) return;
+    const dataQuestion = isDataQuestion(chipText);
+    if (dataQuestion && await showDatabaseAnswer(chipText, flowKey)) return;
 
     if (flowKey && chatFlows[flowKey]) {
+      if (dataQuestion) {
+        logFallback(`Chat answer for "${chipText}"`, `chatFlows.json [${flowKey}]`, '/api/v2/ask returned no answer');
+      } else {
+        logStatic(`Chat answer for action chip "${chipText}" (action chips are never sent to the backend)`, `chatFlows.json [${flowKey}]`);
+      }
       const sigIdx = signalSequence.indexOf(flowKey);
       if (sigIdx >= 0) signalIndexRef.current = sigIdx + 1;
       addAIMessage(flowKey);
@@ -222,6 +233,8 @@ export default function useChatFlow(personaId) {
 
     if (chatFlows.__default__) {
       addAIMessage('__default__');
+    } else {
+      console.warn(`[RAIN data] No answer for "${chipText}": the backend gave none and no scripted flow matches.`);
     }
   }, [addAIMessage, chatFlows, chipToFlowKey, findFlowKey, showDatabaseAnswer, signalSequence]);
 
@@ -279,9 +292,11 @@ export default function useChatFlow(personaId) {
       fetchSignalBrief(personaId).then((text) => {
         if (gen !== generationRef.current) return;
         if (!text) {
+          logFallback('Greeting', 'chatFlows.json [greeting]', 'GET /ultra/rain/{persona}/signals returned nothing');
           addAIMessage(flowKey);
           return;
         }
+        logBackend('Greeting built from live signal descriptions (GET /ultra/rain/{persona}/signals)');
         addLiveMessage({
           ai_message: text,
           suggested_chips: [],

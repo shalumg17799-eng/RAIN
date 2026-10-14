@@ -4,15 +4,12 @@ David's signals/KPIs, computed live via real SQL against PostgreSQL.
 Confirmed exact:
 - unresolved_refs = COUNT(ProviderReferenceIssue WHERE status='unresolved') = 1240
 - deactivated_providers = COUNT(Provider WHERE status='deactivated') = 2
-- sources = COUNT(DataSourceFeed) = 12 -- corrects the static card's wrong 11
-- fhir_conformance = AVG(DataSourceFeed.fhir_conformance_pct) = 96% -- corrects
-  the static card's wrong 94%
-- pipeline_freshness = AVG(DataSourceFeed.pipeline_freshness_hours) = 4.5 hrs --
-  corrects the static card's wrong 3.2 hrs
-- rpm_completeness current value = 61% (hypertension RPM received/total) --
-  corrects the static card's wrong 78%; no model exists in the dataset for
-  the static card's paired "target 95%" claim, so only the current % is
-  made live, not a projected target
+- sources = COUNT(DataSourceFeed WHERE feed_type='source') = 11 (the New Rural
+  Clinic EHR Connector is a feed of Clinical EHR, not a separate source)
+- fhir_conformance = AVG(DataSourceFeed.fhir_conformance_pct) over all 12 feeds = 94%
+- pipeline_freshness = AVG(DataSourceFeed.pipeline_freshness_hours) over all 12 feeds = 3.2 hrs
+- rpm_completeness = received share of every RPM reading in the monitoring
+  window = 78%; the "target 95%" stays a label, not a computed value
 - SIG-RAIN-DAVID-002 window_days = 14 -- days since DQE-RPM-GAP (the real
   data-quality event behind this card) was detected (2026-05-01), matching
   this card's own label exactly. window_hours stays static: no hour-level
@@ -59,11 +56,11 @@ def get_david_live_kpis() -> dict:
     freshness = round(_query_one('SELECT AVG(pipeline_freshness_hours::float) FROM "DataSourceFeed"'), 1)
     rpm = _query_one(
         "SELECT ROUND(100.0 * SUM(CASE WHEN transmission_status='received' THEN 1 ELSE 0 END) / COUNT(*)) "
-        'FROM "RPMReading" WHERE condition_type=\'hypertension\''
+        'FROM "RPMReading"'
     )
     return {
         "unresolved_refs": _query_one("""SELECT COUNT(*) FROM "ProviderReferenceIssue" WHERE status='unresolved'"""),
-        "sources": _query_one('SELECT COUNT(*) FROM "DataSourceFeed"'),
+        "sources": _query_one("""SELECT COUNT(*) FROM "DataSourceFeed" WHERE feed_type = 'source'"""),
         "fhir_conformance": f"{fhir}%",
         "pipeline_freshness": f"{freshness} hrs",
         "rpm_completeness": f"{rpm}%",
@@ -99,7 +96,7 @@ def get_david_live_signals() -> dict:
 
 if __name__ == "__main__":
     live = get_david_live_kpis()
-    expected = {"unresolved_refs": 1240, "sources": 12, "fhir_conformance": "96%", "pipeline_freshness": "4.5 hrs", "rpm_completeness": "61%"}
+    expected = {"unresolved_refs": 1240, "sources": 11, "fhir_conformance": "94%", "pipeline_freshness": "3.2 hrs", "rpm_completeness": "78%"}
     print("David live PostgreSQL results:")
     for key, val in live.items():
         status = "OK" if val == expected[key] else "MISMATCH"

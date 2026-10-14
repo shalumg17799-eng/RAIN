@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { logBackend, logFallback } from '../../../utils/dataLog';
 import { motion } from 'framer-motion';
 import { ClipboardList, FileText, Pill, Bus, Video, Home, Users, Route, Ambulance, HeartPulse, ChevronDown, ChevronUp } from 'lucide-react';
 
@@ -51,9 +52,12 @@ export default function ActionPackageCard({ persona, decidedBy, Fallback = null,
     if (initialPackage) return;
     fetch(url)
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error('unavailable'))))
-      .then((p) => { setPkg(p); setPhase('live'); })
-      .catch(() => setPhase('offline'));
-  }, [url, initialPackage]);
+      .then((p) => { logBackend(`${persona} action package from GET /ultra/rain/${persona}/actionPackage`); setPkg(p); setPhase('live'); })
+      .catch((e) => {
+        logFallback(`${persona} action package`, Fallback ? 'the bundled preview card' : 'nothing (no fallback card)', e.message);
+        setPhase('offline');
+      });
+  }, [url, initialPackage, persona, Fallback]);
 
   if (phase === 'offline') return Fallback ? <Fallback /> : null;
   if (phase === 'loading' || !pkg) {

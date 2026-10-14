@@ -15,8 +15,10 @@ Run:
     docs at http://127.0.0.1:8000/docs
 """
 
+import logging
+import time
 from typing import Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
@@ -45,8 +47,27 @@ from sarah_risk_tiers import get_risk_tiered_outreach
 from maria_risk_stratification import get_maternal_risk_stratification
 from maria_telehealth_scenario import get_telehealth_scenario
 
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)-7s [%(name)s] %(message)s")
+log = logging.getLogger("rain.api")
+
 app = FastAPI(title="Radiant V2 API", version="2.0")
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+# expose_headers lets the browser's fetch() read X-RAIN-Source, which the
+# frontend logs as proof a response came from this server.
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
+                   expose_headers=["X-RAIN-Source"])
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """One line per request, so every value the UI shows can be traced to a
+    server hit. Request bodies are not logged -- /ask carries free text."""
+    start = time.perf_counter()
+    response = await call_next(request)
+    response.headers["X-RAIN-Source"] = "rain-api"
+    if request.method != "OPTIONS":
+        log.info("%s %s -> %d (%.0f ms)", request.method, request.url.path,
+                 response.status_code, (time.perf_counter() - start) * 1000)
+    return response
 
 with open("ask_cache.json") as f:
     ASK_CACHE = json.load(f)
@@ -189,6 +210,9 @@ def ask(req: AskRequest):
     # non-data question (e.g. "cache this plan offline for the field" --
     # a device/sync action, not something rain.db or the graph can answer).
     live = try_live_fallback(req.query, product=req.product, persona=req.persona)
+    log.info("ask persona=%s answered_by=%s sources=%s", req.persona,
+             [v.get("type") for v in (live or {}).get("visualization") or []] or "none (not-found reply)",
+             (live or {}).get("data_sources_used") or [])
     if live:
         return envelope(
             persona_id=persona_id, client_id=req.product,
@@ -347,6 +371,8 @@ def generic(req: GenericRequest):
             viz.append({"type": item.component, "variant": item.variant, "data": resolver(req.product, req.persona)})
         else:
             unresolved.append(item.component)
+    log.info("generic persona=%s resolved=%s unresolved=%s", req.persona,
+             [v["type"] for v in viz], unresolved or "none")
 
     if unresolved and not viz:
         return resolver_error(unresolved)
