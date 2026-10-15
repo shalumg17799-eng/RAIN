@@ -1,0 +1,178 @@
+id: rain
+version: 0.1.0
+description: Auto-generated profile for RAIN from live DB & KAG metadata.
+dialect: postgres
+agent:
+  name: insights-agent
+  version: 0.1.0
+allowed_intents:
+- data_query
+- metadata_question
+- out_of_scope
+- needs_clarification
+multi_turn: false
+router:
+  unsure_policy: needs_clarification
+  max_query_chars: 2000
+  thresholds:
+    embedding_accept: 0.8
+    embedding_margin: 0.05
+    llm_accept: 0.6
+  exemplars:
+    data_query:
+    - what is our total loan portfolio volume by region this quarter
+    - average application processing time for branch north last month
+    - how many high-risk loan applications are currently pending
+    - approval rate by product type year to date
+    metadata_question:
+    - what tables hold member credit ratings
+    - what is the definition of debt to income ratio
+    - which columns are available in the risk assessment table
+    out_of_scope:
+    - generate a marketing email to borrowers
+    - what is the weather today
+    needs_clarification:
+    - show me the numbers
+    - the applications
+datasources:
+- id: main
+  kind: postgres
+  host: localhost
+  port: 5432
+  database: rain
+  default_schema: public
+  user:
+    env: PG_USER
+  password:
+    env: PG_PASSWORD
+catalog:
+  kind: snapshot
+  path: catalog/snapshot.json
+glossary_path: glossary.yaml
+join_hints_path: join_hints.yaml
+identity:
+  mode: per_user
+  fallback: service_principal_with_views
+roles:
+  executive:
+    tables:
+      ChronicConditionEnrollment:
+        columns: '*'
+  risk_officer:
+    tables:
+      ChronicConditionEnrollment:
+        columns: '*'
+      ClaimEncounter:
+        columns: '*'
+      ConnectivityRegistry:
+        columns: '*'
+      DataQualityEvent:
+        columns: '*'
+      DataSourceFeed:
+        columns: '*'
+  branch_manager:
+    tables:
+      ChronicConditionEnrollment:
+        columns: '*'
+      ClaimEncounter:
+        columns: '*'
+      ConnectivityRegistry:
+        columns: '*'
+      DataQualityEvent:
+        columns: '*'
+      DataSourceFeed:
+        columns: '*'
+  loan_officer:
+    tables:
+      ChronicConditionEnrollment:
+        columns: '*'
+      ClaimEncounter:
+        columns: '*'
+      ConnectivityRegistry:
+        columns: '*'
+      DataQualityEvent:
+        columns: '*'
+      DataSourceFeed:
+        columns: '*'
+  analyst:
+    tables:
+      ChronicConditionEnrollment:
+        columns: '*'
+      ClaimEncounter:
+        columns: '*'
+      ConnectivityRegistry:
+        columns: '*'
+      DataQualityEvent:
+        columns: '*'
+      DataSourceFeed:
+        columns: '*'
+      EMSCoverage:
+        columns: '*'
+      Facility:
+        columns: '*'
+      MedicationFill:
+        columns: '*'
+      MetricTrend:
+        columns: '*'
+      Patient:
+        columns: '*'
+      PregnancyEpisode:
+        columns: '*'
+      Provider:
+        columns: '*'
+      ProviderReferenceIssue:
+        columns: '*'
+      RPMReading:
+        columns: '*'
+      SDOHFlag:
+        columns: '*'
+      TelehealthSession:
+        columns: '*'
+      TransportRequest:
+        columns: '*'
+      decisions:
+        columns: '*'
+      routed_actions:
+        columns: '*'
+model_policy:
+  route:
+    enabled: true
+    model_group: fast
+    temperature: 0.0
+    max_tokens: 200
+  sql:
+    enabled: true
+    model_group: strong
+    temperature: 0.0
+    max_tokens: 1500
+  judge:
+    enabled: false
+    model_group: fast
+    temperature: 0.0
+    max_tokens: 200
+  narrate:
+    enabled: false
+    model_group: fast
+    temperature: 0.0
+    max_tokens: 200
+calendar:
+  timezone: America/New_York
+  week_starts_on: monday
+  fiscal_year_start_month: 1
+limits:
+  max_rows: 1000
+  statement_timeout_ms: 10000
+  max_estimated_cost: 100000.0
+  max_estimated_rows: 5000000
+  max_refines: 2
+  max_tokens: 20000
+  deadline_ms: 20000
+confidence_threshold: 0.65
+sql_visibility:
+  default: false
+  roles:
+    executive: false
+    risk_officer: true
+    branch_manager: false
+    loan_officer: false
+    analyst: true

@@ -1,0 +1,13 @@
+terms:
+- term: portfolio volume
+  synonyms:
+  - loan volume
+  - portfolio size
+  definition: Total volume of loan portfolio.
+  maps_to: []
+- term: approval rate
+  synonyms:
+  - pass rate
+  - approval percentage
+  definition: Percentage of processed applications approved.
+  maps_to: []

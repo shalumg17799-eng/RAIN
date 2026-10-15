@@ -1,0 +1,1022 @@
+{
+  "dialect": "postgres",
+  "format": 1,
+  "schema_name": "public",
+  "source_id": "main",
+  "tables": [
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "enrollment_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "condition_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "enrolled_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        },
+        {
+          "description": "",
+          "name": "assigned_provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "care_coordinator_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "enrolled_date": "2026-04-15"
+      },
+      "name": "ChronicConditionEnrollment"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "claim_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "rendering_provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "referring_provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "encounter_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        },
+        {
+          "description": "",
+          "name": "diagnosis_codes",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "avoidable_ed_flag",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "date": "2026-05-15"
+      },
+      "name": "ClaimEncounter"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "zip_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "broadband_available",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        },
+        {
+          "description": "",
+          "name": "telehealth_capable",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "ConnectivityRegistry"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "event_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "source_system",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "event_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "affected_record_count",
+          "nullable": true,
+          "primary_key": false,
+          "type": "integer"
+        },
+        {
+          "description": "",
+          "name": "detected_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        },
+        {
+          "description": "",
+          "name": "related_entity_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "detected_date": "2026-05-15"
+      },
+      "name": "DataQualityEvent"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "source_name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "fhir_conformance_pct",
+          "nullable": true,
+          "primary_key": false,
+          "type": "numeric"
+        },
+        {
+          "description": "",
+          "name": "pipeline_freshness_hours",
+          "nullable": true,
+          "primary_key": false,
+          "type": "numeric"
+        },
+        {
+          "description": "",
+          "name": "ingestion_lag_status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "detected_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "detected_date": "2026-05-15"
+      },
+      "name": "DataSourceFeed"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "zip_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "avg_response_time_minutes",
+          "nullable": true,
+          "primary_key": false,
+          "type": "numeric"
+        },
+        {
+          "description": "",
+          "name": "unit_available_within_60min",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        },
+        {
+          "description": "",
+          "name": "detected_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "detected_date": "2026-05-15"
+      },
+      "name": "EMSCoverage"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "facility_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "county",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "services_offered",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "closure_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "closure_date": "2026-03-01"
+      },
+      "name": "Facility"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "fill_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "medication_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "fill_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        },
+        {
+          "description": "",
+          "name": "days_supply",
+          "nullable": true,
+          "primary_key": false,
+          "type": "integer"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "fill_date": "2026-04-14"
+      },
+      "name": "MedicationFill"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "metric_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "metric_name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "before_value",
+          "nullable": true,
+          "primary_key": false,
+          "type": "numeric"
+        },
+        {
+          "description": "",
+          "name": "after_value",
+          "nullable": true,
+          "primary_key": false,
+          "type": "numeric"
+        },
+        {
+          "description": "",
+          "name": "unit",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "before_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        },
+        {
+          "description": "",
+          "name": "after_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        },
+        {
+          "description": "",
+          "name": "note",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "after_date": "2026-05-15",
+        "before_date": "2026-01-30"
+      },
+      "name": "MetricTrend"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "zip_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "county",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "age",
+          "nullable": true,
+          "primary_key": false,
+          "type": "integer"
+        },
+        {
+          "description": "",
+          "name": "connectivity_status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "primary_provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "Patient"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "episode_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "trimester",
+          "nullable": true,
+          "primary_key": false,
+          "type": "integer"
+        },
+        {
+          "description": "",
+          "name": "risk_diagnoses",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "assigned_provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "delivering_facility_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "distance_to_delivery_miles",
+          "nullable": true,
+          "primary_key": false,
+          "type": "integer"
+        },
+        {
+          "description": "",
+          "name": "last_prenatal_visit_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        },
+        {
+          "description": "",
+          "name": "expected_delivery_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "expected_delivery_date": "2026-12-01",
+        "last_prenatal_visit_date": "2026-05-15"
+      },
+      "name": "PregnancyEpisode"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "npi",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "specialty",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "facility_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "deactivation_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        },
+        {
+          "description": "",
+          "name": "reassigned_to_provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "deactivation_date": "2026-03-01"
+      },
+      "name": "Provider"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "record_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "source_table",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "old_provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "ProviderReferenceIssue"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "reading_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "condition_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "reading_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "value",
+          "nullable": true,
+          "primary_key": false,
+          "type": "numeric"
+        },
+        {
+          "description": "",
+          "name": "timestamp",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        },
+        {
+          "description": "",
+          "name": "transmission_status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "timestamp": "2026-05-15"
+      },
+      "name": "RPMReading"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "flag_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "zip_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "flag_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "SDOHFlag"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "session_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "session_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "scheduled_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        },
+        {
+          "description": "",
+          "name": "eligibility_status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "scheduled_date": "2026-05-29"
+      },
+      "name": "TelehealthSession"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "request_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "request_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "origin_zip",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "destination_facility_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "scheduled",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        },
+        {
+          "description": "",
+          "name": "date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "date"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {
+        "date": "2026-05-25"
+      },
+      "name": "TransportRequest"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "id",
+          "nullable": false,
+          "primary_key": true,
+          "type": "integer"
+        },
+        {
+          "description": "",
+          "name": "scope",
+          "nullable": false,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "package_id",
+          "nullable": false,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "decision",
+          "nullable": false,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "decided_by",
+          "nullable": false,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "decided_at",
+          "nullable": false,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "note",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "inputs_json",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "routed_json",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "held_json",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "delivery",
+          "nullable": false,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "decisions"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "scope",
+          "nullable": false,
+          "primary_key": true,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "action_id",
+          "nullable": false,
+          "primary_key": true,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "package_id",
+          "nullable": false,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "decision_id",
+          "nullable": false,
+          "primary_key": false,
+          "type": "integer"
+        },
+        {
+          "description": "",
+          "name": "routed_at",
+          "nullable": false,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "routed_by",
+          "nullable": false,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "draft_json",
+          "nullable": false,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "routed_actions"
+    }
+  ],
+  "version": "e86c8a73b33c"
+}

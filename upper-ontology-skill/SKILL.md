@@ -30,6 +30,20 @@ Any schema description, in whatever form it's available:
 - An existing upper-ontology concept list, if one exists yet (empty on the
   very first run)
 
+## PRD handoff
+
+This schema-mapping skill does not interpret a raw PRD. When a PRD is the
+starting point, first use `skills/skills/requirements-interpreter/SKILL.md`,
+then the persona-question and entity-model skills, and build or inspect the
+lower ontology from the resulting schema. Pass the resulting tables, columns,
+relationships, and existing concepts into this skill; never invent missing
+columns to make a PRD question appear answerable.
+
+This skill's output is concept-to-source-field mappings. If the requested
+artifact also needs Persona nodes and `SERVES` edges, use
+`skills/skills/upper-ontology-curator/SKILL.md` as the PRD-workflow stage. Do
+not treat this schema-only output as a complete PRD-to-ontology run.
+
 ## Process
 
 1. **Infer candidate concepts.** For each table/field, infer what business

@@ -3,6 +3,7 @@
 *.env
 .env.*
 !.env.example
+/apps/keys.local.yaml
 
 # Python
 .venv/

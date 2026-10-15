@@ -23,6 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import json
 from datetime import datetime, timezone
+from insights.api.rain_adapter import get_rain_router
 
 from signal_data import RAIN_SIGNALS, DATA_SOURCES_USED
 from data_sources_detail import DATA_SOURCES_DETAIL, DATA_SOURCES_HEALTH_KPIS
@@ -51,6 +52,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)-7s [%(n
 log = logging.getLogger("rain.api")
 
 app = FastAPI(title="Radiant V2 API", version="2.0")
+app.include_router(get_rain_router(), prefix="/api/v2")
 # expose_headers lets the browser's fetch() read X-RAIN-Source, which the
 # frontend logs as proof a response came from this server.
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
