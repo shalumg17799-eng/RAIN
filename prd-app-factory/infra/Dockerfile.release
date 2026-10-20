@@ -1,0 +1,14 @@
+# Release agent image: the factory plus the Azure CLI (it deploys generated apps with
+# `az acr build` and `az deployment group create`, signed in with its own managed identity).
+FROM mcr.microsoft.com/azure-cli:2.67.0
+WORKDIR /app
+COPY requirements.txt requirements.txt
+RUN python3 -m pip install --no-cache-dir --break-system-packages -r requirements.txt azure-storage-queue==12.18.0 \
+    || python3 -m pip install --no-cache-dir -r requirements.txt azure-storage-queue==12.18.0
+COPY insights insights
+COPY skills skills
+COPY agents agents
+COPY factory factory
+RUN mkdir -p apppacks
+ENV PYTHONUNBUFFERED=1
+CMD ["python3", "-m", "factory", "worker", "--agent", "release"]

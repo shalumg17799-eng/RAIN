@@ -1,0 +1,28 @@
+{
+  "agent": "requirements",
+  "mode": "",
+  "status": "ok",
+  "summary": "I wrote manifest.yaml and data_contract.yaml for the RAIN (Rural Health AI Infrastructure for Nevada) prototype. The manifest has 5 personas, 35 KPIs and 15 priority signals with 48 secondary figures. The data contract has 26 tables, and every figure in the manifest is mapped to the tables that compute it.\n\n**Manifest**\n- **Personas:** Maria (default), Sarah, James, Priya, David. Each has the PRD's 8 suggested questions, copied word for word. County scope is set for Maria (Humboldt, Pershing), Sarah (Humboldt, Pershing, Lander) and James (Humboldt); the PRD doesn't limit Priya or David.\n- **KPIs:** 35, which is 7 per persona in the PRD's order. Values are copied exactly as printed and every one has a numeric target, e.g. 9.2M \u2192 9,200,000, $1.4M \u2192 1,400,000, 3.2 hrs \u2192 3.2.\n- **Signals:** 15, which is 3 per persona. Every number in the signal text is recorded as a secondary figure, including time windows and thresholds.\n- **Settings:** patient health data is flagged as sensitive (PHI). The reference date (\"today\") is left empty because the PRD never names one.\n- **Data sources:** the 11 source systems are recorded with record counts as printed.\n\n**Data contract**\n- The 26 tables are at row level: patients, pregnancies, appointments, encounters, claims, lab results, pharmacy fills, transport requests, telehealth requests, data-quality quarantine records, and so on. RPM readings have one row per expected reading, so compliance and completeness can both be calculated.\n- Before/after figures (prenatal completion 84\u219261%, RPM compliance 79\u219258%, EMS response time 34\u219247 minutes, the 210%, 64%, 19% and 38% changes) are calculated from row-level data covering both periods. The maternal care desert (31\u219258%) uses before and after distance-to-obstetric-care columns on the ZIP code table.\n- Fixed values the PRD states (time windows and thresholds) are mapped to no table, with a note saying they are fixed PRD values.\n\n**What a reviewer should look at**\n- **Contradictions in the PRD,** all recorded in the notes rather than resolved:\n  - Maria's signal says 6 of the 14 third-trimester patients missed a prenatal visit; demo step 2 says 6 of the 9 high-risk patients. I followed the signal.\n  - The 60-day and 90-day windows imply different \"today\" dates.\n  - An average distance of 115 miles doesn't fit with only 38 of 126 pregnancies being more than 100 miles away (the other 88 would be at or under 100 miles).\n  - Mobile clinic utilization (98%) vs telehealth room capacity (98%).\n  - Elevated-risk counts of 208, 240 and 16 use different populations.\n  - A population served of 168,000 vs the \"10% of Nevada\" in the text.\n  - The two RPM measures (58% compliance, 78% completeness) are different and should not be merged.\n- **Undefined denominators:** the avoidable ED rate per 1,000, telehealth uptake (71%) and transport-barrier prevalence (22%).\n- **Choices I made:**\n  - The 'Elevated-Risk Pregnancies' KPI (38) is defined as the same 38 patients the signal describes as travelling more than 100 miles.\n  - James's transport and telehealth signals use the percentage rise (210%, 64%) as the main number, not 9 trips or 31 visits.\n  - Service area coverage uses the unit 'other', since there is no square-mile unit.\n  - The \"HL7 v2\" version number is not treated as a figure.\n- **Shared ID:** `james_ems_response` is both a KPI and a signal, so they share one entry in the data contract (97 entries for 98 figures).\n- **Left out on purpose:** numbers that appear only in the demo scripts (e.g. Tier 1/2/3 = 5/7/5, 180 mismatched provider records, the projected 88%).",
+  "outputs": [
+    "manifest.yaml",
+    "data_contract.yaml"
+  ],
+  "checks": [
+    "Read the full PRD before saving anything.",
+    "KPIs: 35 saved, matching the 5 KPI tables of 7 rows each; all 35 have numeric targets.",
+    "Signals: 15 saved, matching the 5 signal tables of 3 rows each; 48 secondary figures. Fixed a unit error (days/months changed to duration) and saved again.",
+    "validate_manifest passed and wrote manifest.yaml (5 personas, 35 KPIs, 15 signals, 48 secondary figures).",
+    "Data sources: all 11 saved with record counts as printed; 15 notes on ambiguities and contradictions.",
+    "save_data_contract: 26 tables, 97 coverage entries, nothing left uncovered."
+  ],
+  "open_questions": [
+    "Which 'today' date should the data assume? The 60-day window since the March 1, 2026 closure suggests about 2026-04-30; the 90-day window suggests on or after 2026-05-30.",
+    "Does 'Elevated-Risk Pregnancies' (38) mean the patients more than 100 miles from delivery, a risk-engine flag, or both? Only 9 of the 38 have high-risk diagnoses.",
+    "Maria's missed-visit figure: 6 of the 14 third-trimester patients (signal) or 6 of the 9 high-risk patients (demo step 2)?",
+    "Is the 115-mile 'Avg. Distance to Delivering Hospital' a patient average, or the distance from the closed unit to the nearest delivering hospital?",
+    "Does Mobile Clinic Utilization (98%) cover only the mobile clinic, or the telehealth rooms too?",
+    "What are the denominators and periods for the avoidable ED rate per 1,000, telehealth uptake (71%) and transport-barrier prevalence (22%)?",
+    "Which populations do the elevated-risk counts cover: Sarah's 208, Priya's 240 in dead zones, James's 16?"
+  ],
+  "finished_at": "2026-10-20T22:37:54+00:00"
+}

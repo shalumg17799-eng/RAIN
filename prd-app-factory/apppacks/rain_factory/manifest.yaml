@@ -1,0 +1,1012 @@
+app:
+  id: rain_factory
+  name: Rural Health AI Infrastructure for Nevada (RAIN)
+  domain: Rural healthcare operations and population health (Nevada)
+  description: 'RAIN is a University of Nevada, Reno prototype (with Radiant Digital)
+    of a unified AI intelligence layer that reasons across fragmented rural Nevada
+    health systems: clinical EHRs at critical access hospitals and rural health clinics,
+    the Maternal Health Registry, telehealth (Project ECHO Nevada), remote patient
+    monitoring, claims and pharmacy, EMS dispatch, NEMT logs, SDOH data, public health
+    registries, the State HIE and the enterprise data warehouse. Five personas (maternal
+    health, chronic disease care coordination, rural operations, population health
+    and equity, data interoperability) see priority signals, KPIs and guided AI conversations,
+    all tied to one root-cause event: the March 1, 2026 suspension of labor and delivery
+    services at the Battle Mountain critical access hospital, which left the nearest
+    delivering hospital 115 miles away. Four pages: Ask the AI (Home), Rural Health
+    Intelligence, Care & Risk Signals, Data Sources. All data is mock data.'
+  today: null
+  phi: true
+personas:
+- id: maria
+  name: Dr. Maria Delgado-Reyes
+  role: Rural Health Medical Director and Chief Medical Officer
+  focus: 'Maternal Health: Elevated-risk pregnancy management after loss of local
+    obstetric services (default persona; page: Rural Health Intelligence)'
+  scope:
+    county:
+    - Humboldt
+    - Pershing
+  questions:
+  - Show me all elevated-risk pregnancies in the service area
+  - Which patients have missed prenatal visits since the Battle Mountain closure?
+  - Cross-reference pregnancy risk with chronic conditions
+  - Which patients have no transport scheduled to their next appointment?
+  - Show me telehealth-eligible prenatal patients by connectivity
+  - What is our prenatal completion rate trend?
+  - Generate a maternal access brief for the board
+  - Which ZIP codes have the highest maternal access risk?
+- id: sarah
+  name: Sarah Whitehorse, RN
+  role: Care Coordination Lead, Chronic Disease Management
+  focus: 'Chronic Disease: Cross-system prioritization for CHF, COPD, diabetes, and
+    hypertension cohorts (page: Ask the AI (Home))'
+  scope:
+    county:
+    - Humboldt
+    - Pershing
+    - Lander
+  questions:
+  - Show me chronic disease patients with worsening RPM readings
+  - Which patients have a medication gap over 30 days?
+  - Cross-reference deterioration with transportation barriers
+  - Which patients lost their provider after the Battle Mountain closure?
+  - Show me diabetes patients overdue for an A1c
+  - What is our RPM transmission compliance trend?
+  - Generate a risk-ranked outreach list
+  - Model avoidable hospitalizations for the elevated-risk cohort
+- id: james
+  name: James Tomley
+  role: Rural Clinic and Critical Access Hospital Operations Lead
+  focus: 'Operational Visibility: Transport and telehealth demand coordination across
+    long frontier distances (page: Care & Risk Signals; mobile-app frame, offline-tolerant)'
+  scope:
+    county:
+    - Humboldt
+  questions:
+  - Show me today's transport queue and capacity
+  - Where are the EMS coverage holes right now?
+  - Which transports can be converted to telehealth?
+  - Show me the telehealth demand against room capacity
+  - Which elevated-risk patients are awaiting transport?
+  - How has transport demand changed since the Battle Mountain closure?
+  - Cache today's plan offline for the field
+  - Generate an operations summary for the administrator
+- id: priya
+  name: Dr. Priya Nair
+  role: Director, Rural Population Health and Access Equity
+  focus: 'Population Health: Cross-program access, equity, and utilization patterns
+    across rural Nevada (page: Rural Health Intelligence)'
+  scope: {}
+  questions:
+  - Show me access disparities by county
+  - Where did avoidable ED utilization concentrate after the closure?
+  - Map the maternal care desert before and after Battle Mountain
+  - Which elevated-risk patients are in telehealth dead zones?
+  - Compare outcomes in affected vs. unaffected ZIP codes
+  - Model the equity impact of mobile obstetric outreach
+  - Align our outcomes to the RHTP reporting priorities
+  - Generate a population health and equity brief for NVHA
+- id: david
+  name: David Yazzie
+  role: Director, Health Data Engineering and Interoperability
+  focus: 'Interoperability: Cross-system data-quality and ingestion health that makes
+    the intelligence layer trustworthy (page: Data Sources)'
+  scope: {}
+  questions:
+  - Show me data quality across all connected sources
+  - Which records have unresolved provider references?
+  - Show me RPM transmission completeness by ZIP code
+  - What is our FHIR conformance rate by feed?
+  - Which downstream risk scores are affected by data-quality issues?
+  - Show me pipeline freshness and ingestion lag
+  - What degraded after the Battle Mountain closure?
+  - Generate a data-quality summary for the technical lead
+kpis:
+- id: maria_active_pregnancies
+  persona: maria
+  label: Active Pregnancies in Service Area
+  value: '126'
+  target: 126.0
+  unit: count
+  prior: null
+  definition: Count of distinct patients with an active (ongoing, not yet delivered)
+    pregnancy episode who live in the Humboldt/Pershing service area.
+  sources:
+  - Clinical EHR
+  - Maternal Health Registry
+- id: maria_elevated_risk_pregnancies
+  persona: maria
+  label: Elevated-Risk Pregnancies
+  value: '38'
+  target: 38.0
+  unit: count
+  prior: null
+  definition: Count of active pregnancies in the service area flagged elevated-risk.
+    Per the signal text this is the cohort of pregnant patients who, since the March
+    1 Battle Mountain labor and delivery closure, travel more than 100 miles to the
+    nearest delivering hospital (of whom 14 are third-trimester and 9 carry high-risk
+    diagnoses).
+  sources:
+  - Maternal Health Registry
+  - RAIN Risk Engine
+- id: maria_prenatal_completion
+  persona: maria
+  label: Prenatal Visit Completion Rate
+  value: 61% (was 84%)
+  target: 61.0
+  unit: percent
+  prior: was 84%
+  definition: Completed prenatal visits divided by scheduled prenatal visits for service-area
+    pregnancies, in the 90 days following the March 1 closure (61%), compared with
+    the period before the closure (84%).
+  sources:
+  - Clinical EHR
+  - Scheduling
+- id: maria_avg_distance_delivery
+  persona: maria
+  label: Avg. Distance to Delivering Hospital
+  value: 115 miles
+  target: 115.0
+  unit: distance
+  prior: null
+  definition: Average distance in miles from patient home to the nearest hospital
+    still providing delivery services, after the Battle Mountain closure; the PRD
+    states the nearest delivering hospital is now 115 miles away.
+  sources:
+  - Geospatial
+  - Facility Registry
+- id: maria_no_scheduled_transport
+  persona: maria
+  label: Patients Without Scheduled Transport
+  value: '22'
+  target: 22.0
+  unit: count
+  prior: null
+  definition: Count of distinct pregnant patients with an upcoming prenatal appointment
+    that has no NEMT trip scheduled.
+  sources:
+  - NEMT / Transport Logs
+  - Scheduling
+- id: maria_ed_deliveries_bba
+  persona: maria
+  label: ED Deliveries / Births Before Arrival (60-day)
+  value: '3'
+  target: 3.0
+  unit: count
+  prior: zero in the prior six months
+  definition: Count of service-area deliveries in the 60 days since the closure that
+    occurred in an emergency department or before arrival at a hospital (2 births
+    before arrival + 1 emergency-department delivery).
+  sources:
+  - Clinical EHR
+  - EMS Dispatch
+- id: maria_telehealth_prenatal_booked
+  persona: maria
+  label: Telehealth-Eligible Prenatal Visits Booked
+  value: '47'
+  target: 47.0
+  unit: count
+  prior: null
+  definition: Count of booked prenatal visits that are telehealth-eligible (patient
+    has telehealth-capable connectivity and a care plan supporting virtual monitoring).
+    The PRD gives no time window.
+  sources:
+  - Telehealth Platform
+  - Scheduling
+- id: sarah_chronic_monitored
+  persona: sarah
+  label: Chronic Disease Patients Monitored
+  value: 1,340
+  target: 1340.0
+  unit: count
+  prior: null
+  definition: Count of distinct chronic disease patients (CHF, COPD, diabetes, hypertension)
+    under monitoring in the three-county rural clinic network.
+  sources:
+  - Clinical EHR
+  - RPM Platform
+- id: sarah_elevated_risk_cohort
+  persona: sarah
+  label: Elevated-Risk Cohort (All Conditions)
+  value: '208'
+  target: 208.0
+  unit: count
+  prior: null
+  definition: Count of distinct monitored chronic disease patients flagged elevated-risk
+    by the RAIN Risk Engine, across all conditions.
+  sources:
+  - RAIN Risk Engine
+- id: sarah_chf_copd_worsening
+  persona: sarah
+  label: CHF/COPD Patients With Worsening RPM
+  value: '17'
+  target: 17.0
+  unit: count
+  prior: null
+  definition: 'Count of CHF and COPD patients whose RPM readings worsened over the
+    last 14 days (rising weight or falling SpO2 trends that historically precede hospitalization):
+    11 rising weight, 6 falling SpO2.'
+  sources:
+  - RPM Platform
+- id: sarah_diabetes_no_a1c
+  persona: sarah
+  label: Diabetes Patients Without Recent A1c
+  value: '112'
+  target: 112.0
+  unit: count
+  prior: null
+  definition: Count of diabetes patients in the network with no documented A1c result
+    in the last 9 months.
+  sources:
+  - Clinical EHR
+  - Claims
+- id: sarah_med_nonadherence
+  persona: sarah
+  label: Medication Non-Adherence (30+ days)
+  value: '94'
+  target: 94.0
+  unit: count
+  prior: null
+  definition: Count of monitored chronic disease patients who have not filled a maintenance
+    medication in over 30 days, per pharmacy claims.
+  sources:
+  - Pharmacy Claims
+- id: sarah_rpm_compliance
+  persona: sarah
+  label: RPM Transmission Compliance
+  value: 58% (was 79%)
+  target: 58.0
+  unit: percent
+  prior: was 79%
+  definition: Device transmission compliance (received transmissions / expected transmissions)
+    for the 240 hypertension patients enrolled in remote blood-pressure monitoring;
+    fell from 79% to 58% over 60 days.
+  sources:
+  - RPM Platform
+- id: sarah_sdoh_transport_barrier
+  persona: sarah
+  label: Patients With SDOH Transport Barrier
+  value: '186'
+  target: 186.0
+  unit: count
+  prior: null
+  definition: Count of monitored chronic disease patients with an SDOH transportation
+    barrier flag.
+  sources:
+  - SDOH Data
+  - NEMT Logs
+- id: james_service_area
+  persona: james
+  label: Service Area Coverage
+  value: 10,200 sq mi
+  target: 10200.0
+  unit: other
+  prior: null
+  definition: Land area in square miles of the critical access hospital / EMS service
+    area out of the Winnemucca hub.
+  sources:
+  - Geospatial
+  - EMS Dispatch
+- id: james_transport_requests_today
+  persona: james
+  label: Transport Requests Today
+  value: '47'
+  target: 47.0
+  unit: count
+  prior: null
+  definition: Count of EMS and NEMT transport requests in today's queue (47 requests
+    against capacity for 38).
+  sources:
+  - EMS Dispatch
+  - NEMT Logs
+- id: james_queue_over_capacity
+  persona: james
+  label: Queue Over Capacity (Trips)
+  value: '9'
+  target: 9.0
+  unit: count
+  prior: null
+  definition: Today's transport requests minus today's available trip capacity from
+    the vehicle roster (47 - 38 = 9 trips).
+  sources:
+  - NEMT Logs
+  - Vehicle Roster
+- id: james_ems_response
+  persona: james
+  label: Avg. EMS Response Time
+  value: 47 min (baseline 34)
+  target: 47.0
+  unit: duration
+  prior: baseline 34
+  definition: Average EMS response time (call to unit arrival) in minutes in the northern
+    service area this week, versus a 34-minute baseline.
+  sources:
+  - EMS Dispatch
+- id: james_telehealth_no_slot
+  persona: james
+  label: Telehealth Requests Without a Slot
+  value: '31'
+  target: 31.0
+  unit: count
+  prior: null
+  definition: Count of requested telehealth visits with no slot assigned (mobile clinic
+    and two telehealth rooms booked to capacity); 12 of them are elevated-risk.
+  sources:
+  - Telehealth Demand Queue
+- id: james_mobile_clinic_utilization
+  persona: james
+  label: Mobile Clinic Utilization
+  value: 98%
+  target: 98.0
+  unit: percent
+  prior: null
+  definition: Booked slots divided by available slots for the mobile clinic.
+  sources:
+  - Facility Capacity
+- id: james_elevated_risk_awaiting_transport
+  persona: james
+  label: Elevated-Risk Patients Awaiting Transport
+  value: '16'
+  target: 16.0
+  unit: count
+  prior: null
+  definition: Count of distinct patients flagged elevated-risk by the RAIN Risk Engine
+    who have a pending (not yet completed) transport request.
+  sources:
+  - RAIN Risk Engine
+  - NEMT Logs
+- id: priya_population_served
+  persona: priya
+  label: Rural / Frontier Population Served
+  value: 168,000
+  target: 168000.0
+  unit: count
+  prior: null
+  definition: Count of rural/frontier residents served (eligible population) in the
+    RAIN data warehouse.
+  sources:
+  - EDW
+  - Eligibility
+- id: priya_women_over_60mi_ob
+  persona: priya
+  label: Women of Childbearing Age >60 mi From OB
+  value: 58% (was 31%)
+  target: 58.0
+  unit: percent
+  prior: was 31%
+  definition: Share of service-area women of childbearing age living more than 60
+    miles from obstetric care, after the March 1 Battle Mountain closure (58%) versus
+    before (31%).
+  sources:
+  - Geospatial
+  - Public Health Registry
+- id: priya_avoidable_ed_rate
+  persona: priya
+  label: Avoidable ED Visit Rate (per 1,000)
+  value: '284'
+  target: 284.0
+  unit: rate
+  prior: null
+  definition: Avoidable emergency-department visits per 1,000 population served. Period
+    and denominator are not stated in the PRD.
+  sources:
+  - Claims
+  - State HIE
+- id: priya_avoidable_ed_cost
+  persona: priya
+  label: Avoidable ED Cost (Est. Annual)
+  value: $1.4M
+  target: 1400000.0
+  unit: currency
+  prior: null
+  definition: Estimated annualized cost of avoidable emergency-department visits in
+    the three-county area (1.4 million dollars annualized).
+  sources:
+  - Claims
+  - EDW
+- id: priya_telehealth_uptake
+  persona: priya
+  label: Telehealth Uptake (Connected ZIPs)
+  value: 71%
+  target: 71.0
+  unit: percent
+  prior: null
+  definition: Project ECHO Nevada telehealth uptake among patients in ZIP codes with
+    reliable broadband connectivity. Numerator/denominator not defined in the PRD.
+  sources:
+  - Project ECHO Nevada
+- id: priya_dead_zone_elevated_risk
+  persona: priya
+  label: Elevated-Risk Patients in Telehealth Dead Zones
+  value: '240'
+  target: 240.0
+  unit: count
+  prior: null
+  definition: Count of elevated-risk patients living in the 5 frontier ZIP codes with
+    no reliable connectivity (telehealth dead zones).
+  sources:
+  - Connectivity Registry
+  - RAIN Risk Engine
+- id: priya_sdoh_transport_prevalence
+  persona: priya
+  label: SDOH Transport-Barrier Prevalence
+  value: 22%
+  target: 22.0
+  unit: percent
+  prior: null
+  definition: Share of patients with SDOH data who have a transportation barrier flag.
+    Denominator not stated in the PRD.
+  sources:
+  - SDOH Data
+- id: david_connected_sources
+  persona: david
+  label: Connected Data Sources
+  value: '11'
+  target: 11.0
+  unit: count
+  prior: null
+  definition: Count of connected data source integrations (the 11 sources listed on
+    the Data Sources page).
+  sources:
+  - Integration Monitor
+- id: david_records_ingested_30d
+  persona: david
+  label: Records Ingested (30-day)
+  value: 9.2M
+  target: 9200000.0
+  unit: count
+  prior: null
+  definition: Total records ingested across all pipelines in the last 30 days.
+  sources:
+  - Ingestion Pipelines
+- id: david_fhir_conformance
+  persona: david
+  label: FHIR Conformance Rate
+  value: 94%
+  target: 94.0
+  unit: percent
+  prior: null
+  definition: Share of ingested FHIR resources/messages that pass conformance validation.
+  sources:
+  - Data Quality Monitor
+- id: david_unresolved_provider_refs
+  persona: david
+  label: Unresolved Provider References
+  value: 1,240
+  target: 1240.0
+  unit: count
+  prior: null
+  definition: Count of clinical and claims records (encounters, orders, pending claims)
+    that still reference provider NPIs deactivated after the Battle Mountain closure
+    and cannot be reconciled by the FHIR Practitioner resource against the active
+    provider directory.
+  sources:
+  - FHIR Practitioner Reconciliation
+- id: david_rpm_completeness
+  persona: david
+  label: RPM Transmission Completeness
+  value: 78% (target 95%)
+  target: 78.0
+  unit: percent
+  prior: target 95%
+  definition: Share of expected RPM device readings received within the 24-hour window
+    over the last 14 days (22% missing or delayed); the signal and demo describe this
+    for frontier ZIP codes.
+  sources:
+  - RPM Feed Monitor
+- id: david_pipeline_freshness
+  persona: david
+  label: Pipeline Freshness (Avg. Lag)
+  value: 3.2 hrs
+  target: 3.2
+  unit: duration
+  prior: null
+  definition: Average lag in hours between source event time and ingestion into the
+    lakehouse across pipelines.
+  sources:
+  - Ingestion Pipelines
+- id: david_records_quarantine
+  persona: david
+  label: Records in Quarantine (DQ)
+  value: 14,800
+  target: 14800.0
+  unit: count
+  prior: null
+  definition: Count of records currently held in data-quality quarantine (not released).
+  sources:
+  - Data Quality Monitor
+signals:
+- id: maria_elevated_risk_cohort
+  persona: maria
+  title: Elevated-Risk Pregnancy Cohort Without Local Delivery Access
+  severity: critical
+  description: Since the March 1 Battle Mountain labor and delivery closure, 38 pregnant
+    patients in the service area now travel more than 100 miles to the nearest delivering
+    hospital. Cross-referencing the clinical EHR with the maternal health registry,
+    14 are third-trimester and 9 carry high-risk diagnoses (preeclampsia, gestational
+    diabetes, prior preterm birth). 6 of the 14 have missed at least one prenatal
+    visit since the closure, correlating with the loss of local obstetric care.
+  headline: 38.0
+  unit: count
+  sub_figures:
+  - name: distance_threshold_miles
+    value: 100.0
+    unit: distance
+    description: Travel distance threshold (miles) to nearest delivering hospital
+  - name: third_trimester
+    value: 14.0
+    unit: count
+    description: Of the 38, patients in the third trimester
+  - name: high_risk_dx
+    value: 9.0
+    unit: count
+    description: Patients carrying high-risk diagnoses (preeclampsia, gestational
+      diabetes, prior preterm birth)
+  - name: missed_prenatal_visit
+    value: 6.0
+    unit: count
+    description: Of the 14 third-trimester patients, those who missed at least one
+      prenatal visit since the closure
+- id: maria_prenatal_gap
+  persona: maria
+  title: Prenatal Care Gap Acceleration
+  severity: critical
+  description: Prenatal visit completion in the service area dropped from 84 percent
+    to 61 percent in the 90 days following the closure. Cross-referencing transportation
+    logs with appointment data, 22 patients have no NEMT trip scheduled for upcoming
+    prenatal appointments, and 11 live in ZIP codes with no telehealth-capable broadband,
+    removing the virtual-visit fallback.
+  headline: 61.0
+  unit: percent
+  sub_figures:
+  - name: prior_completion_pct
+    value: 84.0
+    unit: percent
+    description: Prenatal visit completion before the closure
+  - name: window_days
+    value: 90.0
+    unit: duration
+    description: Days following the closure over which completion is measured
+  - name: no_nemt_scheduled
+    value: 22.0
+    unit: count
+    description: Patients with no NEMT trip scheduled for upcoming prenatal appointments
+  - name: no_broadband
+    value: 11.0
+    unit: count
+    description: Patients living in ZIP codes with no telehealth-capable broadband
+- id: maria_ed_delivery_risk
+  persona: maria
+  title: Emergency Department Delivery Risk Trend
+  severity: warning
+  description: Two births before arrival and one emergency-department delivery occurred
+    in the service area in the 60 days since the closure, compared to zero in the
+    prior six months. The pattern correlates with increased travel distance and rising
+    prenatal gaps, the documented downstream effects of rural obstetric unit closures.
+  headline: 3.0
+  unit: count
+  sub_figures:
+  - name: births_before_arrival
+    value: 2.0
+    unit: count
+    description: Births before arrival in the 60 days since the closure
+  - name: ed_deliveries
+    value: 1.0
+    unit: count
+    description: Emergency-department deliveries in the 60 days since the closure
+  - name: window_days
+    value: 60.0
+    unit: duration
+    description: Days since the closure
+  - name: prior_period_events
+    value: 0.0
+    unit: count
+    description: ED deliveries / births before arrival in the prior six months
+  - name: prior_period_months
+    value: 6.0
+    unit: duration
+    description: Length (months) of comparison period before the closure
+- id: sarah_chf_copd_cluster
+  persona: sarah
+  title: CHF / COPD Deterioration Cluster
+  severity: critical
+  description: 'RPM data shows 17 CHF and COPD patients with worsening readings over
+    the last 14 days: rising weight and falling SpO2 trends that historically precede
+    hospitalization. Cross-referencing pharmacy claims, 9 of the 17 have not filled
+    a maintenance medication in over 30 days. 5 of the 9 lost their regular provider
+    when staff were reassigned to cover the Battle Mountain obstetric gap, the same
+    closure driving Dr. Delgado-Reyes''s maternal signals.'
+  headline: 17.0
+  unit: count
+  sub_figures:
+  - name: window_days
+    value: 14.0
+    unit: duration
+    description: RPM trend window (days)
+  - name: med_gap_30d
+    value: 9.0
+    unit: count
+    description: Of the 17, patients who have not filled a maintenance medication
+      in over 30 days
+  - name: med_gap_threshold_days
+    value: 30.0
+    unit: duration
+    description: Medication gap threshold (days)
+  - name: lost_provider
+    value: 5.0
+    unit: count
+    description: Of the 9, patients who lost their regular provider due to reassignment
+      to the obstetric gap
+- id: sarah_diabetes_gap
+  persona: sarah
+  title: Diabetes Control Gap (Provider Continuity Loss)
+  severity: critical
+  description: 112 diabetes patients in the network have no documented A1c in the
+    last 9 months. Cross-referencing the EHR with claims, 41 of them were paneled
+    to the two providers reassigned after the obstetric closure. Their telehealth
+    and in-person visit rates dropped 38 percent since March. SDOH data shows 18 of
+    the 41 also have a transportation barrier flag.
+  headline: 112.0
+  unit: count
+  sub_figures:
+  - name: a1c_window_months
+    value: 9.0
+    unit: duration
+    description: Look-back window (months) for a documented A1c
+  - name: paneled_reassigned
+    value: 41.0
+    unit: count
+    description: Of the 112, patients paneled to the two reassigned providers
+  - name: reassigned_providers
+    value: 2.0
+    unit: count
+    description: Providers reassigned after the obstetric closure
+  - name: visit_rate_drop_pct
+    value: 38.0
+    unit: percent
+    description: Drop in telehealth and in-person visit rates for the 41 since March
+  - name: transport_barrier
+    value: 18.0
+    unit: count
+    description: Of the 41, patients with an SDOH transportation barrier flag
+- id: sarah_htn_rpm_nonadherence
+  persona: sarah
+  title: Hypertension RPM Non-Adherence Trend
+  severity: warning
+  description: Among 240 hypertension patients enrolled in remote blood-pressure monitoring,
+    device transmission compliance fell from 79 percent to 58 percent over 60 days.
+    The drop concentrates in frontier ZIP codes with intermittent broadband, the same
+    connectivity dead zones limiting maternal telehealth.
+  headline: 58.0
+  unit: percent
+  sub_figures:
+  - name: enrolled_patients
+    value: 240.0
+    unit: count
+    description: Hypertension patients enrolled in remote blood-pressure monitoring
+  - name: prior_compliance_pct
+    value: 79.0
+    unit: percent
+    description: Transmission compliance at the start of the 60-day window
+  - name: window_days
+    value: 60.0
+    unit: duration
+    description: Period (days) over which compliance fell
+- id: james_transport_queue
+  persona: james
+  title: Transport Queue Overload (Obstetric Closure Surge)
+  severity: critical
+  description: NEMT and EMS transport requests to the nearest delivering hospital
+    (115 miles) rose 210 percent since the March 1 Battle Mountain obstetric closure.
+    22 prenatal patients now need scheduled long-distance transport that did not exist
+    before. Cross-referencing with the chronic disease transport queue, 18 dialysis
+    and oncology transports compete for the same vehicles and drivers on the same
+    corridor, and today the queue exceeds available capacity by 9 trips.
+  headline: 210.0
+  unit: percent
+  sub_figures:
+  - name: distance_miles
+    value: 115.0
+    unit: distance
+    description: Distance to the nearest delivering hospital
+  - name: prenatal_transport_need
+    value: 22.0
+    unit: count
+    description: Prenatal patients needing scheduled long-distance transport
+  - name: dialysis_oncology_transports
+    value: 18.0
+    unit: count
+    description: Dialysis and oncology transports competing on the same corridor
+  - name: over_capacity_trips
+    value: 9.0
+    unit: count
+    description: Trips by which today's queue exceeds available capacity
+- id: james_telehealth_surge
+  persona: james
+  title: Telehealth Demand Surge Without Room Capacity
+  severity: critical
+  description: Telehealth visit requests rose 64 percent in 30 days as providers shift
+    maternal and chronic disease visits to virtual. The mobile clinic and two telehealth
+    rooms are booked to capacity through next week. 31 requested visits have no slot,
+    and 12 of those are elevated-risk patients flagged by the risk engine.
+  headline: 64.0
+  unit: percent
+  sub_figures:
+  - name: window_days
+    value: 30.0
+    unit: duration
+    description: Period (days) over which telehealth requests rose
+  - name: telehealth_rooms
+    value: 2.0
+    unit: count
+    description: Telehealth rooms booked to capacity
+  - name: unslotted_visits
+    value: 31.0
+    unit: count
+    description: Requested visits with no slot
+  - name: unslotted_elevated_risk
+    value: 12.0
+    unit: count
+    description: Of the 31, elevated-risk patients flagged by the risk engine
+- id: james_ems_response
+  persona: james
+  title: EMS Response Time Degradation (Weather + Distance)
+  severity: warning
+  description: Average EMS response time in the northern service area rose to 47 minutes
+    this week, up from a 34-minute baseline, correlating with a winter weather system
+    and crews diverted to long-distance obstetric and dialysis transports. Two ZIP
+    codes currently have no available unit within 60 minutes.
+  headline: 47.0
+  unit: duration
+  sub_figures:
+  - name: baseline_minutes
+    value: 34.0
+    unit: duration
+    description: Baseline average EMS response time (minutes)
+  - name: zips_no_unit_60min
+    value: 2.0
+    unit: count
+    description: ZIP codes with no available unit within 60 minutes
+  - name: coverage_threshold_minutes
+    value: 60.0
+    unit: duration
+    description: Unit availability threshold (minutes)
+- id: priya_maternal_desert
+  persona: priya
+  title: Maternal Access Desert Expansion
+  severity: critical
+  description: 'The March 1 Battle Mountain obstetric closure expanded the maternal
+    care desert: the share of service-area women of childbearing age living more than
+    60 miles from obstetric care rose from 31 percent to 58 percent overnight. Cross-referencing
+    claims, public health registries, and the EHR, this aligns with a measurable rise
+    in inadequate prenatal care and 3 ED deliveries or births before arrival in 60
+    days. The affected ZIP codes also rank highest on the SDOH transportation-barrier
+    index.'
+  headline: 58.0
+  unit: percent
+  sub_figures:
+  - name: prior_share_pct
+    value: 31.0
+    unit: percent
+    description: Share of women of childbearing age >60 miles from OB care before
+      the closure
+  - name: distance_threshold_miles
+    value: 60.0
+    unit: distance
+    description: Distance threshold to obstetric care
+  - name: ed_deliveries_bba
+    value: 3.0
+    unit: count
+    description: ED deliveries or births before arrival in 60 days
+  - name: window_days
+    value: 60.0
+    unit: duration
+    description: Window (days) for ED deliveries / births before arrival
+- id: priya_avoidable_ed
+  persona: priya
+  title: Avoidable ED Utilization Concentration
+  severity: critical
+  description: 'Avoidable emergency-department visits in the three-county area rose
+    19 percent over 90 days, concentrated in chronic disease (CHF, COPD, diabetes)
+    and behavioral health. Cross-referencing the State HIE with claims and provider
+    data, 64 percent of these visits came from patients who lost provider continuity
+    after staff reassignments tied to the obstetric closure, the same disruption visible
+    in Sarah Whitehorse''s chronic disease cohort. Estimated avoidable cost: 1.4 million
+    dollars annualized.'
+  headline: 19.0
+  unit: percent
+  sub_figures:
+  - name: window_days
+    value: 90.0
+    unit: duration
+    description: Period (days) over which avoidable ED visits rose
+  - name: continuity_loss_share_pct
+    value: 64.0
+    unit: percent
+    description: Share of avoidable ED visits from patients who lost provider continuity
+      after closure-related reassignments
+  - name: avoidable_cost_annual
+    value: 1400000.0
+    unit: currency
+    description: Estimated avoidable cost, annualized (dollars)
+  - name: county_count
+    value: 3.0
+    unit: count
+    description: Counties in the three-county area
+- id: priya_telehealth_equity
+  persona: priya
+  title: Telehealth Equity Gap
+  severity: warning
+  description: Project ECHO Nevada telehealth uptake is strong where broadband exists
+    but near zero in 5 frontier ZIP codes with no reliable connectivity. Cross-referencing
+    connectivity data with the elevated-risk cohort, 240 elevated-risk patients live
+    in these telehealth dead zones, meaning the virtual-care fallback that protects
+    the rest of the population does not reach the most isolated.
+  headline: 240.0
+  unit: count
+  sub_figures:
+  - name: dead_zone_zips
+    value: 5.0
+    unit: count
+    description: Frontier ZIP codes with no reliable connectivity
+- id: david_provider_reconciliation
+  persona: david
+  title: Provider Identity Reconciliation Failure (Closure Ripple)
+  severity: critical
+  description: The Battle Mountain obstetric closure deactivated provider records
+    and reassigned panels, but 1,240 clinical and claims records still reference the
+    deactivated provider NPIs. The FHIR Practitioner resource cannot reconcile these
+    against the active provider directory, generating unresolved-reference errors
+    that break attribution for maternal and chronic disease risk scoring. The same
+    closure driving every clinical persona's signals is now degrading the data layer
+    those signals depend on.
+  headline: 1240.0
+  unit: count
+  sub_figures: []
+- id: david_rpm_ingestion_gap
+  persona: david
+  title: RPM Feed Ingestion Gap (Connectivity)
+  severity: critical
+  description: 'Remote patient monitoring transmissions from frontier ZIP codes are
+    arriving incomplete: 22 percent of expected device readings over the last 14 days
+    are missing or delayed beyond the 24-hour window. The gap concentrates in the
+    same low-connectivity ZIPs limiting telehealth, meaning the CHF and COPD deterioration
+    signals Sarah Whitehorse relies on are running on partial data for the most isolated
+    patients.'
+  headline: 22.0
+  unit: percent
+  sub_figures:
+  - name: window_days
+    value: 14.0
+    unit: duration
+    description: Look-back window (days) for expected readings
+  - name: late_window_hours
+    value: 24.0
+    unit: duration
+    description: Delay threshold (hours) beyond which a reading counts as delayed
+- id: david_fhir_drift
+  persona: david
+  title: FHIR Conformance Drift on New EHR Connector
+  severity: warning
+  description: 'A newly connected rural clinic EHR is sending HL7 v2 messages that
+    map inconsistently to FHIR: 8 percent of encounters land with a null service location
+    and 4 percent with malformed diagnosis codes. Left unresolved, this degrades the
+    population health and equity analytics that depend on accurate geographic and
+    clinical coding.'
+  headline: 8.0
+  unit: percent
+  sub_figures:
+  - name: malformed_dx_pct
+    value: 4.0
+    unit: percent
+    description: Share of encounters from the new connector with malformed diagnosis
+      codes
+data_sources:
+- name: Clinical EHR (Critical Access Hospitals & RHCs)
+  records: 2.1M
+  description: Encounters, problem lists, vitals, prenatal records, orders, and notes
+    from participating rural critical access hospitals and rural health clinics. Primary
+    source for clinical risk.
+- name: Maternal Health Registry
+  records: 18K
+  description: Pregnancy episodes, prenatal visit history, risk diagnoses, delivery
+    outcomes, and obstetric service availability. Supports elevated-risk pregnancy
+    stratification.
+- name: RPM Platform (Remote Patient Monitoring)
+  records: 640K
+  description: 'Home device readings for CHF, COPD, diabetes, and hypertension patients:
+    weight, SpO2, blood glucose, blood pressure. Time-series source for deterioration
+    detection.'
+- name: Claims & Encounters
+  records: 8.4M
+  description: FFS and managed-care claims, pharmacy fills, and adjudication history.
+    Utilization, medication adherence, and avoidable-ED analysis.
+- name: Telehealth (Project ECHO Nevada)
+  records: 210K
+  description: Virtual visit records, telehealth scheduling, provider mentorship sessions,
+    and connectivity-based eligibility. UNR School of Medicine statewide telehealth
+    initiative.
+- name: EMS / Transport Dispatch
+  records: 390K
+  description: Emergency medical services calls, response times, unit availability,
+    and inter-facility transports across the frontier service area.
+- name: NEMT / Transportation Logs
+  records: 520K
+  description: Non-emergency medical transport trips, scheduling, corridor utilization,
+    and transportation-barrier resolution for rural patients.
+- name: SDOH Data
+  records: 1.3M
+  description: 'Social determinants of health: transportation barriers, housing, food
+    access, and broadband connectivity indicators linked to patients and ZIP codes.'
+- name: Public Health Registries
+  records: 2.7M
+  description: Disease surveillance, immunization, maternal and child health, and
+    chronic disease registries via DPBH OPHIE for frontier counties.
+- name: State HIE
+  records: 3.6M
+  description: 'Clinical data exchange: ADT notifications, lab results, and care summaries.
+    HL7 FHIR-based interoperability with hospitals, labs, and health systems.'
+- name: Enterprise Data Warehouse (Medallion Lakehouse)
+  records: 120M
+  description: Governed lakehouse on Google Cloud aggregating all RAIN domains. Bronze
+    through Platinum medallion layers. Decision support, trend analysis, and NVHA
+    reporting.
+notes:
+- 'No ''today'' date is stated. The PRD is dated June 2026 and the closure was March
+  1, 2026, but the figures use different windows: ''60 days since the closure'' (ED
+  deliveries, which puts today around April 30, 2026) and ''90 days following the
+  closure'' (prenatal completion, which puts today on or after May 30, 2026). Both
+  cannot describe the same ''today''. ''Transport Requests Today'' and ''this week''
+  also need a reference date. today was left null; a human should choose one.'
+- 'Elevated-risk pregnancy definition: the KPI ''Elevated-Risk Pregnancies'' = 38
+  matches the signal''s 38 patients who ''travel more than 100 miles'' to delivery,
+  but only 9 of them carry high-risk diagnoses. The PRD does not say whether ''elevated-risk''
+  means the distance criterion, a risk-engine flag, or both.'
+- 'Maria signal vs demo step 2 conflict: the signal says ''6 of the 14 [third-trimester]''
+  missed a prenatal visit, while demo step 2 says ''6 of these 9 [high-risk]'' missed
+  a prenatal visit. The manifest follows the signal wording (6 of the 14).'
+- 'Avg. distance to delivering hospital = 115 miles fits poorly with only 38 of 126
+  active pregnancies traveling more than 100 miles: the other 88 would sit at or under
+  100 miles, so the 38 would have to average about 150 miles. 115 may instead be the
+  facility-to-facility distance from the closed unit to the nearest delivering hospital.
+  The averaging population is not defined.'
+- Maria's 'Patients Without Scheduled Transport' (22) is probably the same 22 as James's
+  '22 prenatal patients now need scheduled long-distance transport', but the PRD does
+  not say so.
+- 'RPM metrics: Sarah''s ''RPM Transmission Compliance'' 58% (was 79%) is defined
+  in the signal only for the 240 hypertension remote-BP patients over 60 days, but
+  the KPI label is generic. David''s ''RPM Transmission Completeness'' 78% (22% missing
+  over 14 days, frontier ZIPs) is a different measure. The two should not be merged.'
+- 'James: the KPI ''Mobile Clinic Utilization'' is 98%, but demo step 3 says ''telehealth
+  room capacity, which is already at 98 percent''. It is unclear whether 98% refers
+  to the mobile clinic, the telehealth rooms, or both combined.'
+- 'James: the transport surge is ''210 percent'' to the delivering hospital, but demo
+  step 2 says the corridor went from ''4 to 6 transports a day'' to 18, which is a
+  200-350% rise. The scope of the two figures may differ (requests to the hospital
+  vs. corridor trips).'
+- 'Elevated-risk counts across personas use different scopes: Sarah''s elevated-risk
+  cohort is 208 (three-county chronic disease), Priya''s elevated-risk patients in
+  dead zones is 240 (5 frontier ZIPs), and James''s elevated-risk patients awaiting
+  transport is 16. 240 is larger than 208, so Priya''s cohort must cover a wider population
+  or more conditions. The PRD does not reconcile them. Separately, 240 is also the
+  number of hypertension RPM enrollees (Sarah); these appear to be unrelated figures.'
+- Priya's 'Rural / Frontier Population Served' is 168,000, while the text says rural
+  and frontier counties hold 10 percent of Nevada's population. That would be about
+  300K+ people, so 168,000 must be a served/eligible subset. Not reconciled in the
+  PRD.
+- Priya's 'Avoidable ED Visit Rate (per 1,000)' = 284 has no stated period or denominator.
+  'Telehealth Uptake (Connected ZIPs)' = 71% and 'SDOH Transport-Barrier Prevalence'
+  = 22% have undefined denominators. Note that Sarah's 186 / 1,340 = 13.9%, which
+  differs from 22%, so the denominators must differ.
+- 'Scope mismatch: Priya''s avoidable ED signal (+19%, $1.4M) is for the ''three-county
+  area'', while her KPIs are labeled rural/frontier statewide (168,000 population).'
+- The FHIR conformance rate of 94% is overall. The signal's 8% null service location
+  and 4% malformed diagnosis codes apply only to encounters from the newly connected
+  rural clinic EHR.
+- 47 appears both as Maria's 'Telehealth-Eligible Prenatal Visits Booked' and James's
+  'Transport Requests Today'. These are unrelated figures. Maria's 47 has no time
+  window.
+- Demo-only figures (e.g., 11 rising weight / 6 falling SpO2, Tier 1/2/3 = 5/7/5,
+  180 crosswalk mismatches, projected 88% completion, $1.0M avoided cost, 13 trips
+  convertible to telehealth) are scripted conversation content. They are not dashboard
+  KPIs or signals and are not in the manifest.

@@ -1,0 +1,357 @@
+metrics:
+- id: maria_active_pregnancies
+  sql: SELECT COUNT(DISTINCT patient_id) FROM pregnancies WHERE status = 'active'
+  value: 126.0
+  computed_at: '2026-10-20T23:11:31+00:00'
+  note: 'Distinct patients with an active pregnancy episode in the maternal registry
+    (the registry is the service-area registry). Not filtered by patients.county:
+    county is unreliable (every ZIP has patients in all three counties, DQ warning).
+    Filtering to Humboldt/Pershing on patients.county would give 83.'
+- id: maria_avg_distance_delivery
+  sql: SELECT ROUND(AVG(distance_to_delivery_miles), 1) FROM pregnancies WHERE status
+    = 'active'
+  value: 45.7
+  computed_at: '2026-10-20T23:11:47+00:00'
+  note: Average home-to-nearest-delivering-hospital distance over all active pregnancies
+    = 45.7 mi. The PRD's 115 is the distance for the 38 patients whose nearest delivering
+    hospital is now Reno (FAC-003, all exactly 115 mi), i.e. the facility distance
+    after the closure, not a population average. Left as a mismatch for review.
+- id: maria_ed_deliveries_bba
+  sql: SELECT COUNT(*) FROM encounters WHERE source_encounter_type = 'ED_delivery_or_BBA'
+    AND encounter_date > (SELECT MAX(detected_date) FROM data_sources) - 60 AND encounter_date
+    <= (SELECT MAX(detected_date) FROM data_sources)
+  value: 3.0
+  computed_at: '2026-10-20T23:12:03+00:00'
+  note: ED-delivery / birth-before-arrival encounters (dx O80/O81) in the last 60
+    days to the data as-of date 2026-05-15, following the demo wording 'in the last
+    60 days'. A closure-anchored window (Mar 1 to Apr 29) would give 2. These encounters
+    are also flagged avoidable_ed in the source, so avoidable-ED metrics exclude them.
+- id: maria_ed_delivery_risk
+  sql: SELECT COUNT(*) FROM encounters WHERE source_encounter_type = 'ED_delivery_or_BBA'
+    AND encounter_date > (SELECT MAX(detected_date) FROM data_sources) - 60 AND encounter_date
+    <= (SELECT MAX(detected_date) FROM data_sources)
+  value: 3.0
+  computed_at: '2026-10-20T23:12:03+00:00'
+  note: Same definition as maria_ed_deliveries_bba.
+- id: maria_ed_delivery_risk.births_before_arrival
+  sql: SELECT COUNT(*) FROM pregnancies WHERE delivery_setting = 'before_arrival'
+    AND delivery_date > (SELECT MAX(detected_date) FROM data_sources) - 60 AND delivery_date
+    <= (SELECT MAX(detected_date) FROM data_sources)
+  value: 0.0
+  computed_at: '2026-10-20T23:12:03+00:00'
+  note: Written from the contract column pregnancies.delivery_setting. It is empty
+    in v1, and the source encounter type 'ED_delivery_or_BBA' combines ED deliveries
+    and births before arrival, so the 2 + 1 split cannot be computed. Returns 0 until
+    delivery_setting is filled.
+- id: maria_ed_delivery_risk.ed_deliveries
+  sql: SELECT COUNT(*) FROM pregnancies WHERE delivery_setting = 'emergency_department'
+    AND delivery_date > (SELECT MAX(detected_date) FROM data_sources) - 60 AND delivery_date
+    <= (SELECT MAX(detected_date) FROM data_sources)
+  value: 0.0
+  computed_at: '2026-10-20T23:12:03+00:00'
+  note: Written from pregnancies.delivery_setting, which is empty in v1 (see births_before_arrival).
+    Returns 0 until it is filled.
+- id: maria_ed_delivery_risk.prior_period_events
+  sql: SELECT COUNT(*) FROM encounters WHERE source_encounter_type = 'ED_delivery_or_BBA'
+    AND encounter_date >= (SELECT MAX(ob_suspended_date) FROM facilities) - INTERVAL
+    '6 months' AND encounter_date < (SELECT MAX(ob_suspended_date) FROM facilities)
+  value: 0.0
+  computed_at: '2026-10-20T23:12:04+00:00'
+  note: ED deliveries / births before arrival in the 6 months before the closure date
+    (facilities.ob_suspended_date = 2026-03-01).
+- id: maria_ed_delivery_risk.prior_period_months
+  sql: ''
+  value: 6.0
+  computed_at: '2026-10-20T23:12:04+00:00'
+  note: PRD parameter (6-month comparison period), not a measured value.
+- id: maria_ed_delivery_risk.window_days
+  sql: ''
+  value: 60.0
+  computed_at: '2026-10-20T23:12:04+00:00'
+  note: PRD parameter (60-day window), not a measured value.
+- id: maria_elevated_risk_cohort
+  sql: SELECT COUNT(DISTINCT patient_id) FROM pregnancies WHERE status = 'active'
+    AND distance_to_delivery_miles > 100
+  value: 38.0
+  computed_at: '2026-10-20T23:11:31+00:00'
+  note: 'Same definition as maria_elevated_risk_pregnancies: active pregnancies more
+    than 100 miles from the nearest delivering hospital.'
+- id: maria_elevated_risk_cohort.distance_threshold_miles
+  sql: ''
+  value: 100.0
+  computed_at: '2026-10-20T23:11:31+00:00'
+  note: PRD parameter (distance threshold) used in the cohort definition, not a measured
+    value.
+- id: maria_elevated_risk_cohort.high_risk_dx
+  sql: SELECT COUNT(DISTINCT patient_id) FROM pregnancies WHERE status = 'active'
+    AND distance_to_delivery_miles > 100 AND high_risk_dx IN ('preeclampsia','gestational_diabetes','prior_preterm_birth')
+  value: 9.0
+  computed_at: '2026-10-20T23:11:31+00:00'
+  note: Elevated-risk pregnancy cohort members carrying a high-risk diagnosis (preeclampsia,
+    gestational diabetes, prior preterm birth).
+- id: maria_elevated_risk_cohort.missed_prenatal_visit
+  sql: SELECT COUNT(DISTINCT patient_id) FROM pregnancies WHERE status = 'active'
+    AND distance_to_delivery_miles > 100 AND trimester = 3 AND last_prenatal_visit_date
+    < (SELECT MAX(detected_date) FROM data_sources) - 30
+  value: 6.0
+  computed_at: '2026-10-20T23:11:31+00:00'
+  note: 'Proxy: there is no appointments table, so a missed visit cannot be observed
+    directly. A third-trimester cohort patient counts as having missed a visit when
+    the last prenatal visit is more than 30 days before the data as-of date (MAX(data_sources.detected_date)
+    = 2026-05-15). 30 days is the longest standard prenatal visit interval (monthly),
+    so a longer gap means at least one visit was missed. The 30-day threshold is not
+    in the PRD.'
+- id: maria_elevated_risk_cohort.third_trimester
+  sql: SELECT COUNT(DISTINCT patient_id) FROM pregnancies WHERE status = 'active'
+    AND distance_to_delivery_miles > 100 AND trimester = 3
+  value: 14.0
+  computed_at: '2026-10-20T23:11:31+00:00'
+  note: Elevated-risk pregnancy cohort (>100 mi) members currently in trimester 3.
+- id: maria_elevated_risk_pregnancies
+  sql: SELECT COUNT(DISTINCT patient_id) FROM pregnancies WHERE status = 'active'
+    AND distance_to_delivery_miles > 100
+  value: 38.0
+  computed_at: '2026-10-20T23:11:31+00:00'
+  note: 'House definition of an ''elevated-risk pregnancy'' (no local delivery access):
+    active pregnancy whose home is more than 100 miles from the nearest delivering
+    hospital, as the PRD signal describes it. pregnancies.elevated_risk is empty in
+    the data, so it is not used.'
+- id: maria_no_scheduled_transport
+  sql: SELECT COUNT(DISTINCT pr.patient_id) FROM pregnancies pr WHERE pr.status =
+    'active' AND NOT EXISTS (SELECT 1 FROM transport_requests t WHERE t.patient_id
+    = pr.patient_id AND t.mode = 'nemt' AND t.status IN ('scheduled','completed')
+    AND t.service_date >= (SELECT MAX(detected_date) FROM data_sources))
+  value: 22.0
+  computed_at: '2026-10-20T23:11:47+00:00'
+  note: Active-pregnancy patients with no upcoming scheduled NEMT trip (service_date
+    on or after the data as-of date 2026-05-15). With no appointments table, every
+    active pregnancy is assumed to have upcoming prenatal appointments.
+- id: maria_prenatal_completion
+  sql: SELECT after_value FROM src_metric_trend WHERE metric_id = 'prenatal_completion_rate'
+  value: 61.0
+  computed_at: '2026-10-20T23:11:46+00:00'
+  note: Read from the supplied trend table (src_metric_trend, 'Service-area prenatal
+    completion, pre- vs post-closure', after_date 2026-05-15). There is no appointments
+    table, so completed/scheduled prenatal visits cannot be computed row by row. Prior
+    value (84) is in maria_prenatal_gap.prior_completion_pct.
+- id: maria_prenatal_gap
+  sql: SELECT after_value FROM src_metric_trend WHERE metric_id = 'prenatal_completion_rate'
+  value: 61.0
+  computed_at: '2026-10-20T23:11:47+00:00'
+  note: Same as maria_prenatal_completion (post-closure value from the supplied trend
+    table; no appointments table exists).
+- id: maria_prenatal_gap.no_broadband
+  sql: SELECT COUNT(DISTINCT pr.patient_id) FROM pregnancies pr JOIN patients p ON
+    p.patient_id = pr.patient_id JOIN zip_codes z ON z.zip = p.zip WHERE pr.status
+    = 'active' AND z.telehealth_broadband = false AND NOT EXISTS (SELECT 1 FROM transport_requests
+    t WHERE t.patient_id = pr.patient_id AND t.mode = 'nemt' AND t.status IN ('scheduled','completed')
+    AND t.service_date >= (SELECT MAX(detected_date) FROM data_sources))
+  value: 8.0
+  computed_at: '2026-10-20T23:11:47+00:00'
+  note: 'Of the patients with no NEMT trip scheduled, those whose home ZIP has no
+    telehealth-capable broadband. Data gives 8, not 11. Other readings also miss 11:
+    all active pregnancies in no-broadband ZIPs = 48, the >100 mi cohort = 15, third-trimester
+    cohort = 9. Left as a mismatch.'
+- id: maria_prenatal_gap.no_nemt_scheduled
+  sql: SELECT COUNT(DISTINCT pr.patient_id) FROM pregnancies pr WHERE pr.status =
+    'active' AND NOT EXISTS (SELECT 1 FROM transport_requests t WHERE t.patient_id
+    = pr.patient_id AND t.mode = 'nemt' AND t.status IN ('scheduled','completed')
+    AND t.service_date >= (SELECT MAX(detected_date) FROM data_sources))
+  value: 22.0
+  computed_at: '2026-10-20T23:11:47+00:00'
+  note: Same definition as maria_no_scheduled_transport.
+- id: maria_prenatal_gap.prior_completion_pct
+  sql: SELECT before_value FROM src_metric_trend WHERE metric_id = 'prenatal_completion_rate'
+  value: 84.0
+  computed_at: '2026-10-20T23:11:47+00:00'
+  note: Pre-closure prenatal completion from the supplied trend table (before_date
+    2026-01-30).
+- id: maria_prenatal_gap.window_days
+  sql: ''
+  value: 90.0
+  computed_at: '2026-10-20T23:11:47+00:00'
+  note: PRD parameter (90-day post-closure window), not a measured value.
+- id: maria_telehealth_prenatal_booked
+  sql: SELECT COUNT(*) FROM telehealth_requests WHERE session_type = 'prenatal' AND
+    eligibility_status = 'eligible' AND status = 'slotted'
+  value: 47.0
+  computed_at: '2026-10-20T23:12:04+00:00'
+  note: Booked (slotted) prenatal telehealth visits whose eligibility status is 'eligible'.
+    Hybrid (3) and dead-zone (3) prenatal bookings are excluded. No time window, as
+    in the PRD.
+- id: priya_maternal_desert.ed_deliveries_bba
+  sql: SELECT COUNT(*) FROM encounters WHERE source_encounter_type = 'ED_delivery_or_BBA'
+    AND encounter_date > (SELECT MAX(detected_date) FROM data_sources) - 60 AND encounter_date
+    <= (SELECT MAX(detected_date) FROM data_sources)
+  value: 3.0
+  computed_at: '2026-10-20T23:12:03+00:00'
+  note: Same definition as maria_ed_deliveries_bba.
+- id: sarah_chf_copd_cluster
+  sql: WITH asof AS (SELECT MAX(detected_date) AS d FROM data_sources), w AS (SELECT
+    r.patient_id FROM rpm_readings r, asof WHERE r.received_at IS NOT NULL AND r.metric
+    IN ('weight','spo2') AND r.expected_at >= asof.d - 13 AND r.expected_at < asof.d
+    + 1 GROUP BY r.patient_id, r.metric HAVING (r.metric = 'weight' AND regr_slope(r.value,
+    extract(epoch FROM r.expected_at)/86400) > 0) OR (r.metric = 'spo2' AND regr_slope(r.value,
+    extract(epoch FROM r.expected_at)/86400) < 0)) SELECT COUNT(DISTINCT patient_id)
+    FROM w
+  value: 17.0
+  computed_at: '2026-10-20T23:12:26+00:00'
+  note: Same definition as sarah_chf_copd_worsening.
+- id: sarah_chf_copd_cluster.lost_provider
+  sql: WITH asof AS (SELECT MAX(detected_date) AS d FROM data_sources), w AS (SELECT
+    r.patient_id FROM rpm_readings r, asof WHERE r.received_at IS NOT NULL AND r.metric
+    IN ('weight','spo2') AND r.expected_at >= asof.d - 13 AND r.expected_at < asof.d
+    + 1 GROUP BY r.patient_id, r.metric HAVING (r.metric = 'weight' AND regr_slope(r.value,
+    extract(epoch FROM r.expected_at)/86400) > 0) OR (r.metric = 'spo2' AND regr_slope(r.value,
+    extract(epoch FROM r.expected_at)/86400) < 0)), g AS (SELECT f.patient_id FROM
+    pharmacy_fills f, asof WHERE f.is_maintenance GROUP BY f.patient_id, asof.d HAVING
+    MAX(f.fill_date) < asof.d - 30), lc AS (SELECT DISTINCT patient_id FROM patient_conditions
+    WHERE assigned_provider_id IN (SELECT provider_id FROM providers WHERE reassigned_to_provider_id
+    IS NOT NULL)) SELECT COUNT(DISTINCT w.patient_id) FROM w WHERE w.patient_id IN
+    (SELECT patient_id FROM g) AND w.patient_id IN (SELECT patient_id FROM lc)
+  value: 5.0
+  computed_at: '2026-10-20T23:12:26+00:00'
+  note: 'Of the worsening and medication-gap patients, those who lost provider continuity.
+    House definition of ''lost provider continuity'': the patient''s chronic-care
+    assigned provider is one of the providers whose panel was reassigned after the
+    closure (providers.reassigned_to_provider_id not null: PRV-001/002, deactivated
+    2026-03-01). patients.lost_provider_continuity is empty in v1.'
+- id: sarah_chf_copd_cluster.med_gap_30d
+  sql: WITH asof AS (SELECT MAX(detected_date) AS d FROM data_sources), w AS (SELECT
+    r.patient_id FROM rpm_readings r, asof WHERE r.received_at IS NOT NULL AND r.metric
+    IN ('weight','spo2') AND r.expected_at >= asof.d - 13 AND r.expected_at < asof.d
+    + 1 GROUP BY r.patient_id, r.metric HAVING (r.metric = 'weight' AND regr_slope(r.value,
+    extract(epoch FROM r.expected_at)/86400) > 0) OR (r.metric = 'spo2' AND regr_slope(r.value,
+    extract(epoch FROM r.expected_at)/86400) < 0)), g AS (SELECT f.patient_id FROM
+    pharmacy_fills f, asof WHERE f.is_maintenance GROUP BY f.patient_id, asof.d HAVING
+    MAX(f.fill_date) < asof.d - 30) SELECT COUNT(DISTINCT w.patient_id) FROM w WHERE
+    w.patient_id IN (SELECT patient_id FROM g)
+  value: 9.0
+  computed_at: '2026-10-20T23:12:26+00:00'
+  note: 'Of the worsening CHF/COPD patients, those with a medication gap. House definition
+    of ''medication gap'': the patient''s latest maintenance-medication fill is more
+    than 30 days before the as-of date.'
+- id: sarah_chf_copd_cluster.med_gap_threshold_days
+  sql: ''
+  value: 30.0
+  computed_at: '2026-10-20T23:12:26+00:00'
+  note: PRD parameter (30-day medication gap threshold), not a measured value.
+- id: sarah_chf_copd_cluster.window_days
+  sql: ''
+  value: 14.0
+  computed_at: '2026-10-20T23:12:26+00:00'
+  note: PRD parameter (14-day RPM trend window), not a measured value.
+- id: sarah_chf_copd_worsening
+  sql: WITH asof AS (SELECT MAX(detected_date) AS d FROM data_sources), w AS (SELECT
+    r.patient_id FROM rpm_readings r, asof WHERE r.received_at IS NOT NULL AND r.metric
+    IN ('weight','spo2') AND r.expected_at >= asof.d - 13 AND r.expected_at < asof.d
+    + 1 GROUP BY r.patient_id, r.metric HAVING (r.metric = 'weight' AND regr_slope(r.value,
+    extract(epoch FROM r.expected_at)/86400) > 0) OR (r.metric = 'spo2' AND regr_slope(r.value,
+    extract(epoch FROM r.expected_at)/86400) < 0)) SELECT COUNT(DISTINCT patient_id)
+    FROM w
+  value: 17.0
+  computed_at: '2026-10-20T23:12:26+00:00'
+  note: 'House definition of ''worsening RPM'': in the last 14 days to the as-of date
+    2026-05-15, the least-squares slope of received readings is rising for weight
+    (CHF) or falling for SpO2 (COPD). Missing readings are excluded (they still carry
+    values, DQ warning). The rpm_trend_assessments table has no source, so trends
+    are computed from readings.'
+- id: sarah_chronic_monitored
+  sql: SELECT COUNT(DISTINCT patient_id) FROM patient_conditions
+  value: 1340.0
+  computed_at: '2026-10-20T23:12:26+00:00'
+  note: Distinct patients enrolled in the chronic-condition care-coordination program
+    (patient_conditions = ChronicConditionEnrollment). Includes 971 'chronic-other'
+    enrollees. Limited to CHF/COPD/diabetes/hypertension the count is 369. The PRD
+    KPI does not name conditions, so all enrollees are counted.
+- id: sarah_diabetes_gap
+  sql: SELECT COUNT(DISTINCT pc.patient_id) FROM patient_conditions pc WHERE pc.condition
+    = 'diabetes' AND NOT EXISTS (SELECT 1 FROM lab_results l WHERE l.patient_id =
+    pc.patient_id AND l.test_code = 'a1c' AND l.result_date >= (SELECT MAX(detected_date)
+    FROM data_sources) - INTERVAL '9 months')
+  value: 112.0
+  computed_at: '2026-10-20T23:12:46+00:00'
+  note: Same definition as sarah_diabetes_no_a1c.
+- id: sarah_diabetes_gap.a1c_window_months
+  sql: ''
+  value: 9.0
+  computed_at: '2026-10-20T23:12:46+00:00'
+  note: PRD parameter (9-month A1c look-back), not a measured value.
+- id: sarah_diabetes_gap.paneled_reassigned
+  sql: SELECT COUNT(DISTINCT pc.patient_id) FROM patient_conditions pc WHERE pc.condition
+    = 'diabetes' AND pc.assigned_provider_id IN (SELECT provider_id FROM providers
+    WHERE reassigned_to_provider_id IS NOT NULL) AND NOT EXISTS (SELECT 1 FROM lab_results
+    l WHERE l.patient_id = pc.patient_id AND l.test_code = 'a1c' AND l.result_date
+    >= (SELECT MAX(detected_date) FROM data_sources) - INTERVAL '9 months')
+  value: 41.0
+  computed_at: '2026-10-20T23:12:46+00:00'
+  note: Of the diabetes patients with no A1c in 9 months, those whose assigned provider
+    is one of the two reassigned providers (the house 'lost provider continuity' definition).
+- id: sarah_diabetes_gap.reassigned_providers
+  sql: SELECT COUNT(*) FROM providers WHERE reassigned_to_provider_id IS NOT NULL
+  value: 2.0
+  computed_at: '2026-10-20T23:12:46+00:00'
+  note: 'Providers whose panels were reassigned after the closure (PRV-001, PRV-002:
+    deactivated 2026-03-01, panels moved to PRV-010/011). providers.reassigned_to_ob_coverage
+    is empty in v1, so it is not used.'
+- id: sarah_diabetes_gap.transport_barrier
+  sql: SELECT COUNT(DISTINCT pc.patient_id) FROM patient_conditions pc JOIN sdoh_screenings
+    s ON s.patient_id = pc.patient_id AND s.transport_barrier WHERE pc.condition =
+    'diabetes' AND pc.assigned_provider_id IN (SELECT provider_id FROM providers WHERE
+    reassigned_to_provider_id IS NOT NULL) AND NOT EXISTS (SELECT 1 FROM lab_results
+    l WHERE l.patient_id = pc.patient_id AND l.test_code = 'a1c' AND l.result_date
+    >= (SELECT MAX(detected_date) FROM data_sources) - INTERVAL '9 months')
+  value: 18.0
+  computed_at: '2026-10-20T23:12:47+00:00'
+  note: Of the 41 (diabetes, no recent A1c, assigned to a reassigned provider), those
+    with an SDOH transportation-barrier flag.
+- id: sarah_diabetes_gap.visit_rate_drop_pct
+  sql: WITH c AS (SELECT MAX(ob_suspended_date) AS d FROM facilities), coh AS (SELECT
+    DISTINCT pc.patient_id FROM patient_conditions pc WHERE pc.condition = 'diabetes'
+    AND pc.assigned_provider_id IN (SELECT provider_id FROM providers WHERE reassigned_to_provider_id
+    IS NOT NULL)), v AS (SELECT COUNT(*) FILTER (WHERE e.encounter_date >= c.d AND
+    e.encounter_date < c.d + 90) AS post, COUNT(*) FILTER (WHERE e.encounter_date
+    >= c.d - 90 AND e.encounter_date < c.d) AS pre FROM encounters e, c WHERE e.encounter_type
+    IN ('in_person','telehealth') AND e.patient_id IN (SELECT patient_id FROM coh))
+    SELECT ROUND(100.0 * (pre - post) / NULLIF(pre, 0), 1) FROM v
+  value: null
+  computed_at: '2026-10-20T23:12:46+00:00'
+  note: Percent drop in in-person and telehealth encounters for the reassigned-provider
+    diabetes cohort, 90 days after the closure vs 90 days before. In v1, encounters
+    hold only 'ed' and 'lab' types, so this returns NULL. It needs in-person and telehealth
+    encounter history.
+- id: sarah_diabetes_no_a1c
+  sql: SELECT COUNT(DISTINCT pc.patient_id) FROM patient_conditions pc WHERE pc.condition
+    = 'diabetes' AND NOT EXISTS (SELECT 1 FROM lab_results l WHERE l.patient_id =
+    pc.patient_id AND l.test_code = 'a1c' AND l.result_date >= (SELECT MAX(detected_date)
+    FROM data_sources) - INTERVAL '9 months')
+  value: 112.0
+  computed_at: '2026-10-20T23:12:46+00:00'
+  note: Diabetes enrollees with no A1c result in the 9 months before the as-of date
+    2026-05-15.
+- id: sarah_elevated_risk_cohort
+  sql: SELECT COUNT(DISTINCT p.patient_id) FROM patients p WHERE p.elevated_risk =
+    true AND p.patient_id IN (SELECT patient_id FROM patient_conditions)
+  value: 0.0
+  computed_at: '2026-10-20T23:12:26+00:00'
+  note: 'House definition of an ''elevated-risk patient'': patients.elevated_risk
+    = true (RAIN Risk Engine flag). That column is empty in v1, so this returns 0.
+    The source enrollment-id prefix ''CCE-PT-'' covers 208 patients but was deliberately
+    not turned into a flag (it does not reproduce the other elevated-risk figures
+    240/16/12). Needs the data agent to fill patients.elevated_risk.'
+- id: sarah_med_nonadherence
+  sql: SELECT COUNT(*) FROM (SELECT f.patient_id FROM pharmacy_fills f JOIN patients
+    p ON p.patient_id = f.patient_id WHERE f.is_maintenance AND p.chronic_program
+    GROUP BY f.patient_id HAVING MAX(f.fill_date) < (SELECT MAX(detected_date) FROM
+    data_sources) - 30) g
+  value: 94.0
+  computed_at: '2026-10-20T23:12:47+00:00'
+  note: Chronic-program patients whose latest maintenance-medication fill is more
+    than 30 days before the as-of date (house 'medication gap' definition). Patients
+    with no fill history at all are not counted.
+- id: sarah_sdoh_transport_barrier
+  sql: SELECT COUNT(DISTINCT s.patient_id) FROM sdoh_screenings s JOIN patients p
+    ON p.patient_id = s.patient_id WHERE s.transport_barrier AND p.chronic_program
+  value: 186.0
+  computed_at: '2026-10-20T23:12:47+00:00'
+  note: Chronic-program patients with an SDOH transportation-barrier flag.

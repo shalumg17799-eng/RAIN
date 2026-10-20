@@ -1,0 +1,59 @@
+# Denylist for Databricks SQL. UNVERIFIED: written from documentation, not tested against a workspace
+# (docs/open-questions.md V1). On Databricks the authority is Unity Catalog under the user's identity.
+dialect: databricks
+version: 1
+
+functions:
+  - read_files          # reads files from cloud storage
+  - input_file_name
+  - "input_file_block_*"
+  - http_request        # outbound network
+  - "read_*"            # read_kafka, read_kinesis, read_pubsub, ...
+  - cloud_files
+  - java_method
+  - reflect
+  - try_reflect
+  - "ai_*"              # model-serving functions
+  - "vector_search*"
+  - python_udf
+  - current_user
+  - session_user
+  - user
+  - current_catalog
+  - current_schema
+  - current_metastore
+  - current_recipient
+  - is_member
+  - is_account_group_member
+  - "mask"
+  - uuid
+  - rand
+  - random
+
+allow_anonymous_functions: []
+
+bare_identifiers:
+  - current_user
+  - session_user
+  - current_catalog
+  - current_schema
+
+allow_table_functions:
+  - explode
+  - posexplode
+  - inline
+  - range
+
+schemas:
+  - information_schema
+  - system
+  - samples
+  - default
+schema_prefixes: []
+
+nodes:
+  - CurrentUser
+  - SessionUser
+  - CurrentCatalog
+  - CurrentSchema
+  - CurrentVersion

@@ -1,0 +1,12 @@
+source_id,name,records_label,connected,health_status,fhir_conformance_pct,pipeline_freshness_hours,ingestion_lag_status,detected_date
+clinical_ehr,Clinical EHR,,,,93,1.5,on-time,2026-05-15
+maternal_health_registry,Maternal Health Registry,,,,97,2.0,on-time,2026-05-15
+rpm_platform,RPM Platform,,,,89,12.0,delayed,2026-05-15
+claims_encounters,Claims & Encounters,,,,97,3.0,on-time,2026-05-15
+telehealth_project_echo_nevada,Telehealth (Project ECHO Nevada),,,,97,2.5,on-time,2026-05-15
+ems_transport_dispatch,EMS / Transport Dispatch,,,,92,1.0,on-time,2026-05-15
+nemt_transportation_logs,NEMT / Transportation Logs,,,,91,2.4,on-time,2026-05-15
+sdoh_data,SDOH Data,,,,97,2.0,on-time,2026-05-15
+public_health_registries,Public Health Registries,,,,93,2.5,on-time,2026-05-15
+state_hie,State HIE,,,,97,2.0,on-time,2026-05-15
+enterprise_data_warehouse_gcp,Enterprise Data Warehouse (GCP),,,,97,0.5,on-time,2026-05-15

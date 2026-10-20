@@ -1,0 +1,16 @@
+zip,county,region,in_service_area,in_ems_service_area,is_frontier,telehealth_broadband,is_telehealth_dead_zone,sdoh_transport_barrier_index,land_area_sq_mi,population_served,women_childbearing_age,ob_distance_before_miles,ob_distance_after_miles,broadband_available
+89820,,,,,,false,true,,,,,,,false
+89821,,,,,,false,true,,,,,,,false
+89823,,,,,,false,true,,,,,,,false
+89825,,,,,,false,true,,,,,,,false
+89828,,,,,,false,true,,,,,,,false
+89801,,,,,,true,false,,,,,,,true
+89803,,,,,,true,false,,,,,,,true
+89806,,,,,,true,false,,,,,,,true
+89807,,,,,,true,false,,,,,,,true
+89808,,,,,,true,false,,,,,,,true
+89810,,,,,,true,false,,,,,,,true
+89812,,,,,,true,false,,,,,,,true
+89814,,,,,,true,false,,,,,,,true
+89816,,,,,,true,false,,,,,,,true
+89818,,,,,,true,false,,,,,,,true

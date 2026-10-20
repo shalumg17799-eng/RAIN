@@ -1,0 +1,545 @@
+[
+  {
+    "version": "v1",
+    "note": "initial load: 17 supplied source files loaded unchanged as src_* tables, plus 19 contract-shaped tables mapped from them (renames and deterministic derivations only; contract columns with no source left NULL). 7 contract tables have no source and are not loaded.",
+    "loaded_at": "2026-10-20T23:05:33+00:00",
+    "tables": [
+      {
+        "table": "zip_codes",
+        "rows": 15,
+        "types": {
+          "zip": "text",
+          "county": "text",
+          "region": "text",
+          "in_service_area": "boolean",
+          "in_ems_service_area": "boolean",
+          "is_frontier": "boolean",
+          "telehealth_broadband": "boolean",
+          "is_telehealth_dead_zone": "boolean",
+          "sdoh_transport_barrier_index": "numeric",
+          "land_area_sq_mi": "numeric",
+          "population_served": "integer",
+          "women_childbearing_age": "integer",
+          "ob_distance_before_miles": "numeric",
+          "ob_distance_after_miles": "numeric",
+          "broadband_available": "boolean"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "facilities",
+        "rows": 8,
+        "types": {
+          "facility_id": "text",
+          "name": "text",
+          "facility_type": "text",
+          "county": "text",
+          "zip": "text",
+          "provides_delivery": "boolean",
+          "ob_suspended_date": "date",
+          "telehealth_rooms": "integer",
+          "services_offered": "text",
+          "status": "text",
+          "utilization_pct": "numeric"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "providers",
+        "rows": 12,
+        "types": {
+          "provider_id": "text",
+          "npi": "text",
+          "name": "text",
+          "facility_id": "text",
+          "status": "text",
+          "deactivated_date": "date",
+          "reassigned_to_ob_coverage": "boolean",
+          "reassigned_date": "date",
+          "specialty": "text",
+          "reassigned_to_provider_id": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "patients",
+        "rows": 1463,
+        "types": {
+          "patient_id": "text",
+          "zip": "text",
+          "birth_date": "date",
+          "sex": "text",
+          "panel_provider_id": "text",
+          "prior_panel_provider_id": "text",
+          "lost_provider_continuity": "boolean",
+          "elevated_risk": "boolean",
+          "risk_score": "numeric",
+          "hospitalization_prob_30d": "numeric",
+          "chronic_program": "boolean",
+          "county": "text",
+          "age": "integer",
+          "connectivity_status": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "patient_conditions",
+        "rows": 1340,
+        "types": {
+          "patient_id": "text",
+          "condition": "text",
+          "diagnosed_date": "date",
+          "enrollment_id": "text",
+          "enrolled_date": "date",
+          "assigned_provider_id": "text",
+          "care_coordinator_id": "text"
+        },
+        "key": null
+      },
+      {
+        "table": "pregnancies",
+        "rows": 126,
+        "types": {
+          "pregnancy_id": "text",
+          "patient_id": "text",
+          "start_date": "date",
+          "due_date": "date",
+          "status": "text",
+          "trimester": "integer",
+          "high_risk_dx": "text",
+          "elevated_risk": "boolean",
+          "distance_to_delivery_miles": "numeric",
+          "delivery_date": "date",
+          "delivery_setting": "text",
+          "assigned_provider_id": "text",
+          "delivering_facility_id": "text",
+          "last_prenatal_visit_date": "date"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "encounters",
+        "rows": 333,
+        "types": {
+          "encounter_id": "text",
+          "patient_id": "text",
+          "provider_id": "text",
+          "facility_id": "text",
+          "connector_id": "text",
+          "encounter_date": "date",
+          "encounter_type": "text",
+          "avoidable_ed": "boolean",
+          "condition_category": "text",
+          "service_location": "text",
+          "diagnosis_code": "text",
+          "diagnosis_code_valid": "boolean",
+          "source_encounter_type": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "claims",
+        "rows": 333,
+        "types": {
+          "claim_id": "text",
+          "encounter_id": "text",
+          "patient_id": "text",
+          "service_date": "date",
+          "status": "text",
+          "allowed_amount": "numeric",
+          "rendering_provider_id": "text",
+          "referring_provider_id": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "lab_results",
+        "rows": 111,
+        "types": {
+          "lab_id": "text",
+          "patient_id": "text",
+          "test_code": "text",
+          "result_date": "date",
+          "value": "numeric"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "pharmacy_fills",
+        "rows": 94,
+        "types": {
+          "fill_id": "text",
+          "patient_id": "text",
+          "drug_class": "text",
+          "is_maintenance": "boolean",
+          "fill_date": "date",
+          "days_supply": "integer"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "rpm_enrollments",
+        "rows": 257,
+        "types": {
+          "enrollment_id": "text",
+          "patient_id": "text",
+          "condition": "text",
+          "device_type": "text",
+          "enrolled_date": "date",
+          "end_date": "date"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "rpm_readings",
+        "rows": 3118,
+        "types": {
+          "reading_id": "text",
+          "enrollment_id": "text",
+          "patient_id": "text",
+          "metric": "text",
+          "expected_at": "timestamp",
+          "received_at": "timestamp",
+          "value": "numeric",
+          "condition_type": "text",
+          "transmission_status": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "sdoh_screenings",
+        "rows": 186,
+        "types": {
+          "screening_id": "text",
+          "patient_id": "text",
+          "screened_date": "date",
+          "transport_barrier": "boolean",
+          "housing_barrier": "boolean",
+          "food_barrier": "boolean",
+          "zip_code": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "transport_requests",
+        "rows": 169,
+        "types": {
+          "request_id": "text",
+          "patient_id": "text",
+          "appointment_id": "text",
+          "mode": "text",
+          "purpose": "text",
+          "requested_date": "date",
+          "service_date": "date",
+          "requested_hour": "integer",
+          "destination_facility_id": "text",
+          "corridor": "text",
+          "status": "text",
+          "origin_zip": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "telehealth_requests",
+        "rows": 92,
+        "types": {
+          "request_id": "text",
+          "patient_id": "text",
+          "requested_date": "date",
+          "visit_category": "text",
+          "slot_id": "text",
+          "status": "text",
+          "scheduled_date": "date",
+          "eligibility_status": "text",
+          "session_type": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "ems_coverage_snapshots",
+        "rows": 15,
+        "types": {
+          "zip": "text",
+          "as_of": "timestamp",
+          "nearest_unit_minutes": "numeric",
+          "avg_response_time_minutes": "numeric",
+          "unit_available_within_60min": "boolean"
+        },
+        "key": null
+      },
+      {
+        "table": "data_sources",
+        "rows": 11,
+        "types": {
+          "source_id": "text",
+          "name": "text",
+          "records_label": "text",
+          "connected": "boolean",
+          "health_status": "text",
+          "fhir_conformance_pct": "numeric",
+          "pipeline_freshness_hours": "numeric",
+          "ingestion_lag_status": "text",
+          "detected_date": "date"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "ehr_connectors",
+        "rows": 1,
+        "types": {
+          "connector_id": "text",
+          "source_id": "text",
+          "facility_id": "text",
+          "message_standard": "text",
+          "connected_date": "date",
+          "is_new": "boolean",
+          "name": "text",
+          "fhir_conformance_pct": "numeric",
+          "pipeline_freshness_hours": "numeric",
+          "ingestion_lag_status": "text",
+          "detected_date": "date"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "provider_references",
+        "rows": 1420,
+        "types": {
+          "reference_id": "text",
+          "record_type": "text",
+          "record_id": "text",
+          "source_id": "text",
+          "referenced_npi": "text",
+          "resolved": "boolean",
+          "crosswalk_mismatch": "boolean",
+          "checked_at": "timestamp",
+          "old_provider_id": "text",
+          "issue_status": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_chronic_condition_enrollment",
+        "rows": 1340,
+        "types": {
+          "enrollment_id": "text",
+          "patient_id": "text",
+          "condition_type": "text",
+          "enrolled_date": "date",
+          "assigned_provider_id": "text",
+          "care_coordinator_id": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_claim_encounter",
+        "rows": 333,
+        "types": {
+          "claim_id": "text",
+          "patient_id": "text",
+          "rendering_provider_id": "text",
+          "referring_provider_id": "text",
+          "encounter_type": "text",
+          "date": "date",
+          "diagnosis_codes": "text",
+          "avoidable_ed_flag": "boolean"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_connectivity_registry",
+        "rows": 15,
+        "types": {
+          "zip_code": "text",
+          "broadband_available": "boolean",
+          "telehealth_capable": "boolean"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_data_quality_event",
+        "rows": 4,
+        "types": {
+          "event_id": "text",
+          "source_system": "text",
+          "event_type": "text",
+          "affected_record_count": "integer",
+          "detected_date": "date",
+          "related_entity_type": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_data_source_feed",
+        "rows": 12,
+        "types": {
+          "source_name": "text",
+          "fhir_conformance_pct": "integer",
+          "pipeline_freshness_hours": "numeric",
+          "ingestion_lag_status": "text",
+          "detected_date": "date",
+          "feed_type": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_ems_coverage",
+        "rows": 15,
+        "types": {
+          "zip_code": "text",
+          "avg_response_time_minutes": "numeric",
+          "unit_available_within_60min": "boolean",
+          "detected_date": "date"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_facility",
+        "rows": 8,
+        "types": {
+          "facility_id": "text",
+          "name": "text",
+          "county": "text",
+          "services_offered": "text",
+          "status": "text",
+          "closure_date": "date",
+          "utilization_pct": "integer"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_medication_fill",
+        "rows": 94,
+        "types": {
+          "fill_id": "text",
+          "patient_id": "text",
+          "medication_type": "text",
+          "fill_date": "date",
+          "days_supply": "integer"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_metric_trend",
+        "rows": 7,
+        "types": {
+          "metric_id": "text",
+          "metric_name": "text",
+          "before_value": "integer",
+          "after_value": "integer",
+          "unit": "text",
+          "before_date": "date",
+          "after_date": "date",
+          "note": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_patient",
+        "rows": 1463,
+        "types": {
+          "patient_id": "text",
+          "zip_code": "text",
+          "county": "text",
+          "age": "integer",
+          "connectivity_status": "text",
+          "primary_provider_id": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_pregnancy_episode",
+        "rows": 126,
+        "types": {
+          "episode_id": "text",
+          "patient_id": "text",
+          "trimester": "integer",
+          "risk_diagnoses": "text",
+          "assigned_provider_id": "text",
+          "delivering_facility_id": "text",
+          "distance_to_delivery_miles": "integer",
+          "last_prenatal_visit_date": "date",
+          "expected_delivery_date": "date"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_provider",
+        "rows": 12,
+        "types": {
+          "provider_id": "text",
+          "npi": "text",
+          "name": "text",
+          "specialty": "text",
+          "facility_id": "text",
+          "status": "text",
+          "deactivation_date": "date",
+          "reassigned_to_provider_id": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_provider_reference_issue",
+        "rows": 1420,
+        "types": {
+          "record_id": "text",
+          "source_table": "text",
+          "old_provider_id": "text",
+          "status": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_rpm_reading",
+        "rows": 3118,
+        "types": {
+          "reading_id": "text",
+          "patient_id": "text",
+          "condition_type": "text",
+          "reading_type": "text",
+          "value": "numeric",
+          "timestamp": "date",
+          "transmission_status": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_sdoh_flag",
+        "rows": 186,
+        "types": {
+          "flag_id": "text",
+          "patient_id": "text",
+          "zip_code": "text",
+          "flag_type": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_telehealth_session",
+        "rows": 92,
+        "types": {
+          "session_id": "text",
+          "patient_id": "text",
+          "session_type": "text",
+          "scheduled_date": "date",
+          "eligibility_status": "text"
+        },
+        "key": "primary key added"
+      },
+      {
+        "table": "src_transport_request",
+        "rows": 169,
+        "types": {
+          "request_id": "text",
+          "patient_id": "text",
+          "request_type": "text",
+          "origin_zip": "text",
+          "destination_facility_id": "text",
+          "scheduled": "boolean",
+          "date": "date"
+        },
+        "key": "primary key added"
+      }
+    ]
+  }
+]

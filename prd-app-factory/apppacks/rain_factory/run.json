@@ -1,0 +1,66 @@
+{
+  "app_id": "rain_factory",
+  "created_at": "2026-10-20T22:31:31+00:00",
+  "stage": "knowledge",
+  "status": "blocked at knowledge",
+  "target": 0.95,
+  "max_loops": 2,
+  "loops": 0,
+  "gates": {
+    "A": {
+      "status": "approved",
+      "by": "auto (--auto-approve)",
+      "note": "",
+      "at": "2026-10-20T22:37:54+00:00"
+    },
+    "B": {
+      "status": "approved",
+      "by": "auto (--auto-approve)",
+      "note": "",
+      "at": "2026-10-20T23:07:07+00:00"
+    }
+  },
+  "feedback": {},
+  "history": [
+    {
+      "at": "2026-10-20T22:37:54+00:00",
+      "stage": "requirements",
+      "status": "ok",
+      "summary": "I wrote manifest.yaml and data_contract.yaml for the RAIN (Rural Health AI Infrastructure for Nevada) prototype. The manifest has 5 personas, 35 KPIs and 15 priority signals with 48 secondary figures. The data contract has 26 tables, and every figure in the manifest is mapped to the tables that compute it.\n\n**Manifest**\n- **Personas:** Maria (default), Sarah, James, Priya, David. Each has the PRD's 8 suggested questions, copied word for word. County scope is set for Maria (Humboldt, Pershing), Sarah (Humboldt, Pershing, Lander) and James (Humboldt); the PRD doesn't limit Priya or David.\n- **KPIs:** 35, which is 7 per persona in the PRD's order. Values are copied exactly as printed and every one has a numeric target, e.g. 9.2M \u2192 9,200,000, $1.4M \u2192 1,400,000, 3.2 hrs \u2192 3.2.\n- **Signals:** 15, which is 3 per persona. Every number in the signal text is recorded as a secondary figure, including time windows and thresholds.\n- **Settings:** patient health data is flagged as sensitive (PHI). The reference date (\"today\") is left empty because the PRD never names one.\n- **Data sources:** the 11 source systems are recorded with record counts as printed.\n\n**Data contract**\n- The 26 tables are at row level: patients, pregnancies, appointments, encounters, claims, lab results, pharmacy fills, transport requests, telehealth requests, data-quality quarantine records, and so on. RPM readings have one row per expected reading, so compliance and completeness can both be calculated.\n- Before/after figures (prenatal completion 84\u219261%, RPM compliance 79\u219258%, EMS response time 34\u219247 minutes, the 210%, 64%, 19% and 38% changes) are calculated from row-level data covering both periods. The maternal care desert (31\u219258%) uses before and after distance-to-obstetric-care columns on the ZIP code table.\n- Fixed values the PRD states (time windows and thresholds) are mapped to no table, with a note saying they are fixed PRD values.\n\n**What a reviewer should look at**\n- **Contradictions in the PRD,",
+      "usage": {
+        "input": 14,
+        "output": 49797,
+        "cache_read": 202620,
+        "cache_write": 76600,
+        "turns": 6
+      }
+    },
+    {
+      "at": "2026-10-20T23:07:07+00:00",
+      "stage": "data",
+      "status": "ok",
+      "summary": "I loaded data version v1 into the staging schema. 19 of the 26 contract tables are now filled from the supplied files. The other 7 have no source data, so contract_check fails.\n\n**What I loaded**\n- **The 17 supplied files, unchanged**, as `src_*` tables. These keep the original data exactly as supplied. Two of them, MetricTrend and DataQualityEvent, have no table in the contract and exist only here.\n- **19 tables shaped to the contract**, built from those files. I renamed columns and filled contract columns only where a source field clearly determines the value. Contract columns with no source are left empty (NULL). Row counts:\n  - zip_codes 15, facilities 8, providers 12, patients 1463, patient_conditions 1340, pregnancies 126\n  - encounters 333, claims 333, lab_results 111, pharmacy_fills 94\n  - rpm_enrollments 257 (built from the distinct patient/condition pairs in the readings), rpm_readings 3118\n  - sdoh_screenings 186, transport_requests 169, telehealth_requests 92, ems_coverage_snapshots 15\n  - data_sources 11, ehr_connectors 1, provider_references 1420\n- **Values I worked out from source fields:**\n  - telehealth_broadband = the ZIP's telehealth_capable flag; is_telehealth_dead_zone = not telehealth-capable (5 ZIPs).\n  - facility_type and provides_delivery come from the facility name and services list; ob_suspended_date = closure_date.\n  - chronic_program = the patient is in ChronicConditionEnrollment.\n  - pregnancy status = 'active' when the due date is after 2026-05-15 (all 126); diagnosis labels changed to snake_case.\n  - transport status: scheduled \u2192 'scheduled', otherwise 'pending'.\n  - telehealth request status: no scheduled date \u2192 'open', otherwise 'slotted'.\n  - provider_references: resolved = false where the source status is 'unresolved'; crosswalk_mismatch = true where it is 'mismatched'; referenced_npi is looked up from the provider directory.\n  - rpm received_at = the reading's date when received, NULL when missing.\n  - Lab results are the 111 lab",
+      "usage": {
+        "input": 34,
+        "output": 34494,
+        "cache_read": 985826,
+        "cache_write": 98653,
+        "turns": 16
+      }
+    },
+    {
+      "at": "2026-10-20T23:18:00+00:00",
+      "stage": "knowledge",
+      "status": "blocked",
+      "summary": "agent error: Anthropic API usage limit reached (access returns 2026-11-01 00:00 UTC). Retry once the limit is raised or a new key is set."
+    }
+  ],
+  "usage": {
+    "input": 48,
+    "output": 84291,
+    "cache_read": 1188446,
+    "cache_write": 175253,
+    "turns": 22
+  },
+  "updated_at": "2026-10-20T23:07:07+00:00"
+}

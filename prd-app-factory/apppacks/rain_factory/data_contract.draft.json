@@ -1,0 +1,1844 @@
+{
+  "tables": [
+    {
+      "name": "zip_codes",
+      "purpose": "ZIP-level geography, connectivity, population and obstetric-access distances before and after the Battle Mountain closure.",
+      "key": "zip",
+      "columns": [
+        {
+          "name": "zip",
+          "type": "text",
+          "description": "5-digit ZIP code"
+        },
+        {
+          "name": "county",
+          "type": "text",
+          "description": "County name (Humboldt, Pershing, Lander, ...)"
+        },
+        {
+          "name": "region",
+          "type": "text",
+          "description": "Service sub-region, e.g. 'northern'"
+        },
+        {
+          "name": "in_service_area",
+          "type": "boolean",
+          "description": "ZIP is in the Humboldt/Pershing maternal service area"
+        },
+        {
+          "name": "in_ems_service_area",
+          "type": "boolean",
+          "description": "ZIP is in the Winnemucca-hub CAH/EMS service area"
+        },
+        {
+          "name": "is_frontier",
+          "type": "boolean",
+          "description": "Frontier ZIP code"
+        },
+        {
+          "name": "telehealth_broadband",
+          "type": "boolean",
+          "description": "Has telehealth-capable / reliable broadband"
+        },
+        {
+          "name": "is_telehealth_dead_zone",
+          "type": "boolean",
+          "description": "Frontier ZIP with no reliable connectivity (telehealth dead zone)"
+        },
+        {
+          "name": "sdoh_transport_barrier_index",
+          "type": "numeric",
+          "description": "SDOH transportation-barrier index score"
+        },
+        {
+          "name": "land_area_sq_mi",
+          "type": "numeric",
+          "description": "Land area in square miles"
+        },
+        {
+          "name": "population_served",
+          "type": "integer",
+          "description": "Rural/frontier residents served (EDW eligibility)"
+        },
+        {
+          "name": "women_childbearing_age",
+          "type": "integer",
+          "description": "Women of childbearing age resident in the ZIP"
+        },
+        {
+          "name": "ob_distance_before_miles",
+          "type": "numeric",
+          "description": "Distance to nearest obstetric care before March 1, 2026"
+        },
+        {
+          "name": "ob_distance_after_miles",
+          "type": "numeric",
+          "description": "Distance to nearest obstetric care after March 1, 2026"
+        }
+      ]
+    },
+    {
+      "name": "facilities",
+      "purpose": "Hospitals, clinics, mobile clinic and their obstetric service status.",
+      "key": "facility_id",
+      "columns": [
+        {
+          "name": "facility_id",
+          "type": "text",
+          "description": "Facility identifier"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "description": "Facility name"
+        },
+        {
+          "name": "facility_type",
+          "type": "text",
+          "description": "critical_access_hospital | rural_health_clinic | delivering_hospital | mobile_clinic"
+        },
+        {
+          "name": "county",
+          "type": "text",
+          "description": "County"
+        },
+        {
+          "name": "zip",
+          "type": "text",
+          "description": "ZIP code"
+        },
+        {
+          "name": "provides_delivery",
+          "type": "boolean",
+          "description": "Currently provides labor and delivery services"
+        },
+        {
+          "name": "ob_suspended_date",
+          "type": "date",
+          "description": "Date obstetric services were suspended (2026-03-01 for Battle Mountain), null if never"
+        },
+        {
+          "name": "telehealth_rooms",
+          "type": "integer",
+          "description": "Number of telehealth rooms"
+        }
+      ]
+    },
+    {
+      "name": "providers",
+      "purpose": "Provider directory with deactivation and reassignment history.",
+      "key": "provider_id",
+      "columns": [
+        {
+          "name": "provider_id",
+          "type": "text",
+          "description": "Provider identifier"
+        },
+        {
+          "name": "npi",
+          "type": "text",
+          "description": "National Provider Identifier"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "description": "Provider name"
+        },
+        {
+          "name": "facility_id",
+          "type": "text",
+          "description": "Primary facility"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "description": "active | deactivated"
+        },
+        {
+          "name": "deactivated_date",
+          "type": "date",
+          "description": "Date the NPI record was deactivated in the directory"
+        },
+        {
+          "name": "reassigned_to_ob_coverage",
+          "type": "boolean",
+          "description": "Reassigned to cover the Battle Mountain obstetric gap"
+        },
+        {
+          "name": "reassigned_date",
+          "type": "date",
+          "description": "Date of reassignment"
+        }
+      ]
+    },
+    {
+      "name": "patients",
+      "purpose": "One row per patient with home ZIP, panel provider history and current risk-engine flags.",
+      "key": "patient_id",
+      "columns": [
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "Patient identifier"
+        },
+        {
+          "name": "zip",
+          "type": "text",
+          "description": "Home ZIP (FK zip_codes)"
+        },
+        {
+          "name": "birth_date",
+          "type": "date",
+          "description": "Date of birth"
+        },
+        {
+          "name": "sex",
+          "type": "text",
+          "description": "F | M"
+        },
+        {
+          "name": "panel_provider_id",
+          "type": "text",
+          "description": "Current panel provider"
+        },
+        {
+          "name": "prior_panel_provider_id",
+          "type": "text",
+          "description": "Panel provider before reassignment, if changed"
+        },
+        {
+          "name": "lost_provider_continuity",
+          "type": "boolean",
+          "description": "Lost regular provider due to closure-related staff reassignment"
+        },
+        {
+          "name": "elevated_risk",
+          "type": "boolean",
+          "description": "Flagged elevated-risk by the RAIN Risk Engine"
+        },
+        {
+          "name": "risk_score",
+          "type": "numeric",
+          "description": "Composite risk score"
+        },
+        {
+          "name": "hospitalization_prob_30d",
+          "type": "numeric",
+          "description": "Modeled 30-day hospitalization probability (0-1)"
+        },
+        {
+          "name": "chronic_program",
+          "type": "boolean",
+          "description": "Monitored in the chronic disease care-coordination program"
+        }
+      ]
+    },
+    {
+      "name": "patient_conditions",
+      "purpose": "Chronic and behavioral conditions per patient.",
+      "key": "patient_id, condition",
+      "columns": [
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "condition",
+          "type": "text",
+          "description": "chf | copd | diabetes | hypertension | behavioral_health"
+        },
+        {
+          "name": "diagnosed_date",
+          "type": "date",
+          "description": "Diagnosis date"
+        }
+      ]
+    },
+    {
+      "name": "pregnancies",
+      "purpose": "Pregnancy episodes from the Maternal Health Registry with risk, distance and delivery outcome.",
+      "key": "pregnancy_id",
+      "columns": [
+        {
+          "name": "pregnancy_id",
+          "type": "text",
+          "description": "Pregnancy episode id"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "start_date",
+          "type": "date",
+          "description": "Episode start (LMP)"
+        },
+        {
+          "name": "due_date",
+          "type": "date",
+          "description": "Estimated due date"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "description": "active | delivered | ended"
+        },
+        {
+          "name": "trimester",
+          "type": "integer",
+          "description": "Current trimester (1-3) for active episodes"
+        },
+        {
+          "name": "high_risk_dx",
+          "type": "text",
+          "description": "preeclampsia | gestational_diabetes | prior_preterm_birth | null"
+        },
+        {
+          "name": "elevated_risk",
+          "type": "boolean",
+          "description": "Elevated-risk flag (registry + risk engine)"
+        },
+        {
+          "name": "distance_to_delivery_miles",
+          "type": "numeric",
+          "description": "Distance from home to nearest delivering hospital"
+        },
+        {
+          "name": "delivery_date",
+          "type": "date",
+          "description": "Delivery date"
+        },
+        {
+          "name": "delivery_setting",
+          "type": "text",
+          "description": "hospital | emergency_department | before_arrival"
+        }
+      ]
+    },
+    {
+      "name": "appointments",
+      "purpose": "Scheduled visits (prenatal and other) with completion status, modality and transport link.",
+      "key": "appointment_id",
+      "columns": [
+        {
+          "name": "appointment_id",
+          "type": "text",
+          "description": "Appointment id"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "pregnancy_id",
+          "type": "text",
+          "description": "FK pregnancies for prenatal visits"
+        },
+        {
+          "name": "provider_id",
+          "type": "text",
+          "description": "FK providers"
+        },
+        {
+          "name": "facility_id",
+          "type": "text",
+          "description": "FK facilities"
+        },
+        {
+          "name": "appointment_type",
+          "type": "text",
+          "description": "prenatal | chronic_followup | other"
+        },
+        {
+          "name": "scheduled_date",
+          "type": "date",
+          "description": "Appointment date"
+        },
+        {
+          "name": "booked_date",
+          "type": "date",
+          "description": "Date booked"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "description": "scheduled | completed | missed | cancelled"
+        },
+        {
+          "name": "modality",
+          "type": "text",
+          "description": "in_person | telehealth"
+        },
+        {
+          "name": "telehealth_eligible",
+          "type": "boolean",
+          "description": "Clinically and connectivity eligible for telehealth"
+        },
+        {
+          "name": "transport_request_id",
+          "type": "text",
+          "description": "Linked transport request, null if none scheduled"
+        }
+      ]
+    },
+    {
+      "name": "encounters",
+      "purpose": "Clinical encounters (EHR / State HIE) incl. ED visits, telehealth visits, FHIR mapping quality fields.",
+      "key": "encounter_id",
+      "columns": [
+        {
+          "name": "encounter_id",
+          "type": "text",
+          "description": "Encounter id"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "provider_id",
+          "type": "text",
+          "description": "FK providers"
+        },
+        {
+          "name": "facility_id",
+          "type": "text",
+          "description": "FK facilities"
+        },
+        {
+          "name": "connector_id",
+          "type": "text",
+          "description": "FK ehr_connectors (sending EHR connector)"
+        },
+        {
+          "name": "encounter_date",
+          "type": "date",
+          "description": "Encounter date"
+        },
+        {
+          "name": "encounter_type",
+          "type": "text",
+          "description": "ed | inpatient | in_person | telehealth"
+        },
+        {
+          "name": "avoidable_ed",
+          "type": "boolean",
+          "description": "ED visit classified as avoidable"
+        },
+        {
+          "name": "condition_category",
+          "type": "text",
+          "description": "chf | copd | diabetes | behavioral_health | other"
+        },
+        {
+          "name": "service_location",
+          "type": "text",
+          "description": "FHIR service location; null when mapping failed"
+        },
+        {
+          "name": "diagnosis_code",
+          "type": "text",
+          "description": "Primary diagnosis code"
+        },
+        {
+          "name": "diagnosis_code_valid",
+          "type": "boolean",
+          "description": "Diagnosis code well-formed"
+        }
+      ]
+    },
+    {
+      "name": "claims",
+      "purpose": "Medical claims with cost for utilization and avoidable-ED cost.",
+      "key": "claim_id",
+      "columns": [
+        {
+          "name": "claim_id",
+          "type": "text",
+          "description": "Claim id"
+        },
+        {
+          "name": "encounter_id",
+          "type": "text",
+          "description": "FK encounters"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "service_date",
+          "type": "date",
+          "description": "Service date"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "description": "paid | pending | denied"
+        },
+        {
+          "name": "allowed_amount",
+          "type": "numeric",
+          "description": "Allowed amount in dollars"
+        }
+      ]
+    },
+    {
+      "name": "lab_results",
+      "purpose": "Lab results (A1c).",
+      "key": "lab_id",
+      "columns": [
+        {
+          "name": "lab_id",
+          "type": "text",
+          "description": "Lab result id"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "test_code",
+          "type": "text",
+          "description": "e.g. a1c"
+        },
+        {
+          "name": "result_date",
+          "type": "date",
+          "description": "Result date"
+        },
+        {
+          "name": "value",
+          "type": "numeric",
+          "description": "Result value"
+        }
+      ]
+    },
+    {
+      "name": "pharmacy_fills",
+      "purpose": "Pharmacy claim fills for adherence.",
+      "key": "fill_id",
+      "columns": [
+        {
+          "name": "fill_id",
+          "type": "text",
+          "description": "Fill id"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "drug_class",
+          "type": "text",
+          "description": "diuretic | beta_blocker | inhaled_corticosteroid | ..."
+        },
+        {
+          "name": "is_maintenance",
+          "type": "boolean",
+          "description": "Maintenance medication"
+        },
+        {
+          "name": "fill_date",
+          "type": "date",
+          "description": "Fill date"
+        },
+        {
+          "name": "days_supply",
+          "type": "integer",
+          "description": "Days supplied"
+        }
+      ]
+    },
+    {
+      "name": "rpm_enrollments",
+      "purpose": "Remote patient monitoring program enrollments.",
+      "key": "enrollment_id",
+      "columns": [
+        {
+          "name": "enrollment_id",
+          "type": "text",
+          "description": "Enrollment id"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "condition",
+          "type": "text",
+          "description": "chf | copd | diabetes | hypertension"
+        },
+        {
+          "name": "device_type",
+          "type": "text",
+          "description": "scale | pulse_oximeter | glucometer | bp_cuff"
+        },
+        {
+          "name": "enrolled_date",
+          "type": "date",
+          "description": "Enrollment start"
+        },
+        {
+          "name": "end_date",
+          "type": "date",
+          "description": "Enrollment end, null if active"
+        }
+      ]
+    },
+    {
+      "name": "rpm_readings",
+      "purpose": "One row per EXPECTED device reading; received_at null when missing. Grain supports compliance and completeness.",
+      "key": "reading_id",
+      "columns": [
+        {
+          "name": "reading_id",
+          "type": "text",
+          "description": "Reading id"
+        },
+        {
+          "name": "enrollment_id",
+          "type": "text",
+          "description": "FK rpm_enrollments"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "metric",
+          "type": "text",
+          "description": "weight | spo2 | glucose | bp_systolic"
+        },
+        {
+          "name": "expected_at",
+          "type": "timestamp",
+          "description": "When the reading was expected"
+        },
+        {
+          "name": "received_at",
+          "type": "timestamp",
+          "description": "When received by the platform; null if never"
+        },
+        {
+          "name": "value",
+          "type": "numeric",
+          "description": "Reading value"
+        }
+      ]
+    },
+    {
+      "name": "rpm_trend_assessments",
+      "purpose": "RAIN Risk Engine trend assessments of RPM series per patient.",
+      "key": "assessment_id",
+      "columns": [
+        {
+          "name": "assessment_id",
+          "type": "text",
+          "description": "Assessment id"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "assessed_date",
+          "type": "date",
+          "description": "Assessment date"
+        },
+        {
+          "name": "window_days",
+          "type": "integer",
+          "description": "Trend window in days (14)"
+        },
+        {
+          "name": "metric",
+          "type": "text",
+          "description": "weight | spo2 | bp_systolic"
+        },
+        {
+          "name": "worsening",
+          "type": "boolean",
+          "description": "Trend is worsening (rising weight / falling SpO2)"
+        }
+      ]
+    },
+    {
+      "name": "sdoh_screenings",
+      "purpose": "SDOH screening results per patient.",
+      "key": "screening_id",
+      "columns": [
+        {
+          "name": "screening_id",
+          "type": "text",
+          "description": "Screening id"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "screened_date",
+          "type": "date",
+          "description": "Screening date"
+        },
+        {
+          "name": "transport_barrier",
+          "type": "boolean",
+          "description": "Transportation barrier flag"
+        },
+        {
+          "name": "housing_barrier",
+          "type": "boolean",
+          "description": "Housing barrier flag"
+        },
+        {
+          "name": "food_barrier",
+          "type": "boolean",
+          "description": "Food access barrier flag"
+        }
+      ]
+    },
+    {
+      "name": "transport_requests",
+      "purpose": "EMS and NEMT transport requests/trips.",
+      "key": "request_id",
+      "columns": [
+        {
+          "name": "request_id",
+          "type": "text",
+          "description": "Request id"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "appointment_id",
+          "type": "text",
+          "description": "FK appointments, if for an appointment"
+        },
+        {
+          "name": "mode",
+          "type": "text",
+          "description": "ems | nemt"
+        },
+        {
+          "name": "purpose",
+          "type": "text",
+          "description": "prenatal | dialysis | oncology | chronic | emergency | other"
+        },
+        {
+          "name": "requested_date",
+          "type": "date",
+          "description": "Date requested"
+        },
+        {
+          "name": "service_date",
+          "type": "date",
+          "description": "Date of the trip"
+        },
+        {
+          "name": "requested_hour",
+          "type": "integer",
+          "description": "Requested pickup hour (0-23)"
+        },
+        {
+          "name": "destination_facility_id",
+          "type": "text",
+          "description": "FK facilities"
+        },
+        {
+          "name": "corridor",
+          "type": "text",
+          "description": "Route corridor, e.g. battle_mountain"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "description": "pending | scheduled | completed | cancelled"
+        }
+      ]
+    },
+    {
+      "name": "transport_capacity",
+      "purpose": "Daily trip capacity from the vehicle roster.",
+      "key": "service_date",
+      "columns": [
+        {
+          "name": "service_date",
+          "type": "date",
+          "description": "Date"
+        },
+        {
+          "name": "trips_capacity",
+          "type": "integer",
+          "description": "Trips that available vehicles/drivers can run"
+        },
+        {
+          "name": "vehicles_available",
+          "type": "integer",
+          "description": "Vehicles available"
+        }
+      ]
+    },
+    {
+      "name": "ems_responses",
+      "purpose": "EMS calls with response times.",
+      "key": "call_id",
+      "columns": [
+        {
+          "name": "call_id",
+          "type": "text",
+          "description": "Call id"
+        },
+        {
+          "name": "zip",
+          "type": "text",
+          "description": "Incident ZIP (FK zip_codes)"
+        },
+        {
+          "name": "call_received_at",
+          "type": "timestamp",
+          "description": "Call received"
+        },
+        {
+          "name": "unit_arrived_at",
+          "type": "timestamp",
+          "description": "Unit arrival"
+        },
+        {
+          "name": "response_minutes",
+          "type": "numeric",
+          "description": "Response time in minutes"
+        }
+      ]
+    },
+    {
+      "name": "ems_coverage_snapshots",
+      "purpose": "Current nearest-available-unit time per ZIP.",
+      "key": "zip, as_of",
+      "columns": [
+        {
+          "name": "zip",
+          "type": "text",
+          "description": "FK zip_codes"
+        },
+        {
+          "name": "as_of",
+          "type": "timestamp",
+          "description": "Snapshot time"
+        },
+        {
+          "name": "nearest_unit_minutes",
+          "type": "numeric",
+          "description": "Minutes to the nearest available EMS unit"
+        }
+      ]
+    },
+    {
+      "name": "telehealth_requests",
+      "purpose": "Telehealth visit requests in the demand queue and their slot assignment.",
+      "key": "request_id",
+      "columns": [
+        {
+          "name": "request_id",
+          "type": "text",
+          "description": "Request id"
+        },
+        {
+          "name": "patient_id",
+          "type": "text",
+          "description": "FK patients"
+        },
+        {
+          "name": "requested_date",
+          "type": "date",
+          "description": "Date requested"
+        },
+        {
+          "name": "visit_category",
+          "type": "text",
+          "description": "maternal | chronic | other"
+        },
+        {
+          "name": "slot_id",
+          "type": "text",
+          "description": "FK capacity_slots; null if no slot"
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "description": "open | slotted | completed | cancelled"
+        }
+      ]
+    },
+    {
+      "name": "capacity_slots",
+      "purpose": "Bookable slots for the mobile clinic and telehealth rooms.",
+      "key": "slot_id",
+      "columns": [
+        {
+          "name": "slot_id",
+          "type": "text",
+          "description": "Slot id"
+        },
+        {
+          "name": "resource_type",
+          "type": "text",
+          "description": "mobile_clinic | telehealth_room"
+        },
+        {
+          "name": "resource_name",
+          "type": "text",
+          "description": "e.g. Telehealth Room 1"
+        },
+        {
+          "name": "facility_id",
+          "type": "text",
+          "description": "FK facilities"
+        },
+        {
+          "name": "slot_start",
+          "type": "timestamp",
+          "description": "Slot start"
+        },
+        {
+          "name": "booked",
+          "type": "boolean",
+          "description": "Slot is booked"
+        }
+      ]
+    },
+    {
+      "name": "data_sources",
+      "purpose": "Connected source-system integrations.",
+      "key": "source_id",
+      "columns": [
+        {
+          "name": "source_id",
+          "type": "text",
+          "description": "Source id"
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "description": "Source name"
+        },
+        {
+          "name": "records_label",
+          "type": "text",
+          "description": "Record count as printed (e.g. 2.1M)"
+        },
+        {
+          "name": "connected",
+          "type": "boolean",
+          "description": "Integration is connected"
+        },
+        {
+          "name": "health_status",
+          "type": "text",
+          "description": "green | yellow | red"
+        }
+      ]
+    },
+    {
+      "name": "ehr_connectors",
+      "purpose": "Individual EHR/HL7 connectors feeding a source (e.g. the new rural clinic EHR).",
+      "key": "connector_id",
+      "columns": [
+        {
+          "name": "connector_id",
+          "type": "text",
+          "description": "Connector id"
+        },
+        {
+          "name": "source_id",
+          "type": "text",
+          "description": "FK data_sources"
+        },
+        {
+          "name": "facility_id",
+          "type": "text",
+          "description": "FK facilities"
+        },
+        {
+          "name": "message_standard",
+          "type": "text",
+          "description": "hl7v2 | fhir"
+        },
+        {
+          "name": "connected_date",
+          "type": "date",
+          "description": "Date connected"
+        },
+        {
+          "name": "is_new",
+          "type": "boolean",
+          "description": "Newly connected connector"
+        }
+      ]
+    },
+    {
+      "name": "ingestion_batches",
+      "purpose": "Pipeline ingestion batches with volume, lag and FHIR validation counts.",
+      "key": "batch_id",
+      "columns": [
+        {
+          "name": "batch_id",
+          "type": "text",
+          "description": "Batch id"
+        },
+        {
+          "name": "source_id",
+          "type": "text",
+          "description": "FK data_sources"
+        },
+        {
+          "name": "ingested_at",
+          "type": "timestamp",
+          "description": "Ingestion time"
+        },
+        {
+          "name": "record_count",
+          "type": "integer",
+          "description": "Records ingested"
+        },
+        {
+          "name": "lag_hours",
+          "type": "numeric",
+          "description": "Lag between source event time and ingestion (hours)"
+        },
+        {
+          "name": "fhir_resources_checked",
+          "type": "integer",
+          "description": "FHIR resources validated"
+        },
+        {
+          "name": "fhir_resources_conformant",
+          "type": "integer",
+          "description": "FHIR resources passing conformance"
+        }
+      ]
+    },
+    {
+      "name": "dq_quarantine",
+      "purpose": "Records held in data-quality quarantine.",
+      "key": "quarantine_id",
+      "columns": [
+        {
+          "name": "quarantine_id",
+          "type": "text",
+          "description": "Quarantine entry id"
+        },
+        {
+          "name": "source_id",
+          "type": "text",
+          "description": "FK data_sources"
+        },
+        {
+          "name": "record_ref",
+          "type": "text",
+          "description": "Reference to quarantined record"
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "description": "DQ rule failed"
+        },
+        {
+          "name": "quarantined_at",
+          "type": "timestamp",
+          "description": "When quarantined"
+        },
+        {
+          "name": "released_at",
+          "type": "timestamp",
+          "description": "When released; null if still held"
+        }
+      ]
+    },
+    {
+      "name": "provider_references",
+      "purpose": "FHIR Practitioner reconciliation results for records referencing provider NPIs.",
+      "key": "reference_id",
+      "columns": [
+        {
+          "name": "reference_id",
+          "type": "text",
+          "description": "Reference id"
+        },
+        {
+          "name": "record_type",
+          "type": "text",
+          "description": "encounter | order | pending_claim"
+        },
+        {
+          "name": "record_id",
+          "type": "text",
+          "description": "Referencing record id"
+        },
+        {
+          "name": "source_id",
+          "type": "text",
+          "description": "FK data_sources (Clinical EHR or Claims)"
+        },
+        {
+          "name": "referenced_npi",
+          "type": "text",
+          "description": "NPI referenced by the record"
+        },
+        {
+          "name": "resolved",
+          "type": "boolean",
+          "description": "Reference reconciles to an active Practitioner"
+        },
+        {
+          "name": "crosswalk_mismatch",
+          "type": "boolean",
+          "description": "Referring vs rendering provider mismatch due to stale crosswalk"
+        },
+        {
+          "name": "checked_at",
+          "type": "timestamp",
+          "description": "Reconciliation run time"
+        }
+      ]
+    }
+  ],
+  "coverage": [
+    {
+      "id": "maria_active_pregnancies",
+      "tables": [
+        "pregnancies",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "COUNT DISTINCT patient_id from pregnancies status='active' joined to patients/zip_codes where in_service_area."
+    },
+    {
+      "id": "maria_elevated_risk_pregnancies",
+      "tables": [
+        "pregnancies",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Active service-area pregnancies with elevated_risk = true (per signal, equals those with distance_to_delivery_miles > 100)."
+    },
+    {
+      "id": "maria_prenatal_completion",
+      "tables": [
+        "appointments",
+        "pregnancies",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Row-level prenatal appointments across both periods: completed/(completed+missed) for 90 days after 2026-03-01 (61%) vs before (84%)."
+    },
+    {
+      "id": "maria_avg_distance_delivery",
+      "tables": [
+        "pregnancies",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "AVG(distance_to_delivery_miles) over active service-area pregnancies (population ambiguity noted in manifest)."
+    },
+    {
+      "id": "maria_no_scheduled_transport",
+      "tables": [
+        "appointments",
+        "transport_requests"
+      ],
+      "rationale": "Distinct patients with upcoming prenatal appointments (scheduled_date >= today, status scheduled) with no linked scheduled NEMT transport request."
+    },
+    {
+      "id": "maria_ed_deliveries_bba",
+      "tables": [
+        "pregnancies",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Deliveries with delivery_setting in (emergency_department, before_arrival) in the 60 days since closure."
+    },
+    {
+      "id": "maria_telehealth_prenatal_booked",
+      "tables": [
+        "appointments"
+      ],
+      "rationale": "Prenatal appointments with status scheduled, telehealth_eligible = true and modality telehealth."
+    },
+    {
+      "id": "sarah_chronic_monitored",
+      "tables": [
+        "patients",
+        "patient_conditions"
+      ],
+      "rationale": "Distinct chronic_program patients with chf/copd/diabetes/hypertension condition."
+    },
+    {
+      "id": "sarah_elevated_risk_cohort",
+      "tables": [
+        "patients",
+        "patient_conditions"
+      ],
+      "rationale": "Distinct chronic_program patients with elevated_risk = true."
+    },
+    {
+      "id": "sarah_chf_copd_worsening",
+      "tables": [
+        "rpm_trend_assessments",
+        "patient_conditions"
+      ],
+      "rationale": "Distinct CHF/COPD patients with a worsening assessment in the last 14 days."
+    },
+    {
+      "id": "sarah_diabetes_no_a1c",
+      "tables": [
+        "patient_conditions",
+        "lab_results",
+        "patients"
+      ],
+      "rationale": "Diabetes patients with no a1c lab_results in the last 9 months."
+    },
+    {
+      "id": "sarah_med_nonadherence",
+      "tables": [
+        "pharmacy_fills",
+        "patients"
+      ],
+      "rationale": "Chronic program patients whose latest maintenance fill (fill_date + days_supply) or last fill date is more than 30 days ago."
+    },
+    {
+      "id": "sarah_rpm_compliance",
+      "tables": [
+        "rpm_readings",
+        "rpm_enrollments"
+      ],
+      "rationale": "Row-level expected readings for hypertension bp_cuff enrollments: received/expected at end vs start of the 60-day window."
+    },
+    {
+      "id": "sarah_sdoh_transport_barrier",
+      "tables": [
+        "sdoh_screenings",
+        "patients"
+      ],
+      "rationale": "Distinct chronic_program patients with transport_barrier = true on latest screening."
+    },
+    {
+      "id": "james_service_area",
+      "tables": [
+        "zip_codes"
+      ],
+      "rationale": "SUM(land_area_sq_mi) where in_ems_service_area."
+    },
+    {
+      "id": "james_transport_requests_today",
+      "tables": [
+        "transport_requests"
+      ],
+      "rationale": "COUNT of EMS+NEMT requests with service_date = today."
+    },
+    {
+      "id": "james_queue_over_capacity",
+      "tables": [
+        "transport_requests",
+        "transport_capacity"
+      ],
+      "rationale": "Today's request count minus transport_capacity.trips_capacity for today (47-38)."
+    },
+    {
+      "id": "james_ems_response",
+      "tables": [
+        "ems_responses",
+        "zip_codes"
+      ],
+      "rationale": "Same as james_ems_response KPI."
+    },
+    {
+      "id": "james_telehealth_no_slot",
+      "tables": [
+        "telehealth_requests"
+      ],
+      "rationale": "Open telehealth requests with slot_id null."
+    },
+    {
+      "id": "james_mobile_clinic_utilization",
+      "tables": [
+        "capacity_slots"
+      ],
+      "rationale": "Booked/total mobile_clinic slots in the reporting period."
+    },
+    {
+      "id": "james_elevated_risk_awaiting_transport",
+      "tables": [
+        "transport_requests",
+        "patients"
+      ],
+      "rationale": "Distinct elevated_risk patients with a pending/scheduled (not completed) transport request."
+    },
+    {
+      "id": "priya_population_served",
+      "tables": [
+        "zip_codes"
+      ],
+      "rationale": "SUM(population_served)."
+    },
+    {
+      "id": "priya_women_over_60mi_ob",
+      "tables": [
+        "zip_codes"
+      ],
+      "rationale": "SUM(women_childbearing_age where ob_distance_after_miles > 60)/SUM(women_childbearing_age) for service-area ZIPs; same with ob_distance_before_miles for the 31% prior."
+    },
+    {
+      "id": "priya_avoidable_ed_rate",
+      "tables": [
+        "encounters",
+        "zip_codes",
+        "patients"
+      ],
+      "rationale": "Avoidable ED encounters (annual) / SUM(population_served) * 1000."
+    },
+    {
+      "id": "priya_avoidable_ed_cost",
+      "tables": [
+        "claims",
+        "encounters"
+      ],
+      "rationale": "SUM(allowed_amount) for claims on avoidable_ed encounters over the last 12 months (annualized)."
+    },
+    {
+      "id": "priya_telehealth_uptake",
+      "tables": [
+        "encounters",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Share of patients in telehealth_broadband ZIPs with at least one telehealth encounter (denominator to be confirmed)."
+    },
+    {
+      "id": "priya_dead_zone_elevated_risk",
+      "tables": [
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Elevated_risk patients whose ZIP is_telehealth_dead_zone."
+    },
+    {
+      "id": "priya_sdoh_transport_prevalence",
+      "tables": [
+        "sdoh_screenings"
+      ],
+      "rationale": "Screened patients with transport_barrier / all screened patients (latest screening)."
+    },
+    {
+      "id": "david_connected_sources",
+      "tables": [
+        "data_sources"
+      ],
+      "rationale": "COUNT where connected."
+    },
+    {
+      "id": "david_records_ingested_30d",
+      "tables": [
+        "ingestion_batches"
+      ],
+      "rationale": "SUM(record_count) for ingested_at in last 30 days."
+    },
+    {
+      "id": "david_fhir_conformance",
+      "tables": [
+        "ingestion_batches"
+      ],
+      "rationale": "SUM(fhir_resources_conformant)/SUM(fhir_resources_checked)."
+    },
+    {
+      "id": "david_unresolved_provider_refs",
+      "tables": [
+        "provider_references",
+        "providers"
+      ],
+      "rationale": "COUNT where resolved = false and referenced_npi belongs to a deactivated provider."
+    },
+    {
+      "id": "david_rpm_completeness",
+      "tables": [
+        "rpm_readings",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Expected readings in last 14 days received within 24h of expected_at / all expected (frontier ZIPs)."
+    },
+    {
+      "id": "david_pipeline_freshness",
+      "tables": [
+        "ingestion_batches"
+      ],
+      "rationale": "AVG(lag_hours) over recent batches."
+    },
+    {
+      "id": "david_records_quarantine",
+      "tables": [
+        "dq_quarantine"
+      ],
+      "rationale": "COUNT where released_at is null."
+    },
+    {
+      "id": "maria_elevated_risk_cohort",
+      "tables": [
+        "pregnancies",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Active service-area pregnancies with distance_to_delivery_miles > 100."
+    },
+    {
+      "id": "maria_elevated_risk_cohort.distance_threshold_miles",
+      "tables": [],
+      "rationale": "Fixed PRD query parameter (100 miles)."
+    },
+    {
+      "id": "maria_elevated_risk_cohort.third_trimester",
+      "tables": [
+        "pregnancies"
+      ],
+      "rationale": "Of the cohort, trimester = 3."
+    },
+    {
+      "id": "maria_elevated_risk_cohort.high_risk_dx",
+      "tables": [
+        "pregnancies"
+      ],
+      "rationale": "Of the cohort, high_risk_dx not null."
+    },
+    {
+      "id": "maria_elevated_risk_cohort.missed_prenatal_visit",
+      "tables": [
+        "pregnancies",
+        "appointments"
+      ],
+      "rationale": "Third-trimester cohort members with >=1 missed prenatal appointment since 2026-03-01."
+    },
+    {
+      "id": "maria_prenatal_gap",
+      "tables": [
+        "appointments",
+        "pregnancies",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Same as maria_prenatal_completion (post-closure)."
+    },
+    {
+      "id": "maria_prenatal_gap.prior_completion_pct",
+      "tables": [
+        "appointments",
+        "pregnancies",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Completion rate for prenatal appointments before 2026-03-01."
+    },
+    {
+      "id": "maria_prenatal_gap.window_days",
+      "tables": [],
+      "rationale": "Fixed PRD window parameter (90 days)."
+    },
+    {
+      "id": "maria_prenatal_gap.no_nemt_scheduled",
+      "tables": [
+        "appointments",
+        "transport_requests"
+      ],
+      "rationale": "Same as maria_no_scheduled_transport."
+    },
+    {
+      "id": "maria_prenatal_gap.no_broadband",
+      "tables": [
+        "pregnancies",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Pregnant patients (within the prenatal-gap cohort) whose ZIP telehealth_broadband = false."
+    },
+    {
+      "id": "maria_ed_delivery_risk",
+      "tables": [
+        "pregnancies",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Same as maria_ed_deliveries_bba."
+    },
+    {
+      "id": "maria_ed_delivery_risk.births_before_arrival",
+      "tables": [
+        "pregnancies"
+      ],
+      "rationale": "delivery_setting = before_arrival in last 60 days."
+    },
+    {
+      "id": "maria_ed_delivery_risk.ed_deliveries",
+      "tables": [
+        "pregnancies"
+      ],
+      "rationale": "delivery_setting = emergency_department in last 60 days."
+    },
+    {
+      "id": "maria_ed_delivery_risk.window_days",
+      "tables": [],
+      "rationale": "Fixed PRD window parameter (60 days)."
+    },
+    {
+      "id": "maria_ed_delivery_risk.prior_period_events",
+      "tables": [
+        "pregnancies"
+      ],
+      "rationale": "ED/before-arrival deliveries in the six months before 2026-03-01 (expected 0)."
+    },
+    {
+      "id": "maria_ed_delivery_risk.prior_period_months",
+      "tables": [],
+      "rationale": "Fixed PRD comparison window (6 months)."
+    },
+    {
+      "id": "sarah_chf_copd_cluster",
+      "tables": [
+        "rpm_trend_assessments",
+        "patient_conditions"
+      ],
+      "rationale": "Same as sarah_chf_copd_worsening."
+    },
+    {
+      "id": "sarah_chf_copd_cluster.window_days",
+      "tables": [],
+      "rationale": "Fixed PRD window parameter (14 days); also rpm_trend_assessments.window_days."
+    },
+    {
+      "id": "sarah_chf_copd_cluster.med_gap_30d",
+      "tables": [
+        "rpm_trend_assessments",
+        "pharmacy_fills"
+      ],
+      "rationale": "Of the 17, no maintenance fill in over 30 days."
+    },
+    {
+      "id": "sarah_chf_copd_cluster.med_gap_threshold_days",
+      "tables": [],
+      "rationale": "Fixed PRD threshold (30 days)."
+    },
+    {
+      "id": "sarah_chf_copd_cluster.lost_provider",
+      "tables": [
+        "patients",
+        "providers"
+      ],
+      "rationale": "Of the 9, lost_provider_continuity = true (prior panel provider reassigned_to_ob_coverage)."
+    },
+    {
+      "id": "sarah_diabetes_gap",
+      "tables": [
+        "patient_conditions",
+        "lab_results",
+        "patients"
+      ],
+      "rationale": "Same as sarah_diabetes_no_a1c."
+    },
+    {
+      "id": "sarah_diabetes_gap.a1c_window_months",
+      "tables": [],
+      "rationale": "Fixed PRD look-back (9 months)."
+    },
+    {
+      "id": "sarah_diabetes_gap.paneled_reassigned",
+      "tables": [
+        "patients",
+        "providers"
+      ],
+      "rationale": "Of the 112, prior/current panel provider is reassigned_to_ob_coverage."
+    },
+    {
+      "id": "sarah_diabetes_gap.reassigned_providers",
+      "tables": [
+        "providers"
+      ],
+      "rationale": "COUNT providers with reassigned_to_ob_coverage = true."
+    },
+    {
+      "id": "sarah_diabetes_gap.visit_rate_drop_pct",
+      "tables": [
+        "encounters",
+        "patients"
+      ],
+      "rationale": "Row-level in_person+telehealth encounters for the 41: visits per patient-month since March 2026 vs before; percent change."
+    },
+    {
+      "id": "sarah_diabetes_gap.transport_barrier",
+      "tables": [
+        "sdoh_screenings"
+      ],
+      "rationale": "Of the 41, transport_barrier = true."
+    },
+    {
+      "id": "sarah_htn_rpm_nonadherence",
+      "tables": [
+        "rpm_readings",
+        "rpm_enrollments"
+      ],
+      "rationale": "Same as sarah_rpm_compliance (current)."
+    },
+    {
+      "id": "sarah_htn_rpm_nonadherence.enrolled_patients",
+      "tables": [
+        "rpm_enrollments",
+        "patient_conditions"
+      ],
+      "rationale": "Distinct active hypertension BP-monitoring enrollees."
+    },
+    {
+      "id": "sarah_htn_rpm_nonadherence.prior_compliance_pct",
+      "tables": [
+        "rpm_readings",
+        "rpm_enrollments"
+      ],
+      "rationale": "Compliance at the start of the 60-day window."
+    },
+    {
+      "id": "sarah_htn_rpm_nonadherence.window_days",
+      "tables": [],
+      "rationale": "Fixed PRD window (60 days)."
+    },
+    {
+      "id": "james_transport_queue",
+      "tables": [
+        "transport_requests",
+        "facilities"
+      ],
+      "rationale": "Row-level requests to the nearest delivering hospital: daily average since 2026-03-01 vs before; percent change."
+    },
+    {
+      "id": "james_transport_queue.distance_miles",
+      "tables": [
+        "pregnancies"
+      ],
+      "rationale": "Distance to nearest delivering hospital; stated PRD value 115, see maria_avg_distance_delivery."
+    },
+    {
+      "id": "james_transport_queue.prenatal_transport_need",
+      "tables": [
+        "appointments",
+        "transport_requests"
+      ],
+      "rationale": "Prenatal patients needing long-distance transport (same 22 as maria_no_scheduled_transport per PRD narrative)."
+    },
+    {
+      "id": "james_transport_queue.dialysis_oncology_transports",
+      "tables": [
+        "transport_requests"
+      ],
+      "rationale": "Today's requests with purpose in (dialysis, oncology) on the same corridor."
+    },
+    {
+      "id": "james_transport_queue.over_capacity_trips",
+      "tables": [
+        "transport_requests",
+        "transport_capacity"
+      ],
+      "rationale": "Same as james_queue_over_capacity."
+    },
+    {
+      "id": "james_telehealth_surge",
+      "tables": [
+        "telehealth_requests"
+      ],
+      "rationale": "Requests in last 30 days vs prior 30 days; percent change."
+    },
+    {
+      "id": "james_telehealth_surge.window_days",
+      "tables": [],
+      "rationale": "Fixed PRD window (30 days)."
+    },
+    {
+      "id": "james_telehealth_surge.telehealth_rooms",
+      "tables": [
+        "facilities",
+        "capacity_slots"
+      ],
+      "rationale": "SUM(telehealth_rooms) / distinct telehealth_room resources."
+    },
+    {
+      "id": "james_telehealth_surge.unslotted_visits",
+      "tables": [
+        "telehealth_requests"
+      ],
+      "rationale": "Same as james_telehealth_no_slot."
+    },
+    {
+      "id": "james_telehealth_surge.unslotted_elevated_risk",
+      "tables": [
+        "telehealth_requests",
+        "patients"
+      ],
+      "rationale": "Unslotted requests whose patient elevated_risk = true."
+    },
+    {
+      "id": "james_ems_response.baseline_minutes",
+      "tables": [
+        "ems_responses",
+        "zip_codes"
+      ],
+      "rationale": "AVG(response_minutes), northern region, baseline period before this week."
+    },
+    {
+      "id": "james_ems_response.zips_no_unit_60min",
+      "tables": [
+        "ems_coverage_snapshots"
+      ],
+      "rationale": "ZIPs in latest snapshot with nearest_unit_minutes > 60."
+    },
+    {
+      "id": "james_ems_response.coverage_threshold_minutes",
+      "tables": [],
+      "rationale": "Fixed PRD threshold (60 minutes)."
+    },
+    {
+      "id": "priya_maternal_desert",
+      "tables": [
+        "zip_codes"
+      ],
+      "rationale": "Same as priya_women_over_60mi_ob."
+    },
+    {
+      "id": "priya_maternal_desert.prior_share_pct",
+      "tables": [
+        "zip_codes"
+      ],
+      "rationale": "Same computation using ob_distance_before_miles."
+    },
+    {
+      "id": "priya_maternal_desert.distance_threshold_miles",
+      "tables": [],
+      "rationale": "Fixed PRD threshold (60 miles)."
+    },
+    {
+      "id": "priya_maternal_desert.ed_deliveries_bba",
+      "tables": [
+        "pregnancies"
+      ],
+      "rationale": "Same as maria_ed_deliveries_bba."
+    },
+    {
+      "id": "priya_maternal_desert.window_days",
+      "tables": [],
+      "rationale": "Fixed PRD window (60 days)."
+    },
+    {
+      "id": "priya_avoidable_ed",
+      "tables": [
+        "encounters",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Row-level avoidable ED encounters in three-county area: last 90 days vs prior 90 days; percent change."
+    },
+    {
+      "id": "priya_avoidable_ed.window_days",
+      "tables": [],
+      "rationale": "Fixed PRD window (90 days)."
+    },
+    {
+      "id": "priya_avoidable_ed.continuity_loss_share_pct",
+      "tables": [
+        "encounters",
+        "patients"
+      ],
+      "rationale": "Share of those avoidable ED visits whose patient lost_provider_continuity = true."
+    },
+    {
+      "id": "priya_avoidable_ed.avoidable_cost_annual",
+      "tables": [
+        "claims",
+        "encounters"
+      ],
+      "rationale": "Same as priya_avoidable_ed_cost."
+    },
+    {
+      "id": "priya_avoidable_ed.county_count",
+      "tables": [
+        "zip_codes"
+      ],
+      "rationale": "COUNT DISTINCT county in the three-county area (Humboldt, Pershing, Lander)."
+    },
+    {
+      "id": "priya_telehealth_equity",
+      "tables": [
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "Same as priya_dead_zone_elevated_risk."
+    },
+    {
+      "id": "priya_telehealth_equity.dead_zone_zips",
+      "tables": [
+        "zip_codes"
+      ],
+      "rationale": "COUNT where is_telehealth_dead_zone."
+    },
+    {
+      "id": "david_provider_reconciliation",
+      "tables": [
+        "provider_references",
+        "providers"
+      ],
+      "rationale": "Same as david_unresolved_provider_refs."
+    },
+    {
+      "id": "david_rpm_ingestion_gap",
+      "tables": [
+        "rpm_readings",
+        "patients",
+        "zip_codes"
+      ],
+      "rationale": "1 - completeness: frontier-ZIP expected readings in last 14 days missing or received > 24h after expected_at."
+    },
+    {
+      "id": "david_rpm_ingestion_gap.window_days",
+      "tables": [],
+      "rationale": "Fixed PRD window (14 days)."
+    },
+    {
+      "id": "david_rpm_ingestion_gap.late_window_hours",
+      "tables": [],
+      "rationale": "Fixed PRD threshold (24 hours)."
+    },
+    {
+      "id": "david_fhir_drift",
+      "tables": [
+        "encounters",
+        "ehr_connectors"
+      ],
+      "rationale": "Share of encounters from the is_new connector with service_location null."
+    },
+    {
+      "id": "david_fhir_drift.malformed_dx_pct",
+      "tables": [
+        "encounters",
+        "ehr_connectors"
+      ],
+      "rationale": "Share of encounters from the is_new connector with diagnosis_code_valid = false."
+    }
+  ]
+}

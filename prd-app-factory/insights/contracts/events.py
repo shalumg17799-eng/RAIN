@@ -1,0 +1,110 @@
+"""SSE stage events and audit events.
+
+Both are closed, fully typed records: there is no free-form field, so there is nowhere to put a row
+or a secret. Audit holds hashes, counts and decisions (design report 5.4, layer 4).
+"""
+
+from typing import Literal
+
+from pydantic import AwareDatetime, Field, model_validator
+
+from insights.contracts.common import (
+    Contract,
+    Identifier,
+    SemVer,
+    Sha256Hex,
+    SkillName,
+    SqlIdentifier,
+)
+from insights.contracts.enums import (
+    AuditEventType,
+    EventType,
+    ExecutionStatus,
+    PolicyDecisionKind,
+    PolicyLayer,
+    RunFailureReason,
+)
+from insights.contracts.response import TraceId
+
+
+class TokenUsage(Contract):
+    prompt_tokens: int = Field(default=0, ge=0)
+    completion_tokens: int = Field(default=0, ge=0)
+
+    @property
+    def total(self) -> int:
+        return self.prompt_tokens + self.completion_tokens
+
+
+class StageEvent(Contract):
+    """What the SSE stream carries: stage name, label and token counts. Never rows."""
+
+    type: EventType
+    run_id: str
+    trace_id: TraceId
+    ts: AwareDatetime
+    step_id: Identifier | None = None
+    skill: SkillName | None = None
+    skill_version: SemVer | None = None
+    attempt: int | None = Field(default=None, ge=0)
+    label: Identifier | None = None
+    duration_ms: int | None = Field(default=None, ge=0)
+    tokens: TokenUsage | None = None
+    note: Identifier | None = None
+    """A code a skill chose (for example `sliver_fallback`). Never free text."""
+    count: int | None = Field(default=None, ge=0)
+    outcome: Literal["completed", "failed"] | None = None
+    failure_reason: RunFailureReason | None = None
+
+    @model_validator(mode="after")
+    def _required_per_type(self) -> "StageEvent":
+        needs: dict[EventType, tuple[str, ...]] = {
+            EventType.STAGE_STARTED: ("step_id", "skill", "skill_version"),
+            EventType.STAGE_FINISHED: (
+                "step_id",
+                "skill",
+                "skill_version",
+                "duration_ms",
+                "tokens",
+            ),
+            EventType.REFINE: ("step_id", "attempt", "label"),
+            EventType.PROGRESS: ("step_id", "note"),
+            EventType.RUN_FINISHED: ("outcome",),
+        }
+        missing = [name for name in needs[self.type] if getattr(self, name) is None]
+        if missing:
+            raise ValueError(f"{self.type.value} event needs: {', '.join(missing)}")
+        return self
+
+
+class PolicyAudit(Contract):
+    layer: PolicyLayer
+    decision: PolicyDecisionKind
+    rules_fired: tuple[str, ...] = ()
+
+
+class AuditEvent(Contract):
+    event_id: str
+    type: AuditEventType
+    ts: AwareDatetime
+    run_id: str
+    trace_id: TraceId
+    principal_subject: str
+    principal_tenant: str
+    app_id: Identifier
+    app_version: SemVer
+    step_id: Identifier | None = None
+    skill: SkillName | None = None
+    skill_version: SemVer | None = None
+    label: Identifier | None = None
+    attempt: int | None = Field(default=None, ge=0)
+    duration_ms: int | None = Field(default=None, ge=0)
+    tokens: TokenUsage | None = None
+    question_sha256: Sha256Hex | None = None
+    sql_sha256: Sha256Hex | None = None
+    tables: tuple[SqlIdentifier, ...] = ()
+    policy: tuple[PolicyAudit, ...] = ()
+    execution_status: ExecutionStatus | None = None
+    row_count: int | None = Field(default=None, ge=0)
+    outcome: Literal["completed", "failed"] | None = None
+    failure_reason: RunFailureReason | None = None

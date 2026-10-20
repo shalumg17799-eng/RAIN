@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRD-to-App Factory</title>
+<style>
+  :root { --bg:#f5f7f8; --card:#fff; --ink:#14232e; --muted:#5a6a76; --line:#d9e1e6; --accent:#1d455f;
+          --ok:#2f7d4f; --wait:#b5651d; --bad:#b42318; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#0f171d; --card:#16222b; --ink:#e4ecf0; --muted:#9aaab5; --line:#2a3a46;
+          --accent:#8fc2dd; --ok:#7cc79a; --wait:#e3a35e; --bad:#f2867c; color-scheme:dark } }
+  * { box-sizing:border-box } body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.5 "Segoe UI", Arial, sans-serif }
+  header { padding:18px max(16px,3vw); border-bottom:1px solid var(--line) } h1 { margin:0; font-size:22px } .muted { color:var(--muted) }
+  main { display:grid; grid-template-columns:minmax(260px,320px) 1fr; gap:20px; padding:20px max(16px,3vw) }
+  @media (max-width:820px) { main { grid-template-columns:1fr } }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:8px; padding:14px; min-width:0 }
+  h2 { font-size:16px; margin:0 0 10px } label { display:block; font-size:13px; margin:8px 0 3px; color:var(--muted) }
+  input[type=text], input[type=file], textarea { width:100%; font:inherit; padding:7px; border:1px solid var(--line); border-radius:6px; background:var(--card); color:var(--ink) }
+  button { font:inherit; padding:8px 12px; border:0; border-radius:6px; background:var(--accent); color:var(--bg); cursor:pointer; margin-top:10px }
+  button.secondary { background:transparent; color:var(--accent); border:1px solid var(--line) }
+  .runs { list-style:none; padding:0; margin:0; display:grid; gap:6px } .runs li { padding:8px; border:1px solid var(--line); border-radius:6px; cursor:pointer }
+  .runs li.active { border-color:var(--accent) }
+  .stages { display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 } .stage { padding:4px 9px; border-radius:999px; border:1px solid var(--line); font-size:12px }
+  .stage.done { border-color:var(--ok); color:var(--ok) } .stage.current { border-color:var(--wait); color:var(--wait); font-weight:600 } .stage.blocked { border-color:var(--bad); color:var(--bad) }
+  .gate { border:1px solid var(--wait); border-radius:8px; padding:12px; margin:10px 0 }
+  .blocked-box { border:1px solid var(--bad); border-radius:8px; padding:12px; margin:10px 0 }
+  table { border-collapse:collapse; width:100%; font-size:13px } td, th { text-align:left; vertical-align:top; padding:6px; border-bottom:1px solid var(--line) }
+  .files { display:flex; flex-wrap:wrap; gap:6px } .files button { margin:0; font-size:12px; padding:4px 8px }
+  pre { white-space:pre-wrap; background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:10px; max-height:480px; overflow:auto; font:12px/1.5 Consolas, monospace }
+  .tbl { overflow-x:auto }
+</style>
+</head>
+<body>
+<header><h1>PRD-to-App Factory</h1><div class="muted">Upload a PRD, follow the five agents, review and approve at each gate.</div></header>
+<main>
+  <div style="display:grid; gap:20px; align-content:start">
+    <form class="card" id="new">
+      <h2>New run</h2>
+      <label for="app_id">App id (lower-case, e.g. claims_insights)</label><input type="text" id="app_id" name="app_id" required pattern="[a-z][a-z0-9_]{0,40}">
+      <label for="prd">PRD (.docx, .md or .txt)</label><input type="file" id="prd" name="prd" accept=".docx,.md,.txt" required>
+      <label for="data">Data (CSV files or a .zip of them; leave empty to generate)</label><input type="file" id="data" name="data" multiple accept=".csv,.zip">
+      <label><input type="checkbox" id="auto_ab" name="auto_ab" value="true"> Approve gates A and B automatically (gate C always needs a person)</label>
+      <button>Start</button> <span id="new-msg" class="muted"></span>
+    </form>
+    <div class="card"><h2>Runs</h2><ul class="runs" id="runs"></ul></div>
+  </div>
+  <div class="card" id="detail"><p class="muted">Select a run.</p></div>
+</main>
+<script>
+const ORDER = ["requirements","gate:A","data","gate:B","knowledge","app","verify","gate:C","release","done"];
+const NAMES = {requirements:"1 Requirements", "gate:A":"Gate A", data:"2 Data", "gate:B":"Gate B", knowledge:"3 Knowledge & AI",
+               app:"4 App builder", verify:"5 Verify", "gate:C":"Gate C", release:"5 Release", done:"Done"};
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+let current = null;
+async function api(url, opts) { const r = await fetch(url, opts); const t = await r.text(); if (!r.ok) throw new Error(t); try { return JSON.parse(t); } catch { return t; } }
+async function loadRuns() {
+  const runs = await api("/api/runs");
+  document.getElementById("runs").innerHTML = runs.map((r) => `<li class="${r.app_id === current ? "active" : ""}" data-id="${r.app_id}">
+    <b>${esc(r.app_id)}</b><br><span class="muted">${esc(NAMES[r.stage] || r.stage)} · ${esc(r.status)}${r.conformance ? " · " + esc(r.conformance) + " figures" : ""}</span></li>`).join("") || `<li class="muted">No runs yet.</li>`;
+  document.querySelectorAll("#runs li[data-id]").forEach((li) => li.onclick = () => { current = li.dataset.id; show(); loadRuns(); });
+}
+async function show() {
+  if (!current) return;
+  const d = await api(`/api/runs/${current}`), s = d.state, idx = ORDER.indexOf(s.stage);
+  const blocked = s.status.startsWith("blocked");
+  const stages = ORDER.map((st, i) => `<span class="stage ${i < idx ? "done" : i === idx ? (blocked ? "blocked" : "current") : ""}">${NAMES[st]}</span>`).join("");
+  const gate = s.stage.startsWith("gate:") && s.status.startsWith("waiting") ? s.stage.slice(5) : null;
+  const usage = s.usage || {};
+  document.getElementById("detail").innerHTML = `<h2>${esc(s.app_id)}</h2>
+    <div class="muted">${esc(s.status)} · loops ${s.loops} · tokens out ${(usage.output||0).toLocaleString()}, cache read ${(usage.cache_read||0).toLocaleString()}</div>
+    <div class="stages">${stages}</div>
+    ${gate ? `<div class="gate"><b>Gate ${gate} needs your review.</b><div>${esc(d.gates[gate])}</div>
+      <label for="note">Note (optional)</label><input type="text" id="note"><button id="approve">Approve gate ${gate}</button></div>` : ""}
+    ${blocked ? `<div class="blocked-box"><b>Blocked.</b> Read the last history entry, fix the cause, then retry.<br><button id="retry">Retry ${esc(NAMES[s.stage])}</button></div>` : ""}
+    <h2 style="margin-top:14px">History</h2><div class="tbl"><table><tr><th>When</th><th>Stage / event</th><th>Status</th><th>Summary</th></tr>
+    ${s.history.slice().reverse().map((h) => `<tr><td>${esc((h.at||"").replace("T"," ").slice(0,19))}</td><td>${esc(NAMES[h.stage] || h.stage || h.event)}</td>
+      <td>${esc(h.status || h.by || "")}</td><td>${esc(h.summary || (h.rate_with_static !== undefined ? "conformance " + Math.round(h.rate_with_static*100) + "%" : h.note || ""))}</td></tr>`).join("")}</table></div>
+    <h2 style="margin-top:14px">Outputs</h2><div class="files">${d.files.map((f) => `<button class="secondary" data-f="${esc(f)}">${esc(f)}</button>`).join("")}</div>
+    <pre id="viewer" hidden></pre>`;
+  document.querySelectorAll("[data-f]").forEach((b) => b.onclick = async () => { const v = document.getElementById("viewer"); v.hidden = false; v.textContent = await api(`/api/runs/${current}/file?path=${encodeURIComponent(b.dataset.f)}`); });
+  const form = (extra) => { const f = new FormData(); Object.entries(extra).forEach(([k, v]) => f.append(k, v)); return {method:"POST", body:f}; };
+  if (gate) document.getElementById("approve").onclick = async () => { await api(`/api/runs/${current}/gates/${gate}/approve`, form({note: document.getElementById("note").value})); show(); };
+  if (blocked) document.getElementById("retry").onclick = async () => { await api(`/api/runs/${current}/retry`, form({})); show(); };
+}
+document.getElementById("new").onsubmit = async (e) => {
+  e.preventDefault(); const msg = document.getElementById("new-msg"); msg.textContent = "Starting…";
+  try { const s = await api("/api/runs", {method:"POST", body:new FormData(e.target)}); current = s.app_id; msg.textContent = "Started."; e.target.reset(); loadRuns(); show(); }
+  catch (err) { msg.textContent = err.message; }
+};
+loadRuns(); setInterval(() => { loadRuns(); show(); }, 5000);
+</script>
+</body>
+</html>

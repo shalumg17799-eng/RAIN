@@ -1,0 +1,25 @@
+# Local infrastructure for the factory: PostgreSQL (staging data) and Neo4j (knowledge graph).
+# Ports are offset (5440, 7690, 7480) so they do not clash with other local databases.
+#   docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: factory
+      POSTGRES_PASSWORD: factory_dev_pw
+      POSTGRES_DB: factory
+    ports: ["5440:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U factory"]
+      interval: 5s
+      retries: 20
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: neo4j/factory_dev_pw
+    ports: ["7480:7474", "7690:7687"]
+    volumes: [neo4jdata:/data]
+volumes:
+  pgdata:
+  neo4jdata:

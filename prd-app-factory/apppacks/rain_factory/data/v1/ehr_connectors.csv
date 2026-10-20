@@ -1,0 +1,2 @@
+connector_id,source_id,facility_id,message_standard,connected_date,is_new,name,fhir_conformance_pct,pipeline_freshness_hours,ingestion_lag_status,detected_date
+new_rural_clinic_ehr_connector,,,,,true,New Rural Clinic EHR Connector,88,7.0,delayed,2026-05-15

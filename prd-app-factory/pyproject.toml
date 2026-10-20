@@ -1,0 +1,15 @@
+[project]
+name = "prd-app-factory"
+version = "0.1.0"
+description = "Five Claude agents that turn a PRD (+ data) into a verified, governed data-and-AI app and deploy it to Azure Container Apps."
+requires-python = ">=3.11"
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+include = ["factory*", "insights*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

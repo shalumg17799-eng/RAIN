@@ -1,0 +1,9 @@
+facility_id,name,facility_type,county,zip,provides_delivery,ob_suspended_date,telehealth_rooms,services_offered,status,utilization_pct
+FAC-001,Battle Mountain Critical Access Hospital,critical_access_hospital,Humboldt,,false,2026-03-01,,"ED,General,Obstetric(closed)",closed,
+FAC-002,Winnemucca Regional Delivering Hospital,delivering_hospital,Humboldt,,true,,,"ED,General,Obstetric",active,
+FAC-003,Reno Regional Medical Center (115mi),delivering_hospital,Washoe,,true,,,"ED,General,Obstetric,NICU",active,
+FAC-004,Rural Health Clinic 4,rural_health_clinic,Lander,,false,,,General,active,
+FAC-005,Rural Health Clinic 5,rural_health_clinic,Humboldt,,false,,,General,active,
+FAC-006,Rural Health Clinic 6,rural_health_clinic,Humboldt,,false,,,General,active,
+FAC-007,Rural Health Clinic 7,rural_health_clinic,Lander,,false,,,General,active,
+FAC-008,Winnemucca Mobile Clinic,mobile_clinic,Humboldt,,false,,,"Mobile primary care,Prenatal,Telehealth",active,98

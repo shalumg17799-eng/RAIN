@@ -1,0 +1,5 @@
+event_id,source_system,event_type,affected_record_count,detected_date,related_entity_type
+DQE-SILENT-001,Clinical EHR/RPM/Pharmacy,no_contact_24d,1,2026-05-15,patient
+DQE-PROV-RECON,FHIR Practitioner Service,unresolved_reference,1240,2026-03-06,provider
+DQE-RPM-GAP,RPM Feed Monitor,missing_transmission,,2026-05-01,patient
+DQE-FHIR-CONFORMANCE,New Rural Clinic EHR Connector,conformance_error,,2026-05-08,encounter

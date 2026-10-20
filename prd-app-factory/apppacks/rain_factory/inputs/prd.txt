@@ -1,0 +1,463 @@
+University of Nevada, Reno
+Rural Health AI Infrastructure for Nevada (RAIN)
+Prototype Specification
+Prepared by Radiant Digital
+June 2026
+CONFIDENTIAL
+Overview
+This document specifies the Rural Health AI Infrastructure for Nevada (RAIN) prototype, developed by the University of Nevada, Reno in partnership with Radiant Digital. The prototype demonstrates how a unified AI intelligence layer, built on Radiant Digital's Applied Intelligence Architecture, can reason across the fragmented clinical, telehealth, monitoring, claims, transportation, public health, and social systems that characterize rural Nevada healthcare, surfacing cross-system insights, detecting elevated risk, and recommending actions that no single system can produce independently.
+The prototype shares the same shell, navigation, and AI capability framework as prior Radiant engagements but is contextualized with five rural Nevada health personas, each mapped to a cross-system intelligence use case aligned to the RAIN proposal and the Rural Health Transformation Program priorities: maternal health, chronic disease management, rural operations and access, population health and equity, and data interoperability.
+Four Adaptations from the Base Prototype
+
+Element | Adaptation
+Personas | 5 rural Nevada health operations personas, each tied to a cross-system intelligence use case aligned to the RHTP / RFA evaluation priorities: maternal healthchronic disease managementrural operations and accesspopulation health and equitydata interoperability
+Data Sources | Rural Nevada health data systems: clinical EHRs at participating critical access hospitals and rural health clinics, telehealth platforms (Project ECHO Nevada), remote patient monitoring (RPM) feeds, claims and encounter data, EMS / transport dispatch, transportation and NEMT logs, public health registries, social determinants of health (SDOH) data, and FHIR / HL7 interoperability services.
+Use Cases | Cross-system intelligence questions that span fragmented rural healthcare environments: maternal risk stratification after obstetric service loss, chronic disease cohort prioritization (CHF, COPD, diabetes, hypertension), transport and telehealth demand coordination, access-and-equity gap detection, and interoperability data-quality monitoring.
+Branding | University of Nevada, Reno and RAIN initiative branding replaces prior client branding. "Powered by Radiant Digital" footer remains.
+Mobile Responsiveness | The existing desktop prototype shell is refactored to be fully mobile-responsive so the team can capture phone-framed screenshots of a patient-facing mobile interface in which a rural patient opens the app and talks to the AI. See Build Instructions for the responsive requirements and the patient screenshot set.
+
+Shared Root-Cause Thread
+The prototype's cross-system intelligence is dramatized through a single root-cause event that cascades differently through all five personas, the same narrative technique used in prior Radiant prototypes. The event:
+
+Battle Mountain Critical Access Hospital labor & delivery closureOn March 1, 2026, the labor and delivery unit at a frontier critical access hospital in Humboldt County (modeled on the Winnemucca service area) suspended obstetric services due to staffing loss. The nearest delivering hospital is now 115 miles away. This single event cascades across every persona: maternal patients lose local prenatal and delivery access, EMS and NEMT transport demand spikes, the same rural clinic's chronic disease patients lose continuity as providers are reassigned, telehealth demand surges, SDOH and transportation barriers compound, and referral and RPM data feeds show the ripple. Nevada is one of only eight states without obstetric services in more than two-thirds of its rural hospitals.
+
+Prototype Structure
+The prototype follows the same four-page navigation structure as the base Radiant Intelligence Platform prototype.
+
+Page | Description
+Ask the AI (Home) | Conversational interface with proactive briefing cards, persona-specific priority signals, guided demo conversation flow, and suggested query bar. Default landing page.
+Rural Health Intelligence | Cross-system analytics dashboards showing correlations across clinical, telehealth, RPM, claims, transportation, public health, and SDOH data that no single rural health system surfaces natively.
+Care & Risk Signals | Elevated-risk cohort alerts, maternal and chronic disease risk indicators, access-gap tracking, and operational signals across participating rural healthcare organizations.
+Data Sources | Connected rural Nevada health system integrations with record counts and descriptions. Same layout as base prototype.
+
+Radiant AI Capabilities Mapping
+Each conversation step in the guided demo is tagged with one of six Radiant AI capabilities. The tags are clickable in the prototype, opening an architecture deep-dive screen. The RAIN prototype uses the same six capabilities as the base prototype, contextualized for rural health operations.
+
+Capability | RAIN Context
+Proactive Intelligence | AI surfaces priority signals before the user asks: elevated-risk pregnancies, chronic disease deterioration, transport backlogs, telehealth demand surges, access and equity gaps.
+Converged Conversation | Single conversational interface that reasons across clinical EHRs, telehealth, RPM, claims, transportation, public health, and SDOH data simultaneously.
+Service / Friction Observability | Identifies friction in rural care delivery: transport queue backlogs, telehealth scheduling gaps, referral leakage, and inter-facility handoff failures across long distances.
+Predictive Intelligence | Forecasts maternal and chronic disease risk escalation, transport demand surges, and access-gap deterioration using cross-system longitudinal data.
+Anomaly Detection | Detects statistical outliers across cohorts, utilization patterns, and access metrics that any single rural system cannot identify because the signal spans multiple systems.
+Automated Action | Generates outreach lists, care-coordination plans, transport schedules, telehealth referrals, and stakeholder reports from conversational context.
+
+Persona: Dr. Maria Delgado-Reyes  (Default)
+
+Attribute | Detail
+Role | Rural Health Medical Director and Chief Medical Officer
+Organization | Participating Critical Access Hospital network, Humboldt and Pershing Counties
+Reports To | Rural Health System Board; RAIN Clinical Governance Committee
+Manages | 6 rural providers, 3 nurse-midwives / OB nurses, 2 care coordinators
+Primary Systems | Clinical EHR, Maternal Health Registry, Telehealth (Project ECHO Nevada), EMS / Transport Dispatch, RAIN Risk Engine
+Use Case | Maternal Health: Elevated-risk pregnancy management after loss of local obstetric services
+Prototype Navigation Page | Rural Health Intelligence
+
+Daily Reality
+Dr. Delgado-Reyes leads clinical care across a frontier critical access hospital network serving Humboldt and Pershing Counties, where about 65 percent of Nevadans live in a federally designated primary care health professional shortage area. When the labor and delivery unit at the Battle Mountain critical access hospital suspended obstetric services on March 1, 2026, the nearest delivering hospital became 115 miles away. The gap: prenatal records live in the clinical EHR, risk scores in the maternal health registry, transport capacity in EMS dispatch, and telehealth availability in a separate scheduling system. No single system shows which pregnant patients are now at risk of inadequate prenatal care, an emergency-department delivery, or a birth before arrival. Her team manually cross-references spreadsheets to find at-risk patients, and rural Nevadans already face higher rates of chronic conditions that compound pregnancy risk. With Nevada one of only eight states without obstetric services in more than two-thirds of its rural hospitals, she needs cross-system visibility to intervene before risk escalates.
+Priority Signals (Briefing Cards)
+
+Signal | Severity | Detail
+Elevated-Risk Pregnancy Cohort Without Local Delivery Access | CRITICAL | Since the March 1 Battle Mountain labor and delivery closure, 38 pregnant patients in the service area now travel more than 100 miles to the nearest delivering hospital. Cross-referencing the clinical EHR with the maternal health registry, 14 are third-trimester and 9 carry high-risk diagnoses (preeclampsia, gestational diabetes, prior preterm birth). 6 of the 14 have missed at least one prenatal visit since the closure, correlating with the loss of local obstetric care.
+Prenatal Care Gap Acceleration | CRITICAL | Prenatal visit completion in the service area dropped from 84 percent to 61 percent in the 90 days following the closure. Cross-referencing transportation logs with appointment data, 22 patients have no NEMT trip scheduled for upcoming prenatal appointments, and 11 live in ZIP codes with no telehealth-capable broadband, removing the virtual-visit fallback.
+Emergency Department Delivery Risk Trend | WARNING | Two births before arrival and one emergency-department delivery occurred in the service area in the 60 days since the closure, compared to zero in the prior six months. The pattern correlates with increased travel distance and rising prenatal gaps, the documented downstream effects of rural obstetric unit closures.
+
+Dashboard KPIs
+
+Metric | Value | Source
+Active Pregnancies in Service Area | 126 | Clinical EHR + Maternal Health Registry
+Elevated-Risk Pregnancies | 38 | Maternal Health Registry + RAIN Risk Engine
+Prenatal Visit Completion Rate | 61% (was 84%) | Clinical EHR + Scheduling
+Avg. Distance to Delivering Hospital | 115 miles | Geospatial + Facility Registry
+Patients Without Scheduled Transport | 22 | NEMT / Transport Logs + Scheduling
+ED Deliveries / Births Before Arrival (60-day) | 3 | Clinical EHR + EMS Dispatch
+Telehealth-Eligible Prenatal Visits Booked | 47 | Telehealth Platform + Scheduling
+
+Guided Demo Conversation Flow
+Each step maps to a Radiant AI capability tag. The flow follows the same pattern as the base prototype.
+
+Step 1 | Proactive Intelligence
+User | (Initial greeting, no user prompt)
+AI Response | Good morning, Dr. Delgado-Reyes. I have flagged 3 maternal health signals that need your attention. The most urgent: since the Battle Mountain labor and delivery closure on March 1, 38 pregnant patients now travel over 100 miles to deliver, and 14 are third-trimester with 6 already missing prenatal visits. Prenatal completion in the service area has fallen from 84 percent to 61 percent. I also see 3 emergency-department deliveries or births before arrival in the last 60 days, up from zero. Want me to walk you through the at-risk cohort?
+Visualization | Priority signal cards. Three cards: Elevated-Risk Pregnancy Cohort (CRITICAL, 38 patients), Prenatal Care Gap (CRITICAL, 61% completion), ED Delivery Risk (WARNING, 3 events). Nevada county map highlighting Humboldt and Pershing with distance-to-delivery overlay.
+Data Sources | Clinical EHR, Maternal Health Registry, RAIN Risk Engine, NEMT / Transport Logs, Telehealth Platform
+Follow-up Options | Walk me through the high-risk cohort | Show me the prenatal care gaps | Which patients have no transport scheduled?
+
+Step 2 | Anomaly Detection
+User | Walk me through the high-risk cohort
+AI Response | Of the 38 pregnant patients now beyond 100 miles from delivery, 14 are third-trimester. Cross-referencing the clinical EHR, maternal health registry, and claims, 9 carry high-risk diagnoses: 4 preeclampsia, 3 gestational diabetes, 2 prior preterm birth. The anomaly only becomes visible across systems: 6 of these 9 have missed a prenatal visit since March 1, and all 6 live in frontier ZIP codes where the closed Battle Mountain unit was their nearest obstetric provider. Three of the 6 also have an open chronic-condition flag (hypertension or diabetes) in the same EHR that Sarah Whitehorse is tracking on the chronic disease side, meaning their pregnancy and chronic disease risks compound. Their last documented blood-pressure readings trend upward across the RPM feed.
+Visualization | Risk stratification table: 14 third-trimester patients ranked by composite risk score. Diagnosis breakdown chart. Map showing patient home ZIPs vs. closed unit vs. nearest delivering hospital. RPM blood-pressure trend sparklines for the 3 compounding-risk patients.
+Data Sources | Clinical EHR, Maternal Health Registry, Claims, RPM Feed, Geospatial
+Follow-up Options | Generate a priority outreach list | Which patients need telehealth prenatal visits? | Show me the compounding chronic-disease cases | What transport options exist?
+
+Step 3 | Predictive Intelligence
+User | Which patients need telehealth prenatal visits?
+AI Response | I analyzed the 14 third-trimester patients against telehealth eligibility and broadband availability. 8 can be served by Project ECHO Nevada telehealth prenatal visits immediately: they have adequate connectivity and a care plan that supports virtual monitoring between in-person visits. 3 need a hybrid model, virtual check-ins plus one scheduled in-person visit at the nearest delivering hospital, with NEMT transport. The remaining 3 live in broadband-dead ZIP codes (no telehealth fallback) and are the highest priority for in-person coordination and possible temporary relocation closer to term. If you activate telehealth for the 8 and hybrid for the 3, projected prenatal completion for the cohort recovers from 61 percent to an estimated 88 percent within 30 days. I can also forecast ED-delivery risk reduction.
+Visualization | Scenario model: current trajectory vs. telehealth + hybrid intervention, with projected prenatal completion recovery. Connectivity map overlay. Patient-by-patient intervention assignment table (telehealth / hybrid / in-person).
+Data Sources | Telehealth Platform, Clinical EHR, Broadband / Connectivity Registry, NEMT Logs, RAIN Risk Engine
+Follow-up Options | Activate telehealth for the 8 patients | Schedule hybrid visits for the 3 | Flag the 3 broadband-dead patients for in-person coordination | Forecast ED-delivery risk reduction
+
+Step 4 | Automated Action
+User | Generate a priority outreach list
+AI Response | Here is a priority maternal outreach package for your care coordinators. It includes: (1) The 14 third-trimester patients ranked by composite risk, each with prenatal history from the clinical EHR, risk diagnosis from the registry, last RPM readings, and distance to nearest delivery. (2) A recommended intervention per patient: telehealth (8), hybrid with NEMT transport (3), in-person coordination (3). (3) Pre-drafted NEMT transport requests for the 3 hybrid patients and 22 patients with no scheduled transport. (4) Project ECHO Nevada telehealth referral drafts for the 8 telehealth-eligible patients. (5) A note flagging the 3 patients whose pregnancy and chronic disease risks compound, shared with the chronic disease care team. Shall I route the telehealth referrals and transport requests, or would you prefer to review first?
+Visualization | Outreach package preview: ranked patient list with intervention assignments. Draft telehealth referrals and NEMT transport requests. Evidence chain showing data from each system per patient. Cross-team handoff note to chronic disease care.
+Data Sources | Clinical EHR, Maternal Health Registry, RPM Feed, NEMT Logs, Telehealth Platform, Care Plan Templates
+Follow-up Options | Route the referrals and transport requests | Review the list first | Share the compounding-risk cases with the chronic disease team | Generate a maternal access brief for the board
+
+Suggested Query Bar (Always Visible)
+Show me all elevated-risk pregnancies in the service area
+Which patients have missed prenatal visits since the Battle Mountain closure?
+Cross-reference pregnancy risk with chronic conditions
+Which patients have no transport scheduled to their next appointment?
+Show me telehealth-eligible prenatal patients by connectivity
+What is our prenatal completion rate trend?
+Generate a maternal access brief for the board
+Which ZIP codes have the highest maternal access risk?
+Persona: Sarah Whitehorse, RN
+
+Attribute | Detail
+Role | Care Coordination Lead, Chronic Disease Management
+Organization | Rural Health Clinic network, Humboldt, Pershing, and Lander Counties
+Reports To | Rural Health Medical Director (Dr. Delgado-Reyes)
+Manages | 5 care coordinators, 2 community health workers, RPM monitoring queue
+Primary Systems | Clinical EHR, RPM Platform, Claims / Pharmacy Data, Telehealth, SDOH Data, RAIN Risk Engine
+Use Case | Chronic Disease: Cross-system prioritization for CHF, COPD, diabetes, and hypertension cohorts
+Prototype Navigation Page | Ask the AI (Home)
+
+Daily Reality
+Sarah leads care coordination for chronic disease patients across a three-county rural clinic network where residents face higher rates of diabetes and heart disease than the state average (Nevada diabetes prevalence is 12.4 percent, above the national rate). Her team monitors CHF, COPD, diabetes, and hypertension patients to prevent avoidable hospitalizations. The gap: clinical data lives in the EHR, device readings in the RPM platform, medication fills in pharmacy claims, and social barriers in SDOH data, but no single system tells her which patient is deteriorating right now. When the Battle Mountain obstetric closure pulled two providers into coverage gaps, several of her chronic disease patients lost their regular provider, and she cannot easily see who fell through. Her coordinators spend roughly 40 percent of their time manually stitching together data across systems to build outreach lists, time that should go to patients.
+Priority Signals (Briefing Cards)
+
+Signal | Severity | Detail
+CHF / COPD Deterioration Cluster | CRITICAL | RPM data shows 17 CHF and COPD patients with worsening readings over the last 14 days: rising weight and falling SpO2 trends that historically precede hospitalization. Cross-referencing pharmacy claims, 9 of the 17 have not filled a maintenance medication in over 30 days. 5 of the 9 lost their regular provider when staff were reassigned to cover the Battle Mountain obstetric gap, the same closure driving Dr. Delgado-Reyes's maternal signals.
+Diabetes Control Gap (Provider Continuity Loss) | CRITICAL | 112 diabetes patients in the network have no documented A1c in the last 9 months. Cross-referencing the EHR with claims, 41 of them were paneled to the two providers reassigned after the obstetric closure. Their telehealth and in-person visit rates dropped 38 percent since March. SDOH data shows 18 of the 41 also have a transportation barrier flag.
+Hypertension RPM Non-Adherence Trend | WARNING | Among 240 hypertension patients enrolled in remote blood-pressure monitoring, device transmission compliance fell from 79 percent to 58 percent over 60 days. The drop concentrates in frontier ZIP codes with intermittent broadband, the same connectivity dead zones limiting maternal telehealth.
+
+Dashboard KPIs
+
+Metric | Value | Source
+Chronic Disease Patients Monitored | 1,340 | Clinical EHR + RPM Platform
+Elevated-Risk Cohort (All Conditions) | 208 | RAIN Risk Engine
+CHF/COPD Patients With Worsening RPM | 17 | RPM Platform
+Diabetes Patients Without Recent A1c | 112 | Clinical EHR + Claims
+Medication Non-Adherence (30+ days) | 94 | Pharmacy Claims
+RPM Transmission Compliance | 58% (was 79%) | RPM Platform
+Patients With SDOH Transport Barrier | 186 | SDOH Data + NEMT Logs
+
+Guided Demo Conversation Flow
+Each step maps to a Radiant AI capability tag. The flow follows the same pattern as the base prototype.
+
+Step 1 | Proactive Intelligence
+User | (Initial greeting, no user prompt)
+AI Response | Good morning, Sarah. I have identified 3 chronic disease signals. The most urgent: 17 CHF and COPD patients show worsening remote-monitoring readings that historically precede hospitalization, and 9 of them have a medication gap over 30 days. 5 of those 9 lost their regular provider when staff were pulled to cover the Battle Mountain obstetric closure, so the same event affecting maternal care is now creating chronic-care gaps. I also see 112 diabetes patients overdue for an A1c. Want me to walk you through the deterioration cluster?
+Visualization | Priority signal cards. Three cards: CHF/COPD Deterioration (CRITICAL, 17 patients), Diabetes Control Gap (CRITICAL, 112 patients), Hypertension RPM Non-Adherence (WARNING, 58% compliance). RPM trend mini-charts.
+Data Sources | RPM Platform, Clinical EHR, Pharmacy Claims, SDOH Data, RAIN Risk Engine
+Follow-up Options | Walk me through the deterioration cluster | Show me the diabetes control gaps | What is happening with RPM adherence?
+
+Step 2 | Converged Conversation
+User | Walk me through the deterioration cluster
+AI Response | 17 CHF and COPD patients show RPM trends that precede hospitalization: 11 with rising daily weight (a CHF decompensation marker) and 6 with falling SpO2 (a COPD exacerbation marker). Cross-referencing pharmacy claims, 9 have not filled a maintenance medication, diuretics, beta-blockers, or inhaled corticosteroids, in over 30 days. Here is what no single system showed: 5 of the 9 were paneled to the two providers reassigned after the Battle Mountain obstetric closure on March 1. Their visit and refill activity dropped sharply that week. SDOH data adds another layer: 4 of the 5 have a transportation barrier, so even when a refill or visit is ordered, they may not reach the pharmacy or clinic. One patient has had no recorded contact of any kind, clinical, pharmacy, or RPM transmission, in 24 days.
+Visualization | Patient deterioration board: 17 patients with RPM trend sparklines (weight, SpO2). Medication gap overlay. Provider-reassignment flag linking 5 patients to the obstetric closure. SDOH transport-barrier icons. The silent patient (24 days no contact) highlighted.
+Data Sources | RPM Platform, Pharmacy Claims, Clinical EHR, Provider Panel Data, SDOH Data
+Follow-up Options | Generate an outreach list ranked by risk | Which patients have a transport barrier? | Show me the silent patient's history | Reassign these patients to an available provider
+
+Step 3 | Predictive Intelligence
+User | Generate an outreach list ranked by risk
+AI Response | I ranked the 17 patients by 30-day hospitalization risk using RPM trends, medication gaps, and SDOH barriers. Tier 1 (5 patients) have a modeled hospitalization probability above 60 percent: all have both a medication gap and worsening RPM, and 4 have a transport barrier. Tier 2 (7 patients) are 30 to 60 percent: worsening RPM but medications current. Tier 3 (5 patients) are under 30 percent: early trend, worth a telehealth check-in. For Tier 1, projected impact: same-day pharmacy outreach plus NEMT transport plus a telehealth visit within 48 hours reduces modeled hospitalization risk by 45 percent. The 5 patients tied to the provider reassignment should be re-paneled to an available provider to restore continuity. I can model the avoidable-hospitalization cost savings if you want the financial view for the RHTP value-based reporting.
+Visualization | Risk-tiered outreach list: Tier 1 (5), Tier 2 (7), Tier 3 (5) with probability scores. Intervention recommendation per tier. Projected risk-reduction chart. Avoidable-cost estimate panel.
+Data Sources | RAIN Risk Engine, RPM Platform, Pharmacy Claims, SDOH Data, NEMT Logs, Telehealth Platform
+Follow-up Options | Activate Tier 1 outreach | Re-panel the 5 reassigned patients | Model the avoidable-hospitalization savings | Schedule telehealth for Tier 3
+
+Step 4 | Automated Action
+User | Activate Tier 1 outreach
+AI Response | I have generated the Tier 1 outreach package for your 5 highest-risk patients. Each record includes: (1) A pre-populated care summary with RPM trends, the specific medication gap, last clinical contact, and SDOH barriers, so your coordinator does not have to toggle between systems. (2) A drafted pharmacy outreach for the lapsed medication, routed to the patient's pharmacy of record. (3) An NEMT transport request for the 4 patients with a transportation barrier. (4) A telehealth visit request to an available provider within 48 hours, with re-paneling for the patients who lost continuity after the obstetric closure. (5) A community health worker home-visit task for the silent patient with no contact in 24 days. Shall I route these now, or hold for your review?
+Visualization | Tier 1 action package preview: 5 patient cards with care summary, pharmacy outreach draft, NEMT request, telehealth request, CHW task. Cross-system evidence chain per patient.
+Data Sources | Clinical EHR, RPM Platform, Pharmacy Claims, NEMT Logs, Telehealth Platform, SDOH Data, Care Plan Templates
+Follow-up Options | Route all Tier 1 actions | Hold for my review | Dispatch the CHW for the silent patient | Generate a chronic disease status report for Dr. Delgado-Reyes
+
+Suggested Query Bar (Always Visible)
+Show me chronic disease patients with worsening RPM readings
+Which patients have a medication gap over 30 days?
+Cross-reference deterioration with transportation barriers
+Which patients lost their provider after the Battle Mountain closure?
+Show me diabetes patients overdue for an A1c
+What is our RPM transmission compliance trend?
+Generate a risk-ranked outreach list
+Model avoidable hospitalizations for the elevated-risk cohort
+Persona: James Tomley
+
+Attribute | Detail
+Role | Rural Clinic and Critical Access Hospital Operations Lead
+Organization | Critical Access Hospital and EMS service area, Humboldt County (Winnemucca hub)
+Reports To | Hospital Administrator; Rural Health System Board
+Manages | EMS dispatch coordination, facility leads, mobile-clinic schedule, transport queue
+Primary Systems | EMS / Transport Dispatch, NEMT Logs, Clinical EHR, Telehealth Demand Queue, Facility Capacity, Mobile App
+Use Case | Operational Visibility: Transport and telehealth demand coordination across long frontier distances
+Prototype Navigation Page | Care & Risk Signals
+
+Daily Reality
+James runs daily operations for a critical access hospital and its EMS service area covering more than 10,000 square miles of high desert out of the Winnemucca hub, terrain where adverse weather and distance drive long response and transport times. He coordinates EMS, non-emergency medical transport, the mobile-clinic schedule, and telehealth room availability. The gap: EMS demand lives in dispatch, patient need lives in the EHR and risk engine, transport capacity lives in NEMT logs, and telehealth demand lives in a scheduling tool, with no single operational view. When the Battle Mountain obstetric unit closed, transport demand to the distant delivering hospital surged overnight, colliding with existing chronic disease transport needs. He needs a daily operational picture, ideally on a mobile device with offline tolerance, because connectivity drops across his service area, that shows him where the day's risk, transport, and telehealth demand concentrate.
+Priority Signals (Briefing Cards)
+
+Signal | Severity | Detail
+Transport Queue Overload (Obstetric Closure Surge) | CRITICAL | NEMT and EMS transport requests to the nearest delivering hospital (115 miles) rose 210 percent since the March 1 Battle Mountain obstetric closure. 22 prenatal patients now need scheduled long-distance transport that did not exist before. Cross-referencing with the chronic disease transport queue, 18 dialysis and oncology transports compete for the same vehicles and drivers on the same corridor, and today the queue exceeds available capacity by 9 trips.
+Telehealth Demand Surge Without Room Capacity | CRITICAL | Telehealth visit requests rose 64 percent in 30 days as providers shift maternal and chronic disease visits to virtual. The mobile clinic and two telehealth rooms are booked to capacity through next week. 31 requested visits have no slot, and 12 of those are elevated-risk patients flagged by the risk engine.
+EMS Response Time Degradation (Weather + Distance) | WARNING | Average EMS response time in the northern service area rose to 47 minutes this week, up from a 34-minute baseline, correlating with a winter weather system and crews diverted to long-distance obstetric and dialysis transports. Two ZIP codes currently have no available unit within 60 minutes.
+
+Dashboard KPIs
+
+Metric | Value | Source
+Service Area Coverage | 10,200 sq mi | Geospatial + EMS Dispatch
+Transport Requests Today | 47 | EMS Dispatch + NEMT Logs
+Queue Over Capacity (Trips) | 9 | NEMT Logs + Vehicle Roster
+Avg. EMS Response Time | 47 min (baseline 34) | EMS Dispatch
+Telehealth Requests Without a Slot | 31 | Telehealth Demand Queue
+Mobile Clinic Utilization | 98% | Facility Capacity
+Elevated-Risk Patients Awaiting Transport | 16 | RAIN Risk Engine + NEMT Logs
+
+Guided Demo Conversation Flow
+Each step maps to a Radiant AI capability tag. The flow follows the same pattern as the base prototype.
+
+Step 1 | Proactive Intelligence
+User | (Initial greeting, no user prompt)
+AI Response | Good morning, James. Your operations have 3 signals today. The most urgent: transport demand to the delivering hospital is up 210 percent since the Battle Mountain obstetric closure, and your queue is over capacity by 9 trips because prenatal transports now compete with dialysis and oncology runs on the same corridor. Telehealth requests are up 64 percent with 31 visits unslotted, 12 of them elevated-risk. EMS response time is also degraded to 47 minutes with a weather system moving in. Want me to walk you through the transport queue?
+Visualization | Operational dashboard with traffic-light tiles: Transport Queue (red), Telehealth Capacity (red), EMS Response (yellow), Mobile Clinic (yellow), Facility Beds (green). Nevada service-area map with today's transport corridors. Three priority signal cards. (Mobile-app layout: daily risk panel, transport queue, telehealth demand views, offline-tolerant.)
+Data Sources | EMS Dispatch, NEMT Logs, Telehealth Demand Queue, RAIN Risk Engine, Facility Capacity, Weather Feed
+Follow-up Options | Walk me through the transport queue | Show me the telehealth capacity gap | Where are the EMS coverage holes?
+
+Step 2 | Friction Observability
+User | Walk me through the transport queue
+AI Response | Today's queue has 47 transport requests against capacity for 38. The 9-trip overflow traces directly to the obstetric closure. Before March 1, the Battle Mountain corridor carried 4 to 6 transports a day. Now it carries 18, because 22 prenatal patients need scheduled trips to the delivering hospital 115 miles away, and those trips take a vehicle and driver out of rotation for most of a day. Cross-referencing the chronic disease transport queue from Sarah Whitehorse's team, 18 dialysis and oncology transports run the same corridor on overlapping schedules. The collision point is between 8 and 11 a.m., when 14 trips are requested but only 6 vehicles are available. I also see 3 patients double-booked across EMS and NEMT because the systems do not share a queue. Consolidating the overlapping trips and shifting 5 non-urgent transports to afternoon clears the morning bottleneck.
+Visualization | Transport queue timeline by hour showing the 8 to 11 a.m. collision. Corridor map with prenatal vs. dialysis/oncology trips color-coded. Vehicle roster utilization bar. Double-booking flags. Before/after the obstetric closure comparison.
+Data Sources | NEMT Logs, EMS Dispatch, Clinical EHR, Vehicle Roster, RAIN Risk Engine
+Follow-up Options | Consolidate the overlapping trips | Shift non-urgent transports to afternoon | Which patients are double-booked? | Can telehealth replace any of these trips?
+
+Step 3 | Predictive Intelligence
+User | Can telehealth replace any of these trips?
+AI Response | Yes. Of the 47 transport requests today, I cross-referenced each against the care plan and visit type. 13 are clinically appropriate for a telehealth visit instead of in-person transport: 8 chronic disease follow-ups and 5 prenatal check-ins that do not require hands-on assessment this week. Converting those 13 removes the 9-trip overflow and frees 2 vehicles for the afternoon dialysis runs. The constraint is telehealth room capacity, which is already at 98 percent. But 7 of the 13 patients have adequate home broadband and can take the visit from home, requiring no room at all. The remaining 6 need a mobile-clinic or telehealth-room slot. If you convert the 7 home-capable visits and schedule the 6 into freed afternoon slots, today's queue clears and EMS crews return to emergency coverage, which also helps the 47-minute response-time problem in the north. Projected: response time back under 38 minutes by afternoon.
+Visualization | Trip-to-telehealth conversion table: 13 convertible visits, 7 home-capable, 6 needing a slot. Vehicle capacity recovery chart. EMS response-time projection. Connectivity check per patient.
+Data Sources | Clinical EHR, Telehealth Platform, NEMT Logs, Broadband Registry, EMS Dispatch, RAIN Risk Engine
+Follow-up Options | Convert the 7 home-capable visits | Schedule the 6 into afternoon slots | Reassign freed crews to the northern coverage hole | Generate today's operations plan
+
+Step 4 | Automated Action
+User | Generate today's operations plan
+AI Response | Here is today's operations plan, optimized for the device you carry in the field. It includes: (1) A consolidated transport schedule that merges the prenatal and chronic disease corridors, resolves the 3 double-bookings, and shifts 5 non-urgent trips to afternoon. (2) 13 trips converted to telehealth: 7 home visits sent directly to patients with a join link, 6 scheduled into freed afternoon rooms. (3) An EMS crew reassignment that restores a unit to the northern ZIP codes with no current coverage, addressing the weather-driven response gap. (4) A daily risk panel of the 16 elevated-risk patients awaiting transport, so field teams know who is highest priority. (5) An offline copy cached to the mobile app in case connectivity drops on the corridor. Shall I publish the plan to dispatch and the field teams?
+Visualization | Operations plan preview: consolidated transport schedule, telehealth conversion list, EMS reassignment map, elevated-risk daily panel. Offline-cache indicator. Mobile-app field view.
+Data Sources | EMS Dispatch, NEMT Logs, Telehealth Platform, RAIN Risk Engine, Facility Capacity, Mobile App Cache
+Follow-up Options | Publish to dispatch and field teams | Cache offline for the field | Notify Sarah's team about the consolidated chronic-disease trips | Generate an operations summary for the administrator
+
+Suggested Query Bar (Always Visible)
+Show me today's transport queue and capacity
+Where are the EMS coverage holes right now?
+Which transports can be converted to telehealth?
+Show me the telehealth demand against room capacity
+Which elevated-risk patients are awaiting transport?
+How has transport demand changed since the Battle Mountain closure?
+Cache today's plan offline for the field
+Generate an operations summary for the administrator
+Persona: Dr. Priya Nair
+
+Attribute | Detail
+Role | Director, Rural Population Health and Access Equity
+Organization | RAIN Population Health Office, in partnership with UNR and DPBH OPHIE
+Reports To | RAIN Program Director; UNR School of Medicine Office of Statewide Initiatives
+Manages | 3 epidemiologists, 2 data analysts, community health worker network liaison
+Primary Systems | Enterprise Data Warehouse, Clinical EHR, Claims, SDOH Data, Public Health Registries, Telehealth (Project ECHO Nevada), State HIE
+Use Case | Population Health: Cross-program access, equity, and utilization patterns across rural Nevada
+Prototype Navigation Page | Rural Health Intelligence
+
+Daily Reality
+Dr. Nair analyzes health outcomes and access patterns across the rural and frontier counties that hold 10 percent of Nevada's population spread across 90 percent of its land mass, where DPBH OPHIE serves as the health authority because the counties have none of their own. Her team identifies where access gaps, avoidable ED utilization, and equity disparities concentrate, and reports outcomes for the Rural Health Transformation Program's value-based priorities. The gap: utilization lives in claims, clinical outcomes in the EHR and State HIE, social barriers in SDOH data, and telehealth reach in Project ECHO records, and correlating them takes weeks of manual extraction. When the Battle Mountain obstetric unit closed, she needed to know immediately which downstream effects, ED deliveries, prenatal gaps, transport strain, chronic-care disruption, were emerging and where, so the program could target resources before disparities widened.
+Priority Signals (Briefing Cards)
+
+Signal | Severity | Detail
+Maternal Access Desert Expansion | CRITICAL | The March 1 Battle Mountain obstetric closure expanded the maternal care desert: the share of service-area women of childbearing age living more than 60 miles from obstetric care rose from 31 percent to 58 percent overnight. Cross-referencing claims, public health registries, and the EHR, this aligns with a measurable rise in inadequate prenatal care and 3 ED deliveries or births before arrival in 60 days. The affected ZIP codes also rank highest on the SDOH transportation-barrier index.
+Avoidable ED Utilization Concentration | CRITICAL | Avoidable emergency-department visits in the three-county area rose 19 percent over 90 days, concentrated in chronic disease (CHF, COPD, diabetes) and behavioral health. Cross-referencing the State HIE with claims and provider data, 64 percent of these visits came from patients who lost provider continuity after staff reassignments tied to the obstetric closure, the same disruption visible in Sarah Whitehorse's chronic disease cohort. Estimated avoidable cost: 1.4 million dollars annualized.
+Telehealth Equity Gap | WARNING | Project ECHO Nevada telehealth uptake is strong where broadband exists but near zero in 5 frontier ZIP codes with no reliable connectivity. Cross-referencing connectivity data with the elevated-risk cohort, 240 elevated-risk patients live in these telehealth dead zones, meaning the virtual-care fallback that protects the rest of the population does not reach the most isolated.
+
+Dashboard KPIs
+
+Metric | Value | Source
+Rural / Frontier Population Served | 168,000 | EDW + Eligibility
+Women of Childbearing Age >60 mi From OB | 58% (was 31%) | Geospatial + Public Health Registry
+Avoidable ED Visit Rate (per 1,000) | 284 | Claims + State HIE
+Avoidable ED Cost (Est. Annual) | $1.4M | Claims + EDW
+Telehealth Uptake (Connected ZIPs) | 71% | Project ECHO Nevada
+Elevated-Risk Patients in Telehealth Dead Zones | 240 | Connectivity Registry + RAIN Risk Engine
+SDOH Transport-Barrier Prevalence | 22% | SDOH Data
+
+Guided Demo Conversation Flow
+Each step maps to a Radiant AI capability tag. The flow follows the same pattern as the base prototype.
+
+Step 1 | Proactive Intelligence
+User | (Initial greeting, no user prompt)
+AI Response | Good morning, Dr. Nair. I have identified 3 population health signals. The most urgent: the Battle Mountain obstetric closure nearly doubled the maternal care desert, the share of childbearing-age women more than 60 miles from obstetric care jumped from 31 to 58 percent, and inadequate prenatal care and ED deliveries are rising in the same ZIP codes. Avoidable ED utilization is also up 19 percent, and 64 percent of those visits trace to patients who lost provider continuity after the closure. Want me to map the downstream impact?
+Visualization | Priority signal cards. Three cards: Maternal Access Desert (CRITICAL, 58% beyond 60 mi), Avoidable ED Concentration (CRITICAL, +19%), Telehealth Equity Gap (WARNING, 240 in dead zones). Nevada county choropleth with access-risk heat overlay.
+Data Sources | EDW, Claims, Public Health Registries, State HIE, SDOH Data, Project ECHO Nevada, Connectivity Registry
+Follow-up Options | Map the downstream impact of the closure | Show me the avoidable ED concentration | Where are the telehealth equity gaps?
+
+Step 2 | Converged Conversation
+User | Map the downstream impact of the closure
+AI Response | The Battle Mountain closure produced a measurable cascade across systems. Maternal access: 58 percent of childbearing-age women are now beyond 60 miles from obstetric care, up from 31 percent, and prenatal completion fell from 84 to 61 percent in the service area, with 3 ED deliveries in 60 days. Chronic disease: provider reassignments to cover the obstetric gap left a cohort without continuity, and avoidable ED visits for CHF, COPD, and diabetes rose 19 percent, with 64 percent of those visits coming from the affected panels. Transport: long-distance medical transport demand rose 210 percent, straining the same corridor that serves dialysis and oncology. Equity: the affected ZIP codes already rank highest on the SDOH transportation-barrier index, and 240 elevated-risk patients there sit in telehealth dead zones, so the virtual fallback does not reach them. One closure, five interconnected effects that no single system would have surfaced.
+Visualization | Cascade diagram: Battle Mountain closure at the center, with five branches (maternal access, chronic-care continuity, ED utilization, transport strain, telehealth equity), each with its metric. County map showing the concentration. Timeline from March 1 to present.
+Data Sources | EDW, Claims, Clinical EHR, State HIE, SDOH Data, NEMT Logs, Connectivity Registry, Maternal Health Registry
+Follow-up Options | Where should we target resources first? | Model the equity impact of mobile obstetric outreach | Show me the cost of inaction | Compare affected vs. unaffected ZIPs
+
+Step 3 | Predictive Intelligence
+User | Where should we target resources first?
+AI Response | I modeled three RHTP-aligned interventions against the cascade. Option A (Mobile Obstetric and Prenatal Outreach): a scheduled mobile clinic to the 4 highest-desert ZIPs would restore prenatal access for an estimated 84 percent of the displaced cohort within 30 days and is fundable under the Flex Fund infrastructure priority. Option B (Telehealth Connectivity Bridge): deploying cellular or satellite telehealth kits to the 5 dead-zone ZIPs would reach the 240 elevated-risk patients currently without a virtual fallback, aligning with the value-based RHOAP priority. Option C (Care Continuity Restoration): re-paneling the disrupted chronic disease cohort and adding community health worker outreach would address the 64 percent of avoidable ED visits, with an estimated 1.0 million dollars in avoided annual cost. Recommendation: Options A and B in parallel for immediate access and equity impact, with C close behind for cost. All three map directly to the Make Rural Nevada Healthy Again initiatives, which strengthens the outcomes narrative for NVHA reporting.
+Visualization | Intervention comparison table: reach, timeline, cost, RHTP priority alignment, projected outcome. ZIP-level targeting map for Options A and B. Avoided-cost projection for Option C.
+Data Sources | EDW, Claims, SDOH Data, Connectivity Registry, Project ECHO Nevada, RHTP Priority Framework, RAIN Risk Engine
+Follow-up Options | Build the case for Options A and B | Show me the RHTP funding alignment | Model 12-month outcomes | Generate an equity brief for NVHA
+
+Step 4 | Automated Action
+User | Generate an equity brief for NVHA
+AI Response | Here is a rural health access and equity brief for the Nevada Health Authority, structured to the RHTP outcome priorities. It covers: (1) Situation: the Battle Mountain obstetric closure expanded the maternal care desert from 31 to 58 percent beyond 60 miles and triggered a measurable cross-system cascade. (2) Cross-system evidence: prenatal completion decline, avoidable ED increase with continuity-loss attribution, transport strain, and the telehealth equity gap, each tied to its data source. (3) Recommended interventions mapped to Make Rural Nevada Healthy Again: mobile obstetric outreach (Flex Fund), telehealth connectivity bridge (RHOAP), and care continuity restoration. (4) Projected 12-month outcomes: prenatal access recovery, avoidable-ED reduction, and equity reach into the dead-zone ZIPs, with estimated cost avoidance. (5) A measurement plan for the people-served, services-delivered, and outcomes reporting NVHA requires. Shall I also produce the supporting data appendix with the county-level charts?
+Visualization | Executive brief preview: one-page situation, evidence, recommendations, projected outcomes, measurement plan. Data appendix preview with county choropleths and trend charts.
+Data Sources | All RAIN Systems (EDW, Claims, EHR, State HIE, SDOH, Connectivity, Project ECHO Nevada, Maternal Registry, NEMT)
+Follow-up Options | Produce the data appendix | Align the brief to the RHTP reporting template | Add the chronic-disease cost detail | Share with Dr. Delgado-Reyes and James
+
+Suggested Query Bar (Always Visible)
+Show me access disparities by county
+Where did avoidable ED utilization concentrate after the closure?
+Map the maternal care desert before and after Battle Mountain
+Which elevated-risk patients are in telehealth dead zones?
+Compare outcomes in affected vs. unaffected ZIP codes
+Model the equity impact of mobile obstetric outreach
+Align our outcomes to the RHTP reporting priorities
+Generate a population health and equity brief for NVHA
+Persona: David Yazzie
+
+Attribute | Detail
+Role | Director, Health Data Engineering and Interoperability
+Organization | RAIN Platform Engineering, Radiant Digital
+Reports To | RAIN Technical Lead; Radiant Digital Delivery
+Manages | 4 data engineers, 2 integration specialists, 1 data governance analyst
+Primary Systems | FHIR / HL7 Interoperability Services, Ingestion Pipelines, Medallion Lakehouse (GCP), State HIE, RPM Feeds, EHR Connectors, Data Quality Monitor
+Use Case | Interoperability: Cross-system data-quality and ingestion health that makes the intelligence layer trustworthy
+Prototype Navigation Page | Data Sources
+
+Daily Reality
+David owns the data plumbing that makes RAIN's intelligence trustworthy: the FHIR and HL7 interoperability services, the ingestion pipelines, and the governed medallion lakehouse on Google Cloud that unify clinical, telehealth, RPM, claims, transportation, public health, and SDOH data. Rural environments are the hardest case, because providers operate across disconnected systems with limited integration capability, intermittent connectivity, and inconsistent data standards. The gap: when a clinical event happens, an obstetric unit closing, a provider panel changing, a new RPM device fleet, the data effects ripple through ingestion in ways no single pipeline monitor catches. If a feed silently degrades, every downstream signal the clinicians rely on becomes unreliable. He needs cross-system data-quality visibility so the maternal, chronic disease, operations, and population health teams can trust what RAIN tells them.
+Priority Signals (Briefing Cards)
+
+Signal | Severity | Detail
+Provider Identity Reconciliation Failure (Closure Ripple) | CRITICAL | The Battle Mountain obstetric closure deactivated provider records and reassigned panels, but 1,240 clinical and claims records still reference the deactivated provider NPIs. The FHIR Practitioner resource cannot reconcile these against the active provider directory, generating unresolved-reference errors that break attribution for maternal and chronic disease risk scoring. The same closure driving every clinical persona's signals is now degrading the data layer those signals depend on.
+RPM Feed Ingestion Gap (Connectivity) | CRITICAL | Remote patient monitoring transmissions from frontier ZIP codes are arriving incomplete: 22 percent of expected device readings over the last 14 days are missing or delayed beyond the 24-hour window. The gap concentrates in the same low-connectivity ZIPs limiting telehealth, meaning the CHF and COPD deterioration signals Sarah Whitehorse relies on are running on partial data for the most isolated patients.
+FHIR Conformance Drift on New EHR Connector | WARNING | A newly connected rural clinic EHR is sending HL7 v2 messages that map inconsistently to FHIR: 8 percent of encounters land with a null service location and 4 percent with malformed diagnosis codes. Left unresolved, this degrades the population health and equity analytics that depend on accurate geographic and clinical coding.
+
+Dashboard KPIs
+
+Metric | Value | Source
+Connected Data Sources | 11 | Integration Monitor
+Records Ingested (30-day) | 9.2M | Ingestion Pipelines
+FHIR Conformance Rate | 94% | Data Quality Monitor
+Unresolved Provider References | 1,240 | FHIR Practitioner Reconciliation
+RPM Transmission Completeness | 78% (target 95%) | RPM Feed Monitor
+Pipeline Freshness (Avg. Lag) | 3.2 hrs | Ingestion Pipelines
+Records in Quarantine (DQ) | 14,800 | Data Quality Monitor
+
+Guided Demo Conversation Flow
+Each step maps to a Radiant AI capability tag. The flow follows the same pattern as the base prototype.
+
+Step 1 | Proactive Intelligence
+User | (Initial greeting, no user prompt)
+AI Response | Good morning, David. The RAIN data layer has 3 signals. The most urgent: 1,240 records still reference provider NPIs deactivated when the Battle Mountain obstetric unit closed, and the FHIR Practitioner resource cannot reconcile them, which breaks attribution for the maternal and chronic disease risk scores the clinical teams are using right now. Separately, RPM feed completeness from frontier ZIPs has dropped to 78 percent on connectivity issues, so the deterioration signals for the most isolated patients are running on partial data. Want me to walk you through the reconciliation failure?
+Visualization | Data health dashboard: traffic-light tiles per source (Clinical EHR yellow, RPM Feed red, Claims green, State HIE green, Telehealth green, SDOH green, Provider Directory red). Three priority signal cards. Pipeline freshness panel.
+Data Sources | FHIR / HL7 Services, Ingestion Pipelines, Data Quality Monitor, RPM Feed Monitor, Provider Directory
+Follow-up Options | Walk me through the reconciliation failure | Show me the RPM ingestion gap | What is the FHIR conformance issue?
+
+Step 2 | Anomaly Detection
+User | Walk me through the reconciliation failure
+AI Response | When the Battle Mountain obstetric unit closed on March 1, the provider directory deactivated the affected practitioner records and the panels were reassigned. But 1,240 clinical and claims records, encounters, orders, and pending claims created before the deactivation, still carry the old provider NPIs. The FHIR Practitioner reference on those records now points to an inactive resource, so attribution fails: the maternal risk engine cannot tie 6 of Dr. Delgado-Reyes's high-risk prenatal patients to a responsible provider, and the chronic disease engine drops continuity flags for part of Sarah Whitehorse's cohort because the panel link is broken. I also see 180 records where patients were reassigned to a new provider but the crosswalk was not updated, creating mismatched referring-versus-rendering provider pairs. This is the data-layer signature of the same closure event every clinical persona is seeing. It is fixable with a claims-only active flag on the deactivated NPIs plus a crosswalk update.
+Visualization | Reconciliation failure breakdown: 1,240 unresolved references by type (encounters, orders, pending claims), 180 crosswalk mismatches. Provider lifecycle timeline showing deactivation vs. lingering records. Impact links to maternal and chronic disease risk engines.
+Data Sources | FHIR Practitioner Service, Provider Directory, Clinical EHR, Claims, Panel Crosswalk
+Follow-up Options | Apply the claims-only active flag | Update the panel crosswalk | Which risk scores are affected downstream? | Generate a remediation plan
+
+Step 3 | Predictive Intelligence
+User | Which risk scores are affected downstream?
+AI Response | I traced the 1,240 unresolved references and 180 crosswalk mismatches into the intelligence layer. Maternal: 6 high-risk prenatal patients lost provider attribution, which suppressed them from Dr. Delgado-Reyes's priority cohort until the engine fell back to facility-level attribution. Chronic disease: 41 diabetes patients and 5 of the CHF/COPD deterioration cluster had continuity flags drop, which understated Sarah Whitehorse's risk counts. Population health: the avoidable-ED attribution that Dr. Nair used, the 64 percent tied to continuity loss, depends on this same provider linkage, so resolving it actually strengthens her evidence. If the reconciliation is not fixed, the risk engines will keep under-counting the highest-risk patients precisely because those patients were tied to the closed unit. Projected: applying the claims-only active flag and crosswalk update restores attribution for all 1,240 records and raises maternal and chronic disease cohort completeness from an estimated 86 percent to 99 percent within one ingestion cycle.
+Visualization | Downstream impact map: data-layer issue flowing into maternal, chronic disease, and population health engines, with the count of affected patients per engine. Before/after cohort completeness projection. Risk-score restoration timeline.
+Data Sources | FHIR Practitioner Service, RAIN Risk Engine, Clinical EHR, Claims, Maternal Registry, Provider Directory
+Follow-up Options | Apply the fix and re-run the engines | Notify the clinical teams about restored cohorts | Prioritize the RPM gap next | Generate a remediation plan
+
+Step 4 | Automated Action
+User | Generate a remediation plan
+AI Response | Here is the data remediation plan. It includes: (1) Provider reconciliation: apply a claims-only active flag to the deactivated Battle Mountain NPIs so the 1,240 historical records resolve, and update the panel crosswalk for the 180 reassigned patients. Estimated effort: one ingestion cycle, low risk. (2) RPM completeness: enable store-and-forward buffering for the frontier device fleet so readings queued during connectivity drops backfill on reconnect, recovering an estimated 17 of the missing 22 percent. (3) FHIR conformance: add a mapping rule for the new rural clinic EHR to default service location from the facility identifier and validate diagnosis codes at ingest, clearing the null-location and malformed-code errors. (4) A downstream re-run that refreshes the maternal, chronic disease, and population health cohorts and notifies each clinical owner that their data is restored, with a note on what changed. (5) A data-quality watch that alerts when any feed degrades after a future facility event. Shall I execute the reconciliation now and schedule the RPM and FHIR fixes?
+Visualization | Remediation plan preview: three fixes with effort, risk, and projected data-quality recovery. Downstream re-run and clinical-team notification list. Data-quality watch configuration. Evidence chain linking the fix to each clinical persona's restored cohort.
+Data Sources | FHIR / HL7 Services, Ingestion Pipelines, RPM Feed Monitor, Data Quality Monitor, Provider Directory, RAIN Risk Engine
+Follow-up Options | Execute the reconciliation now | Schedule the RPM and FHIR fixes | Notify the clinical owners | Generate a data-quality summary for the technical lead
+
+Suggested Query Bar (Always Visible)
+Show me data quality across all connected sources
+Which records have unresolved provider references?
+Show me RPM transmission completeness by ZIP code
+What is our FHIR conformance rate by feed?
+Which downstream risk scores are affected by data-quality issues?
+Show me pipeline freshness and ingestion lag
+What degraded after the Battle Mountain closure?
+Generate a data-quality summary for the technical lead
+Data Sources Configuration
+The Data Sources page shows all connected RAIN rural Nevada health system integrations, mirroring the base prototype layout. Each source displays the name, record count, and a brief description of what data flows through. Record counts are representative mock values for the prototype.
+
+Data Source | Records | Description
+Clinical EHR (Critical Access Hospitals & RHCs) | 2.1M | Encounters, problem lists, vitals, prenatal records, orders, and notes from participating rural critical access hospitals and rural health clinics. Primary source for clinical risk.
+Maternal Health Registry | 18K | Pregnancy episodes, prenatal visit history, risk diagnoses, delivery outcomes, and obstetric service availability. Supports elevated-risk pregnancy stratification.
+RPM Platform (Remote Patient Monitoring) | 640K | Home device readings for CHF, COPD, diabetes, and hypertension patients: weight, SpO2, blood glucose, blood pressure. Time-series source for deterioration detection.
+Claims & Encounters | 8.4M | FFS and managed-care claims, pharmacy fills, and adjudication history. Utilization, medication adherence, and avoidable-ED analysis.
+Telehealth (Project ECHO Nevada) | 210K | Virtual visit records, telehealth scheduling, provider mentorship sessions, and connectivity-based eligibility. UNR School of Medicine statewide telehealth initiative.
+EMS / Transport Dispatch | 390K | Emergency medical services calls, response times, unit availability, and inter-facility transports across the frontier service area.
+NEMT / Transportation Logs | 520K | Non-emergency medical transport trips, scheduling, corridor utilization, and transportation-barrier resolution for rural patients.
+SDOH Data | 1.3M | Social determinants of health: transportation barriers, housing, food access, and broadband connectivity indicators linked to patients and ZIP codes.
+Public Health Registries | 2.7M | Disease surveillance, immunization, maternal and child health, and chronic disease registries via DPBH OPHIE for frontier counties.
+State HIE | 3.6M | Clinical data exchange: ADT notifications, lab results, and care summaries. HL7 FHIR-based interoperability with hospitals, labs, and health systems.
+Enterprise Data Warehouse (Medallion Lakehouse) | 120M | Governed lakehouse on Google Cloud aggregating all RAIN domains. Bronze through Platinum medallion layers. Decision support, trend analysis, and NVHA reporting.
+
+Architecture and Capability Slide Notes
+When the user clicks a Radiant AI capability tag during the demo, the prototype should display the same architecture deep-dive screen seen in prior prototypes, with these RAIN-specific updates.
+Underlying Architecture (same structure, updated labels)
+Predictive AI Layer: Signal Correlation (cross-system pattern detection across clinical EHR, RPM, claims, telehealth, transportation, public health, and SDOH), Anomaly Scoring (time-series analysis on maternal risk, chronic disease deterioration, transport demand, and access metrics), Priority Ranking (business-impact weighting for rural health: maternal and clinical risk, avoidable hospitalization, access and equity, operational friction).
+Responsible AI Sidebar: Data Observability, Compliance and Regulation (HIPAA, HITECH, NIST, FedRAMP), Role-Based Access Control, Bias Removal. Same as base prototype, no changes needed.
+Agentic Data Platform: Inspector Agent, Cleaning Agent, Ontology Agent, Enrichment Agent, Cypher Agent. Same as base prototype, no changes needed.
+RAIN Data Sources (bottom bar)
+Clinical EHR  |  Maternal Health Registry  |  RPM Platform  |  Claims & Encounters  |  Telehealth (Project ECHO Nevada)  |  EMS / Transport Dispatch  |  NEMT Logs  |  SDOH Data  |  Public Health Registries  |  State HIE  |  Enterprise Data Warehouse (Medallion Lakehouse, GCP)
+Gap Statement (bottom callout, per capability)
+The gap today: Each rural Nevada health system reports within its own data. When a maternal risk signal in the EHR correlates with a transport shortage, a chronic-care continuity loss, a telehealth dead zone, or a data-quality break, no native tool connects those signals across systems, and rural providers operate across disconnected systems with limited integration capability.
+With Radiant AI: Cross-system intelligence that reads across clinical, telehealth, RPM, claims, transportation, public health, and SDOH data to surface correlated insights and recommended actions before you ask.
+Deployed At (reference, bottom right)
+Verizon: Multi-agent orchestration across network ops (same as base prototype, keep this reference).
+Build Instructions for Designer
+This section provides specific guidance for implementing the RAIN prototype instance by cloning and reskinning the base shell.
+Persona Switching
+The prototype should support persona switching via the avatar dropdown in the top right (same as base prototype). The default persona for RAIN is Dr. Maria Delgado-Reyes (Rural Health Medical Director). Persona order in the dropdown: (1) Dr. Maria Delgado-Reyes, (2) Sarah Whitehorse, RN, (3) James Tomley, (4) Dr. Priya Nair, (5) David Yazzie. When the user switches personas, all content updates: priority signals, KPIs, conversation flow, and suggested queries. Each persona demonstrates the same intelligence platform from a different operational perspective, showing how the unified rural health data layer serves clinical, operational, population health, and technical roles.
+Branding
+Replace prior client branding with University of Nevada, Reno and the RAIN initiative. Use UNR brand marks and color palette. The "Powered by Radiant Digital" footer remains unchanged.
+Guided Demo Flow
+Each persona has a 4-step guided demo conversation (expandable to 7+ steps by adding branching paths). The conversation flow tables in this document provide the user query, the AI response text, the visualization type and description, the data sources to display, and the follow-up query options. The designer should implement these as scripted interactions, not live AI responses. The shared root-cause thread (the Battle Mountain obstetric closure) should remain visible across personas so demo viewers see the same event surface differently for each role.
+Visualizations
+All charts, data tables, and maps are mock data. The designer should create visuals that match the described patterns (risk stratifications, RPM trend lines, transport corridors, access deserts, data-quality dashboards). Use the same chart library and styling as the base prototype. RAIN-specific additions: Nevada county and frontier ZIP-level maps for maternal access, transport corridors, and population health visualizations; RPM time-series sparklines; offline-tolerant mobile views for the operations persona.
+Navigation Pages
+Four pages total, matching base prototype structure. "Ask the AI" (home), "Rural Health Intelligence" (replaces Member Journey / Medicaid Intelligence), "Care & Risk Signals" (replaces Risk / Compliance Signals), and "Data Sources" (same structure, updated sources). Each page should use the same layout grid as its base prototype equivalent, with RAIN-specific content.
+Capability Tags
+Every AI response in the conversation flow includes a capability tag (Proactive Intelligence, Converged Conversation, and so on). These should be clickable and open the architecture deep-dive slide, same behavior as the base prototype. The architecture slide content is specified in the Architecture and Capability Slide Notes section above.
+Mobile and Offline (Operations Persona)
+The James Tomley operations persona maps to the proposal's committed Flutter operations mobile app: daily risk panels, transport queues, and telehealth demand views with offline-tolerant workflows for low-connectivity frontier areas. The designer should render this persona's views in a mobile-app frame and include an offline-cache indicator, demonstrating the operations app alongside the provider web portal.
+Mobile-Responsive Refactor (Required)
+The current prototype is desktop-first. The designer must refactor the existing prototype shell to be fully mobile-responsive so that the same React components, navigation, conversational interface, and guided demo flow render correctly at mobile viewport widths (target 390 pixels) without horizontal scrolling or broken layout. This is a responsive refactor of the existing build, not a separate codebase: the desktop provider portal and the mobile views should share one responsive shell.
+Responsive requirements: the left navigation collapses to a mobile menu or bottom navigation; priority signal cards, KPI tiles, and conversation bubbles stack vertically in a single column; the "Ask anything" input and suggested-query chips remain reachable above the fold on a phone screen; tables and charts reflow or switch to a mobile-friendly card or scrollable format; and tap targets meet mobile accessibility sizing.
+The primary purpose of this refactor is screenshot capture. Once the shell is responsive, the team must be able to capture clean screenshots of a patient-facing mobile interface, a phone-framed view in which a patient opens the app and talks to the AI, for the proposal and demo. These patient-facing mobile screenshots are a required deliverable.
+Patient-Facing Mobile Interface (Screenshot Target)
+In addition to the five operator and clinical personas, the responsive shell must support a patient-facing mobile view that demonstrates how a rural Nevada patient accesses RAIN and converses with the AI. This view reuses the same conversational "Ask the AI" component as the provider personas, restyled and simplified for a patient audience and rendered inside a phone frame for screenshots.
+Patient-facing conversation pattern (mock, scripted, same as the persona flows): the patient opens the app and is greeted by name; the AI surfaces what matters to that patient (an upcoming prenatal or chronic-care appointment, a telehealth option, a transport reminder, a medication refill); the patient asks plain-language questions such as "When is my next appointment?", "Can I see the doctor by video this week?", "How do I get a ride to my appointment?", or "I need to refill my medication"; and the AI responds with a clear, reassuring, action-oriented answer. Keep the patient tone plain-language and supportive, not clinical or technical. Do not display provider-only intelligence (risk scores, cohort analytics, or other patients' data) in the patient view; respect role-based access so the patient sees only their own information.
+Recommended patient screenshots to capture: (1) a home screen with the personalized greeting and proactive reminders, (2) an active conversation showing the patient asking the AI a question and receiving an answer, (3) a telehealth or transport action confirmation, and (4) an appointment or medication reminder. These four phone-framed screenshots are the minimum set for the proposal and demo.
+Stakeholder Alignment
+The five personas are designed to resonate with the RAIN stakeholders and the RHTP evaluation priorities:
+
+Stakeholder | Primary Persona | Resonance
+Dr. Sushil J. Louis (UNR, Computer Science & Engineering) | David Yazzie + Dr. Priya Nair | Technical architecture, interoperability, and applied AI. Data engineering and population health analytics demonstrate the cross-system intelligence the proposal commits to.
+Dr. Subhash C. Verma (UNR School of Medicine) | Dr. Delgado-Reyes + Sarah Whitehorse | Clinical and biomedical perspective. Maternal health and chronic disease management show direct patient impact in rural Nevada.
+Nevada Health Authority (NVHA) / RHTP reviewers | Dr. Priya Nair | Funder and evaluator perspective. Population health and equity, aligned to Make Rural Nevada Healthy Again, demonstrate measurable outcomes and value-based reporting.
+Rural provider and EMS stakeholders | James Tomley | Front-line operations. Transport, telehealth, and access coordination show friction reduction for rural practitioners on the ground.
+
+Delivery Timeline
+Target: working prototype for the RAIN proposal demo and submission to the UNR VPRI office. Priority order: (1) Dr. Maria Delgado-Reyes (Maternal Health, default, anchors the obstetric-closure root cause and the proposal's named maternal priority), (2) Sarah Whitehorse (Chronic Disease, demonstrates direct patient impact and RPM), (3) James Tomley (Operations, demonstrates the mobile app and transport/telehealth coordination), (4) Dr. Priya Nair (Population Health and Equity, resonates with NVHA and RHTP outcome reporting), (5) David Yazzie (Interoperability, demonstrates the data layer and FHIR/HL7 trustworthiness).
+Parallel deliverable: refactor the prototype shell to be mobile-responsive and capture the patient-facing mobile screenshot set (home with greeting and reminders, an active patient-to-AI conversation, a telehealth or transport confirmation, and an appointment or medication reminder). The responsive refactor and patient screenshots should be completed alongside the clinical personas so they are available for the proposal and demo.

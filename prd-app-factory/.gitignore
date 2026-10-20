@@ -1,0 +1,10 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# Per-app secrets and scratch (the rest of an App Pack is reviewable output and may be committed)
+apppacks/*/insights/persona_keys.env
+apppacks/*/insights/keys.local.yaml
+apppacks/*/logs/
+apppacks/*/data/work/

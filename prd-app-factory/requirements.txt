@@ -1,0 +1,17 @@
+# PRD-to-App Factory + generated runtime apps (versions verified together on 2026-10-21)
+anthropic==1.13.0
+fastapi==0.143.0
+uvicorn==0.54.0
+httpx==0.28.1
+psycopg[binary]==3.3.6
+pydantic==2.14.1
+PyYAML==6.0.3
+python-dotenv==1.2.4
+sqlglot==30.23.0
+neo4j==6.4.0
+jsonschema==4.26.0
+defusedxml==0.7.1
+langgraph==1.2.15
+langchain-core==1.6.11
+opentelemetry-api==1.45.1
+opentelemetry-sdk==1.45.1
