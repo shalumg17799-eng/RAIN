@@ -1,0 +1,4 @@
+# Shell scripts and Dockerfiles run on Linux: keep LF on every platform.
+*.sh text eol=lf
+Dockerfile* text eol=lf
+*.bicep text eol=lf
