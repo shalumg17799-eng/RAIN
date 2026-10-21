@@ -34,3 +34,5 @@ class CompletionResult(Contract):
     usage: Usage
     model: str
     cache_hit: bool = False
+    truncated: bool = False
+    """The provider stopped at max_tokens: the content is incomplete, not malformed."""

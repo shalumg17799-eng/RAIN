@@ -185,7 +185,8 @@ class LLMGateway:
             content = self._structured(response.text, response_schema)
 
         result = CompletionResult(
-            content=content, usage=response.usage, model=response.model, cache_hit=False
+            content=content, usage=response.usage, model=response.model, cache_hit=False,
+            truncated=response.truncated,
         )
         if key is not None and self.cache is not None:
             self.cache.put(key, result)

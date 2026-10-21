@@ -20,14 +20,14 @@ router:
     llm_accept: 0.6
   exemplars:
     data_query:
-    - what is our total loan portfolio volume by region this quarter
-    - average application processing time for branch north last month
-    - how many high-risk loan applications are currently pending
-    - approval rate by product type year to date
+    - how many elevated-risk pregnancies are active
+    - show RPM transmission completeness by ZIP code
+    - how many transport requests are scheduled today
+    - what is prenatal visit completion rate this quarter
     metadata_question:
-    - what tables hold member credit ratings
-    - what is the definition of debt to income ratio
-    - which columns are available in the risk assessment table
+    - what tables hold pregnancy episodes
+    - what does an access barrier mean
+    - which columns describe RPM readings
     out_of_scope:
     - generate a marketing email to borrowers
     - what is the weather today
@@ -54,65 +54,11 @@ identity:
   mode: per_user
   fallback: service_principal_with_views
 roles:
-  executive:
+  maria:
     tables:
-      ChronicConditionEnrollment:
-        columns: '*'
-  risk_officer:
-    tables:
-      ChronicConditionEnrollment:
-        columns: '*'
-      ClaimEncounter:
-        columns: '*'
       ConnectivityRegistry:
-        columns: '*'
-      DataQualityEvent:
-        columns: '*'
-      DataSourceFeed:
-        columns: '*'
-  branch_manager:
-    tables:
-      ChronicConditionEnrollment:
-        columns: '*'
-      ClaimEncounter:
-        columns: '*'
-      ConnectivityRegistry:
-        columns: '*'
-      DataQualityEvent:
-        columns: '*'
-      DataSourceFeed:
-        columns: '*'
-  loan_officer:
-    tables:
-      ChronicConditionEnrollment:
-        columns: '*'
-      ClaimEncounter:
-        columns: '*'
-      ConnectivityRegistry:
-        columns: '*'
-      DataQualityEvent:
-        columns: '*'
-      DataSourceFeed:
-        columns: '*'
-  analyst:
-    tables:
-      ChronicConditionEnrollment:
-        columns: '*'
-      ClaimEncounter:
-        columns: '*'
-      ConnectivityRegistry:
-        columns: '*'
-      DataQualityEvent:
-        columns: '*'
-      DataSourceFeed:
-        columns: '*'
-      EMSCoverage:
         columns: '*'
       Facility:
-        columns: '*'
-      MedicationFill:
-        columns: '*'
-      MetricTrend:
         columns: '*'
       Patient:
         columns: '*'
@@ -120,26 +66,116 @@ roles:
         columns: '*'
       Provider:
         columns: '*'
-      ProviderReferenceIssue:
+      TelehealthSession:
+        columns: '*'
+      TransportRequest:
+        columns: '*'
+  sarah:
+    tables:
+      ChronicConditionEnrollment:
+        columns: '*'
+      ClaimEncounter:
+        columns: '*'
+      MedicationFill:
+        columns: '*'
+      Patient:
+        columns: '*'
+      Provider:
         columns: '*'
       RPMReading:
         columns: '*'
       SDOHFlag:
         columns: '*'
+  james:
+    tables:
+      ConnectivityRegistry:
+        columns: '*'
+      DataSourceFeed:
+        columns: '*'
+      EMSCoverage:
+        columns: '*'
+      Facility:
+        columns: '*'
       TelehealthSession:
         columns: '*'
       TransportRequest:
         columns: '*'
-      decisions:
+  priya:
+    tables:
+      ChronicConditionEnrollment:
         columns: '*'
-      routed_actions:
+      ClaimEncounter:
         columns: '*'
+      ConnectivityRegistry:
+        columns: '*'
+      EMSCoverage:
+        columns: '*'
+      Facility:
+        columns: '*'
+      MetricTrend:
+        columns: '*'
+      Patient:
+        columns: '*'
+      PregnancyEpisode:
+        columns: '*'
+      SDOHFlag:
+        columns: '*'
+      TransportRequest:
+        columns: '*'
+  david:
+    tables:
+      DataQualityEvent:
+        columns: '*'
+      DataSourceFeed:
+        columns: '*'
+      Facility:
+        columns: '*'
+      MetricTrend:
+        columns: '*'
+      Provider:
+        columns: '*'
+      ProviderReferenceIssue:
+        columns: '*'
+  patient:
+    tables:
+      ChronicConditionEnrollment:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      ClaimEncounter:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      MedicationFill:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      Patient:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      PregnancyEpisode:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      RPMReading:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      SDOHFlag:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      TelehealthSession:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      TransportRequest:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
 model_policy:
   route:
     enabled: true
     model_group: fast
     temperature: 0.0
     max_tokens: 200
+  design:
+    enabled: true
+    model_group: strong
+    temperature: 0.0
+    max_tokens: 24000
   sql:
     enabled: true
     model_group: strong
@@ -171,8 +207,9 @@ confidence_threshold: 0.65
 sql_visibility:
   default: false
   roles:
-    executive: false
-    risk_officer: true
-    branch_manager: false
-    loan_officer: false
-    analyst: true
+    maria: false
+    sarah: false
+    james: false
+    priya: true
+    david: true
+    patient: false

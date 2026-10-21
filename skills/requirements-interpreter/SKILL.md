@@ -1,6 +1,15 @@
 ---
 name: requirements-interpreter
+version: 0.2.0
 description: Read a requirements document of any format (docx, pdf, markdown, slides, wiki export) from any domain and reduce it to the canonical Requirements IR — personas, their questions, committed figures, source systems, entity hints, narrative events, and constraints. Use this as the first step whenever a new client requirements document, PRD, build spec, prototype spec, or persona document arrives and synthetic data needs building from it; whenever an existing document has been revised and the IR must be regenerated; or when someone asks what a requirements document actually demands of the data.
+labels:
+- ok
+- escalate
+validation:
+  required_input:
+  - document
+  required_output:
+  - confidence
 ---
 
 # Requirements interpreter

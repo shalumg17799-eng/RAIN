@@ -146,24 +146,35 @@ def introspect_neo4j(env: dict[str, str]) -> tuple[dict[str, Any], list[dict[str
 def generate_app_yaml(app_id: str, tables: list[CatalogTable], pg_info: dict[str, Any]) -> str:
     table_names = [t.name for t in tables]
 
-    # Partition tables by persona
-    roles = {
-        "executive": {
-            "tables": {t: {"columns": "*"} for t in table_names if any(w in t for w in ["summary", "kpi", "performance", "metric", "portfolio"])} or {table_names[0]: {"columns": "*"}}
-        },
-        "risk_officer": {
-            "tables": {t: {"columns": "*"} for t in table_names if any(w in t for w in ["risk", "credit", "audit", "compliance", "assessment"])} or {t: {"columns": "*"} for t in table_names[:5]}
-        },
-        "branch_manager": {
-            "tables": {t: {"columns": "*", "row_filter": "branch_id = {branch_id}"} for t in table_names if "branch" in t or "loan" in t or "application" in t} or {t: {"columns": "*"} for t in table_names[:5]}
-        },
-        "loan_officer": {
-            "tables": {t: {"columns": "*", "row_filter": "officer_id = {user_id}"} for t in table_names if "loan" in t or "application" in t or "member" in t} or {t: {"columns": "*"} for t in table_names[:5]}
-        },
-        "analyst": {
-            "tables": {t: {"columns": "*"} for t in table_names}
-        },
+    # Operator scopes are table-level because the PRD does not define operator row claims.
+    # Patient access is row-scoped by the patient_id claim.
+    persona_tables = {
+        "maria": {"Patient", "PregnancyEpisode", "Provider", "Facility", "TelehealthSession", "TransportRequest", "ConnectivityRegistry"},
+        "sarah": {"Patient", "ChronicConditionEnrollment", "RPMReading", "MedicationFill", "Provider", "ClaimEncounter", "SDOHFlag"},
+        "james": {"TransportRequest", "EMSCoverage", "Facility", "TelehealthSession", "ConnectivityRegistry", "DataSourceFeed"},
+        "priya": {"Patient", "PregnancyEpisode", "ChronicConditionEnrollment", "ClaimEncounter", "SDOHFlag", "ConnectivityRegistry", "EMSCoverage", "MetricTrend", "Facility", "TransportRequest"},
+        "david": {"DataQualityEvent", "DataSourceFeed", "ProviderReferenceIssue", "Provider", "Facility", "MetricTrend"},
     }
+    roles = {
+        persona: {
+            "tables": {
+                table: {"columns": "*"}
+                for table in table_names
+                if table in permitted
+            }
+        }
+        for persona, permitted in persona_tables.items()
+    }
+    patient_tables = {
+        table.name: {
+            "columns": "*",
+            "row_filter": "patient_id = {patient_id}",
+        }
+        for table in tables
+        if any(column.name == "patient_id" for column in table.columns)
+    }
+    if patient_tables:
+        roles["patient"] = {"tables": patient_tables}
 
     doc = {
         "id": app_id,
@@ -179,15 +190,15 @@ def generate_app_yaml(app_id: str, tables: list[CatalogTable], pg_info: dict[str
             "thresholds": {"embedding_accept": 0.8, "embedding_margin": 0.05, "llm_accept": 0.6},
             "exemplars": {
                 "data_query": [
-                    "what is our total loan portfolio volume by region this quarter",
-                    "average application processing time for branch north last month",
-                    "how many high-risk loan applications are currently pending",
-                    "approval rate by product type year to date",
+                    "how many elevated-risk pregnancies are active",
+                    "show RPM transmission completeness by ZIP code",
+                    "how many transport requests are scheduled today",
+                    "what is prenatal visit completion rate this quarter",
                 ],
                 "metadata_question": [
-                    "what tables hold member credit ratings",
-                    "what is the definition of debt to income ratio",
-                    "which columns are available in the risk assessment table",
+                    "what tables hold pregnancy episodes",
+                    "what does an access barrier mean",
+                    "which columns describe RPM readings",
                 ],
                 "out_of_scope": [
                     "generate a marketing email to borrowers",
@@ -218,6 +229,7 @@ def generate_app_yaml(app_id: str, tables: list[CatalogTable], pg_info: dict[str
         "roles": roles,
         "model_policy": {
             "route": {"enabled": True, "model_group": "fast", "temperature": 0.0, "max_tokens": 200},
+            "design": {"enabled": True, "model_group": "strong", "temperature": 0.0, "max_tokens": 24000},
             "sql": {"enabled": True, "model_group": "strong", "temperature": 0.0, "max_tokens": 1500},
             "judge": {"enabled": False, "model_group": "fast", "temperature": 0.0, "max_tokens": 200},
             "narrate": {"enabled": False, "model_group": "fast", "temperature": 0.0, "max_tokens": 200},
@@ -235,7 +247,7 @@ def generate_app_yaml(app_id: str, tables: list[CatalogTable], pg_info: dict[str
         "confidence_threshold": 0.65,
         "sql_visibility": {
             "default": False,
-            "roles": {"executive": False, "risk_officer": True, "branch_manager": False, "loan_officer": False, "analyst": True},
+            "roles": {role: role in {"david", "priya"} for role in roles},
         },
     }
     return yaml.dump(doc, sort_keys=False)
@@ -393,7 +405,7 @@ def main() -> int:
     # 6. Generate API Keys File
     print("\n[6/6] Generating persona API keys...")
     keys_path = root / "apps" / "keys.local.yaml"
-    personas = ["executive", "risk_officer", "branch_manager", "loan_officer", "analyst"]
+    personas = ["maria", "sarah", "james", "priya", "david"]
     keys = generate_keys_file(keys_path, args.app, personas)
     print(f"   Wrote {keys_path.relative_to(root)}")
     persona_keys_path = app_dir / "persona_keys.env"

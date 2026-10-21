@@ -85,6 +85,9 @@ class ProviderResponse:
     text: str
     usage: Usage
     model: str
+    truncated: bool = False
+    """The provider stopped at max_tokens, so the text is cut short. Callers that parse the
+    answer structurally must treat it as incomplete, not as malformed."""
 
 
 class Provider(Protocol):

@@ -1,0 +1,55 @@
+# Agent spec for the requirements-interpreter skill agent (PRD design stage 1).
+# The prompt stays in SKILL.md; this file holds everything configurable about the loop.
+name: requirements-interpreter
+version: 0.2.0
+purpose: design
+capabilities:
+  pipeline: prd_design
+  stage: requirements
+  intents: [extract_requirements]
+  data_sources: [document]
+  artifacts: [requirements_ir]
+prompt: skills/requirements-interpreter/SKILL.md
+output_key: requirements_ir
+output_schema: requirements-interpreter
+max_iterations: 6
+max_repairs: 2
+confidence_threshold: 0.6
+token_budget: 150000
+# each finish/repair turn re-emits the full IR (~3-4 min non-streaming), so the loop
+# deadline covers one draft, one repair and the small verification tools with headroom
+timeout_ms: 1200000
+tools:
+- list_document_sections
+- read_document_section
+- search_document
+- check_relative_time_language
+escalations:
+- low_confidence
+- needs_context
+- budget_exhausted
+- validation_failed
+- max_iterations
+- deadline
+- model_unavailable
+- gateway_error
+- model_escalated
+instruction: |
+  Produce the Requirements IR for the document in the first user message. The finish result is one
+  object with this top-level shape: mode, domain, anchor_date, personas, questions,
+  committed_figures, source_systems, entity_hints, narrative_events, constraints, open_items. Use
+  empty arrays when a category has no evidence. Every persona needs id, name, role, altitude,
+  problems, systems. Every extracted question needs id, persona_id, text, tier=extracted,
+  is_data_question, and a reason when is_data_question is false. Preserve stated figures exactly
+  and record derivation and tolerance, or raise an open item. Do not invent database tables or
+  columns.
+
+  The full document is already in your first message; use the tools to verify details (committed
+  figures, relative time language), not to re-read what you already have. When the IR is complete,
+  submit it with finish directly: it is validated automatically, and if anything is wrong the
+  specific errors come back for you to fix. Never send your draft to a tool -- every extra turn
+  retransmits the whole document and costs minutes.
+
+  The finished IR must fit the output budget: keep every free-text value terse (problems, signals,
+  notes and open items at most 12 words each), never quote document passages, and include nothing
+  the schema does not ask for.

@@ -187,4 +187,10 @@ class OpenAICompatProvider:
         except (KeyError, TypeError, ValueError):
             usage = estimate_usage(request.messages, text)
         model = data.get("model") if isinstance(data.get("model"), str) else request.model
-        return ProviderResponse(text=text, usage=usage, model=model)
+        try:
+            finish_reason = data["choices"][0].get("finish_reason")
+        except (KeyError, IndexError, TypeError):
+            finish_reason = None
+        return ProviderResponse(
+            text=text, usage=usage, model=model, truncated=finish_reason == "length"
+        )

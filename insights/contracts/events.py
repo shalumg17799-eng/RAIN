@@ -55,6 +55,12 @@ class StageEvent(Contract):
     count: int | None = Field(default=None, ge=0)
     outcome: Literal["completed", "failed"] | None = None
     failure_reason: RunFailureReason | None = None
+    iteration: int | None = Field(default=None, ge=1)
+    """Which turn of a skill agent's bounded loop this event belongs to."""
+    tool: Identifier | None = None
+    """The tool a skill agent called. A registered tool name, never free text."""
+    status: Literal["ok", "error"] | None = None
+    """How the tool call ended."""
 
     @model_validator(mode="after")
     def _required_per_type(self) -> "StageEvent":
@@ -70,6 +76,8 @@ class StageEvent(Contract):
             EventType.REFINE: ("step_id", "attempt", "label"),
             EventType.PROGRESS: ("step_id", "note"),
             EventType.RUN_FINISHED: ("outcome",),
+            EventType.AGENT_ITERATION: ("step_id", "skill", "iteration"),
+            EventType.TOOL_CALL: ("step_id", "skill", "tool", "status"),
         }
         missing = [name for name in needs[self.type] if getattr(self, name) is None]
         if missing:

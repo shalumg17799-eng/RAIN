@@ -89,6 +89,8 @@ class Purpose(StrEnum):
     SQL = "sql"
     JUDGE = "judge"
     NARRATE = "narrate"
+    DESIGN = "design"
+    """PRD design-pipeline stages (requirements, questions, entities, ontology). Never sees rows."""
 
 
 class IdentityMode(StrEnum):
@@ -119,6 +121,8 @@ class EventType(StrEnum):
     REFINE = "refine"
     PROGRESS = "progress"
     RUN_FINISHED = "run_finished"
+    AGENT_ITERATION = "agent_iteration"
+    TOOL_CALL = "tool_call"
 
 
 class AuditEventType(StrEnum):

@@ -53,8 +53,6 @@ class AnthropicProvider:
 
     def complete(self, request: ProviderRequest) -> ProviderResponse:
         system = [message.content for message in request.messages if message.role == "system"]
-        if request.response_schema is not None:
-            system.append(_schema_directive(request.response_schema))
         messages = [
             {"role": message.role, "content": message.content}
             for message in request.messages
@@ -68,6 +66,15 @@ class AnthropicProvider:
         }
         if system:
             payload["system"] = "\n\n".join(system)
+        if request.response_schema is not None:
+            payload["tools"] = [
+                {
+                    "name": "submit_structured_response",
+                    "description": "Return the requested structured artifact. This tool does not execute actions.",
+                    "input_schema": request.response_schema,
+                }
+            ]
+            payload["tool_choice"] = {"type": "tool", "name": "submit_structured_response"}
 
         headers = {
             "Content-Type": "application/json",
@@ -93,11 +100,21 @@ class AnthropicProvider:
 
         try:
             data = json.loads(response.body)
-            text = "\n".join(
+            tool_inputs = [
+                block["input"]
+                for block in data["content"]
+                if block.get("type") == "tool_use"
+                and block.get("name") == "submit_structured_response"
+                and isinstance(block.get("input"), dict)
+            ]
+            if request.response_schema is not None and tool_inputs:
+                text = json.dumps(tool_inputs[0], ensure_ascii=False)
+            else:
+                text = "\n".join(
                 block["text"]
                 for block in data["content"]
                 if block.get("type") == "text" and isinstance(block.get("text"), str)
-            )
+                )
         except (ValueError, KeyError, TypeError):
             raise ProviderError("Anthropic response is not a Messages API response") from None
         if not text:
@@ -112,4 +129,7 @@ class AnthropicProvider:
         except (KeyError, TypeError, ValueError):
             usage = estimate_usage(request.messages, text)
         model = data.get("model") if isinstance(data.get("model"), str) else request.model
-        return ProviderResponse(text=text, usage=usage, model=model)
+        return ProviderResponse(
+            text=text, usage=usage, model=model,
+            truncated=data.get("stop_reason") == "max_tokens",
+        )
