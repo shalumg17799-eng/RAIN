@@ -71,6 +71,7 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(sql, str) or not sql.strip():
         raise ValueError("sql must be non-empty text")
     sliver = Sliver.model_validate(input["sliver"])
+    source = str(input["source"]) if input.get("source") else None
     sql_sha256 = hashlib.sha256(sql.encode("utf-8")).hexdigest()
     decisions: list[PolicyDecision] = []
     tables: tuple[str, ...] = ()
@@ -116,6 +117,7 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
             "policy": [d.model_dump(mode="json") for d in decisions],
             "sql_sha256": sql_sha256,
             "tables": list(tables),
+            "source": source,
         }
 
     # ---- identity: who the query runs as ----------------------------------------------------
@@ -159,7 +161,7 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
     checked_sql = outcome.sql
 
     try:
-        adapter = ctx["services"].need("data").adapter_for(app)
+        adapter = ctx["services"].need("data").adapter_for(app, source)
     except Exception as exc:
         return finish(
             ExecutionStatus.ERROR, detail=f"data source unavailable: {type(exc).__name__}"

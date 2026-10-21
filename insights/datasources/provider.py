@@ -7,6 +7,7 @@ works on a developer machine (127.0.0.1:55432) and inside the compose network (p
 
 import threading
 from collections.abc import Mapping
+from typing import Any
 
 from insights.config import resolve_secret
 from insights.contracts.profile import AppProfile
@@ -21,15 +22,21 @@ class EnvDataSources:
         self._adapters: dict[tuple[str, str], DataSourceAdapter] = {}
         self._lock = threading.Lock()
 
-    def adapter_for(self, app: AppProfile) -> DataSourceAdapter:
-        key = (app.id, app.version)
+    def adapter_for(self, app: AppProfile, source_id: str | None = None) -> DataSourceAdapter:
+        """The adapter for one of the app's data sources (the first one when unnamed)."""
+        source = app.datasources[0]
+        if source_id is not None:
+            source = next((s for s in app.datasources if s.id == source_id), None)
+            if source is None:
+                raise LookupError(f"app {app.id!r} has no data source {source_id!r}")
+        key = (app.id, app.version, source.id)
         with self._lock:
             if key not in self._adapters:
-                self._adapters[key] = self._build(app)
+                self._adapters[key] = self._build(app, source)
             return self._adapters[key]
 
-    def _build(self, app: AppProfile) -> DataSourceAdapter:
-        source = app.datasources[0]
+    def _build(self, app: AppProfile, source: Any = None) -> DataSourceAdapter:
+        source = source if source is not None else app.datasources[0]
         if source.kind == "postgres":
             if source.user is None or source.password is None:
                 raise AdapterUnavailableError(f"data source {source.id!r} has no credentials")

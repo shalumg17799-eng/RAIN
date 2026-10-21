@@ -145,23 +145,31 @@ class ChooseNextAgainstTheRealPack(unittest.TestCase):
         decision = choose_next(ORCH, VIEWS, state, source_types=("postgres", "catalog", "knowledge_graph"))
         self.assertEqual((decision.stage, decision.skill), ("schema_slicing", "schema-sliver"))
 
-    def test_exhausted_refines_go_to_the_composer(self):
+    def test_exhausted_refines_continue_to_the_hitl_gate(self):
+        # the insights posture: one refine too many flows ON to human review, not to abstention
         state = self.data_state_through_assessment({"label": "refine_query", "critique": "x"})
         state["refine"]["attempt"] = 2  # == max_refines
         decision = choose_next(ORCH, VIEWS, state, source_types=("postgres", "catalog", "knowledge_graph"))
-        self.assertEqual(decision.stage, "answer_composition")
+        self.assertEqual(decision.stage, "hitl_review")
         self.assertEqual(decision.reason, "refines_exhausted")
 
-    def test_executor_policy_denial_is_terminal(self):
+    def test_execution_fans_out_per_source_and_escalation_is_terminal(self):
         state = routed("data_query")
-        ran(state, "schema_slicing", "schema-sliver", {"label": "ok", "sliver": {}, "concepts": []})
+        ran(state, "schema_slicing", "schema-sliver",
+            {"label": "ok", "sliver": {}, "concepts": [], "sources": ["main"]})
         ran(state, "query_generation", "query-generator", {"label": "generated", "sql": "SELECT 1"})
-        ran(state, "governed_execution", "governed-executor",
-            {"label": "policy_denied", "status": "policy_denied"})
+        decision = choose_next(ORCH, VIEWS, state, source_types=("postgres", "catalog", "knowledge_graph"))
+        self.assertEqual(decision.action, "fanout")
+        self.assertEqual((decision.stage, decision.skill),
+                         ("governed_execution", "governed-executor"))
+        # a refused execution surfaces through the assessor, whose escalation is terminal
+        state = self.data_state_through_assessment(
+            {"label": "escalate", "critique": "the query was refused (policy_denied)"}
+        )
         decision = choose_next(ORCH, VIEWS, state, source_types=("postgres", "catalog", "knowledge_graph"))
         self.assertEqual(decision.stage, "answer_composition")
         self.assertEqual(decision.reason, "escalation")
-        self.assertEqual(decision.detail["label"], "policy_denied")
+        self.assertEqual(decision.detail["label"], "escalate")
 
     def test_hitl_rejection_is_terminal(self):
         state = self.data_state_through_assessment({"label": "answer", "confidence": 0.9})

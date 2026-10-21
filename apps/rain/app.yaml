@@ -4,7 +4,7 @@ description: Auto-generated profile for RAIN from live DB & KAG metadata.
 dialect: postgres
 agent:
   name: insights-orchestrator
-  version: 1.0.0
+  version: 1.1.0
 allowed_intents:
 - data_query
 - metadata_question

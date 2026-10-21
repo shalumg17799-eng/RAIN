@@ -21,7 +21,13 @@ from dataclasses import dataclass, field
 from insights.catalog.bm25 import BM25Index
 from insights.catalog.catalog import Catalog
 from insights.catalog.embedding import Embedder, HashingEmbedder, cosine
-from insights.catalog.entitlements import AllowedObjects, allowed_objects, effective_role
+from insights.catalog.entitlements import (
+    AllowedObjects,
+    allowed_objects,
+    default_schema_of,
+    effective_role,
+    normalize_table,
+)
 from insights.catalog.glossary import GlossaryEntry
 from insights.catalog.snapshot import CatalogTable
 from insights.catalog.text import content_tokens, stems
@@ -132,11 +138,14 @@ class BypassRetriever:
             for t in snapshot.tables
         ]
         allowed = allowed_objects(sliver_like, self._app, principal)
+        schema = default_schema_of(self._app)
         tables: dict[str, CatalogTable] = {}
         for table in snapshot.tables:
-            columns = allowed.columns_of(table.name)
+            # allowed tables and columns are keyed by their normalized (lowercased) names,
+            # while the snapshot keeps the database's own casing (e.g. "PregnancyEpisode")
+            columns = allowed.columns_of(normalize_table(table.name, schema))
             if columns:
-                kept = tuple(c for c in table.columns if c.name in columns)
+                kept = tuple(c for c in table.columns if c.name.lower() in columns)
                 tables[table.name] = table.model_copy(
                     update={
                         "columns": kept,

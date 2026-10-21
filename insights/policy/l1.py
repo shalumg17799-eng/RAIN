@@ -105,10 +105,11 @@ class PolicyOutcome:
 
 
 def _identifier_key(identifier: exp.Expression | str, dialect: str) -> str:
-    """PostgreSQL folds unquoted names to lower case but keeps quoted ones exactly as written."""
+    """Entitlement identity is case-insensitive: the catalog's normalized (lowercased) name is
+    authoritative, so a quoted "Patient" and an unquoted patient are the same entitlement key.
+    The checked SQL itself keeps its quoting, so execution still hits the physical table."""
     name = identifier.name if isinstance(identifier, exp.Identifier) else str(identifier)
-    quoted = isinstance(identifier, exp.Identifier) and bool(identifier.args.get("quoted"))
-    return name if quoted and dialect == "postgres" else name.lower()
+    return name.lower()
 
 
 def table_key(table: exp.Table, dialect: str, default_schema: str | None) -> str:

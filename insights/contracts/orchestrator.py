@@ -7,7 +7,7 @@ every loop-back is decided at runtime by the supervisor from the registry's capa
 run state — nothing here fixes an order beyond the stages' declared data dependencies.
 """
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import Field, model_validator
 
@@ -56,6 +56,10 @@ class OrchestratorDef(Contract):
     version: SemVer
     pack: PackName
     description: str = ""
+    on_refine_exhausted: Literal["terminal", "continue"] = "terminal"
+    """What happens when a stage asks for one refine too many: go straight to the terminal stage
+    (the PRD posture: finalize honestly), or continue forward with the imperfect artifact so the
+    later gates — assessment, human review — judge it (the NLQ posture)."""
     stages: tuple[StageDef, ...] = Field(min_length=1)
     output: dict[str, Ref] = Field(min_length=1)
     limits: SupervisorLimits

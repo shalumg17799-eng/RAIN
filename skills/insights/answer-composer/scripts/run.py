@@ -146,9 +146,16 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
     route = _output(steps, "routing", "route")
     sliver_out = _output(steps, "schema_slicing", "sliver")
     generation = _output(steps, "query_generation", "generate")
-    execution = _output(steps, "governed_execution", "execute")
     assessment = _output(steps, "assessment", "assess")
-    synthesis = _output(steps, "synthesis").get("synthesis") or {}
+    synthesis_out = _output(steps, "synthesis")
+    synthesis = synthesis_out.get("synthesis") or {}
+    # with a per-source fan-out the execution record comes from the synthesizer's primary;
+    # a single-step execution (legacy graph, direct invocation) is read from the stage itself
+    execution = (
+        synthesis_out.get("primary_execution")
+        if isinstance(synthesis_out.get("primary_execution"), dict)
+        else _output(steps, "governed_execution", "execute")
+    )
     hitl = _output(steps, "hitl_review")
     hitl_label = hitl.get("label") if isinstance(hitl.get("label"), str) else None
     path_used = sliver_out.get("path_used")

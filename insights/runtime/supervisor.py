@@ -281,6 +281,39 @@ def choose_next(
     if stage_runs >= orch.limits.max_steps:
         return terminal_decision("max_steps", {"stage_runs": stage_runs})
 
+    def forward() -> Decision | None:
+        intent = current_intent(state)
+        artifacts = produced_artifacts(state, views)
+        for stage_def in orch.stages:
+            if stage_def.terminal or _stage_done(state, stage_def.stage):
+                continue
+            candidates = eligible_candidates(
+                views.get(stage_def.stage, []),
+                intent=intent,
+                source_types=source_types,
+                artifacts=artifacts,
+            )
+            if not candidates:
+                continue
+            chosen = candidates[0]
+            if stage_def.fanout is not None:
+                return Decision(
+                    action="fanout",
+                    reason="fanout_dispatch",
+                    stage=stage_def.stage,
+                    skill=chosen.name,
+                    considered=tuple(v.name for v in candidates),
+                )
+            reason = "intent_match" if intent and intent in chosen.intents else "artifact_missing"
+            return Decision(
+                action="run",
+                reason=reason,
+                stage=stage_def.stage,
+                skill=chosen.name,
+                considered=tuple(v.name for v in candidates),
+            )
+        return None
+
     # --- react to the last stage that ran: refine loop-backs and terminal labels -------------
     last_run = next(
         (d for d in reversed(decisions) if d.get("action") in ("run", "fanout")), None
@@ -293,9 +326,19 @@ def choose_next(
             if label.startswith(REFINE_PREFIX):
                 refine = state.get("refine") or {}
                 if int(refine.get("attempt") or 0) >= int(refine.get("max_refines") or 0):
-                    return terminal_decision(
-                        "refines_exhausted", {"from_stage": stage_name, "label": label}
-                    )
+                    detail = {"from_stage": stage_name, "label": label}
+                    if orch.on_refine_exhausted == "continue":
+                        onward = forward()
+                        if onward is not None:
+                            return Decision(
+                                action=onward.action,
+                                reason="refines_exhausted",
+                                stage=onward.stage,
+                                skill=onward.skill,
+                                considered=onward.considered,
+                                detail=detail,
+                            )
+                    return terminal_decision("refines_exhausted", detail)
                 target = refine_target(label, views, stage_name, stage_names)
                 if target is not None:
                     candidates = eligible_candidates(
@@ -325,37 +368,9 @@ def choose_next(
                 )
 
     # --- forward progress ---------------------------------------------------------------------
-    intent = current_intent(state)
-    artifacts = produced_artifacts(state, views)
-    for stage_def in orch.stages:
-        if stage_def.terminal or _stage_done(state, stage_def.stage):
-            continue
-        candidates = eligible_candidates(
-            views.get(stage_def.stage, []),
-            intent=intent,
-            source_types=source_types,
-            artifacts=artifacts,
-        )
-        if not candidates:
-            continue
-        chosen = candidates[0]
-        if stage_def.fanout is not None:
-            return Decision(
-                action="fanout",
-                reason="fanout_dispatch",
-                stage=stage_def.stage,
-                skill=chosen.name,
-                considered=tuple(v.name for v in candidates),
-            )
-        reason = "intent_match" if intent and intent in chosen.intents else "artifact_missing"
-        return Decision(
-            action="run",
-            reason=reason,
-            stage=stage_def.stage,
-            skill=chosen.name,
-            considered=tuple(v.name for v in candidates),
-        )
-
+    onward = forward()
+    if onward is not None:
+        return onward
     return terminal_decision("pipeline_complete")
 
 

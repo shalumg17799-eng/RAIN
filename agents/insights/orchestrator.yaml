@@ -5,8 +5,9 @@
 # stage declares only the input its skill receives and which output labels end the run at the
 # terminal composer. Bump the version with any edit — the graph cache enforces it.
 name: insights-orchestrator
-version: 1.0.0
+version: 1.1.0
 pack: insights
+on_refine_exhausted: continue
 description: Route, slice the schema, generate SQL, execute governed, synthesize across sources, assess, hold for human review when warranted, and always compose an honest answer.
 
 stages:
@@ -41,21 +42,26 @@ stages:
       attempt: $.refine.attempt
     terminal_labels: [unusable]
 
+  # One governed execution per data source the sliver touches (a 1-source app fans out to one
+  # branch). A failed source becomes a typed per-branch outcome for the synthesizer, never a
+  # dead run; the non-retryable refusals surface through the synthesizer's primary execution.
   - stage: governed_execution
+    fanout:
+      over: $.steps.schema_slicing.output.sources
+      item_key: source
     input:
       sql: $.steps.query_generation.output.sql
       sliver: $.steps.schema_slicing.output.sliver
-    terminal_labels: [policy_denied, access_denied, timeout]
 
   - stage: synthesis
     input:
       question: $.input.query
-      execution: $.steps.governed_execution.output
+      executions: $.fanout.governed_execution
 
   - stage: assessment
     input:
       question: $.input.query
-      execution: $.steps.governed_execution.output
+      execution: $.steps.synthesis.output.primary_execution
       sliver: $.steps.schema_slicing.output.sliver
       generation: $.steps.query_generation.output
       unmatched: $.steps.schema_slicing.output.unmatched
@@ -65,7 +71,7 @@ stages:
     input:
       question: $.input.query
       assessment: $.steps.assessment.output
-      execution: $.steps.governed_execution.output
+      execution: $.steps.synthesis.output.primary_execution
       synthesis: $.steps.synthesis.output.synthesis
       route: $.steps.routing.output
       generation: $.steps.query_generation.output
@@ -83,6 +89,6 @@ output:
 
 limits:
   max_refines: 2
-  max_steps: 16
+  max_steps: 24
   max_tokens: 40000
   deadline_ms: 120000

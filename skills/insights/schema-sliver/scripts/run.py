@@ -117,6 +117,8 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
         "notes": list(choice.result.notes),
         # the matched concepts (glossary terms), passed on to the query generator as grounding
         "concepts": [t.term for t in sliver.glossary_terms],
+        # the data sources the sliver's tables live in: the executor fans out over these
+        "sources": sorted({t.source_id for t in sliver.tables}),
         "attempt": attempt,
         "label": "ok" if sliver.tables else "empty",
     }

@@ -40,5 +40,7 @@ than one source succeeded; a gateway failure just drops the note.
 ## Output
 - `synthesis`: `{sources: [{source, status, row_count, truncated, masked_columns, result_ref}],
   succeeded, failed: [{source, status}], partial, note}`.
+- `primary_execution`: the first successful source's execution record (the composer's answer rows
+  come from it); with nothing successful, the first failure, so downstream sees the typed error.
 - `confidence_hint`: the fraction of sources that succeeded.
 - `label`: `ok` (every source answered), `partial` (some failed), `all_failed`.

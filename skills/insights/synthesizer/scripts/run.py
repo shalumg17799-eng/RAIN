@@ -72,11 +72,23 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
     _assert_no_rows(input, "synthesizer input")
 
     entries: list[tuple[str, dict[str, Any]]] = []
-    if isinstance(input.get("executions"), list):
-        for index, entry in enumerate(input["executions"][:MAX_SOURCES]):
-            if not isinstance(entry, dict) or not isinstance(entry.get("execution"), dict):
-                raise ValueError(f"executions[{index}] must be {{source, execution}}")
-            entries.append((str(entry.get("source") or f"source_{index}"), entry["execution"]))
+    raw = input.get("executions")
+    if isinstance(raw, list):
+        # a refine loop re-dispatches the whole fan-out: read only the highest attempt
+        attempts = [int(e.get("attempt") or 0) for e in raw if isinstance(e, dict)]
+        latest = max(attempts, default=0)
+        for index, entry in enumerate(raw[:MAX_SOURCES]):
+            if not isinstance(entry, dict):
+                raise ValueError(f"executions[{index}] must be an object")
+            if isinstance(entry.get("output"), dict):  # a $.fanout.<stage> entry
+                if int(entry.get("attempt") or 0) != latest:
+                    continue
+                source = entry.get("branch") or entry.get("item")
+                entries.append((str(source or f"source_{index}"), entry["output"]))
+            elif isinstance(entry.get("execution"), dict):  # a plain {source, execution} entry
+                entries.append((str(entry.get("source") or f"source_{index}"), entry["execution"]))
+            else:
+                raise ValueError(f"executions[{index}] must carry an execution")
     elif isinstance(input.get("execution"), dict):
         entries.append(("default", input["execution"]))
     if not entries:
@@ -88,6 +100,12 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
     label = "ok" if not failed else ("all_failed" if not ok else "partial")
     note = _note(ctx, question, sources) if len(ok) > 1 else None
 
+    # the primary execution: the first source that answered (the composer's rows come from it);
+    # with nothing ok, the first failure stands so the assessor and composer see the typed error
+    primary = next(
+        (execution for (source, execution), s in zip(entries, sources) if s["status"] == "ok"),
+        entries[0][1],
+    )
     ctx["emit"]("synthesis_sources", len(sources))
     if failed:
         ctx["emit"]("synthesis_failed_sources", len(failed))
@@ -100,5 +118,6 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
             "partial": label == "partial",
             "note": note,
         },
+        "primary_execution": primary,
         "confidence_hint": round(len(ok) / len(sources), 4),
     }

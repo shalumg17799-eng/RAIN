@@ -29,7 +29,7 @@ def _trigger(input: dict[str, Any], threshold: float) -> str | None:
     if execution.get("masked_columns") or synthesis.get("partial") is True:
         return "governance_flag"
     assessment = input.get("assessment") if isinstance(input.get("assessment"), dict) else {}
-    confidence = assessment.get("confidence")
+    confidence = assessment.get("confidence", assessment.get("score"))
     if isinstance(confidence, (int, float)) and confidence < threshold:
         return "low_confidence"
     return None
@@ -79,7 +79,7 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(question, str):
         raise ValueError("question must be text")
     assessment = input.get("assessment") if isinstance(input.get("assessment"), dict) else {}
-    confidence = assessment.get("confidence")
+    confidence = assessment.get("confidence", assessment.get("score"))
     confidence = float(confidence) if isinstance(confidence, (int, float)) else 0.0
 
     reason = _trigger(input, _SPEC.confidence_threshold)
