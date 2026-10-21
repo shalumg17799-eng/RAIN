@@ -56,6 +56,34 @@ class SliverNeverExceedsEntitlements(unittest.TestCase):
         self.assertIn("no_access", result.notes)
 
 
+class CheckedSqlUsesPhysicalTableNames(unittest.TestCase):
+    def test_unquoted_camelcase_table_regenerates_quoted(self) -> None:
+        """Model-written `FROM Patient` must execute against the quoted physical "Patient"."""
+        from insights.catalog.entitlements import allowed_objects
+        from insights.contracts.state import SliverColumn, SliverTable
+        from insights.policy.denylist import load_denylist
+        from insights.policy.l1 import check_sql
+
+        sliver_tables = [
+            SliverTable(
+                source_id="main",
+                name="Patient",
+                columns=(SliverColumn(name="patient_id", type="text"),),
+            )
+        ]
+        allowed = allowed_objects(sliver_tables, APP, principal_with(("maria",)))
+        outcome = check_sql(
+            "SELECT count(*) AS n FROM Patient",
+            allowed=allowed,
+            app=APP,
+            denylist=load_denylist("postgres"),
+            max_rows=100,
+            row_predicates={},
+        )
+        self.assertTrue(outcome.allowed, outcome.rules)
+        self.assertIn('"Patient"', outcome.sql)
+
+
 class DataSourceAndWriteIsolation(unittest.TestCase):
     def test_only_the_governed_executor_imports_data_sources(self) -> None:
         self.assertEqual(check_datasource_isolation(ROOT), [])

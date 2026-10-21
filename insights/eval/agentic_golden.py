@@ -257,7 +257,7 @@ def run_prd_case(design: DesignRuntime, case: dict[str, Any], mode: str) -> dict
         from insights.prd.tools import _prompt_body
 
         ctx = _ctx(design, "requirements_interpreter", 900_000)
-        system = _prompt_body(ROOT / "skills" / "requirements-interpreter" / "SKILL.md") + "\n\n" + LEGACY_IR_INSTRUCTION
+        system = _prompt_body(ROOT / "skills" / "data" / "requirements-interpreter" / "SKILL.md") + "\n\n" + LEGACY_IR_INSTRUCTION
         try:
             result = ctx["gateway"].complete(
                 [Message(role="system", content=system),

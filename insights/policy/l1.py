@@ -332,6 +332,21 @@ def check_sql(
     limits, limit_notes = _enforce_limit(qualified, max_rows)
     notes += limit_notes
 
+    # Regenerate table identifiers with the catalog's PHYSICAL spelling: an unquoted CamelCase
+    # name in model-written SQL would otherwise fold to lowercase and miss a quoted table.
+    try:
+        real_final, _ = _physical_tables(qualified)
+        for table in real_final:
+            key = table_key(table, dialect, default_schema)
+            physical = allowed.physical.get(key)
+            if physical is not None:
+                table.set(
+                    "this",
+                    exp.to_identifier(physical, quoted=physical != physical.lower()),
+                )
+    except (SqlglotError, RecursionError):
+        return _deny(["unstable_sql"])
+
     final_sql = qualified.sql(dialect=dialect, comments=False)
     try:
         reparsed = sqlglot.parse(final_sql, read=dialect)

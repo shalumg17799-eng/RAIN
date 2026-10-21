@@ -6,7 +6,7 @@ privileged role first if that is what you want), and the choice is the same in e
 """
 
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from insights.contracts.principal import Principal
 from insights.contracts.profile import AppProfile, TableAccess
@@ -51,6 +51,9 @@ class AllowedObjects:
     role: str | None
     tables: Mapping[str, Mapping[str, str]]
     """table name -> {column name -> type}. Empty when the principal has no role in this app."""
+    physical: Mapping[str, str] = field(default_factory=dict)
+    """Normalized table name -> the catalog's physical spelling (e.g. patient -> Patient), so the
+    checked SQL can be regenerated with the exact identifier the database knows."""
 
     def columns_of(self, table: str) -> Mapping[str, str]:
         return self.tables.get(table, {})
@@ -65,6 +68,7 @@ def allowed_objects(
     schema = default_schema_of(app)
     entitled = role_tables(app, role)
     out: dict[str, dict[str, str]] = {}
+    physical: dict[str, str] = {}
     for table in sliver_tables:
         name = normalize_table(table.name, schema)
         access = entitled.get(name)
@@ -78,7 +82,8 @@ def allowed_objects(
         }
         if columns:
             out[name] = columns
-    return AllowedObjects(role, out)
+            physical[name] = table.name.split(".")[-1]
+    return AllowedObjects(role, out, physical)
 
 
 def tables_for(app: AppProfile, roles: Sequence[str]) -> set[str]:
