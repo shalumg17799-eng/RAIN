@@ -50,9 +50,11 @@ W_NS = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
 DESIGN_SUBJECT = "svc-prd-design"
 DESIGN_TENANT = "svc-internal"
-DEFAULT_RUN_TOKEN_BUDGET = 600_000
+DEFAULT_RUN_TOKEN_BUDGET = 900_000
 """Prompt + completion tokens one whole PRD design run may spend across every agent stage.
-Override with INSIGHTS_PRD_TOKEN_BUDGET; the agent definition's max_tokens is a second cap."""
+Override with INSIGHTS_PRD_TOKEN_BUDGET; the agent definition's max_tokens is a second cap.
+Sizing for the RAIN spec (6 personas): stage 1 ~120k + 6 question runs ~180k + entities ~60k
++ scenario ~40k + 6 ontology runs ~300k leaves ~200k headroom for one audit loop-back."""
 RETENTION_DAYS = 7
 """Checkpoint databases older than this are pruned at run start: they hold PRD content."""
 
