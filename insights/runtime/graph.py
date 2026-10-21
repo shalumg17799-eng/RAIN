@@ -297,6 +297,7 @@ def _supervisor_node(orch: OrchestratorDef, views: dict[str, list[Any]]):
                 )
             )
         if decision.reason == "refine_requested":
+            scope.results.drop_run(scope.run_id)  # stale rows must not linger across a refine
             from_stage = str(decision.detail.get("from_stage"))
             critique = _output_of(dict(state), from_stage).get("critique")
             refine = dict(state["refine"])

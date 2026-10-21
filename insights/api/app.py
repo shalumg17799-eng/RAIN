@@ -43,6 +43,7 @@ from insights.obs.tracing import StageSpans, build_tracer_provider, trace_id_of
 from insights.contracts.orchestrator import OrchestratorDef
 from insights.runtime.agent import AgentError, validate_agent
 from insights.runtime.engine import Runtime
+from insights.runtime.hitl import HitlDecision, HitlStore
 from insights.runtime.supervisor import OrchestratorError, load_pipeline, validate_orchestrator
 from insights.runtime.stores import (
     FanOutAuditSink,
@@ -110,6 +111,7 @@ class ServerState:
         self.results = InMemoryResultStore()
         self.runs = InMemoryRunStore()
         self.data = EnvDataSources(env)
+        self.hitl = HitlStore()
         self.runtime = Runtime(
             registry=self.registry,
             gateway=self.gateway,
@@ -120,6 +122,7 @@ class ServerState:
                 catalogs=DirectoryCatalogs(settings.apps_dir),
                 kag=build_kag_provider(KagConfig.from_env(env)),
                 data=self.data,
+                hitl=self.hitl,
             ),
         )
         self.metrics = Metrics()
@@ -424,6 +427,46 @@ def create_app(
             raise HTTPException(status_code=410, detail="the result rows have expired") from None
         response.headers["x-trace-id"] = run.trace_id
         return payload
+
+    # ---- human-in-the-loop review ------------------------------------------------------------
+
+    @app.get("/v1/hitl/pending", openapi_extra=BEARER_REQUIRED)
+    def hitl_pending(request: Request) -> dict[str, Any]:
+        authenticate(request)
+        return {
+            "pending": [
+                {
+                    "run_id": p.run_id,
+                    "trace_id": p.trace_id,
+                    "reason": p.reason,
+                    "question": p.question,
+                    "sql": p.sql,
+                    "confidence": p.confidence,
+                    "proposed_narrative": p.proposed_narrative,
+                    "waiting_s": p.waiting_s,
+                }
+                for p in state.hitl.pending()
+            ]
+        }
+
+    @app.post("/v1/hitl/{run_id}", openapi_extra=BEARER_REQUIRED)
+    def hitl_decide(run_id: str, body: dict[str, Any], request: Request) -> dict[str, Any]:
+        record = authenticate(request)
+        action = body.get("action")
+        if action not in ("approve", "edit", "reject"):
+            raise HTTPException(status_code=422, detail="action must be approve, edit or reject")
+        try:
+            decision = HitlDecision(
+                action=action,
+                decided_by=record.subject,
+                edited_narrative=body.get("edited_narrative"),
+                note=body.get("note"),
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        if not state.hitl.decide(run_id, decision):
+            raise HTTPException(status_code=404, detail="no pending review for this run")
+        return {"resolved": True, "run_id": run_id, "action": action}
 
     @app.get("/health")
     def health() -> dict[str, str]:

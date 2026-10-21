@@ -201,8 +201,8 @@ limits:
   max_estimated_cost: 100000.0
   max_estimated_rows: 5000000
   max_refines: 2
-  max_tokens: 20000
-  deadline_ms: 20000
+  max_tokens: 60000
+  deadline_ms: 180000
 confidence_threshold: 0.65
 sql_visibility:
   default: false

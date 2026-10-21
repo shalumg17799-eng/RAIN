@@ -87,7 +87,8 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
 
     def decide(label: str, score: float, critique: str | None) -> dict[str, Any]:
         if label.startswith("refine_"):
-            ctx["results"].drop_run(ctx["run_id"])  # stale rows must not linger
+            # stale rows are dropped by the supervisor WHEN the refine is granted; an exhausted
+            # request continues forward instead, and the final answer still needs its rows
             ctx["emit"](label)
         return {
             "label": label,

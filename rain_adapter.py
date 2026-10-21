@@ -215,6 +215,59 @@ def get_rain_router(settings: ServerSettings | None = None) -> APIRouter:
         response.headers["x-trace-id"] = trace_id
         return res
 
+    # ---- human-in-the-loop review (the chat UI's approve / edit / reject panel) --------------
+
+    def _authenticated(request: Request):
+        record = state.keys.authenticate(bearer_token(request.headers.get("authorization")))
+        if record is None:
+            raise HTTPException(status_code=401, detail="a valid bearer API key is required")
+        return record
+
+    @router.get("/hitl/pending")
+    def hitl_pending(request: Request) -> dict[str, Any]:
+        _authenticated(request)
+        return {
+            "pending": [
+                {
+                    "run_id": p.run_id,
+                    "trace_id": p.trace_id,
+                    "reason": p.reason,
+                    "question": p.question,
+                    "sql": p.sql,
+                    "confidence": p.confidence,
+                    "proposed_narrative": p.proposed_narrative,
+                    "waiting_s": p.waiting_s,
+                }
+                for p in state.hitl.pending()
+            ]
+        }
+
+    class HitlDecisionPayload(BaseModel):
+        action: str
+        edited_narrative: str | None = None
+        note: str | None = None
+
+    @router.post("/hitl/{run_id}")
+    def hitl_decide(run_id: str, payload: HitlDecisionPayload, request: Request) -> dict[str, Any]:
+        from insights.runtime.hitl import HitlDecision
+
+        record = _authenticated(request)
+        if payload.action not in ("approve", "edit", "reject"):
+            raise HTTPException(status_code=422, detail="action must be approve, edit or reject")
+        try:
+            decision = HitlDecision(
+                action=payload.action,
+                decided_by=record.subject,
+                edited_narrative=payload.edited_narrative,
+                note=payload.note,
+            )
+        except ValueError as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        if not state.hitl.decide(run_id, decision):
+            raise HTTPException(status_code=404, detail="no pending review for this run")
+        _stage_log.info("== HITL %s run=%s by=%s", payload.action, run_id[:8], record.subject)
+        return {"resolved": True, "run_id": run_id, "action": payload.action}
+
     @router.get("/health")
     def health() -> dict[str, str]:
         return {"status": "ok", "service": "rain_insights_adapter"}
