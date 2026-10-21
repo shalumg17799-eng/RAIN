@@ -16,10 +16,16 @@ Run:
 """
 
 import logging
+import os
+import subprocess
+import sys
+import threading
 import time
+from pathlib import Path
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import json
 from datetime import datetime, timezone
@@ -497,6 +503,204 @@ def ultra_action_package_decision(persona: str, body: ActionDecision):
 @app.get("/ultra/rain/{persona}/actionPackage/audit")
 def ultra_action_package_audit(persona: str):
     return _action_package(persona)["audit"]()
+
+
+# ---------------------------------------------------------------------------
+# PRD artifacts, parsed for the UI: personas, questions, entity model and
+# ontology as structured JSON so PRD Studio can render cards, tables and
+# charts instead of raw YAML. Read-only; every file is optional.
+# ---------------------------------------------------------------------------
+@app.get("/ultra/rain/prd/artifacts")
+def ultra_prd_artifacts():
+    import yaml as _yaml
+
+    out_dir = _PRD_ROOT / "artifacts" / "rain-prd-run"
+
+    def read_yaml(name):
+        p = out_dir / name
+        try:
+            return _yaml.safe_load(p.read_text(encoding="utf-8")) if p.is_file() else None
+        except Exception:
+            return None
+
+    def read_json(name):
+        p = out_dir / name
+        try:
+            return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else None
+        except Exception:
+            return None
+
+    requirements = read_yaml("requirements-ir.yaml")
+    registry = read_yaml("question-registry.yaml") or {}
+    entity = read_yaml("entity-model.yaml") or {}
+    schema_audit = read_json("schema-audit.json") or {}
+    ontology_audit = read_json("ontology-audit.json") or {}
+    upper = read_json("upper-ontology.json") or {}
+    scenario = read_yaml("scenario.yaml") or {}
+
+    if not requirements:
+        return {"available": False}
+
+    questions = [q for q in (registry.get("questions") or []) if isinstance(q, dict)]
+    counts = {}
+    for q in questions:
+        pid = str(q.get("persona_id") or "?")
+        counts[pid] = counts.get(pid, 0) + 1
+
+    personas = []
+    raw_personas = requirements.get("personas") or []
+    if isinstance(raw_personas, dict):
+        raw_personas = list(raw_personas.values())
+    for p in raw_personas:
+        if not isinstance(p, dict):
+            continue
+        pid = str(p.get("id") or p.get("persona_id") or "")
+        personas.append({
+            "id": pid,
+            "name": p.get("name") or pid,
+            "role": p.get("role") or "",
+            "altitude": p.get("altitude") or "",
+            "use_case": p.get("use_case") or "",
+            "is_default": bool(p.get("is_default")),
+            "problems": [str(x) for x in (p.get("problems") or [])][:4],
+            "systems": [str(x) for x in (p.get("primary_systems") or [])][:6],
+            "question_count": counts.get(pid, 0),
+        })
+
+    tables = [t for t in (entity.get("tables") or []) if isinstance(t, dict)]
+    new_tables = [str(t) for t in (schema_audit.get("tables_not_in_source") or [])]
+
+    edge_counts = ontology_audit.get("edge_counts_by_type") or {}
+    mtime = None
+    report_path = out_dir / "run-report.json"
+    if report_path.is_file():
+        mtime = datetime.fromtimestamp(report_path.stat().st_mtime, tz=timezone.utc).isoformat()
+
+    return {
+        "available": True,
+        "generated_at": mtime,
+        "source_document": "RAIN_Prototype_Spec_v1.docx",
+        "personas": personas,
+        "questions": [
+            {"persona_id": str(q.get("persona_id") or ""), "text": str(q.get("text") or ""),
+             "tier": str(q.get("tier") or ""), "is_data_question": bool(q.get("is_data_question"))}
+            for q in questions
+        ],
+        "entity_model": {
+            "table_count": len(tables),
+            "column_count": sum(len(t.get("columns") or []) for t in tables),
+            "table_names": [str(t.get("name") or "") for t in tables],
+            "new_tables": new_tables,
+            "existing_table_count": schema_audit.get("source_table_count"),
+        },
+        "ontology": {
+            "concepts": ontology_audit.get("concept_nodes") or sum(
+                1 for n in (upper.get("nodes") or []) if isinstance(n, dict) and n.get("kind") == "Concept"
+            ),
+            "personas": ontology_audit.get("persona_nodes") or 0,
+            "edges": ontology_audit.get("edge_count") or 0,
+            "edge_counts": edge_counts,
+            "unmapped_concepts": len(ontology_audit.get("unmapped_concepts") or []),
+            "invalid_edges": len(ontology_audit.get("invalid_edge_references") or []),
+        },
+        "scenario": {
+            "present": bool(scenario.get("scenarios")),
+            "synthetic": bool(scenario.get("synthetic")),
+            "count": len(scenario.get("scenarios") or []),
+            "db_state_source": scenario.get("db_state_source"),
+        },
+    }
+
+
+# ---------------------------------------------------------------------------
+# PRD design-pipeline runner: the pipeline subprocess prints one typed StageEvent
+# per line ("EVENT {json}"), relayed verbatim over SSE so the UI renders the real
+# graph, iterations and tool calls. One run at a time; `?demo=1` replays the
+# RECORDED events of the last real run (events.jsonl), time-compressed, with
+# demo:true stamped on every event so it can never be mistaken for a live run.
+# ---------------------------------------------------------------------------
+_PRD_ROOT = Path(__file__).resolve().parents[1]
+_PRD_RUN_LOCK = threading.Lock()
+_PRD_EVENTS_FILE = _PRD_ROOT / "artifacts" / "rain-prd-run" / "events.jsonl"
+_DEMO_STEP_SECONDS = 0.35
+
+
+def _demo_replay():
+    """Yield the last real run's recorded events with demo:true, evenly paced."""
+    if not _PRD_EVENTS_FILE.is_file():
+        yield "event: error\ndata: " + json.dumps({
+            "text": "No recorded run to replay yet - run the real pipeline once first."
+        }) + "\n\n"
+        return
+    lines = [l for l in _PRD_EVENTS_FILE.read_text(encoding="utf-8").splitlines() if l.strip()]
+    for line in lines:
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        event["demo"] = True
+        yield "event: prd\ndata: " + json.dumps(event) + "\n\n"
+        time.sleep(_DEMO_STEP_SECONDS)
+    yield "event: done\ndata: " + json.dumps({"exit_code": 0, "demo": True}) + "\n\n"
+
+
+@app.get("/ultra/rain/prd/stream")
+def ultra_prd_stream(demo: bool = False):
+    """Start the PRD graph (or replay the last run's recorded events) and stream typed
+    StageEvents as SSE `prd` events, ending with a `done` event carrying the exit code."""
+    if not _PRD_RUN_LOCK.acquire(blocking=False):
+        def busy():
+            yield "event: error\ndata: " + json.dumps({"text": "A PRD run is already in progress."}) + "\n\n"
+        return StreamingResponse(busy(), media_type="text/event-stream")
+
+    if demo:
+        def demo_gen():
+            try:
+                yield from _demo_replay()
+            finally:
+                _PRD_RUN_LOCK.release()
+        return StreamingResponse(demo_gen(), media_type="text/event-stream",
+                                 headers={"Cache-Control": "no-cache"})
+
+    try:
+        # a fresh events file per real run, so the demo replay is exactly one run
+        _PRD_EVENTS_FILE.unlink(missing_ok=True)
+        proc = subprocess.Popen(
+            [sys.executable, "-u", "-m", "insights.prd.pipeline",
+             "--input", "doc/RAIN_Prototype_Spec_v1.docx",
+             "--output", "artifacts/rain-prd-run"],
+            cwd=str(_PRD_ROOT), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0,
+        )
+    except Exception as exc:
+        _PRD_RUN_LOCK.release()
+        raise HTTPException(status_code=500, detail=f"could not start the PRD pipeline: {type(exc).__name__}")
+    log.info("PRD pipeline started (pid=%s)", proc.pid)
+
+    def gen():
+        try:
+            buffer = b""
+            fd = proc.stdout.fileno()
+            while True:
+                chunk = os.read(fd, 4096)
+                if not chunk:
+                    break
+                buffer += chunk
+                while b"\n" in buffer:
+                    raw, buffer = buffer.split(b"\n", 1)
+                    line = raw.decode("utf-8", errors="replace").strip()
+                    if line.startswith("EVENT "):
+                        yield "event: prd\ndata: " + line[6:] + "\n\n"
+            code = proc.wait()
+            yield "event: done\ndata: " + json.dumps({"exit_code": code}) + "\n\n"
+        finally:
+            try:
+                proc.kill()
+            except Exception:
+                pass
+            _PRD_RUN_LOCK.release()
+
+    return StreamingResponse(gen(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache"})
 
 
 @app.get("/health")

@@ -39,6 +39,11 @@ def main(argv: list[str] | None = None) -> int:
         if not env_path.is_file():
             env_path = ROOT / "rain-api" / ".env"
         runner = PrdRunner(environment(env_path))
+
+        def stdout_event(event) -> None:
+            # one JSON line per typed event; the API server relays these over SSE
+            print("EVENT " + event.model_dump_json(), flush=True)
+
         report = runner.run(
             args.input.resolve(),
             args.output.resolve(),
@@ -48,6 +53,7 @@ def main(argv: list[str] | None = None) -> int:
             db_state_path=args.scenario_db_state.resolve() if args.scenario_db_state else None,
             run_id=args.resume,
             resume=bool(args.resume),
+            event_sink=stdout_event,
         )
     except Exception as exc:
         print(f"PRD pipeline failed: {type(exc).__name__}: {exc}", file=sys.stderr)
