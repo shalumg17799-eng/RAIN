@@ -800,24 +800,38 @@ class PrdPipeline:
         source_schema = read_csv_schema(csv_dir) if csv_dir.is_dir() else {}
         catalog_path = catalog_path or self.root / "apps" / "rain" / "catalog" / "snapshot.json"
         catalog_schema = read_catalog_schema(catalog_path)
-        entity_instruction = """Use Requirements IR and question registry below. Return exactly one JSON object (valid YAML) with anchor_date, tables, relationships, messiness_profile. No prose or markdown. Each table needs name, source_system, grain, primary_key, primary_persona, columns. Each column needs name and type; include nullable, distribution, and note when known. Keep every note and distribution value terse (at most 12 words). Build only what extracted questions require, distinguish proposed new schema from known schemas, and preserve unanswered questions as gaps. Do not fabricate claims that the current database contains proposed fields."""
-        self._current_input = (
-            "Requirements IR:\n" + yaml.safe_dump(requirements, sort_keys=False, allow_unicode=True)
-            + "\nQuestion registry:\n" + yaml.safe_dump(question_registry, sort_keys=False, allow_unicode=True)
-            + "\nExisting PRD CSV table/column headers:\n" + yaml.safe_dump(source_schema, sort_keys=False)
-            + "\nCurrent PostgreSQL catalog headers:\n" + yaml.safe_dump(catalog_schema, sort_keys=False)
-        )
         _t = time.perf_counter()
         print("[prd 3/5] entity-model-designer: designing tables and relationships (LLM)...", flush=True)
-        entity_model = _unwrap(self._run_parsed_skill(
-            "entity-model-designer", entity_instruction,
-            shape="an object with anchor_date, tables, relationships, messiness_profile",
-            # Diagnosed via stop_reason=max_tokens with output_tokens==budget: verbose
-            # runs of this stage exceed 20000 tokens, and a truncated forced-tool answer
-            # collapses to its first field. 32000 gives observed-peak + 60% headroom.
-            max_tokens=32000,
-        ), "entity_model")
-        entity_model = _coerce_entity_model(entity_model)
+        if self.design_runtime is not None:
+            from insights.prd.entities import entity_model_designer_agent
+
+            entity_model = self._run_design_agent(
+                "entity-model-designer",
+                entity_model_designer_agent,
+                {
+                    "requirements_ir": requirements,
+                    "question_registry": question_registry,
+                    "source_schema": source_schema,
+                    "catalog_schema": catalog_schema,
+                },
+            )
+        else:
+            entity_instruction = """Use Requirements IR and question registry below. Return exactly one JSON object (valid YAML) with anchor_date, tables, relationships, messiness_profile. No prose or markdown. Each table needs name, source_system, grain, primary_key, primary_persona, columns. Each column needs name and type; include nullable, distribution, and note when known. Keep every note and distribution value terse (at most 12 words). Build only what extracted questions require, distinguish proposed new schema from known schemas, and preserve unanswered questions as gaps. Do not fabricate claims that the current database contains proposed fields."""
+            self._current_input = (
+                "Requirements IR:\n" + yaml.safe_dump(requirements, sort_keys=False, allow_unicode=True)
+                + "\nQuestion registry:\n" + yaml.safe_dump(question_registry, sort_keys=False, allow_unicode=True)
+                + "\nExisting PRD CSV table/column headers:\n" + yaml.safe_dump(source_schema, sort_keys=False)
+                + "\nCurrent PostgreSQL catalog headers:\n" + yaml.safe_dump(catalog_schema, sort_keys=False)
+            )
+            entity_model = _unwrap(self._run_parsed_skill(
+                "entity-model-designer", entity_instruction,
+                shape="an object with anchor_date, tables, relationships, messiness_profile",
+                # Diagnosed via stop_reason=max_tokens with output_tokens==budget: verbose
+                # runs of this stage exceed 20000 tokens, and a truncated forced-tool answer
+                # collapses to its first field. 32000 gives observed-peak + 60% headroom.
+                max_tokens=32000,
+            ), "entity_model")
+            entity_model = _coerce_entity_model(entity_model)
         if not isinstance(entity_model, dict) or not isinstance(entity_model.get("tables"), list):
             _write_json(output_dir / "entity-model.raw.json", entity_model)
             raise ValueError(

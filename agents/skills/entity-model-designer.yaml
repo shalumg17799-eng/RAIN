@@ -1,0 +1,39 @@
+# Agent spec for the entity-model-designer skill agent (PRD design stage 3).
+name: entity-model-designer
+version: 0.2.0
+purpose: design
+capabilities:
+  pipeline: prd_design
+  stage: entities
+  intents: [design_entity_model]
+  data_sources: [requirements_ir, question_registry, csv_headers, catalog_snapshot]
+  artifacts: [entity_model]
+prompt: skills/entity-model-designer/SKILL.md
+output_key: entity_model
+output_schema: entity-model-designer
+max_iterations: 6
+max_repairs: 2
+confidence_threshold: 0.6
+# the entity model is the largest artifact (~18k output tokens observed), so this stage gets the
+# biggest budgets: each finish or repair turn re-emits the whole model
+token_budget: 200000
+timeout_ms: 1800000
+tools:
+- read_csv_headers
+- read_catalog_snapshot
+- run_schema_audit
+- check_question_answerability
+instruction: |
+  Design the entity model for the Requirements IR and question registry in the first user message.
+  The finish result is one object with anchor_date, tables, relationships, messiness_profile.
+  Each table needs name, source_system, grain, primary_key, primary_persona, columns; each column
+  needs name and type, plus nullable, distribution and note when known. Build only what extracted
+  questions require, distinguish proposed new schema from known schemas, and preserve unanswered
+  questions as gaps. Do not fabricate claims that the current database contains proposed fields.
+  Copy anchor_date verbatim from the IR.
+
+  The IR, registry and both schema header sets are already in your first message. Use
+  run_schema_audit or check_question_answerability at most once, on a near-final draft, if you
+  are unsure; otherwise submit with finish directly -- validation runs there automatically and
+  specific errors come back for repair. Keep every note and distribution value terse (at most 12
+  words); the finished model must fit the output budget.

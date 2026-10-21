@@ -1,6 +1,17 @@
 ---
 name: entity-model-designer
+version: 0.2.0
 description: Turn a Requirements IR and question registry into a database design — the tables, columns, keys, distributions, and relationships needed so every extracted question can be answered from real joins rather than from a script. Use this after the question registry exists; whenever the verifier reports a gap that needs a new table or column; or when someone asks what tables a set of questions requires. Also use when the entity model must be extended because a requirements document was revised.
+labels:
+- ok
+- escalate
+- refine_self
+validation:
+  required_input:
+  - requirements_ir
+  - question_registry
+  required_output:
+  - confidence
 ---
 
 # Entity model designer
