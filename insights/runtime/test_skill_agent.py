@@ -253,9 +253,14 @@ class SkillAgentTests(unittest.TestCase):
             {"action": "finish", "result": '{"personas": [1]}', "confidence": 0.9}
         ])
         ctx, _ = make_ctx(gateway)
-        out = make_agent().run({"document": "d"}, ctx)
+        agent = make_agent()
+        out = agent.run({"document": "d"}, ctx)
         self.assertEqual(out["label"], "ok")
         self.assertEqual(out["artifact"], {"personas": [1]})
+        # the envelope schema itself must tolerate the string, or the gateway refuses it
+        # before the rescue can run (pilot run 3 failure mode)
+        schema = gateway.calls[0]["schema"]
+        self.assertEqual(schema["properties"]["result"]["type"], ["object", "string"])
 
     def test_identical_tool_calls_are_detected_as_a_loop(self):
         turn = {"action": "use_tool", "tool": "echo", "tool_args": {"value": "same"}}

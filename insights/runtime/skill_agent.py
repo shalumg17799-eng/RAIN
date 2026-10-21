@@ -157,7 +157,9 @@ class ActionEnvelope:
                 "thought": {"type": "string", "maxLength": MAX_THOUGHT_CHARS},
                 "tool": tool_property,
                 "tool_args": {"type": "object"},
-                "result": {"type": "object"},
+                # a string is tolerated so a model that stringifies its artifact is rescued by
+                # parse() instead of being refused at the gateway schema check
+                "result": {"type": ["object", "string"]},
                 "confidence": {"type": "number", "minimum": 0, "maximum": 1},
                 "reason": {"type": "string", "maxLength": MAX_REASON_CHARS},
             },

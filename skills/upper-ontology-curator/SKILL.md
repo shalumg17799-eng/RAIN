@@ -1,6 +1,18 @@
 ---
 name: upper-ontology-curator
+version: 0.2.0
 description: Derive the business vocabulary from a question registry, emit the personas that use it, and map the vocabulary onto the tables discovered in the lower ontology — concepts, the synonyms people actually use, one-line definitions, the business relationships between concepts, and which table each concept lives in. Use this after the lower ontology exists; whenever new questions introduce vocabulary the graph does not cover; whenever the schema changed and existing mappings need repointing; or when someone asks why a plain-English question cannot find its data.
+labels:
+- ok
+- escalate
+- refine_self
+validation:
+  required_input:
+  - requirements_ir
+  - question_registry
+  - lower_ontology
+  required_output:
+  - confidence
 ---
 
 # Upper ontology curator

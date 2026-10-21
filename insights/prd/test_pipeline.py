@@ -167,7 +167,7 @@ class PrdPipelineTests(unittest.TestCase):
         }
         upper = {
             "nodes": [
-                {"id": "C-EPISODE", "kind": "Concept", "name": "Episode", "synonyms": ["pregnancy"], "status": "needs_review"},
+                {"id": "C-EPISODE", "kind": "Concept", "name": "Episode", "synonyms": ["pregnancy"], "definition": "One pregnancy episode under care.", "status": "needs_review"},
                 {"id": "P-MARIA", "kind": "Persona", "persona_id": "maria", "name": "Maria"},
             ],
             "edges": [{"id": "S1", "type": "SERVES", "from": "P-MARIA", "to": "C-EPISODE"}],
@@ -178,8 +178,9 @@ class PrdPipelineTests(unittest.TestCase):
             {"action": "finish", "result": requirements, "confidence": 0.9},
             {"action": "finish", "result": {"questions": questions}, "confidence": 0.9},
             {"action": "finish", "result": entity_model, "confidence": 0.9},
+            {"action": "finish", "result": upper, "confidence": 0.9},
         ])
-        model = FakeModel([json.dumps(upper)])
+        model = FakeModel([])
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             input_path = root / "prd.md"
@@ -192,9 +193,9 @@ class PrdPipelineTests(unittest.TestCase):
                 catalog_path=root / "missing-snapshot.json",
             )
 
-            self.assertEqual(len(gateway.calls), 3)  # stages 1, 2 and 3 went through the gateway
+            self.assertEqual(len(gateway.calls), 4)  # every LLM stage went through the gateway
             self.assertEqual(gateway.calls[0]["purpose"].value, "design")
-            self.assertEqual(len(model.calls), 1)  # stage 5 stayed on the legacy path
+            self.assertEqual(len(model.calls), 0)  # no direct-SDK stage remains on the agent path
             saved = yaml.safe_load((output_dir / "requirements-ir.yaml").read_text(encoding="utf-8"))
             self.assertEqual(saved["personas"][0]["id"], "maria")
             self.assertEqual(report["stages"][0], "requirements-interpreter")

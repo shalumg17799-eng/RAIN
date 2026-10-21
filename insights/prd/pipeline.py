@@ -747,20 +747,34 @@ class PrdPipeline:
             print("[prd]     scenario-designer: skipped (no --scenario-db-state given; never runs against the live database)", flush=True)
 
         existing_upper = json.loads(existing_upper_path.read_text(encoding="utf-8")) if existing_upper_path else None
-        upper_instruction = """Return JSON only with nodes, edges, duplicate_candidates, coverage_gaps_detected. Nodes must include Concept nodes with stable ids, definitions, synonyms, status, and Persona nodes for every persona in the IR. Edges must use SERVES, RELATES_TO, and MAPS_TO with explicit from/to ids. Map only to Entity/Attribute ids present in the lower ontology; mark weak or missing mappings for human review. Preserve every concept id and synonym from existing upper ontology when supplied. Do not write to a graph database."""
-        self._current_input = (
-            "Requirements IR:\n" + yaml.safe_dump(requirements, sort_keys=False, allow_unicode=True)
-            + "\nQuestion registry:\n" + yaml.safe_dump(question_registry, sort_keys=False, allow_unicode=True)
-            + "\nLower ontology:\n" + json.dumps(lower, ensure_ascii=False)
-            + "\nExisting upper ontology (preserve stable ids if present):\n" + json.dumps(existing_upper, ensure_ascii=False)
-        )
         _t = time.perf_counter()
         print("[prd 5/5] upper-ontology-curator: mapping concepts onto the lower ontology (LLM)...", flush=True)
-        upper = self._run_parsed_skill(
-            "upper-ontology-curator", upper_instruction,
-            shape="a JSON object with nodes, edges, duplicate_candidates, coverage_gaps_detected",
-            max_tokens=32000, as_json=True,
-        )
+        if self.design_runtime is not None:
+            from insights.prd.ontology import upper_ontology_curator_agent
+
+            upper = self._run_design_agent(
+                "upper-ontology-curator",
+                upper_ontology_curator_agent,
+                {
+                    "requirements_ir": requirements,
+                    "question_registry": question_registry,
+                    "lower_ontology": lower,
+                    "existing_upper_ontology": existing_upper,
+                },
+            )
+        else:
+            upper_instruction = """Return JSON only with nodes, edges, duplicate_candidates, coverage_gaps_detected. Nodes must include Concept nodes with stable ids, definitions, synonyms, status, and Persona nodes for every persona in the IR. Edges must use SERVES, RELATES_TO, and MAPS_TO with explicit from/to ids. Map only to Entity/Attribute ids present in the lower ontology; mark weak or missing mappings for human review. Preserve every concept id and synonym from existing upper ontology when supplied. Do not write to a graph database."""
+            self._current_input = (
+                "Requirements IR:\n" + yaml.safe_dump(requirements, sort_keys=False, allow_unicode=True)
+                + "\nQuestion registry:\n" + yaml.safe_dump(question_registry, sort_keys=False, allow_unicode=True)
+                + "\nLower ontology:\n" + json.dumps(lower, ensure_ascii=False)
+                + "\nExisting upper ontology (preserve stable ids if present):\n" + json.dumps(existing_upper, ensure_ascii=False)
+            )
+            upper = self._run_parsed_skill(
+                "upper-ontology-curator", upper_instruction,
+                shape="a JSON object with nodes, edges, duplicate_candidates, coverage_gaps_detected",
+                max_tokens=32000, as_json=True,
+            )
         if not isinstance(upper, dict):
             raise ValueError("upper-ontology-curator output must be a JSON object")
         _write_json(output_dir / "upper-ontology.json", upper)
