@@ -15,7 +15,9 @@ output_schema: requirements-interpreter
 max_iterations: 6
 max_repairs: 2
 confidence_threshold: 0.6
-token_budget: 150000
+# each turn resends the whole document (~18k tokens), so 6 turns of verification plus a
+# repair cycle legitimately reaches ~200k; observed: 157k on a repair-plus-verification run
+token_budget: 250000
 # each finish/repair turn re-emits the full IR (~3-4 min non-streaming), so the loop
 # deadline covers one draft, one repair and the small verification tools with headroom
 timeout_ms: 1200000
@@ -45,7 +47,9 @@ instruction: |
   columns.
 
   The full document is already in your first message; use the tools to verify details (committed
-  figures, relative time language), not to re-read what you already have. When the IR is complete,
+  figures, relative time language), not to re-read what you already have. Verify every committed
+  figure you are not certain of with search_document BEFORE your first finish -- a figure that is
+  not verbatim in the document fails validation. When the IR is complete,
   submit it with finish directly: it is validated automatically, and if anything is wrong the
   specific errors come back for you to fix. Never send your draft to a tool -- every extra turn
   retransmits the whole document and costs minutes.

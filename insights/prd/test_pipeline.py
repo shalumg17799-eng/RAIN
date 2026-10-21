@@ -174,10 +174,20 @@ class PrdPipelineTests(unittest.TestCase):
             "duplicate_candidates": [],
             "coverage_gaps_detected": [],
         }
+        scenario = {
+            "scenarios": [
+                {"id": "SC-1", "event_id": None, "description": "Shape the committed count.",
+                 "statements": [{"purpose": "mark actives",
+                                 "sql": "UPDATE pregnancies SET episode_id = episode_id WHERE episode_id = 'E-001'"}],
+                 "checks": [{"figure": "active", "sql": "SELECT count(*) FROM pregnancies",
+                             "expected": 1, "tolerance_abs": 0}]}
+            ]
+        }
         gateway = FakeDesignGateway([
             {"action": "finish", "result": requirements, "confidence": 0.9},
             {"action": "finish", "result": {"questions": questions}, "confidence": 0.9},
             {"action": "finish", "result": entity_model, "confidence": 0.9},
+            {"action": "finish", "result": scenario, "confidence": 0.9},
             {"action": "finish", "result": upper, "confidence": 0.9},
         ])
         model = FakeModel([])
@@ -193,12 +203,16 @@ class PrdPipelineTests(unittest.TestCase):
                 catalog_path=root / "missing-snapshot.json",
             )
 
-            self.assertEqual(len(gateway.calls), 4)  # every LLM stage went through the gateway
+            self.assertEqual(len(gateway.calls), 5)  # every LLM stage went through the gateway
             self.assertEqual(gateway.calls[0]["purpose"].value, "design")
             self.assertEqual(len(model.calls), 0)  # no direct-SDK stage remains on the agent path
             saved = yaml.safe_load((output_dir / "requirements-ir.yaml").read_text(encoding="utf-8"))
             self.assertEqual(saved["personas"][0]["id"], "maria")
             self.assertEqual(report["stages"][0], "requirements-interpreter")
+            self.assertEqual(report["scenario"], "generated_synthetic")
+            saved_scenario = yaml.safe_load((output_dir / "scenario.yaml").read_text(encoding="utf-8"))
+            self.assertTrue(saved_scenario["synthetic"])  # the artifact is labelled synthetic
+            self.assertEqual(saved_scenario["db_state_source"], "generated_from_entity_model")
 
 
 if __name__ == "__main__":

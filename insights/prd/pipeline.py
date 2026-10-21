@@ -729,7 +729,31 @@ class PrdPipeline:
             flush=True,
         )
 
-        if scenario_db_state_path:
+        scenario_ran = False
+        if self.design_runtime is not None:
+            from insights.prd.scenario import generate_synthetic_db_state, scenario_designer_agent
+
+            if scenario_db_state_path:
+                supplied = yaml.safe_load(scenario_db_state_path.read_text(encoding="utf-8"))
+                db_state = supplied if isinstance(supplied, dict) else {"tables": supplied}
+                db_state = {"synthetic": True, "source": "supplied_synthetic_state", **db_state}
+            else:
+                # the safe default: a deterministic synthetic state from the entity model;
+                # the live RAIN database is never read here
+                db_state = generate_synthetic_db_state(entity_model)
+            print("[prd]     scenario-designer: designing scenarios against a SYNTHETIC database state (LLM)...", flush=True)
+            scenario = self._run_design_agent(
+                "scenario-designer",
+                scenario_designer_agent,
+                {"requirements_ir": requirements, "entity_model": entity_model, "db_state": db_state},
+            )
+            _write_yaml(output_dir / "scenario.yaml", {
+                "synthetic": True,
+                "db_state_source": db_state.get("source", "generated_from_entity_model"),
+                **scenario,
+            })
+            scenario_ran = True
+        elif scenario_db_state_path:
             scenario_state = scenario_db_state_path.read_text(encoding="utf-8")
             scenario_instruction = "Return exactly one JSON object (valid YAML) matching the scenario designer's scenarios shape; no prose or markdown. Generate SQL proposals only; the pipeline never executes SQL. Include checks for committed figures and explicitly say when a figure cannot be derived."
             self._current_input = (
@@ -742,6 +766,7 @@ class PrdPipeline:
                 shape="an object with a scenarios array", max_tokens=6000,
             )
             _write_yaml(output_dir / "scenario.yaml", scenario)
+            scenario_ran = True
         else:
             _write_yaml(output_dir / "scenario-status.yaml", {"status": "not_run", "reason": "scenario design requires a generated database state and must not run against the live RAIN database"})
             print("[prd]     scenario-designer: skipped (no --scenario-db-state given; never runs against the live database)", flush=True)
@@ -791,7 +816,7 @@ class PrdPipeline:
             "input": str(input_path),
             "source_sha256": source_hash,
             "stages": ["requirements-interpreter", "persona-question-designer", "entity-model-designer", "lower-ontology-builder", "upper-ontology-curator"],
-            "scenario": "generated" if scenario_db_state_path else "not_run",
+            "scenario": "generated_synthetic" if scenario_ran else "not_run",
             "schema_audit": {"source_tables": schema_audit["source_table_count"], "entity_model_tables": schema_audit["entity_model_table_count"], "postgres_tables": schema_audit["catalog_table_count"], "tables_not_in_source": schema_audit["tables_not_in_source"]},
             "ontology_audit": ontology_audit,
             "llm_usage": self.design_runtime.usage_report() if self.design_runtime else None,

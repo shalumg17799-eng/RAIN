@@ -1,6 +1,18 @@
 ---
 name: scenario-designer
+version: 0.2.0
 description: Shape a generated database so it carries the story a requirements document tells — its narrative events and committed figures — and close the data gaps that stop real questions being answered. Use after synthetic data has been loaded from an entity model, when committed figures do not yet hold in the data, or when an evaluation shows questions that fail for want of data or a column. Works for any domain.
+labels:
+- ok
+- escalate
+- refine_self
+validation:
+  required_input:
+  - requirements_ir
+  - entity_model
+  - db_state
+  required_output:
+  - confidence
 ---
 
 # Scenario designer
