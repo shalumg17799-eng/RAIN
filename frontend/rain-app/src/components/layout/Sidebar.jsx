@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom';
-import { MessageSquare, Route, ShieldAlert, Database } from 'lucide-react';
+import { MessageSquare, Route, ShieldAlert, Database, FileText } from 'lucide-react';
 import { useBranding } from '../../context/BrandingContext';
 
 // Nav labels come from the RAIN manifest (Rural Health Intelligence +
@@ -18,6 +18,7 @@ export default function Sidebar({ open = false, onClose = () => {} }) {
     { to: '/journey', icon: Route, label: labels.journey },
     { to: '/risk', icon: ShieldAlert, label: labels.risk },
     { to: '/data-sources', icon: Database, label: 'Data Sources' },
+    { to: '/prd', icon: FileText, label: 'PRD Studio' },
   ];
 
   return (

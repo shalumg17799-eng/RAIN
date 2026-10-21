@@ -8,6 +8,7 @@ import AskTheAI from './screens/AskTheAI';
 import MemberJourney from './screens/MemberJourney';
 import RiskSignals from './screens/RiskSignals';
 import DataSources from './screens/DataSources';
+import PrdStudio from './screens/PrdStudio';
 import PatientConversationView from './screens/PatientConversationView';
 
 function AppContent() {
@@ -37,6 +38,7 @@ function AppContent() {
               <Route path="/journey" element={<MemberJourney />} />
               <Route path="/risk" element={<RiskSignals />} />
               <Route path="/data-sources" element={<DataSources />} />
+              <Route path="/prd" element={<PrdStudio />} />
             </Route>
           </Routes>
         </PersonaProvider>

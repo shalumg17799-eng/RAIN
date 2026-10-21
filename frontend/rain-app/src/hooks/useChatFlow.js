@@ -32,21 +32,54 @@ async function fetchSignalBrief(personaId) {
   }
 }
 
-async function askBackend(personaId, query) {
+// Per-persona bearer tokens for the governed /api/v2/ask (Insights layer).
+// Values come from frontend/rain-app/.env.local (VITE_RAIN_KEY_*), written by
+// the key-generation step next to apps/rain/persona_keys.env.
+const PERSONA_TOKENS = {
+  maria: import.meta.env.VITE_RAIN_KEY_MARIA,
+  sarah: import.meta.env.VITE_RAIN_KEY_SARAH,
+  james: import.meta.env.VITE_RAIN_KEY_JAMES,
+  priya: import.meta.env.VITE_RAIN_KEY_PRIYA,
+  david: import.meta.env.VITE_RAIN_KEY_DAVID,
+};
+
+// Governed ask with live stage streaming (SSE over fetch). onStage receives
+// each engine StageEvent as it happens; the return value is the final
+// AskResponse (status answered/abstained/denied/...), or null on failure.
+async function askGoverned(personaId, query, onStage) {
   const backendId = PERSONA_ID_MAP[personaId];
-  if (!backendId) return null;
+  const token = PERSONA_TOKENS[backendId];
+  if (!backendId || !token) return null;
   try {
     const res = await fetch(`${API_BASE}/api/v2/ask`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        market: 'healthcare', product: 'rain', persona: backendId,
-        query, conversation_history: [],
-      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ query, persona: backendId, stream: true }),
     });
-    const data = await res.json();
-    if (!data.ai_message) return null;
-    return data;
+    if (!res.ok || !res.body) return null;
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let result = null;
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      let sep;
+      while ((sep = buffer.indexOf('\n\n')) >= 0) {
+        const frame = buffer.slice(0, sep);
+        buffer = buffer.slice(sep + 2);
+        const lines = frame.split('\n');
+        const kind = (lines.find((l) => l.startsWith('event:')) || 'event: stage').slice(6).trim();
+        const dataLine = lines.find((l) => l.startsWith('data:'));
+        if (!dataLine) continue;
+        let data;
+        try { data = JSON.parse(dataLine.slice(5)); } catch { continue; }
+        if (kind === 'stage' && onStage) onStage(data);
+        else if (kind === 'result') result = data;
+      }
+    }
+    return result;
   } catch {
     return null;
   }
@@ -78,8 +111,10 @@ export default function useChatFlow(personaId) {
   const [currentChips, setCurrentChips] = useState([]);
   const [currentTurn, setCurrentTurn] = useState(0);
   const [contextPanelData, setContextPanelData] = useState(null);
+  const [agentStages, setAgentStages] = useState([]);
   const signalIndexRef = useRef(0);
   const generationRef = useRef(0);
+  const traceRef = useRef(null);
 
   const addAIMessage = useCallback((flowKey) => {
     const flow = chatFlows[flowKey];
@@ -95,12 +130,15 @@ export default function useChatFlow(personaId) {
 
     const delay = 1500 + Math.random() * 1000;
     const gen = generationRef.current;
+    const agentTrace = traceRef.current; // stage events from a live attempt that fell back here
+    traceRef.current = null;
 
     setTimeout(() => {
       // Skip if a reset happened since this was queued
       if (gen !== generationRef.current) return;
 
       setIsTyping(false);
+      setAgentStages([]);
       setMessages((prev) => [
         ...prev,
         {
@@ -112,6 +150,7 @@ export default function useChatFlow(personaId) {
           uiComponents,
           confidence: flow.confidence,
           capability: flow.capability,
+          agentTrace,
         },
       ]);
       setCurrentChips(chips);
@@ -140,10 +179,13 @@ export default function useChatFlow(personaId) {
     setIsTyping(true);
     setCurrentChips([]);
     const gen = generationRef.current;
+    const agentTrace = traceRef.current; // stage events from the live governed run
+    traceRef.current = null;
     const delay = 1200 + Math.random() * 800;
     setTimeout(() => {
       if (gen !== generationRef.current) return;
       setIsTyping(false);
+      setAgentStages([]);
       setMessages((prev) => [
         ...prev,
         {
@@ -154,6 +196,7 @@ export default function useChatFlow(personaId) {
           flowKey: options.keepFlowKey ? flowKey : null,
           uiComponents: [],
           confidence: backendData.confidence,
+          agentTrace,
         },
       ]);
       setCurrentChips(chips);
@@ -179,16 +222,34 @@ export default function useChatFlow(personaId) {
   }, [chatFlows, chipToFlowKey]);
 
   const showDatabaseAnswer = useCallback(async (question, flowKey) => {
-    const backendResult = await askBackend(personaId, question);
-    if (!backendResult) return false;
-    logBackend(`Chat answer for "${question}" from POST /api/v2/ask -- answered by ${
-      (backendResult.visualization || []).map((v) => v.type).join(', ') || 'narrative only'
-    }; sources: ${(backendResult.data_sources_used || []).join(', ') || 'none'}`);
+    // Governed Insights ask with live stage streaming. The stage strip fills
+    // while the agent works; the collected trace is attached to whichever
+    // message answers (live result, or the scripted fallback).
+    setAgentStages([]);
+    setIsTyping(true);
+    const stages = [];
+    const result = await askGoverned(personaId, question, (ev) => {
+      stages.push(ev);
+      setAgentStages([...stages]);
+    });
+    traceRef.current = stages.length ? stages : null;
+    if (!result || result.status !== 'answered') {
+      const why = result ? `${result.status}${result.reason ? `: ${result.reason.code}` : ''}` : 'request failed';
+      logFallback(`Chat answer for "${question}"`, 'chatFlows.json', `governed /api/v2/ask ${why}`);
+      return false; // the caller plays the scripted flow; the trace rides along
+    }
+    logBackend(`Chat answer for "${question}" from governed POST /api/v2/ask -- answered, ${
+      result.row_count ?? 0} row(s); tables: ${((result.provenance || []).map((p) => p.table).join(', ')) || 'none'}`);
     if (flowKey) {
       const sigIdx = signalSequence.indexOf(flowKey);
       if (sigIdx >= 0) signalIndexRef.current = sigIdx + 1;
     }
-    addLiveMessage(backendResult, flowKey);
+    addLiveMessage({
+      ai_message: result.narrative || `The governed query answered with ${result.row_count ?? 0} row(s).`,
+      suggested_chips: [],
+      data_sources_used: (result.provenance || []).map((p) => p.table),
+      confidence: result.confidence ? Math.round(result.confidence.score * 100) : null,
+    }, flowKey);
     return true;
   }, [addLiveMessage, personaId, signalSequence]);
 
@@ -235,6 +296,9 @@ export default function useChatFlow(personaId) {
       addAIMessage('__default__');
     } else {
       console.warn(`[RAIN data] No answer for "${chipText}": the backend gave none and no scripted flow matches.`);
+      // stop the typing state the live governed attempt started
+      setIsTyping(false);
+      setAgentStages([]);
     }
   }, [addAIMessage, chatFlows, chipToFlowKey, findFlowKey, showDatabaseAnswer, signalSequence]);
 
@@ -312,6 +376,7 @@ export default function useChatFlow(personaId) {
   return {
     messages,
     isTyping,
+    agentStages,
     currentChips,
     currentFlowKey,
     currentTurn,

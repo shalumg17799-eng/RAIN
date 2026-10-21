@@ -135,6 +135,7 @@ export default function AskTheAI() {
   const {
     messages,
     isTyping,
+    agentStages,
     currentChips,
     currentFlowKey,
     handleChipClick,
@@ -313,6 +314,7 @@ export default function AskTheAI() {
             <ChatThread
               messages={messages}
               isTyping={isTyping}
+              agentStages={agentStages}
               chips={[]}
               onChipClick={handleChipClick}
               renderInlineComponents={renderInlineComponents}

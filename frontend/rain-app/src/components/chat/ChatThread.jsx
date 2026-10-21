@@ -3,13 +3,14 @@ import { AnimatePresence } from 'framer-motion';
 import ChatMessage from './ChatMessage';
 import TypingIndicator from './TypingIndicator';
 import SuggestedChips from './SuggestedChips';
+import AgentStageStrip from './AgentStageStrip';
 
-export default function ChatThread({ messages, isTyping, chips, onChipClick, renderInlineComponents, getCapability, onCapabilityClick }) {
+export default function ChatThread({ messages, isTyping, chips, onChipClick, renderInlineComponents, getCapability, onCapabilityClick, agentStages }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, isTyping]);
+  }, [messages, isTyping, agentStages]);
 
   return (
     <div className="flex-1 overflow-y-auto py-3 scrollbar-sleek">
@@ -24,6 +25,12 @@ export default function ChatThread({ messages, isTyping, chips, onChipClick, ren
               onCapabilityClick={onCapabilityClick}
             />
           ))}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {isTyping && agentStages && agentStages.length > 0 && (
+            <AgentStageStrip events={agentStages} />
+          )}
         </AnimatePresence>
 
         <AnimatePresence>

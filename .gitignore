@@ -29,3 +29,5 @@ Thumbs.db
 
 # PRD run artifacts and checkpoints (checkpoints contain PRD content)
 artifacts/
+/apps/keys.local.yaml.*
+/apps/rain/persona_keys.env

@@ -17,6 +17,7 @@ export default function TopHeader({ onMenuClick = () => {} }) {
   const pageTitles = {
     '/': 'Ask the AI',
     '/ask': 'Ask the AI',
+    '/prd': 'PRD Studio',
     '/journey': labels.journey,
     '/risk': labels.risk,
     '/data-sources': 'Data Sources',

@@ -13,7 +13,10 @@ Usage in RAIN's main.py:
 
 from __future__ import annotations
 
+import json
 import logging
+import queue
+import threading
 import uuid
 from typing import Any
 from pathlib import Path
@@ -30,6 +33,35 @@ from insights.config import environment
 from insights.cli import repo_root
 
 _log = logging.getLogger("insights.rain_adapter")
+_stage_log = logging.getLogger("insights.stages")
+
+
+def _console_event(event) -> None:
+    """One console line per engine stage event, so the terminal shows the agent's
+    route -> sliver/metadata -> generate -> execute -> assess -> compose progress live.
+    Best effort by design: the emitter logs and swallows any sink failure."""
+    kind = event.type.value
+    if kind == "stage_started":
+        _stage_log.info("  >> %-15s %s (attempt %d)", event.step_id, event.skill, event.attempt or 0)
+    elif kind == "stage_finished":
+        tokens = event.tokens.total if event.tokens else 0
+        _stage_log.info(
+            "  << %-15s label=%-20s %5d ms  %4d tokens",
+            event.step_id, event.label, event.duration_ms or 0, tokens,
+        )
+    elif kind == "refine":
+        _stage_log.info("  ~~ refine #%d requested by %s (%s)", event.attempt or 0, event.step_id, event.label)
+    elif kind == "progress":
+        suffix = f"={event.count}" if event.count is not None else ""
+        _stage_log.info("   .. %-15s %s%s", event.step_id, event.note, suffix)
+    elif kind == "run_finished":
+        tokens = event.tokens.total if event.tokens else 0
+        failure = f" ({event.failure_reason.value})" if event.failure_reason else ""
+        _stage_log.info(
+            "  == run %s %s in %d ms, %d tokens%s",
+            event.run_id[:8], event.outcome, event.duration_ms or 0, tokens, failure,
+        )
+
 
 class RainAskPayload(BaseModel):
     query: str
@@ -42,7 +74,7 @@ class RainAskPayload(BaseModel):
 _server_state: ServerState | None = None
 
 
-def _run_once(state: ServerState, served, principal, body: AskRequest, trace_id: str):
+def _run_once(state: ServerState, served, principal, body: AskRequest, trace_id: str, on_event=_console_event):
     return state.runtime.run(
         served.agent,
         input={
@@ -53,8 +85,52 @@ def _run_once(state: ServerState, served, principal, body: AskRequest, trace_id:
         principal=principal,
         app=served.profile,
         options=body.options,
+        on_event=on_event,
         conversation_id=str(body.conversation_id) if body.conversation_id else None,
         trace_id=trace_id,
+    )
+
+
+def _sse(kind: str, data: dict) -> str:
+    return f"event: {kind}\ndata: {json.dumps(data, default=str)}\n\n"
+
+
+def _stream_run(state: ServerState, served, principal, body: AskRequest, trace_id: str, request_id) -> StreamingResponse:
+    """SSE: one `stage` event per engine StageEvent (the same ones printed to the
+    console), then one final `result` event carrying the usual AskResponse JSON.
+    Stage events never carry rows (enforced by the engine's contracts)."""
+    events: queue.Queue = queue.Queue()
+
+    def sink(event) -> None:
+        _console_event(event)  # the terminal keeps its stage view too
+        events.put(("stage", event.model_dump(mode="json")))
+
+    def work() -> None:
+        try:
+            run = _run_once(state, served, principal, body, trace_id, on_event=sink)
+            res = build_response(request_id, run, state.results, principal)
+            events.put(("result", res.model_dump(mode="json")))
+        except RowsGoneError:
+            events.put(("error", {"detail": "Result rows expired"}))
+        except Exception as exc:  # surfaced to the client as an SSE error event
+            _log.exception("streamed run failed")
+            events.put(("error", {"detail": type(exc).__name__}))
+        finally:
+            events.put(None)
+
+    threading.Thread(target=work, daemon=True).start()
+
+    def gen():
+        while True:
+            item = events.get()
+            if item is None:
+                break
+            yield _sse(*item)
+
+    return StreamingResponse(
+        gen(),
+        media_type="text/event-stream",
+        headers={"x-trace-id": trace_id, "Cache-Control": "no-cache"},
     )
 
 
@@ -126,6 +202,9 @@ def get_rain_router(settings: ServerSettings | None = None) -> APIRouter:
         )
 
         trace_id = uuid.uuid4().hex
+        _stage_log.info("== ASK persona=%s trace=%s stream=%s q=%.80r", persona, trace_id[:8], payload.stream, payload.query)
+        if payload.stream:
+            return _stream_run(state, served, principal, body, trace_id, request_id)
         run = _run_once(state, served, principal, body, trace_id)
 
         try:

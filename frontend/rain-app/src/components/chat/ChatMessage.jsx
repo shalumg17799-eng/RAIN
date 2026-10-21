@@ -99,6 +99,24 @@ export default function ChatMessage({ message, inlineComponents, capability, onC
             </div>
           </div>
         )}
+        {/* Governed-agent trace: the pipeline stages that ran for this answer */}
+        {!isUser && message.agentTrace && message.agentTrace.length > 0 && (
+          <details className="mt-2 pl-0.5">
+            <summary className="cursor-pointer text-[10px] font-semibold uppercase tracking-wider text-[#003087]/50 hover:text-[#003087]/80">
+              Agent steps ({message.agentTrace.filter((e) => e.type === 'stage_finished').length} stages)
+            </summary>
+            <div className="mt-1.5 rounded-lg border border-gray-100 bg-gray-50/60 px-3 py-2 font-mono text-[10px] leading-relaxed text-gray-600">
+              {message.agentTrace.map((e, i) => {
+                if (e.type === 'stage_started') return <div key={i}>&gt;&gt; {e.step_id} - {e.skill}</div>;
+                if (e.type === 'stage_finished') return <div key={i}>&lt;&lt; {e.step_id} -&gt; {String(e.label)} ({e.duration_ms} ms)</div>;
+                if (e.type === 'progress') return <div key={i} className="text-gray-400">&nbsp;&nbsp;.. {e.note}{e.count != null ? `=${e.count}` : ''}</div>;
+                if (e.type === 'refine') return <div key={i} className="text-amber-600">~~ refine #{e.attempt} ({String(e.label)})</div>;
+                if (e.type === 'run_finished') return <div key={i} className="text-[#003087]">== {e.outcome} in {e.duration_ms} ms</div>;
+                return null;
+              })}
+            </div>
+          </details>
+        )}
       </div>
 
       {/* User avatar */}

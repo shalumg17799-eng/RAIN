@@ -239,6 +239,13 @@
           "nullable": true,
           "primary_key": false,
           "type": "date"
+        },
+        {
+          "description": "",
+          "name": "feed_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
         }
       ],
       "description": "",
@@ -329,6 +336,13 @@
           "nullable": true,
           "primary_key": false,
           "type": "date"
+        },
+        {
+          "description": "",
+          "name": "utilization_pct",
+          "nullable": true,
+          "primary_key": false,
+          "type": "numeric"
         }
       ],
       "description": "",
@@ -1018,5 +1032,5 @@
       "name": "routed_actions"
     }
   ],
-  "version": "e86c8a73b33c"
+  "version": "2f2fa1ebaf21"
 }
