@@ -40,8 +40,10 @@ from insights.gateway.gateway import LLMGateway
 from insights.obs.logging import configure_logging, log_event
 from insights.obs.metrics import Metrics
 from insights.obs.tracing import StageSpans, build_tracer_provider, trace_id_of
-from insights.runtime.agent import AgentError, load_agent, validate_agent
+from insights.contracts.orchestrator import OrchestratorDef
+from insights.runtime.agent import AgentError, validate_agent
 from insights.runtime.engine import Runtime
+from insights.runtime.supervisor import OrchestratorError, load_pipeline, validate_orchestrator
 from insights.runtime.stores import (
     FanOutAuditSink,
     InMemoryAuditSink,
@@ -71,7 +73,7 @@ API_DESCRIPTION = (
 @dataclass(frozen=True)
 class ServedApp:
     profile: AppProfile
-    agent: AgentDef
+    agent: AgentDef | OrchestratorDef
 
 
 class ServerState:
@@ -144,15 +146,19 @@ class ServerState:
                     f"{profile_path}: profile id {profile.id!r} must match its folder"
                 )
             try:
-                agent = load_agent(agents_dir / f"{profile.agent.name}.yaml")
-            except AgentError as exc:
+                agent = load_pipeline(agents_dir, profile.agent.name)
+            except (AgentError, OrchestratorError) as exc:
                 raise StartupError(f"app {profile.id}: {exc}") from exc
             if agent.version != profile.agent.version:
                 raise StartupError(
                     f"app {profile.id} pins agent {profile.agent.name}@{profile.agent.version} "
                     f"but the agent file is version {agent.version}"
                 )
-            problems = validate_agent(agent, self.registry)
+            problems = (
+                validate_orchestrator(agent, self.registry)
+                if isinstance(agent, OrchestratorDef)
+                else validate_agent(agent, self.registry)
+            )
             if problems:
                 raise StartupError(
                     f"app {profile.id}: agent {agent.name} is invalid: {'; '.join(problems)}"

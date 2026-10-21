@@ -1,0 +1,88 @@
+# The insights pack's supervisor: runs on every NLQ. This file is a capability map, NOT a
+# sequence — which skill fills a stage, when a stage runs, and every loop-back is decided at
+# runtime by the supervisor from the registry's capabilities (pack, stage, intents, data source
+# types, consumes/produces) and the run state (labels, confidence, errors, refine budget). Each
+# stage declares only the input its skill receives and which output labels end the run at the
+# terminal composer. Bump the version with any edit — the graph cache enforces it.
+name: insights-orchestrator
+version: 1.0.0
+pack: insights
+description: Route, slice the schema, generate SQL, execute governed, synthesize across sources, assess, hold for human review when warranted, and always compose an honest answer.
+
+stages:
+  - stage: routing
+    input:
+      query: $.input.query
+      context: $.input.context
+    terminal_labels: [out_of_scope, needs_clarification, denied]
+
+  - stage: metadata_answer
+    input:
+      query: $.input.query
+      context: $.input.context
+
+  - stage: schema_slicing
+    input:
+      query: $.input.query
+      path_preference: $.steps.routing.output.path_preference
+      context: $.input.context
+      attempt: $.refine.attempt
+      critique: $.refine.critique
+    terminal_labels: [empty]
+
+  - stage: query_generation
+    input:
+      query: $.input.query
+      sliver: $.steps.schema_slicing.output.sliver
+      context: $.input.context
+      intent: $.steps.routing.output.intent
+      concepts: $.steps.schema_slicing.output.concepts
+      critique: $.refine.critique
+      attempt: $.refine.attempt
+    terminal_labels: [unusable]
+
+  - stage: governed_execution
+    input:
+      sql: $.steps.query_generation.output.sql
+      sliver: $.steps.schema_slicing.output.sliver
+    terminal_labels: [policy_denied, access_denied, timeout]
+
+  - stage: synthesis
+    input:
+      question: $.input.query
+      execution: $.steps.governed_execution.output
+
+  - stage: assessment
+    input:
+      question: $.input.query
+      execution: $.steps.governed_execution.output
+      sliver: $.steps.schema_slicing.output.sliver
+      generation: $.steps.query_generation.output
+      unmatched: $.steps.schema_slicing.output.unmatched
+      attempt: $.refine.attempt
+
+  - stage: hitl_review
+    input:
+      question: $.input.query
+      assessment: $.steps.assessment.output
+      execution: $.steps.governed_execution.output
+      synthesis: $.steps.synthesis.output.synthesis
+      route: $.steps.routing.output
+      generation: $.steps.query_generation.output
+    terminal_labels: [rejected, timeout]
+
+  - stage: answer_composition
+    terminal: true
+    input:
+      question: $.input.query
+      steps: $.steps
+      refine: $.refine
+
+output:
+  answer: $.steps.answer_composition.output
+
+limits:
+  max_refines: 2
+  max_steps: 16
+  max_tokens: 40000
+  deadline_ms: 120000

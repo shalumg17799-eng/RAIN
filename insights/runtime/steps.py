@@ -80,6 +80,7 @@ def execute_map_item(
     reducer to judge, never a dead run; a safety breach (rows in output) still fails the run."""
     attempt = int(payload.get("attempt") or 0)
     index = int(payload.get("index") or 0)
+    branch = payload.get("branch") if isinstance(payload.get("branch"), str) else None
     item_input = payload.get("input") or {}
     try:
         loaded = scope.registry.get(step.skill, step.version)
@@ -97,6 +98,7 @@ def execute_map_item(
             skill=manifest.name,
             skill_version=manifest.version,
             attempt=index,
+            branch=branch,
         )
     )
     ctx = make_context(
@@ -139,6 +141,7 @@ def execute_map_item(
             skill=manifest.name,
             skill_version=manifest.version,
             attempt=index,
+            branch=branch,
             label=str(output.get("label")) if output.get("label") else None,
             duration_ms=duration_ms,
             tokens=tokens,
@@ -154,7 +157,7 @@ def execute_map_item(
         "tokens": tokens.model_dump(),
     }
     patch: dict[str, Any] = {
-        "fanout": {step.id: [{"attempt": attempt, "index": index,
+        "fanout": {step.id: [{"attempt": attempt, "index": index, "branch": branch,
                               "item": payload.get("item"), "output": output}]},
         "trace": [entry],
     }

@@ -17,11 +17,18 @@ from pydantic import ValidationError
 
 from insights.contracts.agent import AgentDef
 from insights.contracts.enums import AuditEventType, EventType, RunFailureReason
+from insights.contracts.orchestrator import OrchestratorDef
 from insights.contracts.events import StageEvent
 from insights.contracts.guards import RowsLeakError, assert_json_safe, assert_no_rows
 from insights.contracts.principal import Principal
 from insights.contracts.profile import AppProfile
-from insights.contracts.record import RunFailure, RunRecord, StepRecord, StepTrace
+from insights.contracts.record import (
+    DecisionRecord,
+    RunFailure,
+    RunRecord,
+    StepRecord,
+    StepTrace,
+)
 from insights.contracts.request import AskOptions
 from insights.contracts.state import RefineState
 from insights.obs.logging import log_event
@@ -80,7 +87,7 @@ class Runtime:
 
     def run(
         self,
-        agent: AgentDef,
+        agent: AgentDef | OrchestratorDef,
         *,
         input: dict[str, Any],
         principal: Principal,
@@ -139,6 +146,20 @@ class Runtime:
         if failure is None:
             failure = self._check_input(input)
 
+        supervised = isinstance(agent, OrchestratorDef)
+        scope.emitter.emit(
+            StageEvent(
+                type=EventType.GRAPH_DEFINITION,
+                run_id=run_id,
+                trace_id=scope.trace_id,
+                ts=self._now(),
+                steps=tuple(stage.stage for stage in agent.stages)
+                if supervised
+                else tuple(step.id for step in agent.steps),
+                agent_name=agent.name,
+                agent_version=agent.version,
+            )
+        )
         if failure is None:
             refine0 = RefineState(max_refines=limits.max_refines).model_dump(mode="json")
             initial = {
@@ -150,11 +171,16 @@ class Runtime:
                 "fanout": {},
                 "failure": None,
             }
-            limit = self._recursion_override or compute_recursion_limit(
-                len(agent.steps),
-                limits.max_refines,
-                map_steps=sum(1 for step in agent.steps if step.map is not None),
-            )
+            if supervised:
+                initial["decisions"] = []
+                initial["needed_runs"] = {}
+                limit = self._recursion_override or (agent.limits.max_steps * 3 + 4)
+            else:
+                limit = self._recursion_override or compute_recursion_limit(
+                    len(agent.steps),
+                    limits.max_refines,
+                    map_steps=sum(1 for step in agent.steps if step.map is not None),
+                )
             outcome = compiled.execute(initial, scope, limit)
             final = {**outcome.state, "request_id": request_id}
             failure = self._failure_from(outcome)
@@ -274,6 +300,7 @@ class Runtime:
                 failure=failure,
                 steps={k: StepRecord(**v) for k, v in final.get("steps", {}).items()},
                 trace=tuple(StepTrace(**t) for t in final.get("trace", [])),
+                decisions=tuple(DecisionRecord(**d) for d in final.get("decisions") or []),
                 refine=refine,
                 usage=usage,
                 output=output,

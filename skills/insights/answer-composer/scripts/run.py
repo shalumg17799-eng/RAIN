@@ -24,10 +24,14 @@ MAX_NARRATIVE = 600
 SENSITIVE_MIN_LENGTH = 12
 
 
-def _output(steps: dict[str, Any], step_id: str) -> dict[str, Any]:
-    step = steps.get(step_id) or {}
-    out = step.get("output") if isinstance(step, dict) else None
-    return out if isinstance(out, dict) else {}
+def _output(steps: dict[str, Any], step_id: str, *aliases: str) -> dict[str, Any]:
+    """A step's output under its supervisor stage name, or a legacy step id alias."""
+    for key in (step_id, *aliases):
+        step = steps.get(key) or {}
+        out = step.get("output") if isinstance(step, dict) else None
+        if isinstance(out, dict):
+            return out
+    return {}
 
 
 def _hints(ctx: dict[str, Any]) -> tuple[str, ...]:
@@ -139,11 +143,14 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(question, str) or not isinstance(steps, dict) or not isinstance(refine, dict):
         raise ValueError("question must be text; steps and refine must be the engine's containers")
 
-    route = _output(steps, "route")
-    sliver_out = _output(steps, "sliver")
-    generation = _output(steps, "generate")
-    execution = _output(steps, "execute")
-    assessment = _output(steps, "assess")
+    route = _output(steps, "routing", "route")
+    sliver_out = _output(steps, "schema_slicing", "sliver")
+    generation = _output(steps, "query_generation", "generate")
+    execution = _output(steps, "governed_execution", "execute")
+    assessment = _output(steps, "assessment", "assess")
+    synthesis = _output(steps, "synthesis").get("synthesis") or {}
+    hitl = _output(steps, "hitl_review")
+    hitl_label = hitl.get("label") if isinstance(hitl.get("label"), str) else None
     path_used = sliver_out.get("path_used")
     refine_info = RefineInfo(
         attempts=int(refine.get("attempt") or 0),
@@ -256,6 +263,25 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
             reason=reason("query_error", "The query could not be run.", with_hints=False),
         )
 
+    # ---- the human reviewer's verdict (never bypassed once a hold was taken) ----------------
+    if hitl_label == "rejected":
+        return record(
+            Status.ABSTAINED,
+            reason=reason(
+                "hitl_rejected", "A reviewer rejected this answer.", with_hints=False
+            ),
+        )
+    if hitl_label == "timeout":
+        return record(
+            Status.ABSTAINED,
+            reason=reason(
+                "hitl_timeout",
+                "This answer could not be verified by a reviewer in time.",
+                with_hints=False,
+            ),
+        )
+    human_approved = hitl_label in ("approved", "edited")
+
     # ---- assessed results --------------------------------------------------------------------
     if status != "ok" or not assessment:
         return record(
@@ -268,9 +294,13 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
         for k, v in (assessment.get("signals") or {}).items()
         if isinstance(v, str | int | float | bool) or v is None
     }
+    if hitl_label:
+        signals["hitl"] = hitl_label
+    if synthesis.get("partial"):
+        signals["partial_sources"] = len(synthesis.get("failed") or [])
     confidence = Confidence(score=score, calibrated=False, signals=signals)
 
-    if assessment.get("label") == "escalate":
+    if assessment.get("label") == "escalate" and not human_approved:
         return record(
             Status.ABSTAINED,
             confidence=confidence,
@@ -279,7 +309,7 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
                 "No confident answer was found after the allowed attempts.",
             ),
         )
-    if score < app.confidence_threshold:
+    if score < app.confidence_threshold and not human_approved:
         return record(
             Status.ABSTAINED,
             confidence=confidence,
@@ -303,6 +333,14 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
         tables=tables if visible else (),
     )
     assumptions = tuple(str(a) for a in generation.get("assumptions") or [])
+    if synthesis.get("partial"):
+        failed = ", ".join(str(f.get("source")) for f in synthesis.get("failed") or [])
+        assumptions = (*assumptions, f"Partial answer: source(s) {failed} did not respond.")
+    narrative = (
+        str(hitl.get("hitl_review", {}).get("edited_narrative"))
+        if hitl_label == "edited" and (hitl.get("hitl_review") or {}).get("edited_narrative")
+        else _narrative(ctx, question, columns, ref, row_count)
+    )
     return record(
         Status.ANSWERED,
         columns=tuple(columns),
@@ -313,6 +351,6 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
         confidence=confidence,
         assumptions=assumptions,
         provenance=provenance,
-        narrative=_narrative(ctx, question, columns, ref, row_count),
+        narrative=narrative,
         reason=_no_data_in_period(generation, sliver, tables) if row_count == 0 else None,
     )

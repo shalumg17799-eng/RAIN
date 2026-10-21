@@ -33,7 +33,9 @@ from insights.eval.golden import GoldenCase, GoldenSet
 from insights.eval.metrics import CaseOutcome, summarize
 from insights.gateway.config import GatewayConfig, build_gateway
 from insights.gateway.gateway import LLMGateway
-from insights.runtime.agent import load_agent, validate_agent
+from insights.contracts.orchestrator import OrchestratorDef
+from insights.runtime.agent import validate_agent
+from insights.runtime.supervisor import load_pipeline, validate_orchestrator
 from insights.runtime.engine import Runtime
 from insights.runtime.stores import (
     InMemoryAuditSink,
@@ -73,8 +75,12 @@ class Harness:
         self.registry = SkillRegistry.scan(repo / "skills")
         if self.registry.errors:
             raise EvalError(f"skills failed to load: {[e.error for e in self.registry.errors]}")
-        self.agent = load_agent(repo / "agents" / f"{app.agent.name}.yaml")
-        problems = validate_agent(self.agent, self.registry)
+        self.agent = load_pipeline(repo / "agents", app.agent.name)
+        problems = (
+            validate_orchestrator(self.agent, self.registry)
+            if isinstance(self.agent, OrchestratorDef)
+            else validate_agent(self.agent, self.registry)
+        )
         if problems:
             raise EvalError(f"agent invalid: {problems}")
         # Default: provider "none" (no model). No fake, no replay reachable from the runner.

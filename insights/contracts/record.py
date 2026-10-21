@@ -40,6 +40,18 @@ class StepRecord(Contract):
     runs: int = Field(ge=1)
 
 
+class DecisionRecord(Contract):
+    """One supervisor decision: which agent was picked for which stage, and why (a closed code)."""
+
+    seq: int = Field(ge=1)
+    action: Literal["run", "fanout", "end"]
+    stage: Identifier | None = None
+    skill: SkillName | None = None
+    reason: Identifier
+    considered: tuple[SkillName, ...] = ()
+    detail: dict[str, Any] = Field(default_factory=dict)
+
+
 class RunRecord(Contract):
     run_id: str
     request_id: str | None = None
@@ -56,6 +68,8 @@ class RunRecord(Contract):
     failure: RunFailure | None = None
     steps: dict[str, StepRecord] = Field(default_factory=dict)
     trace: tuple[StepTrace, ...] = ()
+    decisions: tuple[DecisionRecord, ...] = ()
+    """Supervisor runs only: every agent-selection decision, in order."""
     refine: RefineState = RefineState()
     usage: TokenUsage = TokenUsage()
     output: dict[str, Any] | None = None
