@@ -1,6 +1,9 @@
 ﻿# Agent spec for the scenario-designer skill agent (PRD design stage 4b).
 name: scenario-designer
 version: 0.2.0
+pack: data
+kind: agentic
+stage: scenario_design
 purpose: design
 capabilities:
   pipeline: prd_design

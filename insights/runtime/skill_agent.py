@@ -24,10 +24,11 @@ from typing import Any, Literal
 
 import jsonschema
 import yaml
-from pydantic import Field, ValidationError
+from pydantic import Field, ValidationError, model_validator
 
 from insights.contracts.common import Contract, Identifier, SemVer, SkillName
 from insights.contracts.enums import EventType, Purpose
+from insights.contracts.skill import PackName, SkillKind
 from insights.contracts.events import StageEvent
 from insights.contracts.gateway import Message
 from insights.gateway.base import (
@@ -76,25 +77,34 @@ class SkillCapabilities(Contract):
 
 
 class SkillAgentSpec(Contract):
-    """agents/<pack>/skills/<name>.yaml: everything configurable about one skill agent."""
+    """agents/<pack>/skills/<name>.yaml: everything configurable about one skill agent.
+
+    Every skill has one, whatever its kind. An `agentic` spec configures a full SkillAgent loop,
+    so its loop fields are required. A `guarded` spec may configure a bounded sub-agent (the
+    schema sliver's Cypher proposer) or carry only selection metadata around a deterministic
+    core. A `deterministic` spec carries selection metadata alone and must not name a purpose,
+    prompt or tools — the absence is enforced, not assumed."""
 
     name: SkillName
     version: SemVer
-    purpose: Purpose
-    prompt: str
+    pack: PackName | None = None
+    kind: SkillKind = "agentic"
+    stage: Identifier | None = None
+    purpose: Purpose | None = None
+    prompt: str | None = None
     """Repo-relative path to the SKILL.md whose body is the system prompt."""
-    instruction: str
+    instruction: str = ""
     """The stage instruction appended to the prompt (what to produce, field semantics)."""
-    output_key: Identifier
+    output_key: Identifier | None = None
     """The field the finished artifact is returned under (for example `requirements_ir`)."""
-    output_schema: str
+    output_schema: str | None = None
     """A schema name the skill's factory resolves to a JSON Schema."""
-    max_iterations: int = Field(ge=1, le=10)
+    max_iterations: int = Field(default=1, ge=1, le=10)
     max_repairs: int = Field(default=2, ge=0, le=5)
     confidence_threshold: float = Field(default=0.6, ge=0.0, le=1.0)
-    token_budget: int = Field(ge=1000)
+    token_budget: int = Field(default=0, ge=0)
     """Prompt + completion tokens this one agent run may spend before it escalates."""
-    timeout_ms: int = Field(ge=1000, le=3_600_000)
+    timeout_ms: int = Field(default=30_000, ge=1000, le=3_600_000)
     tools: tuple[Identifier, ...] = ()
     escalations: tuple[Identifier, ...] = ESCALATION_REASONS
     """The reason codes this agent may escalate with. Documentation for the orchestrator."""
@@ -105,6 +115,40 @@ class SkillAgentSpec(Contract):
     """When true, a finish below the confidence threshold returns label `refine_self` with the
     reason as critique, so a graph can loop the skill bounded by max_refines; when false it
     escalates immediately."""
+
+    @model_validator(mode="after")
+    def _fields_match_kind(self) -> "SkillAgentSpec":
+        loop_fields = {
+            "purpose": self.purpose,
+            "prompt": self.prompt,
+            "output_key": self.output_key,
+            "output_schema": self.output_schema,
+        }
+        if self.kind == "deterministic":
+            named = [k for k, v in loop_fields.items() if v is not None]
+            if named or self.tools or self.token_budget:
+                extras = named + (["tools"] if self.tools else []) + (
+                    ["token_budget"] if self.token_budget else []
+                )
+                raise ValueError(
+                    f"a deterministic spec uses no model: remove {', '.join(extras)}"
+                )
+            return self
+        missing = [k for k, v in loop_fields.items() if v is None]
+        if self.kind == "agentic" and missing:
+            raise ValueError(f"an agentic spec needs: {', '.join(missing)}")
+        if not missing and self.token_budget < 1000:
+            raise ValueError("a spec with an agent loop needs a token_budget of at least 1000")
+        if missing and len(missing) < len(loop_fields):
+            raise ValueError(
+                f"either all of purpose/prompt/output_key/output_schema or none: "
+                f"missing {', '.join(missing)}"
+            )
+        return self
+
+    @property
+    def has_agent_loop(self) -> bool:
+        return self.purpose is not None
 
 
 class SpecError(ValueError):
@@ -270,6 +314,8 @@ class SkillAgent:
         event_sink: EventSink | None = None,
         debug_sink: Callable[[str], None] | None = None,
     ) -> None:
+        if not spec.has_agent_loop:
+            raise SpecError(f"{spec.name}: a {spec.kind} spec without a loop cannot drive a SkillAgent")
         jsonschema.Draft202012Validator.check_schema(output_schema)
         self.spec = spec
         self._prompt_text = prompt_text

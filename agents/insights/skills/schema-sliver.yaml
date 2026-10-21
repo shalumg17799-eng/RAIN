@@ -4,6 +4,9 @@
 # and refine once before the deterministic fallback takes over.
 name: schema-sliver
 version: 0.2.0
+pack: insights
+kind: guarded
+stage: schema_slicing
 purpose: cypher
 capabilities:
   pipeline: nlq

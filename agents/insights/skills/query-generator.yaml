@@ -3,6 +3,9 @@
 # this spec configures the bounded generate-validate-repair loop that replaced the hand-rolled one.
 name: query-generator
 version: 0.2.0
+pack: insights
+kind: agentic
+stage: query_generation
 purpose: sql
 capabilities:
   pipeline: nlq

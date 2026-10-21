@@ -1,6 +1,9 @@
 ﻿# Agent spec for the upper-ontology-curator skill agent (PRD design stage 5).
 name: upper-ontology-curator
 version: 0.2.0
+pack: data
+kind: agentic
+stage: ontology_curation
 purpose: design
 capabilities:
   pipeline: prd_design

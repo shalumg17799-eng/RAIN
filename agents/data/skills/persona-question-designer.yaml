@@ -1,6 +1,9 @@
 ﻿# Agent spec for the persona-question-designer skill agent (PRD design stage 2).
 name: persona-question-designer
 version: 0.2.0
+pack: data
+kind: agentic
+stage: question_design
 purpose: design
 capabilities:
   pipeline: prd_design

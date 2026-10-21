@@ -1,0 +1,21 @@
+# Agent spec for the answer-composer. Guarded: the response contract, confidence computation and
+# masking are deterministic and cannot be bypassed; the model writes only the short narrative
+# (purpose `narrate`) over already-masked, already-aggregated material, and a gateway failure
+# degrades to no narrative, never to no answer.
+name: answer-composer
+version: 1.0.0
+pack: insights
+kind: guarded
+stage: answer_composition
+purpose: narrate
+prompt: skills/insights/answer-composer/SKILL.md
+output_key: answer
+output_schema: answer-record
+token_budget: 3000
+timeout_ms: 20000
+capabilities:
+  pipeline: nlq
+  stage: answer_composition
+  intents: []
+  data_sources: []
+  artifacts: [answer]

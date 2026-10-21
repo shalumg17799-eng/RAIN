@@ -4,6 +4,9 @@
 # count -- NEVER row values; it has no tools that could return any.
 name: result-assessor
 version: 0.2.0
+pack: insights
+kind: agentic
+stage: assessment
 purpose: judge
 capabilities:
   pipeline: nlq

@@ -1,0 +1,15 @@
+# Agent spec for the metadata-answerer. Guarded: answers "what data do I have" questions from the
+# entitlement-filtered catalog and glossary alone — deterministic lookups, no SQL, no rows, and
+# no model. The entitlement filter runs before any listing, so the answer can never name a table
+# the caller may not see.
+name: metadata-answerer
+version: 1.0.0
+pack: insights
+kind: guarded
+stage: metadata_answer
+capabilities:
+  pipeline: nlq
+  stage: metadata_answer
+  intents: [metadata_question]
+  data_sources: [catalog, knowledge_graph]
+  artifacts: [metadata_answer]

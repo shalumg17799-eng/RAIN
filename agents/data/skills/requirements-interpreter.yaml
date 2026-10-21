@@ -2,6 +2,9 @@
 # The prompt stays in SKILL.md; this file holds everything configurable about the loop.
 name: requirements-interpreter
 version: 0.2.0
+pack: data
+kind: agentic
+stage: requirements_interpretation
 purpose: design
 capabilities:
   pipeline: prd_design

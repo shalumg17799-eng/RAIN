@@ -1,6 +1,9 @@
 ﻿# Agent spec for the entity-model-designer skill agent (PRD design stage 3).
 name: entity-model-designer
 version: 0.2.0
+pack: data
+kind: agentic
+stage: entity_modeling
 purpose: design
 capabilities:
   pipeline: prd_design
