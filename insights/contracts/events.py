@@ -65,6 +65,15 @@ class StageEvent(Contract):
     """GRAPH_DEFINITION only: the agent's step ids in order."""
     agent_name: SkillName | None = None
     agent_version: SemVer | None = None
+    reason: Identifier | None = None
+    """SUPERVISOR_DECISION: why this agent was picked. HITL_WAITING: the hold trigger.
+    Always a code from a closed set, never free text."""
+    considered: tuple[SkillName, ...] | None = None
+    """SUPERVISOR_DECISION only: the eligible skills the supervisor chose among."""
+    stage: Identifier | None = None
+    """SUPERVISOR_DECISION only: the pipeline stage being filled."""
+    branch: Identifier | None = None
+    """A fan-out branch identity (persona or data source), so a UI can show parallel branches."""
     demo: bool | None = None
     """True on replayed demo events, so a viewer can never mistake them for a live run."""
 
@@ -85,6 +94,9 @@ class StageEvent(Contract):
             EventType.AGENT_ITERATION: ("step_id", "skill", "iteration"),
             EventType.TOOL_CALL: ("step_id", "skill", "tool", "status"),
             EventType.GRAPH_DEFINITION: ("steps", "agent_name", "agent_version"),
+            EventType.SUPERVISOR_DECISION: ("skill", "reason", "stage"),
+            EventType.HITL_WAITING: ("step_id", "reason"),
+            EventType.HITL_DECIDED: ("step_id", "label"),
         }
         missing = [name for name in needs[self.type] if getattr(self, name) is None]
         if missing:

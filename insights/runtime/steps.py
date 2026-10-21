@@ -113,6 +113,7 @@ def execute_map_item(
         usage=scope.meter,
         deadline=scope.deadline,
         services=scope.services,
+        events=scope.emitter,
     )
     tokens_before = scope.meter.total()
     started = scope.clock()
@@ -214,6 +215,7 @@ def execute_step(step: Step, state: dict[str, Any], scope: RunScope) -> dict[str
         usage=scope.meter,
         deadline=scope.deadline,
         services=scope.services,
+        events=scope.emitter,
     )
     tokens_before = scope.meter.total()
     started = scope.clock()

@@ -1,0 +1,21 @@
+# Agent spec for the synthesizer. Guarded: the per-source merge and failure accounting are a
+# deterministic core that cannot be bypassed; the model may add one short cross-source note
+# (purpose `narrate`) over counts and shapes only — never rows — and a gateway failure just
+# drops the note. A failed source yields a `partial` synthesis, never a dead run.
+name: synthesizer
+version: 1.0.0
+pack: insights
+kind: guarded
+stage: synthesis
+purpose: narrate
+prompt: skills/insights/synthesizer/SKILL.md
+output_key: synthesis
+output_schema: synthesis-note
+token_budget: 1500
+timeout_ms: 15000
+capabilities:
+  pipeline: nlq
+  stage: synthesis
+  intents: [data_query]
+  data_sources: []
+  artifacts: [synthesis]

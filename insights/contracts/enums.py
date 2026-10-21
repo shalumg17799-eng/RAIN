@@ -125,6 +125,13 @@ class EventType(StrEnum):
     TOOL_CALL = "tool_call"
     GRAPH_DEFINITION = "graph_definition"
     """Emitted once at run start: the agent's step ids in order, so a UI renders the real graph."""
+    SUPERVISOR_DECISION = "supervisor_decision"
+    """The orchestrator chose the next agent: which skill, the typed reason, who was considered."""
+    HITL_WAITING = "hitl_waiting"
+    """The run is paused for a human decision (low confidence, governance flag or sensitive
+    intent) and will time out to an honest "could not verify" answer."""
+    HITL_DECIDED = "hitl_decided"
+    """A human (or the timeout) resolved the pause; the decision travels in `label`."""
 
 
 class AuditEventType(StrEnum):
@@ -132,6 +139,7 @@ class AuditEventType(StrEnum):
     STEP_FINISHED = "step_finished"
     POLICY_DECISION = "policy_decision"
     EXECUTION = "execution"
+    HITL_DECISION = "hitl_decision"
     RUN_FINISHED = "run_finished"
 
 

@@ -93,6 +93,8 @@ class Services:
     catalogs: Any = None
     kag: Any = None
     data: Any = None
+    hitl: Any = None
+    """The human-in-the-loop decision store (insights.runtime.hitl.HitlStore)."""
 
     def need(self, name: str) -> Any:
         value = getattr(self, name)

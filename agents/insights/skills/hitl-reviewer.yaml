@@ -1,0 +1,18 @@
+# Agent spec for the hitl-reviewer. Guarded: the hold rules (forced, sensitive intent,
+# governance flag, low confidence) are deterministic and cannot be bypassed; no model is used.
+# The wait is bounded by timeout_ms AND the run deadline; no decision resolves as `timeout`
+# and the composer answers "could not be verified". Every resolution is audited.
+name: hitl-reviewer
+version: 1.0.0
+pack: insights
+kind: guarded
+stage: hitl_review
+confidence_threshold: 0.6
+timeout_ms: 60000
+capabilities:
+  pipeline: nlq
+  stage: hitl_review
+  intents: [data_query]
+  data_sources: []
+  artifacts: [hitl_review]
+escalations: [timeout, rejected]

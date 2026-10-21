@@ -34,6 +34,9 @@ class SkillContext(TypedDict):
     usage: UsageMeter
     deadline: Deadline
     services: Services
+    events: object
+    """The run's EventEmitter (or None): first-class typed StageEvents, for skills whose state
+    the UI must show live (the HITL waiting/decided pair). Progress notes stay on `emit`."""
 
 
 def make_context(
@@ -51,6 +54,7 @@ def make_context(
     usage: UsageMeter,
     deadline: Deadline,
     services: Services | None = None,
+    events: object | None = None,
 ) -> SkillContext:
     if not isinstance(principal, Principal):
         raise TypeError("ctx principal must be a Principal")
@@ -70,4 +74,5 @@ def make_context(
         usage=usage,
         deadline=deadline,
         services=services or Services(),
+        events=events,
     )
