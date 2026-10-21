@@ -22,6 +22,7 @@ tools:
 - read_csv_headers
 - read_catalog_snapshot
 - run_schema_audit
+- preview_data_map
 - check_question_answerability
 instruction: |
   Design the entity model for the Requirements IR and question registry in the first user message.

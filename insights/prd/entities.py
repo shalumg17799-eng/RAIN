@@ -51,7 +51,7 @@ def build_entity_tools(
     catalog_schema: dict[str, list],
     registry: dict[str, Any],
 ) -> ToolRegistry:
-    from insights.prd.pipeline import compare_schema
+    from insights.prd.datamap import build_lower_ontology, compare_schema
 
     def read_headers(schema: dict[str, list], args: dict[str, Any]) -> Any:
         table = args.get("table")
@@ -64,6 +64,14 @@ def build_entity_tools(
 
     def audit(args: dict[str, Any]) -> Any:
         return compare_schema(args["draft"], source_schema, catalog_schema)
+
+    def preview(args: dict[str, Any]) -> Any:
+        lower = build_lower_ontology(args["draft"])
+        return {
+            "nodes": len(lower["nodes"]),
+            "edges": len(lower["edges"]),
+            "entities": [n["name"] for n in lower["nodes"] if n.get("kind") == "Entity"][:40],
+        }
 
     def answerability(args: dict[str, Any]) -> Any:
         draft = args["draft"]
@@ -126,6 +134,19 @@ def build_entity_tools(
                 },
                 fn=audit,
                 max_result_chars=6000,
+            ),
+            Tool(
+                name="preview_data_map",
+                description="Build the lower ontology (the data map) from a draft model and "
+                "report its node/edge counts and entity names. Deterministic preview of stage 4.",
+                input_schema={
+                    "type": "object",
+                    "required": ["draft"],
+                    "properties": {"draft": {"type": "object"}},
+                    "additionalProperties": False,
+                },
+                fn=preview,
+                max_result_chars=3000,
             ),
             Tool(
                 name="check_question_answerability",
