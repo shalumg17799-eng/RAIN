@@ -230,6 +230,21 @@ export default function PrdStudio() {
           </div>
         )}
 
+        {/* the click must visibly do something before the first typed event arrives */}
+        {running && steps.length === 0 && !error && (
+          <div className="mt-6 rounded-2xl border border-[#003087]/20 bg-white px-5 py-4 flex items-center gap-3">
+            <Loader2 className="w-5 h-5 animate-spin text-[#003087]" />
+            <div>
+              <p className="text-[13px] font-semibold text-gray-900">Starting the run…</p>
+              <p className="text-[12px] text-gray-500">
+                Loading the document and validating the agent graph — the live step list appears
+                with the first event, usually within a few seconds. If nothing appears, the
+                backend may be running old code and needs a restart.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* ─── step tracker, from the graph definition ─── */}
         {steps.length > 0 && (
           <div className="mt-6 space-y-2.5">
