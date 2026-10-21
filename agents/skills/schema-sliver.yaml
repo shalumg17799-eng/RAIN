@@ -1,0 +1,30 @@
+# Agent spec for the schema-sliver's Cypher proposer (NLQ pipeline, KAG path only).
+# The deterministic retrieval and bypass paths are untouched; this loop lets the model propose a
+# read-only Cypher query, OBSERVE what the entitlement-filtered knowledge graph returns for it,
+# and refine once before the deterministic fallback takes over.
+name: schema-sliver
+version: 0.2.0
+purpose: cypher
+capabilities:
+  pipeline: nlq
+  stage: schema_slicing
+  intents: [retrieve_schema]
+  data_sources: [knowledge_graph, catalog]
+  artifacts: [cypher_retrieval]
+prompt: skills/schema-sliver/SKILL.md
+output_key: cypher_retrieval
+output_schema: schema-sliver-cypher
+max_iterations: 3
+max_repairs: 1
+confidence_threshold: 0.0
+token_budget: 6000
+timeout_ms: 30000
+tools:
+- try_cypher
+instruction: |
+  Propose ONE read-only Cypher query over the knowledge graph that retrieves the Entity `table`
+  values relevant to the question (e.g. RETURN DISTINCT e.table AS table). Use only MATCH,
+  OPTIONAL MATCH, WHERE, WITH, RETURN, ORDER BY and LIMIT; never write, never CALL, apoc or db.*.
+  Check your query with try_cypher: it runs against the entitlement-filtered graph and reports how
+  many tables came back (never any data values). Finish with the cypher that retrieved the most
+  relevant tables; escalate if nothing useful comes back, and the deterministic path takes over.

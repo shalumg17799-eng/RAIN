@@ -1,0 +1,28 @@
+# Agent spec for the query-generator's SkillAgent loop (NLQ pipeline).
+# The skill keeps its deterministic shell (dates, examples, prompt assembly, output contract);
+# this spec configures the bounded generate-validate-repair loop that replaced the hand-rolled one.
+name: query-generator
+version: 0.2.0
+purpose: sql
+capabilities:
+  pipeline: nlq
+  stage: query_generation
+  intents: [generate_sql]
+  data_sources: [schema_sliver, glossary, reviewed_examples]
+  artifacts: [sql_proposal]
+prompt: skills/query-generator/prompts/sql-v1.md
+output_key: sql_proposal
+output_schema: query-generator
+max_iterations: 4
+max_repairs: 2
+confidence_threshold: 0.0
+token_budget: 15000
+timeout_ms: 60000
+tools:
+- validate_sql
+instruction: |
+  Write ONE query that answers the question, grounded ONLY in the schema sliver shown in the task.
+  The finish result is one object with sql, assumptions, tables_used. You may check a draft with
+  validate_sql first; the same validation runs automatically on finish and its problems come back
+  verbatim for repair. Never execute anything -- the governed executor is the only path to the
+  database.

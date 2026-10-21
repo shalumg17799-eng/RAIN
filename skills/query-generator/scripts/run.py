@@ -1,7 +1,10 @@
-"""query-generator: one validated SELECT from the sliver, through the gateway, never executed."""
+"""query-generator: one validated SELECT from the sliver, written by a bounded SkillAgent loop
+through the gateway, never executed. The deterministic shell (dates, reviewed examples, prompt
+assembly, AST grounding checks, the output contract) is unchanged; the model works inside the
+shared agent runtime with validate_sql as a tool and the same grounding check as the finish
+validator, so repair feedback is the exact problem list."""
 
 import hashlib
-import json
 from pathlib import Path
 from typing import Any
 
@@ -9,21 +12,16 @@ from insights.catalog.bm25 import BM25Index
 from insights.catalog.examples import ReviewedExample, columns_resolve, tables_read_by
 from insights.catalog.text import stems
 from insights.contracts.enums import Purpose
-from insights.contracts.gateway import Message
 from insights.contracts.request import AskContext
 from insights.contracts.state import Sliver
 from insights.dates import DateRange, resolve_dates, today_for
-from insights.gateway.base import (
-    GatewayError,
-    ModelUnavailableError,
-    PurposeDisabledError,
-    ResponseSchemaError,
-)
+from insights.runtime.skill_agent import SkillAgent, load_skill_agent_spec
+from insights.runtime.tools import Tool, ToolRegistry
 from insights.yamlio import load_yaml
 
 PROMPTS = Path(__file__).resolve().parents[1] / "prompts"
+SPEC_PATH = Path(__file__).resolve().parents[3] / "agents" / "skills" / "query-generator.yaml"
 PROMPT_VERSION = "sql-v1"
-MAX_REPAIRS = 2
 MAX_ATTEMPT = 5
 MAX_EXAMPLES = 3
 MAX_ASSUMPTIONS = 10
@@ -263,76 +261,75 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
     )
     prompt_hash = hashlib.sha256(f"{system_text}\n{user_text}".encode()).hexdigest()
     base.update({"prompt_hash": prompt_hash, "examples_used": len(examples)})
-    messages = [
-        Message(role="system", content=system_text),
-        Message(role="user", content=user_text),
-    ]
 
-    repairs = 0
-    problems: list[str] = []
-    previous_sql: str | None = None
-    previous_answer = ""
-    for turn in range(MAX_REPAIRS + 1):
-        try:
-            out = ctx["gateway"].complete(messages, Purpose.SQL, ctx, response_schema=SQL_SCHEMA)
-        except PurposeDisabledError:
-            return {**base, "label": "unusable", "reason": "sql_purpose_disabled", "problems": []}
-        except ModelUnavailableError:
-            # No model is configured: the composer turns this into failed / model_unavailable, an
-            # honest answer, never a replayed or invented one.
-            return {
-                **base,
-                "label": "unusable",
-                "reason": "model_unavailable",
-                "problems": [],
-                "repairs": repairs,
-            }
-        except ResponseSchemaError as exc:
-            problems = [f"the answer was not the required JSON object: {str(exc)[:120]}"]
-            previous_sql, previous_answer = None, "(an answer that was not valid JSON)"
-        except GatewayError as exc:
-            return {
-                **base,
-                "label": "unusable",
-                "reason": f"model_error:{type(exc).__name__}",
-                "problems": [],
-                "repairs": repairs,
-            }
-        else:
-            content = out.content
-            base["model"] = out.model
-            sql = " ".join(str(content["sql"]).split())
-            problems, tables_used = check_against_sliver(sql, sliver, dialect)
-            if not problems:
-                assumptions = [d.assumption for d in dates] + _sanitize_assumptions(
-                    content.get("assumptions")
-                )
-                return {
-                    **base,
-                    "label": "generated",
-                    "repairs": repairs,
-                    "sql": sql,
-                    "assumptions": assumptions,
-                    "tables_used": tables_used,
-                    "dates": [
-                        {"phrase": d.phrase, "start": d.start.isoformat(), "end": d.end.isoformat()}
-                        for d in dates
-                    ],
-                }
-            previous_sql, previous_answer = sql, json.dumps(content)
-        if turn == MAX_REPAIRS:
-            break
-        repairs += 1
-        ctx["emit"]("sql_repair", repairs)
-        messages = [
-            *messages,
-            Message(role="assistant", content=previous_answer),
-            Message(role="user", content=render_repair(query, previous_sql, problems)),
-        ]
+    def grounding_errors(draft: Any) -> list[str]:
+        sql = " ".join(str((draft or {}).get("sql") or "").split())
+        if not sql:
+            return ["sql is empty"]
+        problems, _ = check_against_sliver(sql, sliver, dialect)
+        return problems
+
+    def validate_tool(args: dict[str, Any]) -> Any:
+        sql = " ".join(str(args["sql"]).split())
+        problems, tables = check_against_sliver(sql, sliver, dialect)
+        return {"grounded": not problems, "problems": problems, "tables_used": tables}
+
+    tools = ToolRegistry((
+        Tool(
+            name="validate_sql",
+            description="Check a draft query against the schema sliver: unknown tables or "
+            "columns come back as problems. The same check judges your finish.",
+            input_schema={
+                "type": "object",
+                "required": ["sql"],
+                "properties": {"sql": {"type": "string", "minLength": 1, "maxLength": 6000}},
+                "additionalProperties": False,
+            },
+            fn=validate_tool,
+        ),
+    ))
+    agent = SkillAgent(
+        load_skill_agent_spec(SPEC_PATH),
+        prompt_text=system_text,
+        output_schema=SQL_SCHEMA,
+        render_task=lambda _: user_text,
+        tool_factory=lambda _: tools,
+        validator_factory=lambda _: (grounding_errors,),
+    )
+    out = agent.run({}, ctx)
+    base["repairs"] = out["repairs"]
+
+    if out["label"] == "ok":
+        content = out["sql_proposal"] or {}
+        sql = " ".join(str(content.get("sql") or "").split())
+        _, tables_used = check_against_sliver(sql, sliver, dialect)
+        assumptions = [d.assumption for d in dates] + _sanitize_assumptions(
+            content.get("assumptions")
+        )
+        return {
+            **base,
+            "label": "generated",
+            "sql": sql,
+            "assumptions": assumptions,
+            "tables_used": tables_used,
+            "dates": [
+                {"phrase": d.phrase, "start": d.start.isoformat(), "end": d.end.isoformat()}
+                for d in dates
+            ],
+        }
+
+    reason = str(out.get("reason") or "")
+    if "PurposeDisabledError" in reason:
+        return {**base, "label": "unusable", "reason": "sql_purpose_disabled", "problems": []}
+    if reason.startswith("model_unavailable"):
+        # No model is configured: the composer turns this into failed / model_unavailable, an
+        # honest answer, never a replayed or invented one.
+        return {**base, "label": "unusable", "reason": "model_unavailable", "problems": []}
+    if reason.startswith("gateway_error"):
+        return {**base, "label": "unusable", "reason": f"model_error:{reason[15:60]}", "problems": []}
     return {
         **base,
         "label": "unusable",
         "reason": "validation_failed_after_repairs",
-        "problems": problems[:5],
-        "repairs": repairs,
+        "problems": [reason[:200]] if reason else [],
     }
