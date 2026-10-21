@@ -202,10 +202,13 @@ def reduce_upper_ontology(input: dict[str, Any], ctx: dict[str, Any]) -> dict[st
 def finalize_run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
     steps = input.get("steps") or {}
 
-    def output_of(step_id: str) -> dict[str, Any]:
-        record = steps.get(step_id) or {}
-        out = record.get("output") if isinstance(record, dict) else None
-        return out if isinstance(out, dict) else {}
+    def output_of(step_id: str, *aliases: str) -> dict[str, Any]:
+        for key in (step_id, *aliases):
+            record = steps.get(key) or {}
+            out = record.get("output") if isinstance(record, dict) else None
+            if isinstance(out, dict):
+                return out
+        return {}
 
     stage_summary = {}
     for step_id, record in steps.items():
@@ -213,13 +216,13 @@ def finalize_run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
             continue
         output = record.get("output") if isinstance(record.get("output"), dict) else {}
         stage_summary[step_id] = {
-            "label": record.get("label"),
+            "label": record.get("label") or output.get("label"),
             "runs": record.get("runs"),
             "confidence": output.get("confidence"),
             "reason": output.get("reason"),
         }
-    datamap = output_of("datamap")
-    reduce_out = output_of("ontology_reduce")
+    datamap = output_of("data_mapping", "datamap")
+    reduce_out = output_of("ontology_reduction", "ontology_reduce")
     completed = bool(reduce_out.get("upper_ontology"))
     return {
         "run_report": {

@@ -1,0 +1,87 @@
+# The data pack's supervisor: runs when PRD Studio is invoked. A capability map, NOT a sequence —
+# which skill fills a stage and every audit loop-back is decided at runtime by the supervisor from
+# the registry (pack, stage, consumes/produces) and the run state (labels, refine budget). The
+# audit loop-backs: build-data-map's near-miss names re-run the entity designer, the ontology
+# reducer's gaps re-run the per-persona curation fan-out, each bounded by max_refines; exhaustion
+# goes straight to the finalizer, which reports honestly. Bump the version with any edit.
+name: data-orchestrator
+version: 1.0.0
+pack: data
+on_refine_exhausted: terminal
+description: Interpret the PRD, design per-persona questions, model entities, build the data map, design scenarios, curate the upper ontology per persona, reduce, and always finalize a report.
+
+stages:
+  - stage: requirements_interpretation
+    input:
+      document: $.input.document
+      document_name: $.input.document_name
+      source_sha256: $.input.source_sha256
+      critique: $.refine.critique
+
+  - stage: question_design
+    fanout:
+      over: $.steps.requirements_interpretation.output.requirements_ir.personas
+      item_key: persona
+      branch_key: id
+    input:
+      requirements_ir: $.steps.requirements_interpretation.output.requirements_ir
+      critique: $.refine.critique
+
+  - stage: question_reduction
+    input:
+      requirements_ir: $.steps.requirements_interpretation.output.requirements_ir
+      results: $.fanout.question_design
+
+  - stage: entity_modeling
+    input:
+      requirements_ir: $.steps.requirements_interpretation.output.requirements_ir
+      question_registry: $.steps.question_reduction.output.question_registry
+      source_schema: $.input.source_schema
+      catalog_schema: $.input.catalog_schema
+      critique: $.refine.critique
+
+  - stage: data_mapping
+    input:
+      entity_model: $.steps.entity_modeling.output.entity_model
+      source_schema: $.input.source_schema
+      catalog_schema: $.input.catalog_schema
+
+  - stage: scenario_design
+    input:
+      requirements_ir: $.steps.requirements_interpretation.output.requirements_ir
+      entity_model: $.steps.entity_modeling.output.entity_model
+      db_state: $.input.db_state
+      critique: $.refine.critique
+
+  - stage: ontology_curation
+    fanout:
+      over: $.steps.requirements_interpretation.output.requirements_ir.personas
+      item_key: persona
+      branch_key: id
+    input:
+      requirements_ir: $.steps.requirements_interpretation.output.requirements_ir
+      question_registry: $.steps.question_reduction.output.question_registry
+      lower_ontology: $.steps.data_mapping.output.lower_ontology
+      existing_upper_ontology: $.input.existing_upper_ontology
+      critique: $.refine.critique
+
+  - stage: ontology_reduction
+    input:
+      requirements_ir: $.steps.requirements_interpretation.output.requirements_ir
+      lower_ontology: $.steps.data_mapping.output.lower_ontology
+      existing_upper_ontology: $.input.existing_upper_ontology
+      results: $.fanout.ontology_curation
+
+  - stage: finalization
+    terminal: true
+    input:
+      steps: $.steps
+
+output:
+  report: $.steps.finalization.output.run_report
+
+limits:
+  max_refines: 4
+  max_steps: 40
+  max_tokens: 900000
+  deadline_ms: 7200000

@@ -1,7 +1,7 @@
-"""Thin CLI for the PRD design graph. All orchestration lives in agents/prd-agent.yaml and
-insights/prd/runner.py; every LLM call goes through the governed gateway (no provider SDK is
-imported anywhere in the PRD path). `--resume <run_id>` continues an interrupted run from its
-SQLite checkpoint under <output>/checkpoints/."""
+"""Thin CLI for the PRD design pipeline. All orchestration lives in the data pack's supervisor
+(agents/data/orchestrator.yaml) and insights/prd/runner.py; every LLM call goes through the
+governed gateway (no provider SDK is imported anywhere in the PRD path). `--resume <run_id>`
+continues an interrupted run from its SQLite checkpoint under <output>/checkpoints/."""
 
 from __future__ import annotations
 

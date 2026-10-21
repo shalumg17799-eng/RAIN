@@ -1,4 +1,4 @@
-"""End-to-end tests of the PRD graph (agents/prd-agent.yaml) through PrdRunner.
+"""End-to-end tests of the PRD pipeline (agents/data/orchestrator.yaml) through PrdRunner.
 
 Only the model is faked: the real registry, real skills, real validators, real reducers, the real
 LangGraph compilation with Send fan-out, and the real SQLite checkpointer all run. The fake
@@ -231,8 +231,14 @@ class PrdGraphRunTests(unittest.TestCase):
                 for line in (out / "events.jsonl").read_text(encoding="utf-8").splitlines()
             ]
             self.assertEqual(events[0]["type"], "graph_definition")
-            self.assertEqual(events[0]["agent_name"], "prd-agent")
-            self.assertIn("questions_map", events[0]["steps"])
+            self.assertEqual(events[0]["agent_name"], "data-orchestrator")
+            self.assertIn("question_design", events[0]["steps"])
+            picked = [e for e in events if e["type"] == "supervisor_decision"]
+            self.assertTrue(picked, "no supervisor decisions were emitted")
+            self.assertTrue(all(e["reason"] and e["skill"] for e in picked))
+            branches = {e.get("branch") for e in events
+                        if e["type"] == "stage_finished" and e["step_id"] == "question_design"}
+            self.assertEqual(branches, {"maria", "james"})
             self.assertEqual(events[-1]["type"], "run_finished")
             self.assertEqual(events[-1]["outcome"], "completed")
             # a finished run's checkpoint holds PRD content and must be gone
@@ -249,7 +255,7 @@ class PrdGraphRunTests(unittest.TestCase):
             self.assertIn("nearly matches source table", gateway.entity_tasks[1])
             model = yaml.safe_load((out / "entity-model.yaml").read_text(encoding="utf-8"))
             self.assertEqual(model["tables"][0]["name"], "pregnancies")  # the fixed model won
-            self.assertEqual(report["stages"]["entities"]["runs"], 2)
+            self.assertEqual(report["stages"]["entity_modeling"]["runs"], 2)
 
     def test_killed_run_resumes_from_its_checkpoint(self):
         with tempfile.TemporaryDirectory() as temp:

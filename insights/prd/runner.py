@@ -1,9 +1,10 @@
-"""Run the PRD design graph (agents/prd-agent.yaml) end to end.
+"""Run the PRD design pipeline (agents/data/orchestrator.yaml) end to end.
 
 The runner owns everything outside the graph: governed gateway access under the `design` purpose
 with the least-privilege `svc-prd-design` principal and no response cache, document and schema
 loading, the SQLite checkpointer, typed StageEvents as JSON lines, artifact file writing, and the
-run budget. All step logic lives in the skills; all routing lives in prd-agent.yaml.
+run budget. All step logic lives in the skills; WHICH skill runs each stage and every audit
+loop-back is decided at runtime by the data pack's supervisor (agents/data/orchestrator.yaml).
 
 Checkpointing and retention: every superstep's full graph state — including the PRD document and
 every draft artifact — is persisted to `<output>/checkpoints/<run_id>.sqlite` so an interrupted
@@ -31,10 +32,10 @@ from insights.contracts.events import StageEvent
 from insights.contracts.principal import Principal
 from insights.contracts.profile import load_app_profile
 from insights.gateway.config import GatewayConfig, build_gateway
-from insights.runtime.agent import assert_valid_agent, load_agent
 from insights.runtime.events import EventEmitter, EventSink
-from insights.runtime.graph import build_graph, sqlite_checkpointer
-from insights.runtime.limits import EffectiveLimits, compute_recursion_limit
+from insights.runtime.graph import build_supervisor_graph, sqlite_checkpointer
+from insights.runtime.limits import EffectiveLimits
+from insights.runtime.supervisor import assert_valid_orchestrator, load_orchestrator
 from insights.runtime.scope import RunScope
 from insights.runtime.stores import (
     InMemoryAuditSink,
@@ -188,8 +189,10 @@ class PrdRunner:
         self.root = root
         self.design = design or DesignRuntime(environ, app_path=app_path)
         self.registry = registry or SkillRegistry.scan(root / "skills")
-        self.agent = load_agent(agent_path or root / "agents" / "prd-agent.yaml")
-        assert_valid_agent(self.agent, self.registry)
+        self.agent = load_orchestrator(
+            agent_path or root / "agents" / "data" / "orchestrator.yaml"
+        )
+        assert_valid_orchestrator(self.agent, self.registry)
 
     def run(
         self,
@@ -251,7 +254,7 @@ class PrdRunner:
                 run_id=run_id,
                 trace_id=trace_id,
                 ts=now(),
-                steps=tuple(step.id for step in self.agent.steps),
+                steps=tuple(stage.stage for stage in self.agent.stages),
                 agent_name=self.agent.name,
                 agent_version=self.agent.version,
             )
@@ -281,7 +284,7 @@ class PrdRunner:
             services=Services(),
         )
         checkpointer = sqlite_checkpointer(checkpoint_path)
-        compiled = build_graph(self.agent, checkpointer=checkpointer)
+        compiled = build_supervisor_graph(self.agent, self.registry, checkpointer=checkpointer)
         initial = None if resume else {
             "input": run_input,
             "steps": {},
@@ -297,12 +300,10 @@ class PrdRunner:
             "trace": [],
             "fanout": {},
             "failure": None,
+            "decisions": [],
+            "needed_runs": {},
         }
-        limit = compute_recursion_limit(
-            len(self.agent.steps),
-            self.agent.limits.max_refines,
-            map_steps=sum(1 for step in self.agent.steps if step.map is not None),
-        )
+        limit = self.agent.limits.max_steps * 3 + 4
         started = time.monotonic()
         try:
             outcome = compiled.execute(initial, scope, limit, resume=resume)
@@ -358,33 +359,33 @@ class PrdRunner:
             out = record.get("output") if isinstance(record, dict) else None
             return out if isinstance(out, dict) else {}
 
-        requirements = output_of("requirements").get("requirements_ir")
+        requirements = output_of("requirements_interpretation").get("requirements_ir")
         if isinstance(requirements, dict):
             _write_yaml(output_dir / "requirements-ir.yaml", requirements)
-        registry = output_of("questions_reduce").get("question_registry")
+        registry = output_of("question_reduction").get("question_registry")
         if isinstance(registry, dict):
             _write_yaml(output_dir / "question-registry.yaml", registry)
-        entity_model = output_of("entities").get("entity_model")
+        entity_model = output_of("entity_modeling").get("entity_model")
         if isinstance(entity_model, dict):
             _write_yaml(output_dir / "entity-model.yaml", entity_model)
-        datamap = output_of("datamap")
+        datamap = output_of("data_mapping")
         if isinstance(datamap.get("lower_ontology"), dict):
             _write_json(output_dir / "lower-ontology.json", datamap["lower_ontology"])
         if isinstance(datamap.get("schema_audit"), dict):
             _write_json(output_dir / "schema-audit.json", datamap["schema_audit"])
-        scenario = output_of("scenario").get("scenario")
+        scenario = output_of("scenario_design").get("scenario")
         if isinstance(scenario, dict):
             _write_yaml(
                 output_dir / "scenario.yaml",
                 {"synthetic": True, "db_state_source": "generated_from_entity_model", **scenario},
             )
-        reduce_out = output_of("ontology_reduce")
+        reduce_out = output_of("ontology_reduction")
         if isinstance(reduce_out.get("upper_ontology"), dict):
             _write_json(output_dir / "upper-ontology.json", reduce_out["upper_ontology"])
         if isinstance(reduce_out.get("ontology_audit"), dict):
             _write_json(output_dir / "ontology-audit.json", reduce_out["ontology_audit"])
 
-        run_report = output_of("finalize").get("run_report") or {}
+        run_report = output_of("finalization").get("run_report") or {}
         completed = bool(run_report.get("completed")) and failure is None
         report = {
             "run_id": run_id,
