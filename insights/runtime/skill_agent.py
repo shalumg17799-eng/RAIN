@@ -76,7 +76,7 @@ class SkillCapabilities(Contract):
 
 
 class SkillAgentSpec(Contract):
-    """agents/skills/<name>.yaml: everything configurable about one skill agent."""
+    """agents/<pack>/skills/<name>.yaml: everything configurable about one skill agent."""
 
     name: SkillName
     version: SemVer

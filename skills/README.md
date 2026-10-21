@@ -1,28 +1,52 @@
-# Skills
+# Skills — two independent packs
 
-One folder per skill, scanned by `insights/skills_core/registry.py` at server start:
+Skills live in two packs, scanned together by `insights/skills_core/registry.py` at server start.
+The packs are independent: **nothing in one pack may import, call or reference the other**
+(enforced at registry load for dependencies and by `python -m insights.ci` for any reference),
+and there is no publish step between them.
 
-    skills/<skill-name>/
-      SKILL.md          # YAML front matter (name, version, labels, validation) + the prompt body
-      scripts/run.py    # run(input, ctx) — the skill's implementation (or a SkillAgent shim)
-      tests/            # the skill's own tests
+    skills/insights/<skill-name>/   # the Insights Server pack: runs on every NLQ
+    skills/data/<skill-name>/       # the data pack: PRD design and all other data-side work
 
-Naming: folders are kebab-case and must match the `name` in SKILL.md front matter exactly.
-Folders starting with `_` or `.` are ignored by the registry.
+Each skill is a folder of exactly four parts (no runtime edits needed to add one):
 
-Three kinds of skill live here; the registry treats them identically (every one is
-`run(input, ctx) -> dict` with a declared label set):
+    skills/<pack>/<skill-name>/
+      SKILL.md                      # front matter: name, version, pack, stage, kind,
+                                    #   capabilities (intents, data sources, consumes/produces),
+                                    #   labels, validation — plus the prompt body
+      scripts/run.py                # run(input, ctx) — a thin shim; logic in libraries or SkillAgent
+    agents/<pack>/skills/<name>.yaml  # the skill's agent spec (budgets, tools, thresholds)
 
-| Kind | Skills | LLM use |
+Naming: folders are kebab-case and must match the `name` in SKILL.md front matter exactly; a
+skill's `pack` must match its pack folder. Folders starting with `_` or `.` are ignored.
+
+## The insights pack (one agent per NLQ stage)
+
+| Skill | Stage | Kind |
 |---|---|---|
-| deterministic | governed-executor, metadata-answerer, build-data-map, question-registry-reducer, upper-ontology-reducer, prd-finalizer | none |
-| hybrid | skill-router, answer-composer | at most one bounded call |
-| agentic | requirements-interpreter, persona-question-designer, entity-model-designer, scenario-designer, upper-ontology-curator, schema-sliver (Cypher path), query-generator, result-assessor (judge) | SkillAgent bounded loop (`insights/runtime/skill_agent.py`), paired spec in `agents/skills/<name>.yaml`, typed read-only tools from `insights/runtime/tools.py` |
+| skill-router | routing | guarded |
+| metadata-answerer | metadata_answer | guarded |
+| schema-sliver | schema_slicing | guarded |
+| query-generator | query_generation | agentic |
+| governed-executor | governed_execution | guarded |
+| result-assessor | assessment | agentic |
+| answer-composer | answer_composition | guarded |
 
-Safety fixtures that never change kind: **governed-executor is the only path to the database**;
-the result-assessor's judge never sees row values; schema-sliver's tools never widen beyond the
-principal's entitlements (filtering runs inside the KAG); PRD tools are read-only; scenario SQL
-is proposal-only against a synthetic state and is never executed by the pipeline.
+## The data pack (PRD design pipeline)
 
-Adding a skill agent = SKILL.md + spec YAML + factory module + run.py shim; the runner, engine,
-graph compiler and registry are never edited (see the root README for the walkthrough).
+| Skill | Stage | Kind |
+|---|---|---|
+| requirements-interpreter | requirements_interpretation | agentic |
+| persona-question-designer | question_design | agentic |
+| question-registry-reducer | question_reduction | deterministic |
+| entity-model-designer | entity_modeling | agentic |
+| build-data-map | data_mapping | deterministic |
+| scenario-designer | scenario_design | agentic |
+| upper-ontology-curator | ontology_curation | agentic |
+| upper-ontology-reducer | ontology_reduction | deterministic |
+| prd-finalizer | finalization | deterministic |
+
+Kinds: **agentic** = a bounded plan→tool→observe SkillAgent loop with semantic validators;
+**guarded** = an agent may pick parameters and handle errors but a deterministic core cannot be
+bypassed; **deterministic** = no LLM at all. Every kind is still `run(input, ctx) -> dict` with a
+closed label set to the registry.

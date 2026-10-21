@@ -1,0 +1,39 @@
+﻿# Agent spec for the upper-ontology-curator skill agent (PRD design stage 5).
+name: upper-ontology-curator
+version: 0.2.0
+purpose: design
+capabilities:
+  pipeline: prd_design
+  stage: ontology
+  intents: [curate_upper_ontology]
+  data_sources: [requirements_ir, question_registry, lower_ontology, upper_ontology]
+  artifacts: [upper_ontology]
+prompt: skills/data/upper-ontology-curator/SKILL.md
+output_key: upper_ontology
+output_schema: upper-ontology-curator
+max_iterations: 6
+max_repairs: 2
+confidence_threshold: 0.6
+retry_on_low_confidence: true
+# the ontology is a large artifact (~25k output tokens observed) over large inputs; each finish
+# or repair turn re-emits the whole thing
+token_budget: 300000
+timeout_ms: 1800000
+tools:
+- read_lower_ontology
+- read_existing_upper_ontology
+- run_ontology_audit
+instruction: |
+  Curate the upper ontology for the Requirements IR, question registry and lower-ontology index in
+  the first user message. The finish result is one object with nodes, edges, duplicate_candidates,
+  coverage_gaps_detected. Nodes include Concept nodes with stable ids, one-sentence definitions,
+  generous synonyms and status, plus a Persona node for every persona in the IR. Edges use SERVES
+  (Persona to Concept), RELATES_TO (Concept to Concept) and MAPS_TO (Concept to Entity or
+  Attribute) with explicit from/to ids. Map only to ids present in the lower-ontology index; mark
+  weak or missing mappings for human review rather than inventing targets. When an existing upper
+  ontology is supplied you are editing it: keep every concept id and every synonym.
+
+  The compact index in your first message lists every valid Entity and Attribute id; use
+  read_lower_ontology only when you need a node's detail. Submit with finish directly -- the real
+  audit runs there automatically and its findings come back as repairs. Keep definitions to one
+  sentence; the finished ontology must fit the output budget.

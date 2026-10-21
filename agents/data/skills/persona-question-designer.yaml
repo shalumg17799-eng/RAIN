@@ -1,0 +1,36 @@
+﻿# Agent spec for the persona-question-designer skill agent (PRD design stage 2).
+name: persona-question-designer
+version: 0.2.0
+purpose: design
+capabilities:
+  pipeline: prd_design
+  stage: questions
+  intents: [design_questions]
+  data_sources: [requirements_ir]
+  artifacts: [question_registry]
+prompt: skills/data/persona-question-designer/SKILL.md
+output_key: question_registry
+output_schema: persona-question-designer
+max_iterations: 6
+max_repairs: 2
+confidence_threshold: 0.6
+retry_on_low_confidence: true
+token_budget: 120000
+timeout_ms: 1200000
+tools:
+- read_requirements_ir
+- get_persona
+- validate_question_registry
+- dedupe_questions
+instruction: |
+  Produce the tiered question registry for the Requirements IR in the first user message. The
+  finish result is one object with a `questions` array; each item carries persona_id, text, tier
+  (extracted, derived, or schema_generated), signal, and is_data_question. Preserve every
+  extracted question from the IR unchanged; add derived questions conservatively and label them
+  derived; never make inferred questions contractual.
+
+  The whole IR is already in your first message; the tools are for verifying a persona's details
+  or deduping a candidate list, not for re-reading what you have. When the registry is complete,
+  submit it with finish directly -- it is validated automatically and specific errors come back
+  for repair. Keep signals terse (at most 12 words); the finished registry must fit the output
+  budget.

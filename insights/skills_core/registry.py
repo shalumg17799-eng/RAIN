@@ -1,9 +1,12 @@
 """Skill registry: scan skills/, keep versions, enforce the contract, isolate broken skills.
 
-A skill folder is `skills/<name>/` (or `skills/<name>@<version>/` to keep an older version
-beside the current one). Each is loaded on its own: a skill that fails to parse, import or satisfy
-its dependencies is recorded in `errors` and everything else keeps working. The registry is
-immutable once built; `reload()` returns a new one.
+A skill folder is `skills/<pack>/<name>/` (or `<name>@<version>/` to keep an older version beside
+the current one). A direct child of skills/ that itself holds a SKILL.md is also accepted as a
+flat, pack-less skill, so tests can build small registries without pack folders. A skill inside a
+pack must declare that pack in its manifest, and its dependencies must stay inside the pack: the
+two packs are independent and nothing in one may reference the other. Each folder is loaded on its
+own: a skill that fails to parse, import or satisfy its dependencies is recorded in `errors` and
+everything else keeps working. The registry is immutable once built; `reload()` returns a new one.
 """
 
 import copy
@@ -30,6 +33,8 @@ class LoadedSkill:
     run: RunFn
     path: Path
     body: str
+    pack: str | None = None
+    """The pack folder the skill was loaded from (None for a flat, pack-less folder)."""
 
 
 @dataclass(frozen=True)
@@ -82,7 +87,7 @@ def _import_run(folder: Path, manifest: SkillManifest) -> RunFn:
     return run  # type: ignore[no-any-return]
 
 
-def _load_folder(folder: Path) -> tuple[SkillManifest, RunFn, str]:
+def _load_folder(folder: Path, pack: str | None) -> tuple[SkillManifest, RunFn, str]:
     try:
         manifest, body = parse_skill_md(folder / "SKILL.md")
     except ManifestError as exc:
@@ -91,6 +96,10 @@ def _load_folder(folder: Path) -> tuple[SkillManifest, RunFn, str]:
         raise _LoadFailure(
             f"folder name {folder.name!r} does not match skill {manifest.name!r}"
             f" (expected {manifest.name!r} or '{manifest.name}@{manifest.version}')"
+        )
+    if pack is not None and manifest.pack != pack:
+        raise _LoadFailure(
+            f"skill lives in pack {pack!r} but its manifest declares pack {manifest.pack!r}"
         )
     return manifest, _import_run(folder, manifest), body
 
@@ -128,18 +137,31 @@ class SkillRegistry:
     def scan(cls, skills_dir: Path) -> "SkillRegistry":
         errors: list[SkillLoadError] = []
         loaded: list[LoadedSkill] = []
-        folders = (
+        folders: list[tuple[str | None, Path]] = []
+        children = (
             sorted(p for p in skills_dir.iterdir() if p.is_dir() and p.name[0] not in "._")
             if skills_dir.is_dir()
             else []
         )
-        for folder in folders:
+        for child in children:
+            if (child / "SKILL.md").is_file():
+                folders.append((None, child))  # a flat, pack-less skill folder (tests)
+            else:
+                folders.extend(
+                    (child.name, sub)
+                    for sub in sorted(
+                        p for p in child.iterdir() if p.is_dir() and p.name[0] not in "._"
+                    )
+                )
+        for pack, folder in folders:
             try:
-                manifest, run, body = _load_folder(folder)
+                manifest, run, body = _load_folder(folder, pack)
             except _LoadFailure as exc:
                 errors.append(SkillLoadError(path=str(folder), error=str(exc)))
                 continue
-            loaded.append(LoadedSkill(manifest=manifest, run=run, path=folder, body=body))
+            loaded.append(
+                LoadedSkill(manifest=manifest, run=run, path=folder, body=body, pack=pack)
+            )
 
         # Two folders claiming the same (name, version) is ambiguous: reject both.
         counts: dict[tuple[str, str], int] = {}
@@ -168,6 +190,7 @@ class SkillRegistry:
         remaining = list(skills)
         while True:
             present = {s.manifest.name for s in remaining}
+            packs = {s.manifest.name: s.pack for s in remaining}
             graph: dict[str, set[str]] = {name: set() for name in present}
             for skill in remaining:
                 graph[skill.manifest.name] |= set(skill.manifest.dependencies) & present
@@ -175,9 +198,25 @@ class SkillRegistry:
             kept: list[LoadedSkill] = []
             for skill in remaining:
                 missing = [d for d in skill.manifest.dependencies if d not in present]
+                cross = [
+                    d
+                    for d in skill.manifest.dependencies
+                    if d in present
+                    and skill.pack is not None
+                    and packs[d] is not None
+                    and packs[d] != skill.pack
+                ]
                 if missing:
                     errors.append(
                         _error(skill, f"dependency {missing[0]!r} is missing or failed to load")
+                    )
+                elif cross:  # the packs are independent: no cross-pack wiring, ever
+                    errors.append(
+                        _error(
+                            skill,
+                            f"dependency {cross[0]!r} is in pack {packs[cross[0]]!r}; "
+                            f"a {skill.pack!r} skill may not reference the other pack",
+                        )
                     )
                 elif skill.manifest.name in cyclic:
                     errors.append(_error(skill, "dependency cycle"))
@@ -192,8 +231,29 @@ class SkillRegistry:
 
     # ---- lookup ----------------------------------------------------------------------------
 
-    def names(self) -> list[str]:
-        return sorted(self._skills)
+    def names(self, pack: str | None = None) -> list[str]:
+        if pack is None:
+            return sorted(self._skills)
+        return sorted(
+            name
+            for name, versions in self._skills.items()
+            if any(skill.pack == pack for skill in versions.values())
+        )
+
+    def packs(self) -> list[str]:
+        return sorted(
+            {
+                skill.pack
+                for versions in self._skills.values()
+                for skill in versions.values()
+                if skill.pack is not None
+            }
+        )
+
+    def pack_of(self, name: str) -> str | None:
+        if name not in self._skills:
+            raise SkillNotFoundError(f"unknown skill {name!r}")
+        return next(iter(self._skills[name].values())).pack
 
     def versions(self, name: str) -> list[str]:
         if name not in self._skills:

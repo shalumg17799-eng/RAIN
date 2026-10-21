@@ -16,7 +16,7 @@ from insights.runtime.skill_agent import SkillAgent, Validator, load_skill_agent
 from insights.runtime.tools import Tool, ToolRegistry
 
 ROOT = Path(__file__).resolve().parents[2]
-SPECS_DIR = ROOT / "agents" / "skills"
+SPECS_DIR = ROOT / "agents" / "data" / "skills"
 
 MAX_SECTIONS = 120
 MAX_SECTION_CHARS = 6000
