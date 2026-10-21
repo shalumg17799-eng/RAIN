@@ -141,7 +141,13 @@ def _refs_in(value: Any) -> Iterator[str]:
 
 
 def _check_ref(
-    ref: str, where: str, *, must_precede: set[str] | None, known: set[str], own_id: str | None
+    ref: str,
+    where: str,
+    *,
+    must_precede: set[str] | None,
+    known: set[str],
+    own_id: str | None,
+    map_ids: set[str] = frozenset(),
 ) -> list[str]:
     """Problems with one reference. `must_precede` is the dominator set of the referring point."""
     parts = ref[2:].split(".")
@@ -153,6 +159,17 @@ def _check_ref(
         if len(parts) > 1 and parts[1] not in REFINE_FIELDS:
             return [
                 f"{where}: {ref} is not a refine field (known: {', '.join(sorted(REFINE_FIELDS))})"
+            ]
+    elif root == "fanout":
+        if len(parts) < 2 or parts[1] not in map_ids:
+            return [
+                f"{where}: {ref} must name a map step "
+                f"(map steps: {', '.join(sorted(map_ids)) or 'none'})"
+            ]
+        if must_precede is not None and parts[1] not in must_precede:
+            return [
+                f"{where}: {ref} references map step {parts[1]!r}, which does not always run "
+                "before this point"
             ]
     elif root == "steps" and len(parts) > 1:
         step_id = parts[1]
@@ -176,6 +193,7 @@ def _check_ref(
 def validate_agent(agent: AgentDef, registry: SkillRegistry) -> list[str]:
     problems: list[str] = []
     known = {s.id for s in agent.steps}
+    map_ids = {s.id for s in agent.steps if s.map is not None}
 
     for step in agent.steps:
         pin = f"@{step.version}" if step.version else ""
@@ -186,7 +204,7 @@ def validate_agent(agent: AgentDef, registry: SkillRegistry) -> list[str]:
             loaded = None
         labels = set(loaded.manifest.labels) if loaded else None
 
-        if loaded and labels and step.route is None:
+        if loaded and labels and step.route is None and step.map is None:
             problems.append(
                 f"step {step.id!r}: skill {step.skill!r} declares labels {sorted(labels)} "
                 "but the step has no route"
@@ -240,13 +258,17 @@ def validate_agent(agent: AgentDef, registry: SkillRegistry) -> list[str]:
     for step in agent.steps:
         if step.id not in dom:
             continue
-        for ref in _refs_in(step.input):
+        refs = list(_refs_in(step.input))
+        if step.map is not None:
+            refs.append(step.map.over)
+        for ref in refs:
             problems += _check_ref(
                 ref,
                 f"step {step.id!r} input",
                 must_precede=dom[step.id],
                 known=known,
                 own_id=step.id,
+                map_ids=map_ids,
             )
     last = agent.steps[-1].id
     for key, ref in agent.output.items():
@@ -256,6 +278,7 @@ def validate_agent(agent: AgentDef, registry: SkillRegistry) -> list[str]:
             must_precede=dom.get(last),
             known=known,
             own_id=None,
+            map_ids=map_ids,
         )
     return problems
 

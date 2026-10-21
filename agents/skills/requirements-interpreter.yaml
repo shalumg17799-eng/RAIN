@@ -1,4 +1,4 @@
-# Agent spec for the requirements-interpreter skill agent (PRD design stage 1).
+﻿# Agent spec for the requirements-interpreter skill agent (PRD design stage 1).
 # The prompt stays in SKILL.md; this file holds everything configurable about the loop.
 name: requirements-interpreter
 version: 0.2.0
@@ -12,12 +12,13 @@ capabilities:
 prompt: skills/requirements-interpreter/SKILL.md
 output_key: requirements_ir
 output_schema: requirements-interpreter
-max_iterations: 6
+max_iterations: 8
 max_repairs: 2
 confidence_threshold: 0.6
-# each turn resends the whole document (~18k tokens), so 6 turns of verification plus a
-# repair cycle legitimately reaches ~200k; observed: 157k on a repair-plus-verification run
-token_budget: 250000
+retry_on_low_confidence: true
+# each turn resends the whole document (~18k tokens), so verification turns plus a repair
+# cycle legitimately reach ~220k; observed: 214k on a repair-plus-four-searches run
+token_budget: 300000
 # each finish/repair turn re-emits the full IR (~3-4 min non-streaming), so the loop
 # deadline covers one draft, one repair and the small verification tools with headroom
 timeout_ms: 1200000
@@ -39,8 +40,9 @@ escalations:
 instruction: |
   Produce the Requirements IR for the document in the first user message. The finish result is one
   object with this top-level shape: mode, domain, anchor_date, personas, questions,
-  committed_figures, source_systems, entity_hints, narrative_events, constraints, open_items. Use
-  empty arrays when a category has no evidence. Every persona needs id, name, role, altitude,
+  committed_figures, source_systems, entity_hints, narrative_events, constraints, open_items.
+  domain is a short string (or null), never an object. Use empty arrays when a category has no
+  evidence. Every persona needs id, name, role, altitude,
   problems, systems. Every extracted question needs id, persona_id, text, tier=extracted,
   is_data_question, and a reason when is_data_question is false. Preserve stated figures exactly
   and record derivation and tolerance, or raise an open item. Do not invent database tables or
@@ -48,8 +50,9 @@ instruction: |
 
   The full document is already in your first message; use the tools to verify details (committed
   figures, relative time language), not to re-read what you already have. Verify every committed
-  figure you are not certain of with search_document BEFORE your first finish -- a figure that is
-  not verbatim in the document fails validation. When the IR is complete,
+  figure you are not certain of with ONE batched search_document call (the `queries` array takes
+  up to 8 terms) BEFORE your first finish -- a figure that is not verbatim in the document fails
+  validation. When the IR is complete,
   submit it with finish directly: it is validated automatically, and if anything is wrong the
   specific errors come back for you to fix. Never send your draft to a tool -- every extra turn
   retransmits the whole document and costs minutes.

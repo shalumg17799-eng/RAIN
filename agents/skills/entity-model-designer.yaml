@@ -1,4 +1,4 @@
-# Agent spec for the entity-model-designer skill agent (PRD design stage 3).
+﻿# Agent spec for the entity-model-designer skill agent (PRD design stage 3).
 name: entity-model-designer
 version: 0.2.0
 purpose: design
@@ -14,6 +14,7 @@ output_schema: entity-model-designer
 max_iterations: 6
 max_repairs: 2
 confidence_threshold: 0.6
+retry_on_low_confidence: true
 # the entity model is the largest artifact (~18k output tokens observed), so this stage gets the
 # biggest budgets: each finish or repair turn re-emits the whole model
 token_budget: 200000

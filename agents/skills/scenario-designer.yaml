@@ -1,4 +1,4 @@
-# Agent spec for the scenario-designer skill agent (PRD design stage 4b).
+﻿# Agent spec for the scenario-designer skill agent (PRD design stage 4b).
 name: scenario-designer
 version: 0.2.0
 purpose: design
@@ -14,6 +14,7 @@ output_schema: scenario-designer
 max_iterations: 6
 max_repairs: 2
 confidence_threshold: 0.6
+retry_on_low_confidence: true
 token_budget: 120000
 timeout_ms: 1200000
 tools:

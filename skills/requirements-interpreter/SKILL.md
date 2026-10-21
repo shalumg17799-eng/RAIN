@@ -5,6 +5,7 @@ description: Read a requirements document of any format (docx, pdf, markdown, sl
 labels:
 - ok
 - escalate
+- refine_self
 validation:
   required_input:
   - document

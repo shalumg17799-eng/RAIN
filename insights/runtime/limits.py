@@ -38,6 +38,7 @@ def effective_limits(
     )
 
 
-def compute_recursion_limit(step_count: int, max_refines: int) -> int:
-    """Upper bound on node executions: every pass may run every step, plus a small margin."""
-    return step_count * (max_refines + 1) + RECURSION_MARGIN
+def compute_recursion_limit(step_count: int, max_refines: int, *, map_steps: int = 0) -> int:
+    """Upper bound on graph supersteps: every pass may run every step, a map step adds its
+    dispatch and item supersteps, plus a small margin."""
+    return (step_count + 2 * map_steps) * (max_refines + 1) + RECURSION_MARGIN

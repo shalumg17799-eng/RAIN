@@ -26,3 +26,6 @@ yarn-error.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# PRD run artifacts and checkpoints (checkpoints contain PRD content)
+artifacts/

@@ -108,9 +108,7 @@ def build_requirements_tools(document: PrdDocument) -> ToolRegistry:
             "truncated": truncated,
         }
 
-    def search(args: dict[str, Any]) -> Any:
-        query = str(args["query"])
-        limit = min(int(args.get("max_matches") or 5), MAX_SEARCH_MATCHES)
+    def _find(query: str, limit: int) -> dict[str, Any]:
         matches = []
         lowered, needle = document.text.lower(), query.lower()
         start = 0
@@ -122,6 +120,13 @@ def build_requirements_tools(document: PrdDocument) -> ToolRegistry:
             matches.append({"at_char": at, "snippet": document.text[lo:hi]})
             start = at + len(needle)
         return {"query": query, "match_count": len(matches), "matches": matches}
+
+    def search(args: dict[str, Any]) -> Any:
+        limit = min(int(args.get("max_matches") or 5), MAX_SEARCH_MATCHES)
+        queries = args.get("queries")
+        if queries:
+            return {"results": [_find(str(q), min(limit, 3)) for q in queries[:8]]}
+        return _find(str(args.get("query") or ""), limit)
 
     def relative_time(_: dict[str, Any]) -> Any:
         found = [m.group(0) for m in RELATIVE_TIME.finditer(document.text)]
@@ -156,18 +161,23 @@ def build_requirements_tools(document: PrdDocument) -> ToolRegistry:
             ),
             Tool(
                 name="search_document",
-                description="Find every occurrence of a literal phrase or figure in the document, "
-                "with surrounding context. Use it to verify committed figures and quotes.",
+                description="Find occurrences of literal phrases or figures in the document, with "
+                "surrounding context. Pass `queries` with up to 8 terms to verify many committed "
+                "figures in ONE call; `query` searches a single term.",
                 input_schema={
                     "type": "object",
-                    "required": ["query"],
                     "properties": {
                         "query": {"type": "string", "minLength": 2, "maxLength": 80},
+                        "queries": {
+                            "type": "array", "minItems": 1, "maxItems": 8,
+                            "items": {"type": "string", "minLength": 2, "maxLength": 80},
+                        },
                         "max_matches": {"type": "integer", "minimum": 1, "maximum": 10},
                     },
                     "additionalProperties": False,
                 },
                 fn=search,
+                max_result_chars=10000,
             ),
             Tool(
                 name="check_relative_time_language",

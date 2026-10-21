@@ -123,6 +123,8 @@ class EventType(StrEnum):
     RUN_FINISHED = "run_finished"
     AGENT_ITERATION = "agent_iteration"
     TOOL_CALL = "tool_call"
+    GRAPH_DEFINITION = "graph_definition"
+    """Emitted once at run start: the agent's step ids in order, so a UI renders the real graph."""
 
 
 class AuditEventType(StrEnum):

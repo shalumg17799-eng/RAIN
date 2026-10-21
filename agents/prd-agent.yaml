@@ -1,0 +1,123 @@
+# The PRD design pipeline as a routed graph: one skill agent per stage, per-persona fan-out for
+# questions and ontology curation, deterministic audits deciding the loop-backs, every loop
+# bounded by max_refines, and a finalizer every route ends at. Validated against the skill
+# registry before it is compiled; bump the version with any edit.
+name: prd-agent
+version: 0.1.0
+description: Requirements -> per-persona questions -> entity model -> data map (audit loops back on near-miss names) -> synthetic scenarios -> per-persona ontology curation -> merged audit -> report.
+
+steps:
+  - id: requirements
+    skill: requirements-interpreter
+    input:
+      document: $.input.document
+      document_name: $.input.document_name
+      source_sha256: $.input.source_sha256
+      critique: $.refine.critique
+    route:
+      on: $.steps.requirements.output.label
+      to:
+        ok: questions_map
+        refine_self: requirements
+        escalate: finalize
+
+  - id: questions_map
+    skill: persona-question-designer
+    map:
+      over: $.steps.requirements.output.requirements_ir.personas
+      item_key: persona
+    input:
+      requirements_ir: $.steps.requirements.output.requirements_ir
+      critique: $.refine.critique
+
+  - id: questions_reduce
+    skill: question-registry-reducer
+    input:
+      requirements_ir: $.steps.requirements.output.requirements_ir
+      results: $.fanout.questions_map
+    route:
+      on: $.steps.questions_reduce.output.label
+      to:
+        ok: entities
+        escalate: finalize
+
+  - id: entities
+    skill: entity-model-designer
+    input:
+      requirements_ir: $.steps.requirements.output.requirements_ir
+      question_registry: $.steps.questions_reduce.output.question_registry
+      source_schema: $.input.source_schema
+      catalog_schema: $.input.catalog_schema
+      critique: $.refine.critique
+    route:
+      on: $.steps.entities.output.label
+      to:
+        ok: datamap
+        refine_self: entities
+        escalate: finalize
+
+  - id: datamap
+    skill: build-data-map
+    input:
+      entity_model: $.steps.entities.output.entity_model
+      source_schema: $.input.source_schema
+      catalog_schema: $.input.catalog_schema
+    route:
+      on: $.steps.datamap.output.label
+      to:
+        ok: scenario
+        refine_entity_model: entities
+        escalate: finalize
+
+  - id: scenario
+    skill: scenario-designer
+    input:
+      requirements_ir: $.steps.requirements.output.requirements_ir
+      entity_model: $.steps.entities.output.entity_model
+      db_state: $.input.db_state
+      critique: $.refine.critique
+    route:
+      on: $.steps.scenario.output.label
+      to:
+        ok: ontology_map
+        refine_self: scenario
+        escalate: finalize
+
+  - id: ontology_map
+    skill: upper-ontology-curator
+    map:
+      over: $.steps.requirements.output.requirements_ir.personas
+      item_key: persona
+    input:
+      requirements_ir: $.steps.requirements.output.requirements_ir
+      question_registry: $.steps.questions_reduce.output.question_registry
+      lower_ontology: $.steps.datamap.output.lower_ontology
+      existing_upper_ontology: $.input.existing_upper_ontology
+      critique: $.refine.critique
+
+  - id: ontology_reduce
+    skill: upper-ontology-reducer
+    input:
+      requirements_ir: $.steps.requirements.output.requirements_ir
+      lower_ontology: $.steps.datamap.output.lower_ontology
+      existing_upper_ontology: $.input.existing_upper_ontology
+      results: $.fanout.ontology_map
+    route:
+      on: $.steps.ontology_reduce.output.label
+      to:
+        ok: finalize
+        refine_ontology: ontology_map
+        escalate: finalize
+
+  - id: finalize
+    skill: prd-finalizer
+    input:
+      steps: $.steps
+
+output:
+  report: $.steps.finalize.output.run_report
+
+limits:
+  max_refines: 4
+  max_tokens: 900000
+  deadline_ms: 7200000

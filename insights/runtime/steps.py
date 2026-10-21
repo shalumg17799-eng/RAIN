@@ -49,6 +49,123 @@ def _progress(scope: RunScope, step_id: str):
     return emit
 
 
+def map_items_and_input(
+    step: Step, state: dict[str, Any], scope: RunScope
+) -> tuple[list[Any], dict[str, Any]] | dict[str, Any]:
+    """Resolve a map step's item list and base input, or return a failure patch."""
+    root = {
+        "input": state["input"],
+        "steps": state["steps"],
+        "refine": state["refine"],
+        "fanout": state.get("fanout") or {},
+    }
+    try:
+        items = resolve_ref(step.map.over, root)  # type: ignore[union-attr]
+        base_input = resolve_value(step.input, root)
+    except RefError as exc:
+        return failure_patch(RunFailureReason.REF_ERROR, step.id, str(exc))
+    if not isinstance(items, list) or not items:
+        return failure_patch(
+            RunFailureReason.INVALID_INPUT,
+            step.id,
+            f"map over {step.map.over} must resolve to a non-empty list",  # type: ignore[union-attr]
+        )
+    return items, base_input
+
+
+def execute_map_item(
+    step: Step, payload: dict[str, Any], scope: RunScope
+) -> dict[str, Any]:
+    """Run one fan-out item. A per-item skill failure becomes an `escalate` entry for the
+    reducer to judge, never a dead run; a safety breach (rows in output) still fails the run."""
+    attempt = int(payload.get("attempt") or 0)
+    index = int(payload.get("index") or 0)
+    item_input = payload.get("input") or {}
+    try:
+        loaded = scope.registry.get(step.skill, step.version)
+    except SkillNotFoundError as exc:
+        return failure_patch(RunFailureReason.SKILL_ERROR, step.id, str(exc))
+    manifest = loaded.manifest
+
+    scope.emitter.emit(
+        StageEvent(
+            type=EventType.STAGE_STARTED,
+            run_id=scope.run_id,
+            trace_id=scope.trace_id,
+            ts=scope.now(),
+            step_id=step.id,
+            skill=manifest.name,
+            skill_version=manifest.version,
+            attempt=index,
+        )
+    )
+    ctx = make_context(
+        run_id=scope.run_id,
+        trace_id=scope.trace_id,
+        step_id=step.id,
+        attempt=index,
+        principal=scope.principal,
+        app=scope.app,
+        gateway=scope.gateway,
+        emit=_progress(scope, step.id),
+        audit=scope.audit,
+        results=scope.results,
+        usage=scope.meter,
+        deadline=scope.deadline,
+        services=scope.services,
+    )
+    tokens_before = scope.meter.total()
+    started = scope.clock()
+    try:
+        output = scope.registry.invoke(manifest.name, manifest.version, item_input, ctx)
+    except SkillError as exc:
+        output = {"label": "escalate", "reason": f"item failed: {str(exc)[:200]}", "confidence": 0.0}
+    try:
+        assert_no_rows(output, f"map step {step.id!r} item output")
+        assert_json_safe(output, f"map step {step.id!r} item output")
+    except (RowsLeakError, ValueError) as exc:
+        return failure_patch(RunFailureReason.ROWS_IN_STATE, step.id, str(exc))
+
+    duration_ms = round((scope.clock() - started) * 1000)
+    tokens = _delta(tokens_before, scope.meter.total())
+    scope.emitter.emit(
+        StageEvent(
+            type=EventType.STAGE_FINISHED,
+            run_id=scope.run_id,
+            trace_id=scope.trace_id,
+            ts=scope.now(),
+            step_id=step.id,
+            skill=manifest.name,
+            skill_version=manifest.version,
+            attempt=index,
+            label=str(output.get("label")) if output.get("label") else None,
+            duration_ms=duration_ms,
+            tokens=tokens,
+        )
+    )
+    entry = {
+        "step_id": step.id,
+        "skill": manifest.name,
+        "skill_version": manifest.version,
+        "attempt": attempt,
+        "label": str(output.get("label")) if output.get("label") else None,
+        "duration_ms": duration_ms,
+        "tokens": tokens.model_dump(),
+    }
+    patch: dict[str, Any] = {
+        "fanout": {step.id: [{"attempt": attempt, "index": index,
+                              "item": payload.get("item"), "output": output}]},
+        "trace": [entry],
+    }
+    if scope.meter.total().total > scope.limits.max_tokens:
+        patch["failure"] = failure_patch(
+            RunFailureReason.TOKEN_BUDGET,
+            step.id,
+            f"{scope.meter.total().total} tokens used, budget {scope.limits.max_tokens}",
+        )["failure"]
+    return patch
+
+
 def execute_step(step: Step, state: dict[str, Any], scope: RunScope) -> dict[str, Any]:
     if state.get("failure"):
         return {}
@@ -56,7 +173,12 @@ def execute_step(step: Step, state: dict[str, Any], scope: RunScope) -> dict[str
     if scope.deadline.expired():
         return failure_patch(RunFailureReason.DEADLINE, step.id, "deadline reached before the step")
 
-    root = {"input": state["input"], "steps": state["steps"], "refine": state["refine"]}
+    root = {
+        "input": state["input"],
+        "steps": state["steps"],
+        "refine": state["refine"],
+        "fanout": state.get("fanout") or {},
+    }
     try:
         step_input = resolve_value(step.input, root)
         loaded = scope.registry.get(step.skill, step.version)

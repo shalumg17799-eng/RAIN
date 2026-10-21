@@ -1,0 +1,6 @@
+# Pinned additions for the PRD orchestrator (install into the project venv).
+# The base langgraph stack was already present; the sqlite checkpointer is new and pinned.
+langgraph==1.2.15
+langgraph-checkpoint==4.3.0
+langgraph-checkpoint-sqlite==3.1.2
+jsonschema>=4.21

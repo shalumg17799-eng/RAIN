@@ -1,4 +1,4 @@
-# Agent spec for the upper-ontology-curator skill agent (PRD design stage 5).
+﻿# Agent spec for the upper-ontology-curator skill agent (PRD design stage 5).
 name: upper-ontology-curator
 version: 0.2.0
 purpose: design
@@ -14,6 +14,7 @@ output_schema: upper-ontology-curator
 max_iterations: 6
 max_repairs: 2
 confidence_threshold: 0.6
+retry_on_low_confidence: true
 # the ontology is a large artifact (~25k output tokens observed) over large inputs; each finish
 # or repair turn re-emits the whole thing
 token_budget: 300000

@@ -5,6 +5,7 @@ description: Deterministically turn an entity model into the connected data map 
 labels:
 - ok
 - refine_entity_model
+- escalate
 validation:
   required_input:
   - entity_model

@@ -35,9 +35,12 @@ TARGET_TABLE = re.compile(
 def stage_input(input: dict[str, Any]) -> tuple[dict, dict, dict]:
     ir = input.get("requirements_ir")
     model = input.get("entity_model")
+    if not isinstance(ir, dict) or not isinstance(model, dict):
+        raise ValueError("input needs requirements_ir and entity_model objects")
     state = input.get("db_state")
-    if not isinstance(ir, dict) or not isinstance(model, dict) or not isinstance(state, dict):
-        raise ValueError("input needs requirements_ir, entity_model and db_state objects")
+    if not isinstance(state, dict):
+        # the safe default: a synthetic state from the entity model, never the live database
+        state = generate_synthetic_db_state(model)
     return ir, model, state
 
 

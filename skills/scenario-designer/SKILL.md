@@ -10,7 +10,6 @@ validation:
   required_input:
   - requirements_ir
   - entity_model
-  - db_state
   required_output:
   - confidence
 ---

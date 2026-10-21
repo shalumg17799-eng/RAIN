@@ -147,10 +147,13 @@ class Runtime:
                 "exec_counts": {},
                 "refine": refine0,
                 "trace": [],
+                "fanout": {},
                 "failure": None,
             }
             limit = self._recursion_override or compute_recursion_limit(
-                len(agent.steps), limits.max_refines
+                len(agent.steps),
+                limits.max_refines,
+                map_steps=sum(1 for step in agent.steps if step.map is not None),
             )
             outcome = compiled.execute(initial, scope, limit)
             final = {**outcome.state, "request_id": request_id}

@@ -61,6 +61,12 @@ class StageEvent(Contract):
     """The tool a skill agent called. A registered tool name, never free text."""
     status: Literal["ok", "error"] | None = None
     """How the tool call ended."""
+    steps: tuple[Identifier, ...] | None = None
+    """GRAPH_DEFINITION only: the agent's step ids in order."""
+    agent_name: SkillName | None = None
+    agent_version: SemVer | None = None
+    demo: bool | None = None
+    """True on replayed demo events, so a viewer can never mistake them for a live run."""
 
     @model_validator(mode="after")
     def _required_per_type(self) -> "StageEvent":
@@ -78,6 +84,7 @@ class StageEvent(Contract):
             EventType.RUN_FINISHED: ("outcome",),
             EventType.AGENT_ITERATION: ("step_id", "skill", "iteration"),
             EventType.TOOL_CALL: ("step_id", "skill", "tool", "status"),
+            EventType.GRAPH_DEFINITION: ("steps", "agent_name", "agent_version"),
         }
         missing = [name for name in needs[self.type] if getattr(self, name) is None]
         if missing:
