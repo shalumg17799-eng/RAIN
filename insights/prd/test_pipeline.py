@@ -174,10 +174,11 @@ class PrdPipelineTests(unittest.TestCase):
             "duplicate_candidates": [],
             "coverage_gaps_detected": [],
         }
-        gateway = FakeDesignGateway(
-            [{"action": "finish", "result": requirements, "confidence": 0.9}]
-        )
-        model = FakeModel([yaml.safe_dump(questions), yaml.safe_dump(entity_model), json.dumps(upper)])
+        gateway = FakeDesignGateway([
+            {"action": "finish", "result": requirements, "confidence": 0.9},
+            {"action": "finish", "result": {"questions": questions}, "confidence": 0.9},
+        ])
+        model = FakeModel([yaml.safe_dump(entity_model), json.dumps(upper)])
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             input_path = root / "prd.md"
@@ -190,9 +191,9 @@ class PrdPipelineTests(unittest.TestCase):
                 catalog_path=root / "missing-snapshot.json",
             )
 
-            self.assertEqual(len(gateway.calls), 1)  # stage 1 went through the gateway
+            self.assertEqual(len(gateway.calls), 2)  # stages 1 and 2 went through the gateway
             self.assertEqual(gateway.calls[0]["purpose"].value, "design")
-            self.assertEqual(len(model.calls), 3)  # stages 2, 3 and 5 stayed on the legacy path
+            self.assertEqual(len(model.calls), 2)  # stages 3 and 5 stayed on the legacy path
             saved = yaml.safe_load((output_dir / "requirements-ir.yaml").read_text(encoding="utf-8"))
             self.assertEqual(saved["personas"][0]["id"], "maria")
             self.assertEqual(report["stages"][0], "requirements-interpreter")

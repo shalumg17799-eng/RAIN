@@ -1,6 +1,16 @@
 ---
 name: persona-question-designer
+version: 0.2.0
 description: Expand a Requirements IR into a complete tiered question registry organized by persona — keeping the questions stated in the document, deriving the ones each persona would plausibly ask but the document never listed, and generating systematic coverage questions from the entity model. Use this after the requirements interpreter has run; whenever a requirements document has personas but no question list; whenever the entity model changes and the question set must be resynced; or when someone asks whether the question set is hardcoded.
+labels:
+- ok
+- escalate
+- refine_self
+validation:
+  required_input:
+  - requirements_ir
+  required_output:
+  - confidence
 ---
 
 # Persona question designer

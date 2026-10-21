@@ -641,22 +641,17 @@ class PrdPipeline:
         self.skills_dir = root / "skills" / "_prd_pending"
         self.design_runtime = design_runtime
 
-    def _run_requirements_agent(
-        self, document: str, document_name: str, source_hash: str
+    def _run_design_agent(
+        self, stage: str, agent_factory: Any, input: dict[str, Any]
     ) -> dict[str, Any]:
-        """Stage 1 through the governed SkillAgent loop: gateway-only LLM access, read-only
+        """One stage through the governed SkillAgent loop: gateway-only LLM access, read-only
         tools, schema plus semantic validation with bounded repair, escalation instead of a crash."""
-        from insights.prd.tools import requirements_interpreter_agent
-
-        self.design_runtime.check_run_budget("requirements-interpreter")
-        agent = requirements_interpreter_agent()
+        self.design_runtime.check_run_budget(stage)
+        agent = agent_factory()
         ctx = self.design_runtime.context(
-            step_id="requirements_interpreter", timeout_ms=agent.spec.timeout_ms
+            step_id=stage.replace("-", "_"), timeout_ms=agent.spec.timeout_ms
         )
-        out = agent.run(
-            {"document": document, "document_name": document_name, "source_sha256": source_hash},
-            ctx,
-        )
+        out = agent.run(input, ctx)
         tokens = out.get("tokens") or {}
         print(
             f"[prd]     [agent] label={out['label']} confidence={out['confidence']} "
@@ -665,13 +660,22 @@ class PrdPipeline:
             flush=True,
         )
         if out["label"] != "ok":
-            raise ValueError(
-                f"requirements-interpreter escalated: {out.get('reason') or 'no reason given'}"
-            )
-        requirements = out.get("requirements_ir")
-        if not isinstance(requirements, dict):
-            raise ValueError("requirements-interpreter returned no requirements_ir object")
-        return requirements
+            raise ValueError(f"{stage} escalated: {out.get('reason') or 'no reason given'}")
+        artifact = out.get(agent.spec.output_key)
+        if not isinstance(artifact, dict):
+            raise ValueError(f"{stage} returned no {agent.spec.output_key} object")
+        return artifact
+
+    def _run_requirements_agent(
+        self, document: str, document_name: str, source_hash: str
+    ) -> dict[str, Any]:
+        from insights.prd.tools import requirements_interpreter_agent
+
+        return self._run_design_agent(
+            "requirements-interpreter",
+            requirements_interpreter_agent,
+            {"document": document, "document_name": document_name, "source_sha256": source_hash},
+        )
 
     def _run_skill(self, name: str, instruction: str, *, max_tokens: int = 8000, response_schema: dict[str, Any] | None = None) -> str:
         system = _skill_prompt(name) + "\n\n" + instruction
@@ -760,17 +764,27 @@ class PrdPipeline:
             flush=True,
         )
 
-        question_instruction = """Use the Requirements IR below. Return exactly one JSON object with a `questions` array. Each item contains persona_id, text, tier (extracted, derived, or schema_generated), signal, and is_data_question. No prose or markdown. Preserve all extracted questions; add derived questions conservatively and label them derived. Do not make inferred questions contractual."""
-        self._current_input = "Requirements IR:\n" + yaml.safe_dump(requirements, sort_keys=False, allow_unicode=True)
         _t = time.perf_counter()
         print("[prd 2/5] persona-question-designer: building the question registry (LLM)...", flush=True)
-        question_value = self._run_parsed_skill(
-            "persona-question-designer", question_instruction,
-            shape="an array of objects with persona_id, text, tier, signal, is_data_question",
-        )
-        question_mapping = _find_mapping_with(question_value, "questions")
-        questions = question_mapping.get("questions") if question_mapping else question_value
-        questions = _require_list(questions, "question registry")
+        if self.design_runtime is not None:
+            from insights.prd.questions import persona_question_designer_agent
+
+            registry_artifact = self._run_design_agent(
+                "persona-question-designer",
+                persona_question_designer_agent,
+                {"requirements_ir": requirements},
+            )
+            questions = _require_list(registry_artifact.get("questions"), "question registry")
+        else:
+            question_instruction = """Use the Requirements IR below. Return exactly one JSON object with a `questions` array. Each item contains persona_id, text, tier (extracted, derived, or schema_generated), signal, and is_data_question. No prose or markdown. Preserve all extracted questions; add derived questions conservatively and label them derived. Do not make inferred questions contractual."""
+            self._current_input = "Requirements IR:\n" + yaml.safe_dump(requirements, sort_keys=False, allow_unicode=True)
+            question_value = self._run_parsed_skill(
+                "persona-question-designer", question_instruction,
+                shape="an array of objects with persona_id, text, tier, signal, is_data_question",
+            )
+            question_mapping = _find_mapping_with(question_value, "questions")
+            questions = question_mapping.get("questions") if question_mapping else question_value
+            questions = _require_list(questions, "question registry")
         if any(not isinstance(item, dict) or not item.get("persona_id") or not item.get("text") for item in questions):
             raise ValueError("question registry items need persona_id and text")
         question_registry = {"questions": questions}
