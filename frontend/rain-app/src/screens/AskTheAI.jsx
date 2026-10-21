@@ -136,6 +136,8 @@ export default function AskTheAI() {
     messages,
     isTyping,
     agentStages,
+    hitlRequest,
+    respondHitl,
     currentChips,
     currentFlowKey,
     handleChipClick,
@@ -315,6 +317,8 @@ export default function AskTheAI() {
               messages={messages}
               isTyping={isTyping}
               agentStages={agentStages}
+              hitlRequest={hitlRequest}
+              onHitlDecide={respondHitl}
               chips={[]}
               onChipClick={handleChipClick}
               renderInlineComponents={renderInlineComponents}

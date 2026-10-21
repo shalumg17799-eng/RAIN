@@ -4,8 +4,9 @@ import ChatMessage from './ChatMessage';
 import TypingIndicator from './TypingIndicator';
 import SuggestedChips from './SuggestedChips';
 import AgentStageStrip from './AgentStageStrip';
+import HitlReviewBar from './HitlReviewBar';
 
-export default function ChatThread({ messages, isTyping, chips, onChipClick, renderInlineComponents, getCapability, onCapabilityClick, agentStages }) {
+export default function ChatThread({ messages, isTyping, chips, onChipClick, renderInlineComponents, getCapability, onCapabilityClick, agentStages, hitlRequest, onHitlDecide }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -30,6 +31,12 @@ export default function ChatThread({ messages, isTyping, chips, onChipClick, ren
         <AnimatePresence>
           {isTyping && agentStages && agentStages.length > 0 && (
             <AgentStageStrip events={agentStages} />
+          )}
+        </AnimatePresence>
+
+        <AnimatePresence>
+          {isTyping && hitlRequest && onHitlDecide && (
+            <HitlReviewBar request={hitlRequest} onDecide={onHitlDecide} />
           )}
         </AnimatePresence>
 

@@ -107,10 +107,20 @@ export default function ChatMessage({ message, inlineComponents, capability, onC
             </summary>
             <div className="mt-1.5 rounded-lg border border-gray-100 bg-gray-50/60 px-3 py-2 font-mono text-[10px] leading-relaxed text-gray-600">
               {message.agentTrace.map((e, i) => {
-                if (e.type === 'stage_started') return <div key={i}>&gt;&gt; {e.step_id} - {e.skill}</div>;
-                if (e.type === 'stage_finished') return <div key={i}>&lt;&lt; {e.step_id} -&gt; {String(e.label)} ({e.duration_ms} ms)</div>;
+                const branch = e.branch ? `[${e.branch}] ` : '';
+                if (e.type === 'graph_definition') return <div key={i} className="text-[#003087]">## {e.agent_name} v{e.agent_version}: {e.steps.join(' → ')}</div>;
+                if (e.type === 'supervisor_decision') return <div key={i} className="text-violet-700">?? picked {e.skill} for {e.stage} ({e.reason}{e.considered && e.considered.length > 1 ? `; considered ${e.considered.join(', ')}` : ''})</div>;
+                if (e.type === 'stage_started') return <div key={i}>&gt;&gt; {branch}{e.step_id} - {e.skill}</div>;
+                if (e.type === 'stage_finished') {
+                  const tok = e.tokens ? (e.tokens.prompt_tokens || 0) + (e.tokens.completion_tokens || 0) : 0;
+                  return <div key={i}>&lt;&lt; {branch}{e.step_id} -&gt; {String(e.label)} ({e.duration_ms} ms{tok ? `, ${tok} tok` : ''})</div>;
+                }
+                if (e.type === 'agent_iteration') return <div key={i} className="text-gray-400">&nbsp;&nbsp;.. iteration {e.iteration}</div>;
+                if (e.type === 'tool_call') return <div key={i} className="text-gray-400">&nbsp;&nbsp;.. tool {e.tool} {e.status}</div>;
                 if (e.type === 'progress') return <div key={i} className="text-gray-400">&nbsp;&nbsp;.. {e.note}{e.count != null ? `=${e.count}` : ''}</div>;
-                if (e.type === 'refine') return <div key={i} className="text-amber-600">~~ refine #{e.attempt} ({String(e.label)})</div>;
+                if (e.type === 'refine') return <div key={i} className="text-amber-600">~~ loop-back #{e.attempt} ({String(e.label)})</div>;
+                if (e.type === 'hitl_waiting') return <div key={i} className="text-amber-600">?! human review requested ({e.reason})</div>;
+                if (e.type === 'hitl_decided') return <div key={i} className="text-amber-700">?! review {String(e.label)}</div>;
                 if (e.type === 'run_finished') return <div key={i} className="text-[#003087]">== {e.outcome} in {e.duration_ms} ms</div>;
                 return null;
               })}

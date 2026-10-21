@@ -1,7 +1,8 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { getPersonaFlowConfigs } from '../data/personaFlowConfigs';
 import { useBranding } from '../context/BrandingContext';
 import { logBackend, logFallback, logStatic } from '../utils/dataLog';
+import { hitlWaiting } from '../components/chat/AgentStageStrip';
 
 // Backend base URL -- set VITE_API_BASE in .env for a deployed backend;
 // defaults to the local dev server.
@@ -112,6 +113,25 @@ export default function useChatFlow(personaId) {
   const [currentTurn, setCurrentTurn] = useState(0);
   const [contextPanelData, setContextPanelData] = useState(null);
   const [agentStages, setAgentStages] = useState([]);
+
+  // the open HITL hold on the in-flight run (if any), and the reviewer's decision call
+  const hitlRequest = useMemo(() => hitlWaiting(agentStages), [agentStages]);
+  const respondHitl = useCallback(async (action, editedNarrative) => {
+    if (!hitlRequest) return false;
+    const backendId = PERSONA_ID_MAP[personaId];
+    const token = PERSONA_TOKENS[backendId];
+    if (!token) return false;
+    try {
+      const res = await fetch(`${API_BASE}/api/v2/hitl/${hitlRequest.runId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ action, edited_narrative: editedNarrative || null }),
+      });
+      return res.ok;
+    } catch {
+      return false;
+    }
+  }, [hitlRequest, personaId]);
   const signalIndexRef = useRef(0);
   const generationRef = useRef(0);
   const traceRef = useRef(null);
@@ -377,6 +397,8 @@ export default function useChatFlow(personaId) {
     messages,
     isTyping,
     agentStages,
+    hitlRequest,
+    respondHitl,
     currentChips,
     currentFlowKey,
     currentTurn,

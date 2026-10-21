@@ -12,6 +12,9 @@ export default function ChatDrawer({ isOpen, onClose, preloadedChips = [], initi
   const {
     messages,
     isTyping,
+    agentStages,
+    hitlRequest,
+    respondHitl,
     currentChips,
     handleChipClick,
   } = useChatFlow(persona.id);
@@ -54,6 +57,9 @@ export default function ChatDrawer({ isOpen, onClose, preloadedChips = [], initi
             <ChatThread
               messages={messages}
               isTyping={isTyping}
+              agentStages={agentStages}
+              hitlRequest={hitlRequest}
+              onHitlDecide={respondHitl}
               chips={[]}
               onChipClick={handleChipClick}
             />

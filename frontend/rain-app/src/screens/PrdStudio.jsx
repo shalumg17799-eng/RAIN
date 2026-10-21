@@ -12,27 +12,39 @@ import {
 const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
 const NAVY = '#003087';
 
-// Friendly names and descriptions per graph step id; anything unknown is prettified from its id,
+// Friendly names and descriptions per graph stage id; anything unknown is prettified from its id,
 // so the step list always comes from the GRAPH_DEFINITION event, never from hardcoded counts.
+// WHICH agent fills each stage arrives live in supervisor_decision events.
 const STEP_META = {
-  requirements: { title: 'Read the PRD', skill: 'Requirements Interpreter · AI agent',
+  requirements_interpretation: { title: 'Read the PRD', skill: 'agentic',
     desc: 'Reads the whole document and lists the people it serves, their systems, problems and committed figures.' },
-  questions_map: { title: 'Write their questions', skill: 'Persona Question Designer · AI agent, one run per persona',
+  question_design: { title: 'Write their questions', skill: 'agentic · one run per persona',
     desc: 'Each persona gets its own agent run writing the questions they would ask.' },
-  questions_reduce: { title: 'Merge the questions', skill: 'Deterministic reducer · no AI',
+  question_reduction: { title: 'Merge the questions', skill: 'deterministic · no AI',
     desc: 'Merges and dedupes the per-persona registries, re-checks nothing was lost.' },
-  entities: { title: 'Design the data tables', skill: 'Entity Model Designer · AI agent',
+  entity_modeling: { title: 'Design the data tables', skill: 'agentic',
     desc: 'Designs the database tables needed to answer those questions.' },
-  datamap: { title: 'Build the data map', skill: 'Deterministic build + audit · no AI',
+  data_mapping: { title: 'Build the data map', skill: 'deterministic build + audit · no AI',
     desc: 'Builds the connected map and audits it; near-miss names send the design back one step.' },
-  scenario: { title: 'Design scenarios', skill: 'Scenario Designer · AI agent, synthetic data only',
+  scenario_design: { title: 'Design scenarios', skill: 'agentic · synthetic data only',
     desc: 'Writes scenario SQL proposals against a synthetic database state. Never the live database.' },
-  ontology_map: { title: 'Connect business concepts', skill: 'Upper Ontology Curator · AI agent, one run per persona',
+  ontology_curation: { title: 'Connect business concepts', skill: 'agentic · one run per persona',
     desc: 'Each persona’s concepts are curated separately and mapped onto the data map.' },
-  ontology_reduce: { title: 'Merge the concept graph', skill: 'Deterministic reducer + audit · no AI',
+  ontology_reduction: { title: 'Merge the concept graph', skill: 'deterministic reducer + audit · no AI',
     desc: 'Merges the persona slices, dedupes concepts, audits every edge; problems loop back.' },
-  finalize: { title: 'Write the run report', skill: 'Deterministic · no AI',
+  finalization: { title: 'Write the run report', skill: 'deterministic · no AI',
     desc: 'Says honestly what ran, what looped back, and what needs human review.' },
+};
+
+const REASON_TEXT = {
+  artifact_missing: 'its artifact is missing',
+  intent_match: 'it matches the routed intent',
+  refine_requested: 'an audit sent work back',
+  refines_exhausted: 'the refine budget is spent',
+  escalation: 'a stage escalated',
+  fanout_dispatch: 'one run per persona',
+  pipeline_complete: 'everything else is done',
+  max_steps: 'the step budget was reached',
 };
 
 const prettify = (id) =>
@@ -43,7 +55,7 @@ const stepFromId = (id) => ({
   title: STEP_META[id]?.title || prettify(id),
   skill: STEP_META[id]?.skill || 'Pipeline step',
   desc: STEP_META[id]?.desc || '',
-  status: 'pending', activity: '', runs: 0, warn: '',
+  status: 'pending', activity: '', runs: 0, warn: '', picked: null,
 });
 
 const firstName = (name) => {
@@ -107,10 +119,18 @@ export default function PrdStudio() {
         setSteps(ev.steps.map(stepFromId));
         setIsDemo(Boolean(ev.demo));
         return;
+      case 'supervisor_decision':
+        patchStep(ev.stage, {
+          picked: `supervisor picked ${ev.skill}`
+            + (REASON_TEXT[ev.reason] ? ` — ${REASON_TEXT[ev.reason]}` : ` (${ev.reason})`)
+            + (ev.considered && ev.considered.length > 1 ? ` · considered ${ev.considered.join(', ')}` : ''),
+        });
+        return;
       case 'stage_started':
         patchStep(ev.step_id, (s) => ({
-          status: 'running', runs: s.runs + (ev.attempt ? 0 : 1),
-          activity: ev.attempt ? `persona run ${ev.attempt + 1} started` : 'started',
+          status: 'running', runs: s.runs + (ev.branch || ev.attempt ? 0 : 1),
+          activity: ev.branch ? `branch ${ev.branch} started`
+            : ev.attempt ? `run ${ev.attempt + 1} started` : 'started',
         }));
         return;
       case 'agent_iteration':
@@ -130,13 +150,18 @@ export default function PrdStudio() {
           warn: `loop-back: ${ev.label} (attempt ${ev.attempt}) — the audit sent work back`,
         });
         return;
-      case 'stage_finished':
+      case 'stage_finished': {
+        const tokens = ev.tokens
+          ? (ev.tokens.prompt_tokens || 0) + (ev.tokens.completion_tokens || 0) : 0;
         patchStep(ev.step_id, (s) => ({
           status: ev.label === 'escalate' ? 'failed' : 'done',
-          activity: `${ev.label || 'done'} · ${(ev.duration_ms / 1000).toFixed(1)}s`
+          activity: `${ev.branch ? `branch ${ev.branch}: ` : ''}${ev.label || 'done'}`
+            + ` · ${(ev.duration_ms / 1000).toFixed(1)}s`
+            + (tokens ? ` · ${tokens.toLocaleString()} tok` : '')
             + (s.runs > 1 ? ` · run ${s.runs}` : ''),
         }));
         return;
+      }
       case 'run_finished':
         if (ev.outcome === 'failed') setError('The run ended with a failure — see the run report.');
         return;
@@ -269,6 +294,9 @@ export default function PrdStudio() {
                       )}
                     </div>
                     <p className="text-[12px] text-gray-500 mt-0.5">{s.desc}</p>
+                    {s.picked && (
+                      <p className="text-[11.5px] text-violet-700 mt-1 font-medium">{s.picked}</p>
+                    )}
                     {s.activity && (
                       <p className={`text-[12px] mt-1 font-medium flex items-center gap-1.5 ${
                         s.status === 'done' ? 'text-emerald-700' : s.status === 'failed' ? 'text-red-600' : 'text-[#003087]'}`}>
