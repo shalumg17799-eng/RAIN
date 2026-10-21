@@ -90,6 +90,54 @@ def check_gateway_only_llm(root: Path) -> list[str]:
     return problems
 
 
+DATASOURCE_IMPORT = re.compile(
+    r"^\s*(import\s+(insights\.datasources|psycopg2|neo4j)\b"
+    r"|from\s+(insights\.datasources|psycopg2|neo4j)[.\s])",
+    re.MULTILINE,
+)
+EXECUTOR_FOLDER = "skills/insights/governed-executor"
+
+WRITE_CALL = re.compile(
+    r"\.write_text\(|\.write_bytes\(|open\([^)\n]*,\s*['\"][wax]"
+    r"|os\.(remove|unlink|rename|rmdir)\b|shutil\.|\.unlink\(|\.mkdir\("
+)
+
+
+def check_datasource_isolation(root: Path) -> list[str]:
+    """Only the governed executor touches a data source. No other skill — in either pack — may
+    import a data-source adapter or a database driver; everything else sees summaries and refs."""
+    problems: list[str] = []
+    for path in _text_files(root / "skills"):
+        if path.suffix != ".py":
+            continue
+        rel = path.relative_to(root).as_posix()
+        if rel.startswith(EXECUTOR_FOLDER):
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        hit = DATASOURCE_IMPORT.search(text)
+        if hit:
+            problems.append(
+                f"{rel}: imports a data-source module ({hit.group(0).strip()!r}); only the "
+                "governed executor's deterministic core touches a data source"
+            )
+    return problems
+
+
+def check_skills_read_only(root: Path) -> list[str]:
+    """Skill code never writes to disk: artifacts are written by the runners, rows live in the
+    result store, and every skill tool is read-only by the ToolRegistry contract."""
+    problems: list[str] = []
+    for path in _text_files(root / "skills"):
+        if path.suffix != ".py":
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        hit = WRITE_CALL.search(text)
+        if hit:
+            rel = path.relative_to(root).as_posix()
+            problems.append(f"{rel}: calls a write API ({hit.group(0).strip()!r}); skills are read-only")
+    return problems
+
+
 def check_registry(root: Path) -> list[str]:
     from insights.skills_core.registry import SkillRegistry
 
@@ -111,6 +159,8 @@ def run_all(root: Path) -> list[str]:
     return (
         [f"pack_isolation: {p}" for p in check_pack_isolation(root)]
         + [f"gateway_only_llm: {p}" for p in check_gateway_only_llm(root)]
+        + [f"datasource_isolation: {p}" for p in check_datasource_isolation(root)]
+        + [f"skills_read_only: {p}" for p in check_skills_read_only(root)]
         + [f"registry: {p}" for p in check_registry(root)]
     )
 
