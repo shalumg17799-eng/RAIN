@@ -31,3 +31,6 @@ Thumbs.db
 artifacts/
 /apps/keys.local.yaml.*
 /apps/rain/persona_keys.env
+
+# docker: the Postgres seed is derived from the live DB (data!), never source
+/deploy/initdb/

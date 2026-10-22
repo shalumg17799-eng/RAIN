@@ -1,0 +1,19 @@
+# Build context hygiene: no secrets, no local state, no junk in the images.
+.git
+.claude
+.venv*
+**/__pycache__
+**/*.pyc
+**/node_modules
+frontend/rain-app/dist
+artifacts
+deploy/initdb
+# secrets are MOUNTED at runtime, never baked into an image
+rain-api/.env
+apps/keys.local.yaml
+apps/keys.local.yaml.*
+apps/rain/persona_keys.env
+# heavy binaries the containers never need
+**/*.pptx
+**/*.zip
+**/*.sqlite
