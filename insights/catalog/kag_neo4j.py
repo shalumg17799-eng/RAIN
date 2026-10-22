@@ -26,7 +26,13 @@ from typing import Any, Protocol
 
 from pydantic import BaseModel, ConfigDict, SecretStr
 
-from insights.catalog.entitlements import allowed_objects, effective_role, role_tables
+from insights.catalog.entitlements import (
+    allowed_objects,
+    default_schema_of,
+    effective_role,
+    normalize_table,
+    role_tables,
+)
 from insights.catalog.retrieval import RetrievalResult
 from insights.catalog.text import content_tokens, stems
 from insights.contracts.enums import PathName
@@ -151,9 +157,14 @@ class Neo4jKag:
         if role is None or not concepts_in_q:
             return self._empty(concepts_in_q)
         matched = self._match_concepts(question)
-        # ENTITLEMENT FIRST: keep only tables this role may see (profile, not the graph's personas)
+        # ENTITLEMENT FIRST: keep only tables this role may see (profile, not the graph's
+        # personas). Entitlement identity is case-insensitive (normalized names); the graph's
+        # own spelling is kept so the sliver carries the physical table name.
         entitled = set(role_tables(self._app, role))
-        wanted = sorted({t for _, ts in matched for t in ts} & entitled)
+        schema = default_schema_of(self._app)
+        wanted = sorted(
+            {t for _, ts in matched for t in ts if normalize_table(t, schema) in entitled}
+        )
         if not wanted:
             return self._empty(concepts_in_q)
         return self._assemble(wanted, matched, question, principal, ("kag:neo4j",))
@@ -253,7 +264,9 @@ class Neo4jKag:
         role = effective_role(principal, self._app)
         if role is None:
             return self._empty(list(dict.fromkeys(content_tokens(question))))
-        wanted = sorted(found & set(role_tables(self._app, role)))
+        entitled = set(role_tables(self._app, role))
+        schema = default_schema_of(self._app)
+        wanted = sorted(t for t in found if normalize_table(t, schema) in entitled)
         if not wanted:
             return self._empty(list(dict.fromkeys(content_tokens(question))))
         # the tables come from the Cypher output; concept matching only supplies glossary terms
@@ -280,11 +293,13 @@ class Neo4jKag:
             )
             for table, cols in by_table.items()
         ]
-        # second entitlement pass, now at column granularity (masks/column lists apply)
+        # second entitlement pass, now at column granularity (masks/column lists apply);
+        # allowed objects are keyed by NORMALIZED names, the sliver keeps the graph's spelling
         allowed = allowed_objects(candidates, self._app, principal)
+        schema = default_schema_of(self._app)
         out = []
         for table in candidates:
-            cols = allowed.columns_of(table.name)
+            cols = allowed.columns_of(normalize_table(table.name, schema))
             if not cols:
                 continue
             out.append(
@@ -303,7 +318,8 @@ class Neo4jKag:
         if role is None:
             return ()
         entitled = set(role_tables(self._app, role))
-        names = [t for t in tables if t in entitled]
+        schema = default_schema_of(self._app)
+        names = [t for t in tables if normalize_table(t, schema) in entitled]
         return self._build_joins(set(names)) if names else ()
 
     def _build_joins(self, kept: set[str]) -> tuple[SliverJoin, ...]:

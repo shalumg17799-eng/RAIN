@@ -103,6 +103,7 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
         principal,
         context,
         widen=attempt,
+        min_coverage=app.router.kag_min_coverage,
         cypher=cypher_source,
     )
     for note in choice.result.notes:

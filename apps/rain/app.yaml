@@ -1,5 +1,5 @@
 id: rain
-version: 0.1.0
+version: 0.2.0
 description: Auto-generated profile for RAIN from live DB & KAG metadata.
 dialect: postgres
 agent:
@@ -12,6 +12,11 @@ allowed_intents:
 - needs_clarification
 multi_turn: false
 router:
+  # the KAG now holds the PRD-published ontology: probe it first, catalog stays the fallback
+  path_preference: kag
+  # the hybrid merge only ADDS graph tables/joins/definitions on top of the catalog retrieval,
+  # so a partially-covering concept match is still worth merging in
+  kag_min_coverage: 0.3
   unsure_policy: needs_clarification
   max_query_chars: 2000
   thresholds:

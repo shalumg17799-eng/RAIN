@@ -62,6 +62,7 @@ def run(input: dict[str, Any], ctx: dict[str, Any]) -> dict[str, Any]:
         query,
         principal,
         context,
+        min_coverage=app.router.kag_min_coverage,
     )
     for note in choice.result.notes:
         ctx["emit"](note.replace(":", "_"))  # a progress note is an identifier; output keeps ":"

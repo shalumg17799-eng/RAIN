@@ -60,6 +60,10 @@ class RouterConfig(Contract):
     max_query_chars: int = Field(default=2000, ge=1, le=MAX_QUERY_CHARS)
     path_preference: PathName = PathName.BYPASS
     """The retrieval path the router prefers. The sliver step probes it and may fall back."""
+    kag_min_coverage: float = Field(default=0.6, ge=0.0, le=1.0)
+    """The question coverage the KAG's own concepts must reach before its result is merged in.
+    The hybrid path MERGES the graph into the catalog retrieval (it never replaces it), so a
+    lower bar only adds graph-known tables, joins and definitions on top of the bypass result."""
 
 
 class DataSource(Contract):
