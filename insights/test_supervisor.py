@@ -182,6 +182,16 @@ class ChooseNextAgainstTheRealPack(unittest.TestCase):
         state = fresh_state(failure={"reason": "deadline", "step_id": None, "message": "x"})
         self.assertEqual(choose_next(ORCH, VIEWS, state).action, "end")
 
+    def test_branch_ids_are_normalized_to_event_identifiers(self):
+        # the live model names personas 'P1', 'P2'; an event label must never kill a run
+        from insights.runtime.steps import branch_id
+
+        self.assertEqual(branch_id("P1"), "p1")
+        self.assertEqual(branch_id("Dr. Maria Delgado-Reyes"), "dr_maria_delgado_reyes")
+        self.assertEqual(branch_id("3west"), "b_3west")
+        self.assertIsNone(branch_id(None))
+        self.assertIsNone(branch_id("---"))
+
 
 # ---- part 2: a real graph run over a small fake pack -----------------------------------------
 

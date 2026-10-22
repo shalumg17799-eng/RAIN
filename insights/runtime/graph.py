@@ -403,10 +403,11 @@ def _sup_fanout_dispatch(stage: StageDef, item_node: str):
         branch_key = stage.fanout.branch_key  # type: ignore[union-attr]
 
         def branch_of(item: Any) -> str | None:
+            from insights.runtime.steps import branch_id
+
             if branch_key and isinstance(item, dict):
-                value = item.get(branch_key)
-                return str(value) if value is not None else None
-            return str(item) if isinstance(item, str) else None
+                return branch_id(item.get(branch_key))
+            return branch_id(item) if isinstance(item, str) else None
 
         return [
             Send(

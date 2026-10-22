@@ -4,6 +4,7 @@ Returns a state patch. A failure is a patch too (`failure` key), never a raised 
 partial trace survives and the graph routes to its end.
 """
 
+import re
 from typing import Any
 
 from insights.contracts.agent import Step
@@ -17,6 +18,22 @@ from insights.skills_core.context import make_context
 from insights.skills_core.errors import SkillError, SkillNotFoundError
 
 MAX_MESSAGE = 300
+
+_BRANCH_INVALID = re.compile(r"[^a-z0-9_]+")
+
+
+def branch_id(value: Any) -> str | None:
+    """A fan-out branch identity as a typed event identifier. Branch names come from DATA (a
+    persona id like 'P1', a source id) — normalize rather than refuse, so a run never dies over
+    an event label: lowercase, invalid runs of characters become '_', must start with a letter."""
+    if value is None:
+        return None
+    text = _BRANCH_INVALID.sub("_", str(value).strip().lower()).strip("_")
+    if not text:
+        return None
+    if not text[0].isalpha():
+        text = f"b_{text}"
+    return text[:63]
 
 
 def failure_patch(reason: RunFailureReason, step_id: str | None, message: str) -> dict[str, Any]:
@@ -80,7 +97,7 @@ def execute_map_item(
     reducer to judge, never a dead run; a safety breach (rows in output) still fails the run."""
     attempt = int(payload.get("attempt") or 0)
     index = int(payload.get("index") or 0)
-    branch = payload.get("branch") if isinstance(payload.get("branch"), str) else None
+    branch = branch_id(payload.get("branch"))
     item_input = payload.get("input") or {}
     try:
         loaded = scope.registry.get(step.skill, step.version)
