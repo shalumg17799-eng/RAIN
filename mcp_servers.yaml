@@ -1,0 +1,13 @@
+# MCP servers the platform's skills may call (see docs/MCP-INTEGRATION.md). Secrets come from environment variables.
+servers:
+  atlassian:                      # Atlassian Rovo MCP: Jira, Confluence, Bitbucket Cloud, JSM, Compass
+    transport: http
+    url: https://mcp.atlassian.com/v2/mcp
+    auth:
+      type: auto                  # ATLASSIAN_EMAIL set   -> Basic email:token  (personal API token, starts ATATT)
+      username: "${ATLASSIAN_EMAIL}"   # ATLASSIAN_EMAIL empty -> Bearer token (service-account API key, starts ATSTT)
+      token: "${ATLASSIAN_API_KEY}"
+    # READ-ONLY by default. After GET /mcp/servers/atlassian/tools shows the real tool names, list exactly what agents may call;
+    # write tools (createJiraIssue, editJiraIssue, transitionJiraIssue, ...) stay blocked until you add them here on purpose.
+    allowed_tools: ["get*", "search*", "lookup*", "fetch*", "atlassianUserInfo", "discover", "executeRead"]   # executeRead = read-only gateway (Bitbucket etc.); executeWrite/executeDestructive stay blocked
+    timeout: 30

@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dif.radiant.digital/contracts/manifest.v1.json",
+  "title": "manifest",
+  "type": "object",
+  "properties": {
+    "enterprise_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "package_version": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "uri": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "uri": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sha256": {
+            "type": "string"
+          },
+          "bytes": {
+            "type": "integer"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "bytes",
+          "kind"
+        ]
+      },
+      "minItems": 1
+    },
+    "versions": {
+      "type": "object",
+      "properties": {
+        "ontology": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "upper_ontology": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "kag_snapshot": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "agents": {
+          "type": "object"
+        },
+        "skills": {
+          "type": "object"
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object"
+    },
+    "validation": {
+      "type": "object"
+    },
+    "readiness": {
+      "type": "string",
+      "enum": [
+        "ready",
+        "partial",
+        "blocked"
+      ]
+    },
+    "data_status": {
+      "type": "string",
+      "enum": [
+        "synthetic",
+        "schema_only",
+        "validated"
+      ]
+    }
+  },
+  "required": [
+    "package_version",
+    "created_at",
+    "files",
+    "versions",
+    "artifacts",
+    "readiness",
+    "data_status"
+  ]
+}

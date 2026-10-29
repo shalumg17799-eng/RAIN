@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dif.radiant.digital/contracts/alignment.v1.json",
+  "title": "alignment",
+  "type": "object",
+  "properties": {
+    "upper_ontology_version": {
+      "type": "string"
+    },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "class": {
+            "type": "string"
+          },
+          "upper_concept": {
+            "type": "string"
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "broader",
+              "narrower",
+              "related"
+            ]
+          },
+          "confidence": {
+            "type": "number"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "class",
+          "upper_concept",
+          "relation",
+          "confidence"
+        ]
+      }
+    },
+    "extensions_proposed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "parent": {
+            "type": "string"
+          },
+          "rationale": {
+            "type": "string"
+          },
+          "classes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "parent",
+          "rationale"
+        ]
+      }
+    },
+    "unaligned": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "issues": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "passed"
+      ]
+    }
+  },
+  "required": [
+    "upper_ontology_version",
+    "mappings",
+    "extensions_proposed",
+    "unaligned",
+    "confidence"
+  ]
+}

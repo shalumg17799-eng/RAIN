@@ -1,0 +1,24 @@
+RAIN platform PRD v0.2 factory extract
+This is the build-factory input distilled from the product requirements document version 0.2: the two mvp use cases, the entities of the planned data layer, and the governing policies. The full document remains the human reference.
+
+The platform gives rural health centers, their partners and state programs one platform for remote access to care and population-level insight, starting with smart scheduling with pattern-based reminders and rural population health insights.
+
+The platform manages patient and provider records with clinic_site context for the participating health centers.
+Smart scheduling uses schedule, slot and appointment records. Rural patients book, confirm or switch to telehealth with fewer wasted trips.
+Reminders use reminder_message and contact_preference data in the patient's own language over text or voice.
+Coverage checks use eligibility_check responses before a visit.
+Clinical history uses encounter, condition and medication records.
+Remote monitoring uses rpm_reading data for blood pressure, glucose, weight and oxygen trends.
+Social needs use sdoh_screening responses covering the five core social domains.
+Utilization analysis uses claim history for emergency and admission patterns.
+Risk and follow-up use risk_score and outreach_task records. Care coordinators get a prioritized follow-up list.
+County context uses county_metric, broadband_coverage and travel_time data for access and equity views.
+
+Use case 1, smart scheduling: which patients are likely to miss an appointment, which open slots fit them, and which visits can switch to telehealth?
+Use case 2, population health insights: which patients are rising risk across clinical, monitoring, social and utilization signals, and where are the county-level care gaps?
+
+Policy: the mvp runs on synthetic and public data only, labelled as such on every screen.
+Policy: patient matching uses name, birth date, address and phone with a manual review queue for uncertain matches.
+Policy: the platform flags and routes; clinicians decide.
+
+The platform also needs a no_show_rate entity that is not yet modelled.

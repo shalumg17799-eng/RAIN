@@ -34,3 +34,7 @@ artifacts/
 
 # docker: the Postgres seed is derived from the live DB (data!), never source
 /deploy/initdb/
+
+# DIF build-time factory runtime state (runs DB + object store)
+dif.db
+.data/

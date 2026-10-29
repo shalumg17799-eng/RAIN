@@ -1,0 +1,41 @@
+name: upper-ontology-alignment-agent
+version: 1.0.0
+description: Aligns every class of a lower ontology to the governed upper ontology, proposes extensions for unaligned classes, validates the alignment and persists a versioned ontology_alignment artifact.
+# Plan 5.6 / PRD US-013. Generic implementation; to be reconciled with the ontology definitions from DIF-8 / DIF-9.
+# input: {ontology, upper_ontology?, semantic_mappings?, domain_model?, min_confidence?}
+# Extensions in extensions_proposed are proposals only; accepting them is the governance gate (gate 2), not this agent.
+steps:
+  - id: align
+    skill: upper-ontology-aligner
+    input:
+      ontology: $.input.ontology
+      upper_ontology: $.input.upper_ontology
+      semantic_mappings: $.input.semantic_mappings
+      domain_model: $.input.domain_model
+      min_confidence: $.input.min_confidence
+  - id: validate
+    skill: ontology-validator
+    input:
+      ontology: $.input.ontology
+      alignment: $.steps.align.output
+      upper_ontology: $.input.upper_ontology
+output:
+  upper_ontology_version: $.steps.align.output.upper_ontology_version
+  mappings: $.steps.align.output.mappings
+  extensions_proposed: $.steps.align.output.extensions_proposed
+  unaligned: $.steps.align.output.unaligned
+  confidence: $.steps.align.output.confidence
+  validation: $.steps.validate.output
+persist:
+  kind: ontology_alignment
+  from:
+    upper_ontology_version: $.steps.align.output.upper_ontology_version
+    mappings: $.steps.align.output.mappings
+    extensions_proposed: $.steps.align.output.extensions_proposed
+    unaligned: $.steps.align.output.unaligned
+    confidence: $.steps.align.output.confidence
+    validation: $.steps.validate.output
+acceptance:
+  schema: alignment.v1.json
+  required_outputs: [mappings]
+  min_confidence: {path: $.steps.validate.output.score, value: 1.0}

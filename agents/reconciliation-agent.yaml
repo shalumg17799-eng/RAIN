@@ -1,0 +1,27 @@
+name: reconciliation-agent
+version: 1.0.0
+description: Semantic-to-data reconciliation - verifies that concepts, mappings, data assets and KPIs agree and reports readiness and unresolved gaps.
+steps:
+  - id: reconcile
+    skill: reconciler
+    input:
+      semantic_mappings: $.input.semantic_mappings
+      data_assets: $.input.data_assets
+      ontology: $.input.ontology
+      alignment: $.input.alignment
+      kag_release: $.input.kag_release
+      requirements: $.input.requirements
+      min_confidence: $.input.min_confidence
+output:
+  resolved: $.steps.reconcile.output.resolved
+  unresolved: $.steps.reconcile.output.unresolved
+  kpis: $.steps.reconcile.output.kpis
+  readiness: $.steps.reconcile.output.readiness
+  score: $.steps.reconcile.output.score
+  explanation: $.steps.reconcile.output.explanation
+persist:
+  kind: reconciliation
+  from: $.steps.reconcile.output
+acceptance:
+  schema: reconciliation.v1.json
+  required_outputs: [readiness]

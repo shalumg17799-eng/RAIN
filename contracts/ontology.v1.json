@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dif.radiant.digital/contracts/ontology.v1.json",
+  "title": "ontology",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "namespace": {
+      "type": "string"
+    },
+    "classes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "subclass_of": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "type": "object",
+            "properties": {
+              "entity": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "table": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "minItems": 1
+    },
+    "object_properties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          },
+          "cardinality": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "domain",
+          "range"
+        ]
+      }
+    },
+    "data_properties": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "datatype": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "domain",
+          "datatype"
+        ]
+      }
+    },
+    "axioms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "statement": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "statement"
+        ]
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "properties": {
+        "entities_total": {
+          "type": "integer"
+        },
+        "entities_covered": {
+          "type": "integer"
+        },
+        "tables_total": {
+          "type": "integer"
+        },
+        "tables_covered": {
+          "type": "integer"
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "issues": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "passed"
+      ]
+    }
+  },
+  "required": [
+    "name",
+    "version",
+    "namespace",
+    "classes",
+    "object_properties",
+    "data_properties",
+    "coverage",
+    "validation"
+  ]
+}

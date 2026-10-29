@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dif.radiant.digital/contracts/source-inventory.v1.json",
+  "title": "source-inventory",
+  "type": "object",
+  "properties": {
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "reachable",
+              "unreachable",
+              "not_configured",
+              "inline"
+            ]
+          },
+          "files": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "path": {
+                  "type": "string"
+                },
+                "hash": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "bytes": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                }
+              },
+              "required": [
+                "path"
+              ]
+            }
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "type",
+          "status"
+        ]
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "reachable": {
+          "type": "integer"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "files": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "required": [
+    "sources",
+    "summary"
+  ]
+}

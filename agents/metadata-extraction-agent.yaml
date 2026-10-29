@@ -1,0 +1,22 @@
+name: metadata-extraction-agent
+version: 1.0.0
+description: Extracts a normalized metadata graph from a PRD and source schemas, validates it, and persists it.
+steps:
+  - id: extract
+    skill: schema-metadata-extractor
+    input:
+      prd: $.input.prd
+      schemas: $.input.schemas
+  - id: validate
+    skill: metadata-validator
+    input:
+      extraction: $.steps.extract.output
+output:
+  metadata_graph: $.steps.extract.output.metadata_graph
+  tables: $.steps.extract.output.tables
+  columns: $.steps.extract.output.columns
+  lineage: $.steps.extract.output.lineage
+  validation: $.steps.validate.output
+persist:
+  kind: normalized_metadata_graph
+  from: $.steps.extract.output.metadata_graph

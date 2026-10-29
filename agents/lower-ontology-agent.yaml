@@ -1,0 +1,47 @@
+name: lower-ontology-agent
+version: 1.0.0
+description: Builds the enterprise lower ontology from the domain model, semantic mappings and metadata graph, validates it (provenance, dangling ranges, naming, 100% entity coverage) and persists a versioned lower_ontology artifact.
+# Plan 5.5 / PRD US-012. Generic implementation; to be reconciled with the ontology definitions from DIF-8 / DIF-9.
+# input: {domain_model, semantic_mappings?, extraction?, glossary?, namespace?}
+steps:
+  - id: build
+    skill: lower-ontology-builder
+    input:
+      domain_model: $.input.domain_model
+      semantic_mappings: $.input.semantic_mappings
+      extraction: $.input.extraction
+      glossary: $.input.glossary
+      namespace: $.input.namespace
+      name: $.input.name
+  - id: validate
+    skill: ontology-validator
+    input:
+      ontology: $.steps.build.output
+      domain_model: $.input.domain_model
+      extraction: $.input.extraction
+output:
+  name: $.steps.build.output.name
+  version: $.steps.build.output.version
+  namespace: $.steps.build.output.namespace
+  classes: $.steps.build.output.classes
+  object_properties: $.steps.build.output.object_properties
+  data_properties: $.steps.build.output.data_properties
+  axioms: $.steps.build.output.axioms
+  coverage: $.steps.build.output.coverage
+  validation: $.steps.validate.output
+persist:
+  kind: lower_ontology
+  from:
+    name: $.steps.build.output.name
+    version: $.steps.build.output.version
+    namespace: $.steps.build.output.namespace
+    classes: $.steps.build.output.classes
+    object_properties: $.steps.build.output.object_properties
+    data_properties: $.steps.build.output.data_properties
+    axioms: $.steps.build.output.axioms
+    coverage: $.steps.build.output.coverage
+    validation: $.steps.validate.output
+acceptance:
+  schema: ontology.v1.json
+  required_outputs: [classes]
+  min_confidence: {path: $.steps.validate.output.score, value: 1.0}

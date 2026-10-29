@@ -1,0 +1,23 @@
+RAIN rural health intelligence platform PRD
+
+The platform gives rural nevada health teams one governed view across fragmented clinical, telehealth, remote monitoring, claims, transport, public health and social systems, so that maternal risk, chronic disease deterioration, access gaps and data quality problems surface before they become emergencies.
+
+The platform manages patient and provider records with facility context for the participating critical access hospitals and rural health clinics.
+Maternal care tracking uses pregnancy_episode records to stratify elevated-risk pregnancies after obstetric service loss.
+Chronic disease management uses chronic_condition_enrollment and RPMReading data to detect deterioration in heart failure, lung disease, diabetes and hypertension cohorts.
+Utilization and medication adherence analysis uses claim_encounter and medication_fill history.
+Access coordination uses telehealth_session, transport_request and EMSCoverage records to balance transport demand against telehealth room capacity.
+Equity analysis uses SDOHFlag and connectivity_registry indicators linked to patients and zip codes.
+Interoperability monitoring uses data_source_feed, data_quality_event and provider_reference_issue records.
+Reporting uses metric_trend aggregates, and the platform keeps decisions and routed_actions records.
+
+Use case 1, maternal access: after the obstetric closure in humboldt county, which pregnant patients are at elevated risk and how far is the nearest delivery facility?
+Use case 2, chronic disease: which monitored patients are deteriorating while transportation barriers block in-person visits?
+Use case 3, rural operations: what is in today's transport queue, where is ems coverage thin, and which trips can convert to telehealth?
+Use case 4, population health and equity: how do access and outcomes differ by county, and what would mobile outreach change?
+Use case 5, interoperability: how fresh and complete is each connected feed, and where do provider references fail to resolve?
+
+Policy: personal health information is masked by default and every answer carries provenance.
+Policy: each persona only sees the rows their role is entitled to.
+
+The platform also needs a care_gap_score entity that is not yet modelled.

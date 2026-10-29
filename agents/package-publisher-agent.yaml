@@ -1,0 +1,41 @@
+name: package-publisher-agent
+version: 1.0.0
+description: Assembles the versioned Knowledge Package from the build-time artifacts and stores it immutably in the artifact store.
+steps:
+  - id: assemble
+    skill: package-assembler
+    input:
+      package_version: $.input.package_version
+      requirements: $.input.requirements
+      domain_model: $.input.domain_model
+      ontology: $.input.ontology
+      alignment: $.input.alignment
+      semantic_mappings: $.input.semantic_mappings
+      domain_catalog: $.input.domain_catalog
+      data_assets: $.input.data_assets
+      kag_release: $.input.kag_release
+      reconciliation: $.input.reconciliation
+      validation_reports: $.input.validation_reports
+      evaluation_report: $.input.evaluation_report
+      artifact_ids: $.input.artifact_ids
+  - id: store
+    skill: package-store
+    input: {package: $.steps.assemble.output, overwrite: $.input.overwrite}
+output:   # the manifest itself (contracts/manifest.v1.json) plus the store result
+  enterprise_id: $.steps.store.output.manifest.enterprise_id
+  package_version: $.steps.store.output.manifest.package_version
+  created_at: $.steps.store.output.manifest.created_at
+  uri: $.steps.store.output.manifest.uri
+  files: $.steps.store.output.manifest.files
+  versions: $.steps.store.output.manifest.versions
+  artifacts: $.steps.store.output.manifest.artifacts
+  validation: $.steps.store.output.manifest.validation
+  readiness: $.steps.store.output.manifest.readiness
+  data_status: $.steps.store.output.manifest.data_status
+  written: $.steps.store.output.written
+persist:
+  kind: knowledge_package
+  from: $.steps.store.output.manifest
+acceptance:
+  schema: manifest.v1.json
+  required_outputs: [files]

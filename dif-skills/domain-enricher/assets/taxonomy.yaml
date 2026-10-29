@@ -1,0 +1,29 @@
+# Default sample taxonomy (credit-union style). Replace or extend with real domain definitions from DIF-5 (Domain Data Modelling).
+# A table is scored against each capability by keyword hits: table-name tokens x3, column-name tokens x1 (max 3 per capability),
+# lineage source-system tokens x1, PRD sentences that mention the table x1 (max 2). Keywords with "_" match as phrases.
+version: 1
+domains:
+  - name: Lending
+    capabilities:
+      - name: Loan Origination
+        keywords: [loan, application, applicant, origination, underwriting, product_type, approval, apr, interest, collateral]
+      - name: Loan Servicing
+        keywords: [payment, installment, delinquency, servicing, payoff, amortization, escrow]
+  - name: Membership
+    capabilities:
+      - name: Member Management
+        keywords: [member, customer, party, joined, enrollment, profile, zip_code, address, contact]
+  - name: Deposits
+    capabilities:
+      - name: Account Management
+        keywords: [account, deposit, balance, ledger, transaction, statement, withdrawal]
+  - name: Compliance
+    capabilities:
+      - name: Fair Lending Monitoring
+        keywords: [fair, lending, hmda, disparate, approval_rate, snapshot, regulatory, audit]
+      - name: Regulatory Reporting
+        keywords: [report, reporting, filing, regulator, submission]
+  - name: Risk
+    capabilities:
+      - name: Credit Risk
+        keywords: [risk, score, rating, exposure, default, pd, lgd]

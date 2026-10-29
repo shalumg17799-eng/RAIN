@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dif.radiant.digital/contracts/normalized-metadata.v1.json",
+  "title": "normalized-metadata",
+  "type": "object",
+  "properties": {
+    "tables": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "columns": {
+      "type": "object"
+    },
+    "keys": {
+      "type": "object"
+    },
+    "lineage": {
+      "type": "object"
+    },
+    "metadata_graph": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      },
+      "required": [
+        "nodes",
+        "edges"
+      ]
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "valid": {
+          "type": "boolean"
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "issues": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "valid",
+        "confidence"
+      ]
+    }
+  },
+  "required": [
+    "tables",
+    "columns",
+    "lineage",
+    "metadata_graph",
+    "validation"
+  ]
+}

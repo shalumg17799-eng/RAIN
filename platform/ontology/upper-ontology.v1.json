@@ -1,0 +1,333 @@
+{
+  "name": "DIF Upper Ontology",
+  "version": "1.0.0",
+  "namespace": "https://dif.radiant.digital/ontology/upper#",
+  "description": "Governed, reusable foundational concepts. Enterprise lower ontologies align to these; extensions go through an approval gate. GENERIC PLACEHOLDER: to be replaced/merged with the ontology work in DIF-8/DIF-9.",
+  "concepts": [
+    {
+      "id": "Thing",
+      "name": "Thing",
+      "parent": null,
+      "description": "Root concept."
+    },
+    {
+      "id": "Party",
+      "name": "Party",
+      "parent": "Thing",
+      "description": "A person or organisation that takes part in business activity.",
+      "keywords": [
+        "party",
+        "customer",
+        "member",
+        "client",
+        "user",
+        "person",
+        "organisation",
+        "organization",
+        "company",
+        "vendor",
+        "supplier",
+        "employee",
+        "borrower",
+        "applicant"
+      ]
+    },
+    {
+      "id": "Person",
+      "name": "Person",
+      "parent": "Party",
+      "keywords": [
+        "person",
+        "individual",
+        "member",
+        "customer",
+        "employee",
+        "applicant",
+        "borrower"
+      ]
+    },
+    {
+      "id": "Organization",
+      "name": "Organization",
+      "parent": "Party",
+      "keywords": [
+        "organization",
+        "organisation",
+        "company",
+        "vendor",
+        "supplier",
+        "institution",
+        "bank",
+        "branch",
+        "department"
+      ]
+    },
+    {
+      "id": "Role",
+      "name": "Role",
+      "parent": "Thing",
+      "description": "A part a party plays in a context.",
+      "keywords": [
+        "role",
+        "officer",
+        "agent",
+        "owner"
+      ]
+    },
+    {
+      "id": "Agreement",
+      "name": "Agreement",
+      "parent": "Thing",
+      "description": "A binding arrangement between parties.",
+      "keywords": [
+        "agreement",
+        "contract",
+        "loan",
+        "policy",
+        "application",
+        "subscription",
+        "lease",
+        "mortgage",
+        "credit"
+      ]
+    },
+    {
+      "id": "Application",
+      "name": "Application",
+      "parent": "Agreement",
+      "keywords": [
+        "application",
+        "request",
+        "enrollment",
+        "enrolment",
+        "onboarding"
+      ]
+    },
+    {
+      "id": "Product",
+      "name": "Product",
+      "parent": "Thing",
+      "description": "Something offered to parties.",
+      "keywords": [
+        "product",
+        "offering",
+        "service",
+        "plan",
+        "package",
+        "item",
+        "sku"
+      ]
+    },
+    {
+      "id": "Account",
+      "name": "Account",
+      "parent": "Thing",
+      "description": "A ledger or relationship record holding balances or state for a party.",
+      "keywords": [
+        "account",
+        "wallet",
+        "balance",
+        "ledger",
+        "portfolio"
+      ]
+    },
+    {
+      "id": "Event",
+      "name": "Event",
+      "parent": "Thing",
+      "description": "Something that happened at a point in time.",
+      "keywords": [
+        "event",
+        "transaction",
+        "payment",
+        "order",
+        "claim",
+        "log",
+        "activity",
+        "visit",
+        "session",
+        "snapshot",
+        "incident",
+        "audit"
+      ]
+    },
+    {
+      "id": "Transaction",
+      "name": "Transaction",
+      "parent": "Event",
+      "keywords": [
+        "transaction",
+        "payment",
+        "transfer",
+        "disbursement",
+        "deposit",
+        "withdrawal",
+        "invoice"
+      ]
+    },
+    {
+      "id": "Asset",
+      "name": "Asset",
+      "parent": "Thing",
+      "description": "A thing of value that is owned or managed.",
+      "keywords": [
+        "asset",
+        "property",
+        "vehicle",
+        "equipment",
+        "device",
+        "collateral",
+        "inventory"
+      ]
+    },
+    {
+      "id": "Location",
+      "name": "Location",
+      "parent": "Thing",
+      "keywords": [
+        "location",
+        "address",
+        "site",
+        "region",
+        "country",
+        "city",
+        "geography",
+        "store",
+        "facility"
+      ]
+    },
+    {
+      "id": "Document",
+      "name": "Document",
+      "parent": "Thing",
+      "keywords": [
+        "document",
+        "file",
+        "record",
+        "statement",
+        "report",
+        "form",
+        "attachment",
+        "notice"
+      ]
+    },
+    {
+      "id": "Metric",
+      "name": "Metric",
+      "parent": "Thing",
+      "description": "A measured or derived quantity (KPI, score, rating).",
+      "keywords": [
+        "metric",
+        "score",
+        "rate",
+        "ratio",
+        "kpi",
+        "measure",
+        "index",
+        "rating",
+        "risk"
+      ]
+    },
+    {
+      "id": "Rule",
+      "name": "Rule",
+      "parent": "Thing",
+      "description": "A policy, regulation or business rule.",
+      "keywords": [
+        "rule",
+        "regulation",
+        "compliance",
+        "policy",
+        "limit",
+        "threshold",
+        "eligibility",
+        "fair_lending"
+      ]
+    },
+    {
+      "id": "Process",
+      "name": "Process",
+      "parent": "Thing",
+      "description": "A sequence of activities with a goal.",
+      "keywords": [
+        "process",
+        "workflow",
+        "case",
+        "pipeline",
+        "procedure",
+        "status",
+        "stage"
+      ]
+    },
+    {
+      "id": "TimePeriod",
+      "name": "TimePeriod",
+      "parent": "Thing",
+      "keywords": [
+        "period",
+        "month",
+        "quarter",
+        "year",
+        "date",
+        "calendar",
+        "fiscal"
+      ]
+    }
+  ],
+  "relations": [
+    {
+      "id": "partyHasAccount",
+      "name": "has account",
+      "domain": "Party",
+      "range": "Account"
+    },
+    {
+      "id": "partyPartyTo",
+      "name": "party to",
+      "domain": "Party",
+      "range": "Agreement"
+    },
+    {
+      "id": "agreementForProduct",
+      "name": "for product",
+      "domain": "Agreement",
+      "range": "Product"
+    },
+    {
+      "id": "eventInvolves",
+      "name": "involves",
+      "domain": "Event",
+      "range": "Thing"
+    },
+    {
+      "id": "eventAt",
+      "name": "occurred at",
+      "domain": "Event",
+      "range": "Location"
+    },
+    {
+      "id": "metricMeasures",
+      "name": "measures",
+      "domain": "Metric",
+      "range": "Thing"
+    },
+    {
+      "id": "ruleAppliesTo",
+      "name": "applies to",
+      "domain": "Rule",
+      "range": "Thing"
+    },
+    {
+      "id": "documentAbout",
+      "name": "about",
+      "domain": "Document",
+      "range": "Thing"
+    },
+    {
+      "id": "processActsOn",
+      "name": "acts on",
+      "domain": "Process",
+      "range": "Thing"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+name: data-acquisition-agent
+version: 1.0.0
+description: MVP-1 data acquisition without Databricks - routes the scenario (uc1 no sources, uc2 schema only, uc3 schema via MCP), derives a provisional schema from the domain model when needed, generates seeded synthetic data with FK integrity, lands it as CSV in the artifact store (Bronze-lite), profiles it and persists a data-assets readiness report.
+# input: {scenario?, requirements?, domain_model?, extraction?, schemas?, schema_calls?, sources?, rows_per_table?, seed?, format?}
+# uc2: extraction only | uc1: domain_model only | uc3: extraction (schema already resolved through MCP upstream) + schema_calls/sources
+steps:
+  - id: route
+    skill: scenario-router
+    input: {scenario: $.input.scenario, requirements: $.input.requirements, extraction: $.input.extraction,
+            schemas: $.input.schemas, schema_calls: $.input.schema_calls, sources: $.input.sources}
+  - id: provisional
+    skill: provisional-schema-generator
+    when: $.input.domain_model          # the generator only uses it for uc1 (or when no schema tables exist)
+    input: {domain_model: $.input.domain_model}
+  - id: generate
+    skill: synthetic-data-generator
+    input: {scenario: $.steps.route.output.scenario, tables_from_schema: $.input.extraction,
+            tables_provisional: $.steps.provisional.output.tables,
+            rows_per_table: $.input.rows_per_table, seed: $.input.seed}
+  - id: land
+    skill: data-landing
+    input: {tables: $.steps.generate.output.tables, synthetic: true, source: synthetic-data-generator, format: $.input.format}
+  - id: profile
+    skill: data-profiler
+    input: {tables: $.steps.generate.output.tables}
+  - id: report
+    skill: data-readiness-report
+    input: {scenario: $.steps.route.output.scenario, extraction: $.input.extraction, landed: $.steps.land.output,
+            profiles: $.steps.profile.output, provisional_schema: $.steps.provisional.output,
+            assumptions: [$.steps.route.output.assumptions, $.steps.provisional.output.assumptions, $.steps.generate.output.notes]}
+output:
+  scenario: $.steps.report.output.scenario
+  readiness_status: $.steps.report.output.readiness_status
+  tables: $.steps.report.output.tables
+  assumptions: $.steps.report.output.assumptions
+  gaps: $.steps.report.output.gaps
+  landing_uri: $.steps.report.output.landing_uri
+  provisional_schema: $.steps.report.output.provisional_schema
+persist:
+  kind: data_assets
+  from: $.steps.report.output
+acceptance:
+  schema: data-assets.v1.json
+  required_outputs: [tables]

@@ -1,0 +1,170 @@
+name: dif-build-orchestrator
+version: 1.0.0
+description: >
+  Build-time Data Intelligence Factory orchestrator. PRD intake, parallel discovery (domain model, metadata, source
+  inventory), validation, gate 1, enrichment, parallel ontology and data acquisition, upper-ontology alignment, gate 2,
+  KAG build, reconciliation, gate 3, knowledge package publication. Each stage runs as a linked child run.
+# Input: {prd (text), schemas[] (DDL text or catalog names) | schema_calls[] (MCP), sources[]?, glossary?, taxonomy?,
+#         namespace?, upper_ontology?, release?, package_version?, rows_per_table?, seed?, skip_judge?, auto_approve?,
+#         overwrite?}. auto_approve: true skips the three human gates (dry runs, evaluation, demos).
+defaults:
+  retry: {attempts: 2, backoff: {initial: 5, factor: 2, max: 60}}
+  timeout: 1800
+steps:
+  - id: intake
+    skill: prd-intake
+    input: {prd: $.input.prd, schemas: $.input.schemas, schema_calls: $.input.schema_calls, sources: $.input.sources, requirements: $.input.requirements}
+  - id: discover
+    on_error: fail_fast
+    parallel:
+      - id: model
+        agent: domain-modelling-agent
+        input: {prd: $.input.prd, requirements: $.steps.intake.output, glossary: $.input.glossary}
+      - id: metadata
+        agent: metadata-extraction-agent
+        input: {prd: $.input.prd, schemas: $.input.schemas}
+      - id: sources
+        skill: source-discovery
+        when: $.input.sources
+        input: {sources: $.input.sources}
+  - id: validate_discovery
+    agent: validation-agent
+    input:
+      subject: {domain_model: $.steps.model.output, metadata: $.steps.metadata.output}
+      rubric: "The domain model entities should be grounded in the PRD and the technical metadata should cover the entities the PRD needs; flag entities without tables and tables without business meaning."
+      required_keys: [domain_model, metadata]
+      thresholds: {"$.metadata.validation.confidence": 0.5, "$.domain_model.confidence": 0.3}
+      skip_judge: $.input.skip_judge
+  - id: gate_1
+    unless: $.input.auto_approve
+    approval:
+      title: "Gate 1: approve the domain model and technical metadata"
+      payload:
+        entities: $.steps.model.output.entities
+        tables: $.steps.metadata.output.tables
+        lineage: $.steps.metadata.output.lineage
+        metadata_validation: $.steps.metadata.output.validation
+        validation: $.steps.validate_discovery.output
+        sources: $.steps.sources.output
+  - id: enrich
+    agent: domain-enrichment-agent
+    input: {extraction: $.steps.metadata.output, domain_model: $.steps.model.output, prd: $.input.prd, taxonomy: $.input.taxonomy}
+  - id: build
+    on_error: fail_fast
+    parallel:
+      - id: ontology
+        agent: lower-ontology-agent
+        input:
+          domain_model: $.steps.model.output
+          semantic_mappings: $.steps.enrich.output.semantic_mappings
+          extraction: $.steps.metadata.output
+          glossary: $.steps.model.output.glossary
+          namespace: $.input.namespace
+      - id: acquire
+        agent: data-acquisition-agent
+        input:
+          scenario: $.steps.intake.output.scenario
+          requirements: $.steps.intake.output
+          domain_model: $.steps.model.output
+          extraction: $.steps.metadata.output
+          schema_calls: $.input.schema_calls
+          sources: $.input.sources
+          rows_per_table: $.input.rows_per_table
+          seed: $.input.seed
+  - id: align
+    agent: upper-ontology-alignment-agent
+    input:
+      ontology: $.steps.ontology.output
+      semantic_mappings: $.steps.enrich.output.semantic_mappings
+      domain_model: $.steps.model.output
+      upper_ontology: $.input.upper_ontology
+  - id: gate_2
+    unless: $.input.auto_approve
+    approval:
+      title: "Gate 2: approve the ontology and the proposed upper-ontology extensions"
+      payload:
+        coverage: $.steps.ontology.output.coverage
+        classes: $.steps.ontology.output.classes
+        alignment_confidence: $.steps.align.output.confidence
+        extensions_proposed: $.steps.align.output.extensions_proposed
+        unaligned: $.steps.align.output.unaligned
+  - id: kag
+    agent: kag-builder-agent
+    input:
+      ontology: $.steps.ontology.output
+      alignment: $.steps.align.output
+      extraction: $.steps.metadata.output
+      semantic_mappings: $.steps.enrich.output.semantic_mappings
+      data_assets: $.steps.acquire.output
+      release: $.input.release
+  - id: reconcile
+    agent: reconciliation-agent
+    input:
+      semantic_mappings: $.steps.enrich.output.semantic_mappings
+      data_assets: $.steps.acquire.output
+      ontology: $.steps.ontology.output
+      alignment: $.steps.align.output
+      kag_release: $.steps.kag.output
+      requirements: $.steps.intake.output
+  - id: gate_3
+    unless: $.input.auto_approve
+    approval:
+      title: "Gate 3: approve publication of the knowledge package"
+      payload:
+        readiness: $.steps.reconcile.output.readiness
+        score: $.steps.reconcile.output.score
+        unresolved: $.steps.reconcile.output.unresolved
+        explanation: $.steps.reconcile.output.explanation
+        data_status: $.steps.acquire.output.readiness_status
+        data_gaps: $.steps.acquire.output.gaps
+        kag: $.steps.kag.output.counts
+        kag_published: $.steps.kag.output.published
+        kag_validation: $.steps.kag.output.validation
+  - id: publish
+    agent: package-publisher-agent
+    input:
+      package_version: $.input.package_version
+      requirements: $.steps.intake.output
+      domain_model: $.steps.model.output
+      ontology: $.steps.ontology.output
+      alignment: $.steps.align.output
+      semantic_mappings: $.steps.enrich.output.semantic_mappings
+      domain_catalog: $.steps.enrich.output.domain_catalog
+      data_assets: $.steps.acquire.output
+      kag_release: $.steps.kag.output
+      reconciliation: $.steps.reconcile.output
+      validation_reports: [$.steps.validate_discovery.output]
+      overwrite: $.input.overwrite
+output:
+  scenario: $.steps.intake.output.scenario
+  entities: $.steps.model.output.entities
+  tables: $.steps.metadata.output.tables
+  domain_catalog: $.steps.enrich.output.domain_catalog
+  ontology_classes: $.steps.ontology.output.classes
+  alignment: $.steps.align.output.mappings
+  extensions_proposed: $.steps.align.output.extensions_proposed
+  data_status: $.steps.acquire.output.readiness_status
+  kag_release: $.steps.kag.output.release
+  kag_published: $.steps.kag.output.published
+  readiness: $.steps.reconcile.output.readiness
+  unresolved: $.steps.reconcile.output.unresolved
+  package_version: $.steps.publish.output.package_version
+  package_uri: $.steps.publish.output.uri
+  package_files: $.steps.publish.output.files
+  child_runs:
+    model: $.steps.model.child_run
+    metadata: $.steps.metadata.child_run
+    validation: $.steps.validate_discovery.child_run
+    enrich: $.steps.enrich.child_run
+    ontology: $.steps.ontology.child_run
+    acquire: $.steps.acquire.child_run
+    align: $.steps.align.child_run
+    kag: $.steps.kag.child_run
+    reconcile: $.steps.reconcile.child_run
+    publish: $.steps.publish.child_run
+persist:
+  kind: requirements
+  from: $.steps.intake.output
+acceptance:
+  required_outputs: [package_version, package_uri, readiness, kag_release]
+  required_artifacts: [requirements]
