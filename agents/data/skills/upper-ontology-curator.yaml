@@ -19,8 +19,10 @@ max_repairs: 2
 confidence_threshold: 0.6
 retry_on_low_confidence: true
 # the ontology is a large artifact (~25k output tokens observed) over large inputs; each finish
-# or repair turn re-emits the whole thing
-token_budget: 300000
+# or repair turn re-emits the whole thing. Reconciling against an existing upper ontology
+# (--existing-upper) roughly doubles every turn: the baseline rides along in context and the
+# merged ontology is re-emitted whole, so the budget is sized for that worst case.
+token_budget: 700000
 timeout_ms: 1800000
 tools:
 - read_lower_ontology

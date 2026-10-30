@@ -83,5 +83,7 @@ output:
 limits:
   max_refines: 4
   max_steps: 40
-  max_tokens: 900000
+  # sized for ontology curation against an existing upper ontology: up to 8 persona branches,
+  # each re-emitting the merged ontology per turn (see upper-ontology-curator token_budget)
+  max_tokens: 4500000
   deadline_ms: 7200000

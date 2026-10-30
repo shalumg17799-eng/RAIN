@@ -30,7 +30,7 @@ def schema(name):
 
 def make(tmp):
     store = Store(f"sqlite:///{tmp}/t.db")
-    return Runtime(store, SkillRegistry(settings.skills_dirs), AgentRegistry(ROOT / "agents", store, ROOT / "contracts"),
+    return Runtime(store, SkillRegistry(settings.skills_dirs), AgentRegistry(settings.agents_dir, store, ROOT / "contracts"),
                    LocalExecutor(2), ArtifactStore(f"file://{tmp}/art"), ROOT / "contracts")
 
 

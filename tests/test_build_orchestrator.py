@@ -22,7 +22,7 @@ KINDS = {"requirements", "domain_model", "normalized_metadata_graph", "validatio
 
 def make(tmp):
     store = Store(f"sqlite:///{tmp}/t.db")
-    return Runtime(store, SkillRegistry(settings.skills_dirs), AgentRegistry(ROOT / "agents", store, ROOT / "contracts"),
+    return Runtime(store, SkillRegistry(settings.skills_dirs), AgentRegistry(settings.agents_dir, store, ROOT / "contracts"),
                    LocalExecutor(3), ArtifactStore(f"file://{tmp}/art"), ROOT / "contracts")
 
 

@@ -16,7 +16,7 @@ INP = {"prd": PRD, "schemas": ["loan_application", "member", "fair_lending_snaps
 def make():
     db = Path(tempfile.mkdtemp()) / "t.db"
     store = Store(f"sqlite:///{db}")
-    return Runtime(store, SkillRegistry(settings.skills_dir), AgentRegistry(ROOT / "agents", store, ROOT / "contracts"), LocalExecutor(2))
+    return Runtime(store, SkillRegistry(settings.skills_dir), AgentRegistry(settings.agents_dir, store, ROOT / "contracts"), LocalExecutor(2))
 
 
 def test_registry_discovers_and_versions():

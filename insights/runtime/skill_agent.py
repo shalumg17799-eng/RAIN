@@ -399,7 +399,9 @@ class SkillAgent:
             Message(role="user", content=self._render_task(input)),
         ]
 
-        tokens_at_start = ctx["usage"].total().total
+        # This agent's own spend. The run meter (ctx["usage"]) is shared with every parallel
+        # fan-out sibling, so a meter delta would charge this agent for its siblings' tokens.
+        own_prompt_tokens = own_completion_tokens = 0
         started = time.monotonic()
         iterations = tool_calls = repairs = 0
         draft: dict[str, Any] | None = None
@@ -407,7 +409,6 @@ class SkillAgent:
         identical_calls: dict[str, int] = {}
 
         def finish(label: str, confidence: float, reason: str | None) -> dict[str, Any]:
-            usage = ctx["usage"].total()
             if label == "escalate":
                 self._emit_note(ctx, "agent_escalate")
             return {
@@ -421,9 +422,9 @@ class SkillAgent:
                 "repairs": repairs,
                 "duration_ms": round((time.monotonic() - started) * 1000),
                 "tokens": {
-                    "total": usage.total - tokens_at_start,
-                    "prompt_tokens": usage.prompt_tokens,
-                    "completion_tokens": usage.completion_tokens,
+                    "total": own_prompt_tokens + own_completion_tokens,
+                    "prompt_tokens": own_prompt_tokens,
+                    "completion_tokens": own_completion_tokens,
                 },
             }
 
@@ -449,7 +450,7 @@ class SkillAgent:
             iterations = turn
             if ctx["deadline"].expired():
                 return finish("escalate", draft_confidence, "deadline: the time budget ran out")
-            spent = ctx["usage"].total().total - tokens_at_start
+            spent = own_prompt_tokens + own_completion_tokens
             if spent >= spec.token_budget:
                 return finish(
                     "escalate",
@@ -463,6 +464,8 @@ class SkillAgent:
                 completion = ctx["gateway"].complete(
                     messages, spec.purpose, ctx, response_schema=envelope_schema
                 )
+                own_prompt_tokens += completion.usage.prompt_tokens
+                own_completion_tokens += completion.usage.completion_tokens
             except ResponseSchemaError as exc:
                 escalated = repair([f"the reply was not a valid action envelope: {exc}"], None)
                 if escalated is not None:
@@ -473,7 +476,11 @@ class SkillAgent:
                     "escalate", draft_confidence, f"model_unavailable: {type(exc).__name__}"
                 )
             except GatewayError as exc:
-                return finish("escalate", draft_confidence, f"gateway_error: {type(exc).__name__}")
+                return finish(
+                    "escalate",
+                    draft_confidence,
+                    f"gateway_error: {type(exc).__name__}: {str(exc)[:160]}",
+                )
 
             content = completion.content
             if getattr(completion, "truncated", False):

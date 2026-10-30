@@ -156,8 +156,12 @@ class SkillAgentTests(unittest.TestCase):
         class ExpensiveGateway(FakeGateway):
             def complete(self, messages, purpose, ctx, response_schema=None):
                 result = super().complete(messages, purpose, ctx, response_schema)
-                ctx["usage"].add(9_000, 500)  # this call alone blows the budget
-                return result
+                ctx["usage"].add(9_000, 500)  # the run meter records it too
+                # this call alone blows the budget: the agent accounts its OWN completions'
+                # usage, never the shared run meter (parallel siblings write there as well)
+                return result.model_copy(
+                    update={"usage": Usage(prompt_tokens=9_000, completion_tokens=500)}
+                )
 
         gateway = ExpensiveGateway([
             {"action": "use_tool", "tool": "echo", "tool_args": {"value": "x"}},

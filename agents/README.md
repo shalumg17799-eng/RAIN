@@ -1,5 +1,8 @@
 # Agents
 
+This folder holds ONLY the RAIN insights-runtime packs. The DIF build-time (knowledge gathering)
+agents live in `knowledge-gathering/agents/` beside their skills (`knowledge-gathering/skills/`).
+
 Nothing in this folder contains code — these files configure runtimes that live under
 `insights/runtime/`. The layout mirrors the two independent skill packs:
 

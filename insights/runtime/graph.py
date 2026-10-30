@@ -58,6 +58,14 @@ def _merge_fanout(
     return out
 
 
+def _first_failure(
+    left: dict[str, Any] | None, right: dict[str, Any] | None
+) -> dict[str, Any] | None:
+    """Parallel fan-out branches can fail in the same superstep; the first recorded failure
+    stands (without a reducer LangGraph rejects the concurrent writes outright)."""
+    return left if left is not None else right
+
+
 class GraphState(TypedDict, total=False):
     input: dict[str, Any]
     steps: Annotated[dict[str, Any], _merge]
@@ -65,7 +73,7 @@ class GraphState(TypedDict, total=False):
     refine: dict[str, Any]
     trace: Annotated[list[dict[str, Any]], operator.add]
     fanout: Annotated[dict[str, list[Any]], _merge_fanout]
-    failure: dict[str, Any] | None
+    failure: Annotated[dict[str, Any] | None, _first_failure]
 
 
 class SupervisorState(GraphState, total=False):
@@ -128,6 +136,11 @@ class CompiledAgent:
             "configurable": {"scope": scope, "thread_id": scope.thread_id},
             "recursion_limit": recursion_limit,
         }
+        # INSIGHTS_MAX_CONCURRENCY caps parallel fan-out branches (unset = unbounded). Large
+        # fan-outs of heavyweight prompts can trip provider rate limits when fired all at once.
+        raw_limit = (os.environ.get("INSIGHTS_MAX_CONCURRENCY") or "").strip()
+        if raw_limit.isdigit() and int(raw_limit) > 0:
+            config["max_concurrency"] = int(raw_limit)
         try:
             stream_input = None if resume else initial
             for values in self._graph.stream(stream_input, config=config, stream_mode="values"):

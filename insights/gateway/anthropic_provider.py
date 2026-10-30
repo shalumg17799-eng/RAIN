@@ -1,6 +1,7 @@
 """Native Anthropic Messages API provider for the governed LLM gateway."""
 
 import json
+import time
 from collections.abc import Mapping
 from typing import Any
 from urllib.parse import urlsplit
@@ -11,6 +12,20 @@ from insights.gateway.openai_compat import Transport, TransportResponse, UrllibT
 
 DEFAULT_BASE_URL = "https://api.anthropic.com/v1"
 ANTHROPIC_VERSION = "2023-06-01"
+# Rate limits, overload and transient server/transport errors are retried with backoff: a
+# completion request is pure, so re-sending it is always safe. Anything else fails immediately.
+RETRYABLE_STATUS = frozenset({408, 409, 429, 500, 502, 503, 504, 529})
+_RETRY_SLEEPS = (10.0, 30.0, 60.0)  # module-level so tests can stub the backoff
+
+
+def _error_kind(body: bytes) -> str:
+    """The error *type* from an Anthropic error body (e.g. rate_limit_error, overloaded_error).
+    Only this short identifier is surfaced; the body itself is never echoed into messages."""
+    try:
+        kind = json.loads(body).get("error", {}).get("type")
+        return str(kind) if kind else ""
+    except Exception:
+        return ""
 
 
 def _schema_directive(schema: dict[str, Any]) -> str:
@@ -84,19 +99,31 @@ class AnthropicProvider:
         }
         if request.no_store:
             headers["Cache-Control"] = "no-store"
-        try:
-            response: TransportResponse = self._transport.post(
-                f"{self._base_url}/messages",
-                headers,
-                json.dumps(payload).encode("utf-8"),
-                self._timeout_s,
-            )
-        except ProviderError:
-            raise
-        except Exception as exc:
-            raise ProviderError(f"transport failed: {type(exc).__name__}") from exc
-        if response.status != 200:
-            raise ProviderError(f"Anthropic provider returned HTTP {response.status}")
+        body = json.dumps(payload).encode("utf-8")
+        response: TransportResponse | None = None
+        for attempt in range(len(_RETRY_SLEEPS) + 1):
+            try:
+                response = self._transport.post(
+                    f"{self._base_url}/messages", headers, body, self._timeout_s
+                )
+            except ProviderError:
+                if attempt == len(_RETRY_SLEEPS):
+                    raise
+                time.sleep(_RETRY_SLEEPS[attempt])
+                continue
+            except Exception as exc:
+                raise ProviderError(f"transport failed: {type(exc).__name__}") from exc
+            if response.status == 200:
+                break
+            if response.status not in RETRYABLE_STATUS or attempt == len(_RETRY_SLEEPS):
+                kind = _error_kind(response.body)
+                raise ProviderError(
+                    f"Anthropic provider returned HTTP {response.status}"
+                    + (f" ({kind})" if kind else "")
+                    + (f" after {attempt + 1} attempts" if attempt else "")
+                )
+            time.sleep(_RETRY_SLEEPS[attempt])
+        assert response is not None  # the loop either breaks with a 200 or raises
 
         try:
             data = json.loads(response.body)

@@ -12,11 +12,11 @@ def _dirs(env, default):
 
 class Settings:
     database_url = os.getenv("DIF_DATABASE_URL", f"sqlite:///{ROOT}/dif.db")
-    skills_dir = Path(os.getenv("DIF_SKILLS_DIR", ROOT / "dif-skills"))  # "skills/" belongs to the RAIN insights packs in this repo
+    skills_dir = Path(os.getenv("DIF_SKILLS_DIR", ROOT / "knowledge-gathering" / "skills"))  # "skills/" belongs to the RAIN insights packs in this repo
     # Layered skill directories: later directories override earlier ones for the same skill name/version (and
     # enterprise-specific overrides live under enterprises/<id>/skills). DIF_SKILLS_DIRS is os.pathsep separated.
-    skills_dirs = _dirs("DIF_SKILLS_DIRS", [skills_dir, ROOT / "skills-factory", *sorted(ROOT.glob("enterprises/*/skills"))])
-    agents_dir = Path(os.getenv("DIF_AGENTS_DIR", ROOT / "agents"))
+    skills_dirs = _dirs("DIF_SKILLS_DIRS", [skills_dir, *sorted(ROOT.glob("enterprises/*/skills"))])
+    agents_dir = Path(os.getenv("DIF_AGENTS_DIR", ROOT / "knowledge-gathering" / "agents"))
     contracts_dir = Path(os.getenv("DIF_CONTRACTS_DIR", ROOT / "contracts"))
     platform_dir = Path(os.getenv("DIF_PLATFORM_DIR", ROOT / "platform"))   # governed platform assets (upper ontology)
     schema_catalog_dir = Path(os.getenv("DIF_SCHEMA_CATALOG", ROOT / "samples" / "schemas"))

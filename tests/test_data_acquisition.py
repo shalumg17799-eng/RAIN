@@ -51,7 +51,7 @@ def tmp():
 
 def make(tmp):
     store = Store(f"sqlite:///{tmp}/t.db")
-    return Runtime(store, SKILLS, AgentRegistry(ROOT / "agents", store, ROOT / "contracts"), LocalExecutor(2),
+    return Runtime(store, SKILLS, AgentRegistry(settings.agents_dir, store, ROOT / "contracts"), LocalExecutor(2),
                    ArtifactStore(f"file://{tmp}/artifacts"), ROOT / "contracts")
 
 

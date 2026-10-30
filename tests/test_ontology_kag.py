@@ -76,7 +76,7 @@ def build(**over):
 def make_runtime():
     tmp = Path(tempfile.mkdtemp())
     store = Store(f"sqlite:///{tmp}/t.db")
-    return Runtime(store, SkillRegistry(settings.skills_dirs), AgentRegistry(ROOT / "agents", store, ROOT / "contracts"),
+    return Runtime(store, SkillRegistry(settings.skills_dirs), AgentRegistry(settings.agents_dir, store, ROOT / "contracts"),
                    LocalExecutor(2), ArtifactStore(f"file://{tmp}/artifacts"), ROOT / "contracts")
 
 
@@ -413,7 +413,7 @@ def test_kag_builder_never_publishes_an_invalid_graph(monkeypatch):
     onto = build()
     al = skill("upper-ontology-aligner").execute({"ontology": onto})
     store = Store(f"sqlite:///{Path(tempfile.mkdtemp())}/t.db")
-    rt = Runtime(store, SKILLS, AgentRegistry(ROOT / "agents", store, ROOT / "contracts"), LocalExecutor(1),
+    rt = Runtime(store, SKILLS, AgentRegistry(settings.agents_dir, store, ROOT / "contracts"), LocalExecutor(1),
                  ArtifactStore(f"file://{tempfile.mkdtemp()}"), ROOT / "contracts")
     bad_ext = {**EXTRACTION, "tables": [*EXTRACTION["tables"], "lonely_table"]}  # a table with no columns/edges/mapping -> orphan node
     run = rt.start("kag-builder-agent", {"ontology": onto, "alignment": al, "extraction": bad_ext, "release": "rel-bad"})
@@ -428,7 +428,7 @@ def test_kag_builder_never_publishes_an_invalid_graph(monkeypatch):
 # ---- platform KAG seed: registry-driven, agent, CLI ------------------------------------------------------
 def make_rt():
     store = Store(f"sqlite:///{Path(tempfile.mkdtemp())}/t.db")
-    return Runtime(store, SkillRegistry(settings.skills_dirs), AgentRegistry(ROOT / "agents", store, ROOT / "contracts"), LocalExecutor(1),
+    return Runtime(store, SkillRegistry(settings.skills_dirs), AgentRegistry(settings.agents_dir, store, ROOT / "contracts"), LocalExecutor(1),
                    ArtifactStore(f"file://{tempfile.mkdtemp()}"), ROOT / "contracts")
 
 

@@ -59,6 +59,11 @@ log = logging.getLogger("rain.api")
 
 app = FastAPI(title="Radiant V2 API", version="2.0")
 app.include_router(get_rain_router(), prefix="/api/v2")
+
+# Generated data API (synthetic + public_data schemas) - produced by
+# deploy/scripts/build_data_api.py; regenerate, don't edit.
+from data_api import router as data_router  # noqa: E402
+app.include_router(data_router, prefix="/api/v2/data")
 # expose_headers lets the browser's fetch() read X-RAIN-Source, which the
 # frontend logs as proof a response came from this server.
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
