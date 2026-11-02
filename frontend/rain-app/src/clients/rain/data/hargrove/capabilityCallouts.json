@@ -1,0 +1,26 @@
+[
+  {
+    "trigger": "home_load",
+    "capabilityName": "Proactive Intelligence",
+    "description": "RAIN recomputes the clinic's quality picture on every refresh — risk-mix shift, care-gap closure pace, ED concentration — and surfaces what moved before the measure period closes, so the quality program reacts mid-quarter instead of at the report deadline.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_1",
+    "capabilityName": "Anomaly Detection",
+    "description": "Catches the distribution shift no single chart shows — the high tier absorbing weight from monitoring trends and utilization patterns at once — and explains each tier assignment with its top reasons, down to the ranked patient worklist.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_2",
+    "capabilityName": "Predictive Intelligence",
+    "description": "Traces every open care gap to its measure, its patient, and the outreach task carrying it, and projects which gaps the scheduling loop closes fastest — the high-tier patients with a bookable slot inside two weeks.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_3",
+    "capabilityName": "Automated Action",
+    "description": "Assembles the board-ready quality report from the conversation — risk mix, closure pace, ED pattern, benchmarks against county baselines — with measure definitions, provenance on every number, and the synthetic-data label on every page.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  }
+]

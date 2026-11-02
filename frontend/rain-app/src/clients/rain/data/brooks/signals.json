@@ -1,0 +1,47 @@
+[
+  {
+    "id": "SIG-RAIN-KAYLA-001",
+    "type": "no_show_risk",
+    "title": "High No-Show Risk on This Week's Booked Visits",
+    "description": "53 of the 200 booked visits on the schedule carry a high no-show risk from their pattern profile — prior no-shows, long travel, or slow reminder response. Per the reminder rules, these patients get touches at 72, 24, and 3 hours on their preferred channel, and the 24-hour reminder offers telehealth where the visit is eligible.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 53,
+    "sources": ["Scheduling System", "Reminder Engine", "Pattern Profiles"],
+    "timestamp": "2026-11-02T06:00:00",
+    "trend": "stable",
+    "related_segment": null,
+    "metrics": { "booked_visits": 200, "high_risk": 53, "reminder_touches": 3 },
+    "affected_unit": "visits"
+  },
+  {
+    "id": "SIG-RAIN-KAYLA-002",
+    "type": "telehealth_slot_gap",
+    "title": "Open Telehealth Slots While Long-Drive Visits Hold",
+    "description": "39 telehealth slots are open across nearby clinics while patients with more than an hour's drive hold in-person bookings for telehealth-eligible visit reasons. Offering the switch in the 24-hour reminder converts wasted trips into kept visits.",
+    "impact": "medium",
+    "severity": "warning",
+    "affected_count": 39,
+    "sources": ["Scheduling System", "Slot Inventory", "Travel Time Matrix"],
+    "timestamp": "2026-11-02T06:00:00",
+    "trend": "stable",
+    "related_segment": null,
+    "metrics": { "open_telehealth_slots": 39, "telehealth_capable_sites": 95 },
+    "affected_unit": "slots"
+  },
+  {
+    "id": "SIG-RAIN-KAYLA-003",
+    "type": "eligibility_lapse",
+    "title": "Coverage Checks Coming Back Inactive",
+    "description": "Only 41 of 200 eligibility checks returned active coverage this cycle. Per the exception flow, booking still completes for lapsed patients — the appointment is flagged and the patient is routed to an enrollment assister, so a coverage lapse never blocks care.",
+    "impact": "medium",
+    "severity": "warning",
+    "affected_count": 159,
+    "sources": ["Eligibility Service (270/271)", "Scheduling System"],
+    "timestamp": "2026-11-02T06:00:00",
+    "trend": "stable",
+    "related_segment": null,
+    "metrics": { "checks_run": 200, "active": 41 },
+    "affected_unit": "checks"
+  }
+]

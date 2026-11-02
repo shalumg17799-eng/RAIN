@@ -17,6 +17,13 @@ const PERSONA_ID_MAP = {
   rain_tomley: 'james',
   rain_nair: 'priya',
   rain_yazzie: 'david',
+  // PRD v0.2 wave -- live signals/KPIs only; no governed-ask tokens yet, so
+  // chat answers play the scripted flows until ask_cache entries exist.
+  rain_brooks: 'kayla',
+  rain_holloway: 'denise',
+  rain_okafor: 'samuel',
+  rain_hargrove: 'linda',
+  rain_bell: 'marcus',
 };
 
 async function fetchSignalBrief(personaId) {

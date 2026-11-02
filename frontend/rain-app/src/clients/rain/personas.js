@@ -78,4 +78,81 @@ export const rainPersonas = {
       'Automated Action',
     ],
   },
+
+  // ── PRD v0.2 wave (doc/prd/RAIN_Platform_PRD_v0.2.docx §2) ────────────────
+  // The v0.2 PRD's two MVP use cases: UC-01 smart scheduling with
+  // pattern-based reminders, UC-02 rural population health insights.
+  // Rosa Martínez (rural patient) is the patient-facing /patient route, not an
+  // operator persona; Hannah Lee (payer / MCO analyst) is Phase 2 per the PRD.
+
+  // 6 — Clinic scheduler / front desk (UC-01).
+  rain_brooks: {
+    id: 'rain_brooks',
+    name: 'Kayla Brooks',
+    initials: 'KB',
+    role: 'Clinic Scheduler / Front Desk',
+    greeting: 'Kayla',
+    capabilities: [
+      'Proactive Intelligence',
+      'Converged Conversation',
+      'Predictive Intelligence',
+      'Automated Action',
+    ],
+  },
+  // 7 — Community health worker / care coordinator (UC-01, UC-02).
+  rain_holloway: {
+    id: 'rain_holloway',
+    name: 'Denise Holloway',
+    initials: 'DH',
+    role: 'Community Health Worker / Care Coordinator',
+    greeting: 'Denise',
+    capabilities: [
+      'Proactive Intelligence',
+      'Friction Observability',
+      'Predictive Intelligence',
+      'Automated Action',
+    ],
+  },
+  // 8 — Provider: physician, NP, PA (UC-01, UC-02).
+  rain_okafor: {
+    id: 'rain_okafor',
+    name: 'Dr. Samuel Okafor',
+    initials: 'SO',
+    role: 'Rural Provider (Physician, NP, PA)',
+    greeting: 'Dr. Okafor',
+    capabilities: [
+      'Proactive Intelligence',
+      'Converged Conversation',
+      'Predictive Intelligence',
+      'Automated Action',
+    ],
+  },
+  // 9 — Clinic medical / quality director (UC-02).
+  rain_hargrove: {
+    id: 'rain_hargrove',
+    name: 'Dr. Linda Hargrove',
+    initials: 'LH',
+    role: 'Clinic Medical / Quality Director',
+    greeting: 'Dr. Hargrove',
+    capabilities: [
+      'Proactive Intelligence',
+      'Anomaly Detection',
+      'Predictive Intelligence',
+      'Automated Action',
+    ],
+  },
+  // 10 — State RHTP program manager (UC-02).
+  rain_bell: {
+    id: 'rain_bell',
+    name: 'Marcus Bell',
+    initials: 'MB',
+    role: 'State RHTP Program Manager',
+    greeting: 'Marcus',
+    capabilities: [
+      'Proactive Intelligence',
+      'Anomaly Detection',
+      'Predictive Intelligence',
+      'Automated Action',
+    ],
+  },
 };

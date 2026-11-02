@@ -5,6 +5,7 @@ import {
   Map, Truck, Layers, Building2,
   DollarSign, Activity, WifiOff,
   Database, ShieldCheck, UserX, Clock,
+  MessageSquare, ClipboardList,
 } from 'lucide-react';
 import SignalCard from '@/components/cards/SignalCard';
 import { personaUIConfigs } from '@/clients/personaConfigs';
@@ -20,6 +21,12 @@ const PERSONA_ID_MAP = {
   rain_tomley: 'james',
   rain_nair: 'priya',
   rain_yazzie: 'david',
+  // PRD v0.2 wave (UC-01 smart scheduling, UC-02 population health insights)
+  rain_brooks: 'kayla',
+  rain_holloway: 'denise',
+  rain_okafor: 'samuel',
+  rain_hargrove: 'linda',
+  rain_bell: 'marcus',
 };
 
 // KPI icon name (string, from the backend) -> the real lucide-react
@@ -32,6 +39,7 @@ export const KPI_ICON_MAP = {
   Map, Truck, Layers, Building2,
   DollarSign, Activity, WifiOff,
   Database, ShieldCheck, UserX, Clock,
+  MessageSquare, ClipboardList,
 };
 
 /**

@@ -1,0 +1,131 @@
+{
+  "greeting": {
+    "ai_message": "Good morning, Marcus. The program view is current across 165 counties: care gaps are concentrating in the rural counties with the fewest connected clinic sites, 96 coverage areas in the footprint remain unserved by qualifying broadband while 95 of 200 connected sites are telehealth-capable, and the 96 ED-flagged claims distribute unevenly across clinics once county benchmarks are applied. All of it runs on synthetic and public data, labelled on every screen. Want me to start with the county care-gap concentration?",
+    "suggested_chips": [
+      "Which counties concentrate the most care gaps?",
+      "Where do broadband dead zones limit telehealth?",
+      "Which clinics diverge from their county ED baseline?"
+    ],
+    "data_sources_used": ["County Metrics", "CDC PLACES", "Broadband Coverage (FCC)", "Claims"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+
+  "turn_1_counties": {
+    "user_query": "Which counties concentrate the most care gaps?",
+    "ai_message": "Rolling every clinic's risk tiers and open gaps up to the county level: the concentration sits in the frontier counties that pair high social vulnerability with the fewest connected sites — need and capacity pulling in opposite directions. The state scope shows each county's gap density against its CDC PLACES prevalence baseline and its rurality code, so you can separate counties that are behind because need is extreme from counties that are behind because reach is thin. Drill-down goes county, then clinic, then the ranked patient worklist at the clinic's own scope — the state view never exposes patient identity.",
+    "suggested_chips": [
+      "Compare counties against public benchmarks",
+      "Where do broadband dead zones limit telehealth?",
+      "Show me program reach and outcomes by clinic",
+      "What public datasets back the county view?"
+    ],
+    "data_sources_used": ["County Metrics", "Risk Engine", "CDC PLACES", "SVI County Data", "RUCC Codes"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_2_benchmark": {
+    "user_query": "Compare counties against public benchmarks",
+    "ai_message": "The benchmark join runs each county's program metrics against the public baselines: CDC PLACES for prevalence, the social vulnerability index for need, the rurality codes for context, and the provider-shortage designations for capacity. The counties that outperform their baseline despite high vulnerability are the program's proof points; the ones that trail despite normal vulnerability are where the funding conversation starts. Every benchmark figure carries its source dataset and vintage, so the CMS submission can cite exactly what it compared against.",
+    "suggested_chips": [
+      "Generate the CMS reporting package",
+      "Which clinics diverge from their county ED baseline?",
+      "Which counties concentrate the most care gaps?"
+    ],
+    "data_sources_used": ["CDC PLACES", "SVI County Data", "RUCC Codes", "HRSA Shortage Areas", "County Metrics"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_3_cms": {
+    "user_query": "Generate the CMS reporting package",
+    "ai_message": "The reporting package is assembled on the need-reach-outcomes frame: need from the county benchmarks, reach from the 200 connected sites and the patients engaged through scheduling and outreach, outcomes from gap closure, telehealth conversion, and the ED divergence view. County and clinic tables carry provenance and dataset vintages, the synthetic-and-public-data label sits on every page, and the appendix maps each figure to the RHTP reporting priorities. Nothing in the package identifies a patient — the state scope aggregates only.",
+    "suggested_chips": [
+      "Share the package with the clinic directors",
+      "Compare counties against public benchmarks",
+      "Show me program reach and outcomes by clinic"
+    ],
+    "data_sources_used": ["County Metrics", "CDC PLACES", "Claims", "Outreach Tasks", "Clinic Site Registry"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_broadband": {
+    "user_query": "Where do broadband dead zones limit telehealth?",
+    "ai_message": "96 coverage areas in the footprint are unserved by qualifying broadband. Overlaying them on the clinic map: 95 of the 200 connected sites are telehealth-capable, but where the dead zones and the thin-site counties coincide, home telehealth simply is not an option — those are the places the strategy leans on clinic-hosted telehealth rooms and mobile units instead. That overlay is the difference between a telehealth target that is realistic per county and one that just averages the state.",
+    "suggested_chips": [
+      "Which counties concentrate the most care gaps?",
+      "How many clinic sites are telehealth-capable?",
+      "Next signal"
+    ],
+    "data_sources_used": ["Broadband Coverage (FCC)", "Clinic Site Registry", "County Metrics"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_ed_divergence": {
+    "user_query": "Which clinics diverge from their county ED baseline?",
+    "ai_message": "Applying each county's baseline to its clinics: the 96 ED-flagged claims split unevenly — a set of clinics run below their county's expected rate, and a smaller set run above it. The divergence view is deliberately fair to rural clinics: each one is compared against its own county's prevalence and vulnerability, not against an urban average. Outperformers become the reference practices for the program; the clinics above baseline get the drill-down into which patients and which gaps drive the excess.",
+    "suggested_chips": [
+      "Show me program reach and outcomes by clinic",
+      "Compare counties against public benchmarks",
+      "Next signal"
+    ],
+    "data_sources_used": ["Claims", "County Metrics", "CDC PLACES"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_datasets": {
+    "user_query": "What public datasets back the county view?",
+    "ai_message": "The county view joins the program's synthetic clinical layer with public datasets: CDC PLACES county and place-level prevalence, the CDC/ATSDR Social Vulnerability Index, USDA rural-urban continuum codes, HRSA health-center sites and shortage-area designations, FCC broadband coverage, and census geography for the travel-time work. 200 county metric records are loaded across 165 counties. Everything public is public domain or attributed per its license, and every screen labels the data as synthetic and public — no real patient data exists anywhere in the MVP.",
+    "suggested_chips": [
+      "Compare counties against public benchmarks",
+      "Which counties concentrate the most care gaps?",
+      "Generate the CMS reporting package"
+    ],
+    "data_sources_used": ["CDC PLACES", "SVI County Data", "RUCC Codes", "HRSA Shortage Areas", "Broadband Coverage (FCC)"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_telehealth_sites": {
+    "user_query": "How many clinic sites are telehealth-capable?",
+    "ai_message": "95 of the 200 connected clinic sites are telehealth-capable. Capability clusters in the larger health centers, which means the counties that most need clinic-hosted telehealth — the broadband dead zones — are often the ones with the fewest capable sites. That mismatch is the program's clearest infrastructure target: equipping a handful of sites in the overlap counties moves the telehealth reach number more than anything else on the map.",
+    "suggested_chips": [
+      "Where do broadband dead zones limit telehealth?",
+      "Which counties concentrate the most care gaps?",
+      "Generate the CMS reporting package"
+    ],
+    "data_sources_used": ["Clinic Site Registry", "Broadband Coverage (FCC)"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_reach": {
+    "user_query": "Show me program reach and outcomes by clinic",
+    "ai_message": "Per clinic, the reach-and-outcomes table reads: patients engaged through scheduling and outreach, high-risk patients reached, care-gap tasks closed against opened, telehealth share of visits, and ED-flagged claims against the county baseline. The spread is the story — the best clinics close gaps as fast as they open and run telehealth above half of visits; the trailing clinics are the ones the state view flags for support rather than sanction. The same table, aggregated, is the outcomes section of the CMS package.",
+    "suggested_chips": [
+      "Which clinics diverge from their county ED baseline?",
+      "Generate the CMS reporting package",
+      "Compare counties against public benchmarks"
+    ],
+    "data_sources_used": ["Outreach Tasks", "Claims", "Encounters", "County Metrics"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "share_report": {
+    "user_query": "Share the package with the clinic directors",
+    "ai_message": "Staged. The package is queued to each clinic's medical and quality director with their own clinic's section on top — their risk mix, closure pace, telehealth share, and county-baseline comparison — ahead of the state rollup, so every director sees their own picture before the aggregate. Distribution respects scope: each clinic sees itself and the state view, never another clinic's patient-level detail. On this demo stack the send is simulated and the full distribution list is logged for audit.",
+    "suggested_chips": [
+      "Show me program reach and outcomes by clinic",
+      "Which counties concentrate the most care gaps?",
+      "Compare counties against public benchmarks"
+    ],
+    "data_sources_used": ["Clinic Site Registry", "County Metrics"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  }
+}

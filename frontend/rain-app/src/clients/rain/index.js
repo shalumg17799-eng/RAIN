@@ -26,10 +26,14 @@ export default {
   auth: { username: 'rain', password: 'rain@9705' },
   personas: {
     defs: rainPersonas,
-    // Dropdown order per spec: Delgado-Reyes, Whitehorse, Tomley, Nair, Yazzie.
+    // Dropdown order per spec: Delgado-Reyes, Whitehorse, Tomley, Nair, Yazzie,
+    // then the PRD v0.2 wave (Brooks, Holloway, Okafor, Hargrove, Bell).
     // Personas are added to this allowlist as each is completed (keeps the
     // dev-time validator green at every step).
-    allowed: ['rain_delgado', 'rain_whitehorse', 'rain_tomley', 'rain_nair', 'rain_yazzie'],
+    allowed: [
+      'rain_delgado', 'rain_whitehorse', 'rain_tomley', 'rain_nair', 'rain_yazzie',
+      'rain_brooks', 'rain_holloway', 'rain_okafor', 'rain_hargrove', 'rain_bell',
+    ],
     default: 'rain_delgado',
   },
 };

@@ -1,0 +1,26 @@
+[
+  {
+    "trigger": "home_load",
+    "capabilityName": "Proactive Intelligence",
+    "description": "RAIN keeps the state view current across 165 counties on every refresh — care-gap concentration, broadband dead zones against telehealth capacity, and ED divergence by clinic — so program oversight starts from a live map, not a quarterly spreadsheet.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_1",
+    "capabilityName": "Anomaly Detection",
+    "description": "Separates counties that trail because need is extreme from counties that trail because reach is thin — a distinction only visible when clinic risk tiers, county vulnerability, rurality, and site capacity are rolled up together.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_2",
+    "capabilityName": "Predictive Intelligence",
+    "description": "Benchmarks every county against its own public baselines — CDC PLACES, SVI, RUCC, shortage designations — with source and vintage on each figure, so outperformance and shortfall are both defensible in a CMS submission.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_3",
+    "capabilityName": "Automated Action",
+    "description": "Assembles the need-reach-outcomes reporting package directly from the conversation — county and clinic tables, provenance, dataset vintages, the synthetic-data label on every page — and distributes it scope-safe, each director seeing their own clinic before the rollup.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  }
+]

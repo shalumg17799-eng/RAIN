@@ -1,0 +1,47 @@
+[
+  {
+    "id": "SIG-RAIN-SAMUEL-001",
+    "type": "schedule_confirmation",
+    "title": "This Week's Schedule: Confirmations and Pre-Visit Summaries",
+    "description": "Your week holds a full slate of visits, 54 percent of them telehealth. Reminders are out on every booked visit, and each confirmed patient gets a pre-visit risk summary — tier, top reasons, and open care gaps — so the short rural visit starts informed.",
+    "impact": "medium",
+    "severity": "info",
+    "affected_count": 200,
+    "sources": ["Scheduling System", "Risk Engine", "Clinical EHR"],
+    "timestamp": "2026-11-02T06:00:00",
+    "trend": "stable",
+    "related_segment": null,
+    "metrics": { "visits": 200, "telehealth_pct": 54 },
+    "affected_unit": "visits"
+  },
+  {
+    "id": "SIG-RAIN-SAMUEL-002",
+    "type": "rising_risk_panel",
+    "title": "Rising-Risk Patients on Your Panel",
+    "description": "60 patients on the panel score in the high-risk tier across clinical, monitoring, social, and utilization signals. The platform flags and routes — each one carries the top reasons for the score so you decide what changes clinically.",
+    "impact": "high",
+    "severity": "critical",
+    "affected_count": 60,
+    "sources": ["Risk Engine", "RPM Readings", "Claims", "SDOH Screenings"],
+    "timestamp": "2026-11-02T06:00:00",
+    "trend": "worsening",
+    "related_segment": null,
+    "metrics": { "high_risk": 60, "panel_size": 200 },
+    "affected_unit": "patients"
+  },
+  {
+    "id": "SIG-RAIN-SAMUEL-003",
+    "type": "medication_adherence",
+    "title": "Medication Adherence Gaps Ahead of Visits",
+    "description": "161 active medications show an adherence ratio under 80 percent. Where the patient has a visit booked this week, the gap is pulled into the pre-visit summary so the conversation can address it directly.",
+    "impact": "medium",
+    "severity": "warning",
+    "affected_count": 161,
+    "sources": ["Medication History", "Scheduling System"],
+    "timestamp": "2026-11-02T06:00:00",
+    "trend": "stable",
+    "related_segment": null,
+    "metrics": { "low_adherence": 161 },
+    "affected_unit": "medications"
+  }
+]

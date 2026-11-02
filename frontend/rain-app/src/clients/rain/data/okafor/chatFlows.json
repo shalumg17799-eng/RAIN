@@ -1,0 +1,131 @@
+{
+  "greeting": {
+    "ai_message": "Good morning, Dr. Okafor. Your schedule is fully loaded — 200 visits on the books, 54 percent of them telehealth — and reminders are out on every one, so the confirmations are flowing in without the front desk chasing them. Two things need your eye: 60 patients on the panel now score in the high-risk tier across clinical, monitoring, social, and utilization signals, and 161 active medications show adherence under 80 percent, several attached to patients you will see this week. Everything here runs on synthetic and public data. Want me to walk you through the schedule?",
+    "suggested_chips": [
+      "Walk me through this week's schedule",
+      "Which of my patients are rising risk?",
+      "Who has a medication adherence gap before their visit?"
+    ],
+    "data_sources_used": ["Scheduling System", "Risk Engine", "Medication History", "Reminder Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+
+  "turn_1_schedule": {
+    "user_query": "Walk me through this week's schedule",
+    "ai_message": "The week holds a confirmed, full slate: 200 visits with a 54 percent telehealth share, which is what keeps a panel this spread out reachable. Reminder replies update the schedule automatically — confirms lock the slot, reschedules offer the next three openings, and telehealth switches convert the visit and send the link. Each confirmed patient carries a pre-visit summary: risk tier with its top reasons, open care gaps against the measure set, recent remote readings, and any adherence gap — so the fifteen minutes you get starts at the problem, not at the chart hunt.",
+    "suggested_chips": [
+      "Which of my patients are rising risk?",
+      "Show me the pre-visit summary for my next patient",
+      "Which visits still need a confirmation?",
+      "How much of my schedule is telehealth?"
+    ],
+    "data_sources_used": ["Scheduling System", "Risk Engine", "Clinical EHR", "Reminder Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_2_risk": {
+    "user_query": "Which of my patients are rising risk?",
+    "ai_message": "60 patients on the panel score in the high-risk tier. The score combines the four UC-02 signal classes — clinical history, remote monitoring trends, social-need screenings, and utilization — and each patient shows the top reasons driving it: a blood-pressure trend drifting up, a medication gap past 30 days, a positive transport screen, or an ED visit pattern. The ones with visits already booked this week are flagged on the schedule; the rest feed the outreach list so Denise's team gets them booked. The platform flags and routes — the clinical call is yours.",
+    "suggested_chips": [
+      "Generate pre-visit summaries for tomorrow",
+      "Who has a medication adherence gap before their visit?",
+      "Show me the latest remote monitoring readings"
+    ],
+    "data_sources_used": ["Risk Engine", "RPM Readings", "SDOH Screenings", "Claims"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_3_previsit": {
+    "user_query": "Generate pre-visit summaries for tomorrow",
+    "ai_message": "Pre-visit summaries are generated for tomorrow's confirmed visits. Each one is a single card: risk tier and its top three reasons, open care gaps against the measure set, the last remote readings with their trend, active medications with any adherence gap highlighted, and the social-need flags that change the plan — a transport barrier argues for booking the follow-up as telehealth before the patient leaves. Summaries attach to the schedule, stay masked until you open them, and carry provenance on every number so you can see which system said what.",
+    "suggested_chips": [
+      "Order a follow-up for a patient",
+      "Walk me through this week's schedule",
+      "Which of my patients are rising risk?"
+    ],
+    "data_sources_used": ["Risk Engine", "Clinical EHR", "RPM Readings", "Medication History", "SDOH Screenings"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_adherence": {
+    "user_query": "Who has a medication adherence gap before their visit?",
+    "ai_message": "161 active medications show an adherence ratio under 80 percent. Where the patient has a visit booked this week, the gap is already pulled into their pre-visit summary with the fill history behind it, so the conversation can start at why — cost, transport to the pharmacy, side effects — rather than at discovery. The adherence pattern also feeds the risk tier, which is why several of these patients sit in the high-risk 60.",
+    "suggested_chips": [
+      "Which of my patients are rising risk?",
+      "Generate pre-visit summaries for tomorrow",
+      "Next signal"
+    ],
+    "data_sources_used": ["Medication History", "Scheduling System", "Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_telehealth_share": {
+    "user_query": "How much of my schedule is telehealth?",
+    "ai_message": "54 percent of visits run as telehealth right now. That share is doing the access work for the long-drive half of the panel: the visit-mode suggestion offers telehealth whenever the reason is eligible, the drive is over an hour, and the patient has device access — and the 24-hour reminder repeats the offer with a one-tap switch. Patients in broadband dead zones are the exception; they stay in-person or use a clinic-hosted telehealth room, which is why the share plateaus rather than climbing forever.",
+    "suggested_chips": [
+      "Walk me through this week's schedule",
+      "Show me the latest remote monitoring readings",
+      "Which visits still need a confirmation?"
+    ],
+    "data_sources_used": ["Encounters", "Scheduling System", "Broadband Coverage (FCC)"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_rpm": {
+    "user_query": "Show me the latest remote monitoring readings",
+    "ai_message": "200 remote readings arrived in the current window — blood pressure, glucose, weight, and oxygen — each mapped to its patient and trended against their own baseline. Out-of-range readings raise the patient's risk reasons rather than paging you directly: the tier moves, the reason says which measure moved it, and the pre-visit summary carries the trend chart. That keeps monitoring signal useful without turning every spike into an alert.",
+    "suggested_chips": [
+      "Which of my patients are rising risk?",
+      "Generate pre-visit summaries for tomorrow",
+      "Walk me through this week's schedule"
+    ],
+    "data_sources_used": ["RPM Readings", "Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_previsit_next": {
+    "user_query": "Show me the pre-visit summary for my next patient",
+    "ai_message": "Here is the shape of the card for your next confirmed visit: risk tier with the top three reasons, open care gaps against the measure set, the latest remote readings trended against baseline, active medications with the adherence gap highlighted, and the social-need flags that should change the plan. On this demo stack the patient identity is masked and every number carries its source system, per the governance policy — nothing shows without provenance.",
+    "suggested_chips": [
+      "Generate pre-visit summaries for tomorrow",
+      "Walk me through this week's schedule",
+      "Who has a medication adherence gap before their visit?"
+    ],
+    "data_sources_used": ["Risk Engine", "Clinical EHR", "RPM Readings", "Medication History"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_unconfirmed": {
+    "user_query": "Which visits still need a confirmation?",
+    "ai_message": "39 reminders are still awaiting a reply across the clinic's schedule. For your panel, the non-responders are watched against the 24-hour cut-off — when it passes, a CHW call task is created and ranked by risk tier, so the high-risk silent patients get a human call before the slot is lost. If a session of yours ever cancels, the same engine bulk-notifies the affected patients and offers replacement slots or telehealth, instead of the front desk working a call sheet.",
+    "suggested_chips": [
+      "Walk me through this week's schedule",
+      "Which of my patients are rising risk?",
+      "How much of my schedule is telehealth?"
+    ],
+    "data_sources_used": ["Reminder Engine", "Scheduling System", "Outreach Tasks"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "order_followup": {
+    "user_query": "Order a follow-up for a patient",
+    "ai_message": "Ready. Pick the patient and the interval, and the follow-up enters the booking flow with the right defaults: visit mode suggested from the reason, travel time, and device access; slots sorted by the patient's drive time and earliest date; and the reminder plan built from their pattern profile the moment it books. Ordered follow-ups also chain to the post-visit step — after today's visit, the system books the next ordered one automatically. On this demo stack the order writes to the synthetic schedule with a full audit entry.",
+    "suggested_chips": [
+      "Walk me through this week's schedule",
+      "Generate pre-visit summaries for tomorrow",
+      "Which visits still need a confirmation?"
+    ],
+    "data_sources_used": ["Scheduling System", "Reminder Engine", "Slot Inventory"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  }
+}

@@ -21,6 +21,8 @@ from sarah_live_data import get_sarah_live_kpis, get_sarah_live_signals
 from james_live_data import get_james_live_kpis, get_james_live_signals
 from priya_live_data import get_priya_live_kpis, get_priya_live_signals
 from david_live_data import get_david_live_kpis, get_david_live_signals
+from prdv2_personas import PRDV2_SIGNALS, PRDV2_ULTRA_KPIS
+from prdv2_live_data import PRDV2_LIVE_KPI_FUNCS, PRDV2_LIVE_SIGNAL_FUNCS
 from graph_provenance import get_signal_provenance, get_kpi_provenance
 
 # Says, per request, which fields came from a live PostgreSQL query and which
@@ -36,6 +38,7 @@ LIVE_KPI_FUNCS = {
     "james": get_james_live_kpis,
     "david": get_david_live_kpis,
     "priya": get_priya_live_kpis,
+    **PRDV2_LIVE_KPI_FUNCS,
 }
 
 LIVE_SIGNAL_FUNCS = {
@@ -44,7 +47,13 @@ LIVE_SIGNAL_FUNCS = {
     "james": get_james_live_signals,
     "priya": get_priya_live_signals,
     "david": get_david_live_signals,
+    **PRDV2_LIVE_SIGNAL_FUNCS,
 }
+
+# v0.1 wave + the PRD v0.2 wave (kayla/denise/samuel/linda/marcus) in one
+# lookup each -- the serving functions below read these, so both waves go
+# through the identical live-overlay + provenance path.
+ALL_SIGNALS = {**RAIN_SIGNALS, **PRDV2_SIGNALS}
 
 # Icon assignment matches Ultra's own dataSources.json exactly for these
 # same 11 sources -- not a guess, copied from the file itself.
@@ -81,7 +90,7 @@ def ultra_signals_for_persona(persona: str) -> list:
     """Matches signals.json's exact field set, verified against SignalCard.jsx:
     id, type, title, description, impact, severity, affected_count, sources,
     timestamp, trend, related_segment, metrics, affected_unit."""
-    cards = RAIN_SIGNALS.get(persona, [])
+    cards = ALL_SIGNALS.get(persona, [])
     live = {}
     live_func = LIVE_SIGNAL_FUNCS.get(persona)
     if live_func:
@@ -224,7 +233,7 @@ def _overlay_kpi_value(static_value: str, live_value):
 
 
 def ultra_kpis_for_persona(persona: str) -> list:
-    kpis = ULTRA_KPI_DATA.get(persona, [])
+    kpis = {**ULTRA_KPI_DATA, **PRDV2_ULTRA_KPIS}.get(persona, [])
     live_func = LIVE_KPI_FUNCS.get(persona)
     live = {}
     if live_func:

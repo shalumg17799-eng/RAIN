@@ -32,6 +32,7 @@ from datetime import datetime, timezone
 from insights.api.rain_adapter import get_rain_router
 
 from signal_data import RAIN_SIGNALS, DATA_SOURCES_USED
+from prdv2_personas import PRDV2_SIGNALS, PRDV2_PERSONA_IDS
 from data_sources_detail import DATA_SOURCES_DETAIL, DATA_SOURCES_HEALTH_KPIS
 from rural_health_data import CASCADE_ROOT, CASCADE_BRANCHES, COUNTY_ACCESS_DATA, COUNTY_RISK_SUMMARY
 from ultra_adapter import ultra_signals_for_persona, ultra_data_sources, ultra_kpis_for_persona
@@ -90,11 +91,14 @@ with open("ask_cache.json") as f:
 PRODUCTS = {
     "rain": {
         "market": "healthcare",
-        "signals": RAIN_SIGNALS,
+        # v0.1 wave + the PRD v0.2 wave (kayla/denise/samuel/linda/marcus).
+        # The v0.2 personas have no ask_cache entries yet -- /api/v2/ask
+        # falls through for them and the UI plays its scripted flows.
+        "signals": {**RAIN_SIGNALS, **PRDV2_SIGNALS},
         "kpis": RAIN_KPIS,
         "ask_cache": ASK_CACHE,
         "data_sources": DATA_SOURCES_USED,
-        "personas": {"maria", "sarah", "james", "priya", "david"},
+        "personas": {"maria", "sarah", "james", "priya", "david"} | PRDV2_PERSONA_IDS,
     },
     # "ussfcu": {...}  <- Charan's own service owns this; not reimplemented
     # here. Registering it would mean pointing at his real backend/DB,

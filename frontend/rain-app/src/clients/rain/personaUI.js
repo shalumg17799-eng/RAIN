@@ -4,6 +4,7 @@ import {
   Map, Truck, Layers, Building2,
   DollarSign, Activity, WifiOff,
   Database, ShieldCheck, UserX, Clock,
+  MessageSquare, ClipboardList,
 } from 'lucide-react';
 
 /**
@@ -222,10 +223,221 @@ const yazzieUI = {
   greetingFlowKey: 'greeting',
 };
 
+// ─── PRD v0.2 wave (UC-01 smart scheduling, UC-02 population health) ────────
+
+const brooksUI = {
+  initialChips: [
+    'Which booked visits carry the highest no-show risk?',
+    'Show me open telehealth slots across nearby clinics',
+    'Which visits can switch to telehealth?',
+    "Run eligibility checks for this week's bookings",
+    'Which patients have no SMS consent on file?',
+    'Build reminder plans for the high-risk visits',
+    'Who has not confirmed their visit yet?',
+    "Show me this week's confirmations board",
+  ],
+  goldenPathChip: {
+    greeting: 'Walk me through the no-show risk list',
+    turn_1_noshow: 'Which visits can switch to telehealth?',
+    turn_2_telehealth: 'Build reminder plans for the high-risk visits',
+    turn_3_reminders: 'Create CHW call tasks for the non-responders',
+  },
+  flowKeyToCapabilityTrigger: {
+    greeting: 'home_load',
+    turn_1_noshow: 'ask_turn_1',
+    signal_slots: 'ask_turn_1',
+    signal_eligibility: 'ask_turn_1',
+    turn_2_telehealth: 'ask_turn_2',
+    turn_3_reminders: 'ask_turn_3',
+  },
+  stats: [
+    { id: 'booked_visits', label: 'Booked Visits on the Schedule', value: '200', trend: 'Scheduling System', positive: true, icon: CalendarCheck, iconColor: 'text-blue-600', iconBg: 'bg-blue-500/10', chipText: "Show me this week's confirmations board" },
+    { id: 'high_no_show', label: 'Visits at High No-Show Risk', value: '53', trend: 'Pattern Profiles + Reminder Engine', positive: false, icon: AlertTriangle, iconColor: 'text-red-600', iconBg: 'bg-red-500/10', chipText: 'Which booked visits carry the highest no-show risk?' },
+    { id: 'open_telehealth_slots', label: 'Open Telehealth Slots', value: '39', trend: 'Slot Inventory', positive: true, icon: Video, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-500/10', chipText: 'Show me open telehealth slots across nearby clinics' },
+    { id: 'eligibility_active', label: 'Coverage Checks Active', value: '41', trend: 'of 200 — Eligibility Service (270/271)', positive: false, icon: ShieldCheck, iconColor: 'text-amber-600', iconBg: 'bg-amber-500/10', chipText: "Run eligibility checks for this week's bookings" },
+    { id: 'reminders_sent', label: 'Reminders Sent (7-day)', value: '200', trend: 'Reminder Engine — SMS + voice, EN/ES', positive: true, icon: MessageSquare, iconColor: 'text-blue-600', iconBg: 'bg-blue-500/10', chipText: 'Who has not confirmed their visit yet?' },
+    { id: 'sms_consent', label: 'Patients With SMS Consent', value: '97', trend: 'Contact Preferences (TCPA)', positive: false, icon: Users, iconColor: 'text-violet-600', iconBg: 'bg-violet-500/10', chipText: 'Which patients have no SMS consent on file?' },
+  ],
+  signalToChip: {
+    'SIG-RAIN-KAYLA-001': 'Walk me through the no-show risk list',
+    'SIG-RAIN-KAYLA-002': 'Which visits can switch to telehealth?',
+    'SIG-RAIN-KAYLA-003': 'Show me the lapsed coverage list',
+  },
+  greetingFlowKey: 'greeting',
+};
+
+const hollowayUI = {
+  initialChips: [
+    "Walk me through today's call list",
+    'Which of my patients are highest risk?',
+    'Who has not replied to their reminders?',
+    "Which high-risk patients can't be reached by SMS?",
+    'Which patients screened positive for a social need?',
+    'Plan my field visits for the week',
+    'What did outreach close this month?',
+    'Log an outreach outcome',
+  ],
+  goldenPathChip: {
+    greeting: "Walk me through today's call list",
+    turn_1_calllist: 'Plan my field visits for the week',
+    turn_2_fieldplan: 'Generate the day sheet for tomorrow',
+    turn_3_daysheet: 'Log an outreach outcome',
+  },
+  flowKeyToCapabilityTrigger: {
+    greeting: 'home_load',
+    turn_1_calllist: 'ask_turn_1',
+    signal_nonresponse: 'ask_turn_1',
+    signal_unreachable: 'ask_turn_1',
+    turn_2_fieldplan: 'ask_turn_2',
+    turn_3_daysheet: 'ask_turn_3',
+  },
+  stats: [
+    { id: 'open_tasks', label: 'Open Outreach Tasks', value: '80', trend: 'Outreach Tasks — risk-ranked', positive: false, icon: ClipboardList, iconColor: 'text-red-600', iconBg: 'bg-red-500/10', chipText: "Walk me through today's call list" },
+    { id: 'high_risk', label: 'High-Risk Patients in the Area', value: '60', trend: 'Risk Engine', positive: false, icon: HeartPulse, iconColor: 'text-red-600', iconBg: 'bg-red-500/10', chipText: 'Which of my patients are highest risk?' },
+    { id: 'pending_replies', label: 'Reminders Awaiting a Reply', value: '39', trend: 'Reminder Engine', positive: false, icon: MessageSquare, iconColor: 'text-amber-600', iconBg: 'bg-amber-500/10', chipText: 'Who has not replied to their reminders?' },
+    { id: 'sdoh_screened', label: 'SDOH Screenings on File', value: '200', trend: 'Social-Need Screening', positive: true, icon: Users, iconColor: 'text-blue-600', iconBg: 'bg-blue-500/10', chipText: 'Which patients screened positive for a social need?' },
+    { id: 'tasks_closed', label: 'Outreach Tasks Closed', value: '51', trend: 'Outreach Tasks', positive: true, icon: CalendarCheck, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-500/10', chipText: 'What did outreach close this month?' },
+    { id: 'no_sms', label: 'Patients Without SMS Consent', value: '103', trend: 'Contact Preferences — voice/CHW only', positive: false, icon: WifiOff, iconColor: 'text-violet-600', iconBg: 'bg-violet-500/10', chipText: "Which high-risk patients can't be reached by SMS?" },
+  ],
+  signalToChip: {
+    'SIG-RAIN-DENISE-001': "Walk me through today's call list",
+    'SIG-RAIN-DENISE-002': 'Who has not replied to their reminders?',
+    'SIG-RAIN-DENISE-003': "Which high-risk patients can't be reached by SMS?",
+  },
+  greetingFlowKey: 'greeting',
+};
+
+const okaforUI = {
+  initialChips: [
+    "Walk me through this week's schedule",
+    'Which of my patients are rising risk?',
+    'Show me the pre-visit summary for my next patient',
+    'Who has a medication adherence gap before their visit?',
+    'How much of my schedule is telehealth?',
+    'Show me the latest remote monitoring readings',
+    'Which visits still need a confirmation?',
+    'Order a follow-up for a patient',
+  ],
+  goldenPathChip: {
+    greeting: "Walk me through this week's schedule",
+    turn_1_schedule: 'Which of my patients are rising risk?',
+    turn_2_risk: 'Generate pre-visit summaries for tomorrow',
+    turn_3_previsit: 'Order a follow-up for a patient',
+  },
+  flowKeyToCapabilityTrigger: {
+    greeting: 'home_load',
+    turn_1_schedule: 'ask_turn_1',
+    signal_adherence: 'ask_turn_1',
+    turn_2_risk: 'ask_turn_2',
+    turn_3_previsit: 'ask_turn_3',
+  },
+  stats: [
+    { id: 'panel_size', label: 'Patients on the Panel', value: '200', trend: 'Patient Registry', positive: true, icon: Users, iconColor: 'text-blue-600', iconBg: 'bg-blue-500/10', chipText: null },
+    { id: 'visits_week', label: 'Visits on the Schedule', value: '200', trend: 'Scheduling System', positive: true, icon: CalendarCheck, iconColor: 'text-blue-600', iconBg: 'bg-blue-500/10', chipText: "Walk me through this week's schedule" },
+    { id: 'telehealth_share', label: 'Telehealth Share of Visits', value: '54%', trend: 'Encounters', positive: true, icon: Video, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-500/10', chipText: 'How much of my schedule is telehealth?' },
+    { id: 'high_risk_panel', label: 'High-Risk Patients on Panel', value: '60', trend: 'Risk Engine', positive: false, icon: HeartPulse, iconColor: 'text-red-600', iconBg: 'bg-red-500/10', chipText: 'Which of my patients are rising risk?' },
+    { id: 'low_adherence', label: 'Medications Under 80% Adherence', value: '161', trend: 'Medication History', positive: false, icon: Pill, iconColor: 'text-amber-600', iconBg: 'bg-amber-500/10', chipText: 'Who has a medication adherence gap before their visit?' },
+    { id: 'rpm_readings', label: 'RPM Readings (7-day)', value: '200', trend: 'Remote Monitoring', positive: true, icon: Activity, iconColor: 'text-violet-600', iconBg: 'bg-violet-500/10', chipText: 'Show me the latest remote monitoring readings' },
+  ],
+  signalToChip: {
+    'SIG-RAIN-SAMUEL-001': "Walk me through this week's schedule",
+    'SIG-RAIN-SAMUEL-002': 'Which of my patients are rising risk?',
+    'SIG-RAIN-SAMUEL-003': 'Who has a medication adherence gap before their visit?',
+  },
+  greetingFlowKey: 'greeting',
+};
+
+const hargroveUI = {
+  initialChips: [
+    'Walk me through the clinic risk mix',
+    'Which care gaps are still open?',
+    'How are we trending on care-gap closure?',
+    'Where is ED utilization concentrating?',
+    'What is our telehealth share trend?',
+    'What is our social-need screening coverage?',
+    'Compare our measures against county benchmarks',
+    'Generate the quality report for the board',
+  ],
+  goldenPathChip: {
+    greeting: 'Walk me through the clinic risk mix',
+    turn_1_riskmix: 'Which care gaps are still open?',
+    turn_2_gaps: 'Generate the quality report for the board',
+    turn_3_report: 'Assign the open gaps to the outreach team',
+  },
+  flowKeyToCapabilityTrigger: {
+    greeting: 'home_load',
+    turn_1_riskmix: 'ask_turn_1',
+    signal_closure: 'ask_turn_1',
+    signal_ed: 'ask_turn_1',
+    turn_2_gaps: 'ask_turn_2',
+    turn_3_report: 'ask_turn_3',
+  },
+  stats: [
+    { id: 'high_risk', label: 'High-Risk Patients (Clinic)', value: '60', trend: 'Risk Engine — of 200 attributed', positive: false, icon: HeartPulse, iconColor: 'text-red-600', iconBg: 'bg-red-500/10', chipText: 'Walk me through the clinic risk mix' },
+    { id: 'open_gaps', label: 'Open Care-Gap Tasks', value: '80', trend: 'Outreach Tasks', positive: false, icon: ClipboardList, iconColor: 'text-amber-600', iconBg: 'bg-amber-500/10', chipText: 'Which care gaps are still open?' },
+    { id: 'gaps_closed', label: 'Care-Gap Tasks Closed', value: '51', trend: 'Outreach Tasks', positive: true, icon: CalendarCheck, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-500/10', chipText: 'How are we trending on care-gap closure?' },
+    { id: 'ed_claims', label: 'ED-Flagged Claims (Window)', value: '96', trend: 'Claims', positive: false, icon: Ambulance, iconColor: 'text-red-600', iconBg: 'bg-red-500/10', chipText: 'Where is ED utilization concentrating?' },
+    { id: 'telehealth_share', label: 'Telehealth Share of Visits', value: '54%', trend: 'Encounters', positive: true, icon: Video, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-500/10', chipText: 'What is our telehealth share trend?' },
+    { id: 'sdoh_coverage', label: 'SDOH Screenings on File', value: '200', trend: 'Social-Need Screening', positive: true, icon: Users, iconColor: 'text-blue-600', iconBg: 'bg-blue-500/10', chipText: 'What is our social-need screening coverage?' },
+  ],
+  signalToChip: {
+    'SIG-RAIN-LINDA-001': 'Walk me through the clinic risk mix',
+    'SIG-RAIN-LINDA-002': 'How are we trending on care-gap closure?',
+    'SIG-RAIN-LINDA-003': 'Where is ED utilization concentrating?',
+  },
+  greetingFlowKey: 'greeting',
+};
+
+const bellUI = {
+  initialChips: [
+    'Which counties concentrate the most care gaps?',
+    'Where do broadband dead zones limit telehealth?',
+    'Which clinics diverge from their county ED baseline?',
+    'Compare counties against public benchmarks',
+    'How many clinic sites are telehealth-capable?',
+    'What public datasets back the county view?',
+    'Show me program reach and outcomes by clinic',
+    'Generate the CMS reporting package',
+  ],
+  goldenPathChip: {
+    greeting: 'Which counties concentrate the most care gaps?',
+    turn_1_counties: 'Compare counties against public benchmarks',
+    turn_2_benchmark: 'Generate the CMS reporting package',
+    turn_3_cms: 'Share the package with the clinic directors',
+  },
+  flowKeyToCapabilityTrigger: {
+    greeting: 'home_load',
+    turn_1_counties: 'ask_turn_1',
+    signal_broadband: 'ask_turn_1',
+    signal_ed_divergence: 'ask_turn_1',
+    turn_2_benchmark: 'ask_turn_2',
+    turn_3_cms: 'ask_turn_3',
+  },
+  stats: [
+    { id: 'counties', label: 'Counties in the Program View', value: '165', trend: 'County Metrics + CDC PLACES', positive: true, icon: Map, iconColor: 'text-blue-600', iconBg: 'bg-blue-500/10', chipText: 'Which counties concentrate the most care gaps?' },
+    { id: 'metric_records', label: 'County Metric Records Loaded', value: '200', trend: 'Public Data — labelled synthetic/public', positive: true, icon: Database, iconColor: 'text-blue-600', iconBg: 'bg-blue-500/10', chipText: 'What public datasets back the county view?' },
+    { id: 'unserved_broadband', label: 'Broadband-Unserved Areas', value: '96', trend: 'FCC Broadband Coverage', positive: false, icon: WifiOff, iconColor: 'text-red-600', iconBg: 'bg-red-500/10', chipText: 'Where do broadband dead zones limit telehealth?' },
+    { id: 'clinic_sites', label: 'Connected Clinic Sites', value: '200', trend: 'Clinic Site Registry', positive: true, icon: Building2, iconColor: 'text-violet-600', iconBg: 'bg-violet-500/10', chipText: 'How many clinic sites are telehealth-capable?' },
+    { id: 'telehealth_sites', label: 'Telehealth-Capable Sites', value: '95', trend: 'Clinic Site Registry', positive: true, icon: Video, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-500/10', chipText: 'How many clinic sites are telehealth-capable?' },
+    { id: 'ed_claims', label: 'ED-Flagged Claims (Program)', value: '96', trend: 'Claims', positive: false, icon: Ambulance, iconColor: 'text-red-600', iconBg: 'bg-red-500/10', chipText: 'Which clinics diverge from their county ED baseline?' },
+  ],
+  signalToChip: {
+    'SIG-RAIN-MARCUS-001': 'Which counties concentrate the most care gaps?',
+    'SIG-RAIN-MARCUS-002': 'Where do broadband dead zones limit telehealth?',
+    'SIG-RAIN-MARCUS-003': 'Which clinics diverge from their county ED baseline?',
+  },
+  greetingFlowKey: 'greeting',
+};
+
 export const rainUIConfigs = {
   rain_delgado: delgadoUI,
   rain_whitehorse: whitehorseUI,
   rain_tomley: tomleyUI,
   rain_nair: nairUI,
   rain_yazzie: yazzieUI,
+  rain_brooks: brooksUI,
+  rain_holloway: hollowayUI,
+  rain_okafor: okaforUI,
+  rain_hargrove: hargroveUI,
+  rain_bell: bellUI,
 };

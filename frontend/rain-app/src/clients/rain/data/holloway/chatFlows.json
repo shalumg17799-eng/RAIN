@@ -1,0 +1,144 @@
+{
+  "greeting": {
+    "ai_message": "Good morning, Denise. Your call list holds 80 open outreach tasks, ranked by risk tier so the highest-risk, hardest-to-reach patients come first — 60 patients in the area currently score high-risk. 39 reminders are still awaiting a reply and will escalate to your list at the 24-hour cut-off, and 103 patients have no SMS consent, so their touches fall to voice or to you. Everything here runs on synthetic and public data. Want me to walk you through today's call list?",
+    "suggested_chips": [
+      "Walk me through today's call list",
+      "Who has not replied to their reminders?",
+      "Which high-risk patients can't be reached by SMS?"
+    ],
+    "data_sources_used": ["Outreach Tasks", "Risk Engine", "Reminder Engine", "Contact Preferences"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+
+  "turn_1_calllist": {
+    "user_query": "Walk me through today's call list",
+    "ai_message": "The 80 open tasks rank by the population-health risk tier, then by how close each patient's visit is. The top of the list combines three things: a high-risk score, a reminder that got no reply, and a social-need flag like transport or housing from the screening data. Each task card shows the patient's preferred language, the channels that have actually worked before, the visit on the line, and why the automated touches did not land — so the first call of the day is the one most likely to prevent a missed visit, not just the oldest task.",
+    "suggested_chips": [
+      "Plan my field visits for the week",
+      "Which of my patients are highest risk?",
+      "Which patients screened positive for a social need?",
+      "Who has not replied to their reminders?"
+    ],
+    "data_sources_used": ["Outreach Tasks", "Risk Engine", "SDOH Screenings", "Reminder Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_2_fieldplan": {
+    "user_query": "Plan my field visits for the week",
+    "ai_message": "Grouping the list for the field: the patients who can only be reached in person — no working number, no SMS consent, or repeated undeliverable messages — cluster into three ZIP groups, and the plan orders them by risk tier and drive route so one trip covers each cluster. Patients who are phone-reachable stay on the call block, and anyone with a visit inside 48 hours is pulled to the front regardless of cluster. The plan also pairs each stop with what to carry: the visit details to confirm, the screening to complete, and the enrollment-assist paperwork where coverage lapsed.",
+    "suggested_chips": [
+      "Generate the day sheet for tomorrow",
+      "Which high-risk patients can't be reached by SMS?",
+      "What did outreach close this month?"
+    ],
+    "data_sources_used": ["Outreach Tasks", "Travel Time Matrix", "Contact Preferences", "Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "turn_3_daysheet": {
+    "user_query": "Generate the day sheet for tomorrow",
+    "ai_message": "Tomorrow's day sheet is ready: the morning call block first — non-responders whose visits are inside 48 hours, ranked by risk tier — then the field route for the first ZIP cluster with drive order, visit details, and the screenings due at each stop. Every outcome you log closes its task and updates the schedule and the contact record in one step, so a confirmed visit, a reschedule, or a new phone number lands back in the clinic system without re-entry. The sheet holds PHI to the minimum and works offline for the dead-zone stretches.",
+    "suggested_chips": [
+      "Log an outreach outcome",
+      "Walk me through today's call list",
+      "What did outreach close this month?"
+    ],
+    "data_sources_used": ["Outreach Tasks", "Scheduling System", "Travel Time Matrix"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_nonresponse": {
+    "user_query": "Who has not replied to their reminders?",
+    "ai_message": "39 reminder messages are still pending a reply. These patients got their automated touches on schedule — SMS where consented, voice otherwise — and the 24-hour cut-off is what moves them to you: when it passes with no confirm, reschedule, or telehealth switch, each becomes a call task ranked by risk tier. Six of the pending group are already high-risk patients with a visit inside 48 hours; they are at the top of today's list.",
+    "suggested_chips": [
+      "Walk me through today's call list",
+      "Which high-risk patients can't be reached by SMS?",
+      "Next signal"
+    ],
+    "data_sources_used": ["Reminder Engine", "Outreach Tasks", "Risk Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "signal_unreachable": {
+    "user_query": "Which high-risk patients can't be reached by SMS?",
+    "ai_message": "103 of 200 patients have no documented SMS consent — some share a phone, some have no mobile, some simply never consented. For them, no text is ever sent: the plan falls back to voice calls in their preferred language, and where voice fails too, to you. The ones who matter most today are the high-risk patients in that group with upcoming visits; they are flagged on your list with the full contact history so you can see what has already been tried before you knock.",
+    "suggested_chips": [
+      "Plan my field visits for the week",
+      "Update a patient's contact preference",
+      "Next signal"
+    ],
+    "data_sources_used": ["Contact Preferences", "Risk Engine", "Outreach Tasks"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_highrisk": {
+    "user_query": "Which of my patients are highest risk?",
+    "ai_message": "60 patients in the service area currently score in the high-risk tier, combining clinical history, remote monitoring trends, social-need screenings, and utilization patterns — each one carries its top reasons, so you can see whether it's a missed medication pattern, a worsening reading, or a transport barrier driving the score. The platform flags and routes; what changes clinically stays with the care team. Your list already orders today's 80 tasks by this tier.",
+    "suggested_chips": [
+      "Walk me through today's call list",
+      "Which patients screened positive for a social need?",
+      "Plan my field visits for the week"
+    ],
+    "data_sources_used": ["Risk Engine", "SDOH Screenings", "Claims", "RPM Readings"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_sdoh": {
+    "user_query": "Which patients screened positive for a social need?",
+    "ai_message": "200 social-need screenings are on file covering the five core domains — food, housing, transportation, utilities, and safety. The screens that matter for scheduling are the transport positives: those patients are the ones a 60-mile drive quietly turns into no-shows, and they are exactly who the telehealth-switch offer and your field route are built around. Each positive screen links to its patient's tasks so the need travels with the outreach, not in a separate spreadsheet.",
+    "suggested_chips": [
+      "Which of my patients are highest risk?",
+      "Plan my field visits for the week",
+      "Walk me through today's call list"
+    ],
+    "data_sources_used": ["SDOH Screenings", "Outreach Tasks", "Travel Time Matrix"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "q_closed": {
+    "user_query": "What did outreach close this month?",
+    "ai_message": "51 outreach tasks closed in the current window against 80 still open. Closures split across confirmed visits, completed screenings, updated contact records, and enrollment assists — every one logged with its outcome, so the quality team can trace a closed care gap from the task that opened it to the visit that closed it. The pace is the number to watch: tasks are opening faster than they close, which is the argument for the field-route clustering.",
+    "suggested_chips": [
+      "Walk me through today's call list",
+      "Plan my field visits for the week",
+      "Log an outreach outcome"
+    ],
+    "data_sources_used": ["Outreach Tasks", "Scheduling System"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "log_outcome": {
+    "user_query": "Log an outreach outcome",
+    "ai_message": "Ready to log. Pick the task and the outcome — reached and confirmed, reached and rescheduled, switched to telehealth, not reached, declined, or needs follow-up — and add anything the care team should see. The log closes the task, stamps the attempt history, and pushes the result where it belongs: a confirmation updates the schedule, a new number updates the contact record, a declined visit flags the provider. On this demo stack the writes land in the synthetic store and the full audit trail is kept.",
+    "suggested_chips": [
+      "Walk me through today's call list",
+      "What did outreach close this month?",
+      "Generate the day sheet for tomorrow"
+    ],
+    "data_sources_used": ["Outreach Tasks", "Scheduling System", "Contact Preferences"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  },
+
+  "update_contact": {
+    "user_query": "Update a patient's contact preference",
+    "ai_message": "Ready. A contact update changes the channel, language, number, or consent flag, effective immediately — the reminder engine re-plans any queued touches on the spot, so a patient who just consented to SMS starts getting texts for the very next reminder, and a STOP stays honored everywhere. Every change is stamped with who recorded it and when, which is what keeps the consent trail clean for TCPA.",
+    "suggested_chips": [
+      "Which high-risk patients can't be reached by SMS?",
+      "Walk me through today's call list",
+      "Log an outreach outcome"
+    ],
+    "data_sources_used": ["Contact Preferences", "Reminder Engine"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": []
+  }
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "trigger": "home_load",
+    "capabilityName": "Proactive Intelligence",
+    "description": "RAIN assembles the week before you ask — a confirmed schedule, the panel's rising-risk patients, and the adherence gaps attached to this week's visits — so the scarce rural clinic hour starts at the decision, not at the chart hunt.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_1",
+    "capabilityName": "Converged Conversation",
+    "description": "Reads the schedule, reminder replies, risk tiers, and visit modes as one picture in one conversation — the confirmed slate, who switched to telehealth, and which patients arrive with a summary already prepared.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_2",
+    "capabilityName": "Predictive Intelligence",
+    "description": "Scores the panel across the four UC-02 signal classes — clinical, remote monitoring, social need, and utilization — and shows the top reasons behind every tier, so the flag explains itself and the clinical judgment stays with you.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_3",
+    "capabilityName": "Automated Action",
+    "description": "Generates tomorrow's pre-visit summaries directly from the conversation — tier, reasons, gaps, readings, adherence, social flags — masked by default, every number carrying provenance, and attached to the schedule where the visit happens.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  }
+]

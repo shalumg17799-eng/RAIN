@@ -36,6 +36,12 @@ const PERSONA_ID_MAP = {
   rain_tomley: 'james',
   rain_nair: 'priya',
   rain_yazzie: 'david',
+  // PRD v0.2 wave (UC-01 smart scheduling, UC-02 population health insights)
+  rain_brooks: 'kayla',
+  rain_holloway: 'denise',
+  rain_okafor: 'samuel',
+  rain_hargrove: 'linda',
+  rain_bell: 'marcus',
 };
 
 
@@ -115,6 +121,11 @@ function usePersonaCapabilityCallouts(personaId) {
       rain_tomley: () => import('@/clients/rain/data/tomley/capabilityCallouts.json'),
       rain_nair: () => import('@/clients/rain/data/nair/capabilityCallouts.json'),
       rain_yazzie: () => import('@/clients/rain/data/yazzie/capabilityCallouts.json'),
+      rain_brooks: () => import('@/clients/rain/data/brooks/capabilityCallouts.json'),
+      rain_holloway: () => import('@/clients/rain/data/holloway/capabilityCallouts.json'),
+      rain_okafor: () => import('@/clients/rain/data/okafor/capabilityCallouts.json'),
+      rain_hargrove: () => import('@/clients/rain/data/hargrove/capabilityCallouts.json'),
+      rain_bell: () => import('@/clients/rain/data/bell/capabilityCallouts.json'),
     };
     const loader = calloutImports[personaId];
     if (loader) {

@@ -1,0 +1,26 @@
+[
+  {
+    "trigger": "home_load",
+    "capabilityName": "Proactive Intelligence",
+    "description": "RAIN rebuilds your call list on every data refresh — open tasks ranked by risk tier, reminder non-responders approaching the cut-off, and high-risk patients with no reachable channel — so the day starts with the right first call, not a stack of unsorted tasks.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_1",
+    "capabilityName": "Friction Observability",
+    "description": "Sees where the automated loop breaks for real patients — no consent, shared phones, dead numbers, silent reminders — and turns each breakpoint into a ranked human task with the full contact history attached, instead of letting it vanish as a quiet no-show.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_2",
+    "capabilityName": "Predictive Intelligence",
+    "description": "Clusters the in-person-only patients by geography and risk, orders the route by drive time, and pulls anyone with a visit inside 48 hours to the front — so one field day covers what matters instead of what happens to be nearby.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  },
+  {
+    "trigger": "ask_turn_3",
+    "capabilityName": "Automated Action",
+    "description": "Generates the day sheet — call block, field route, screenings due, paperwork to carry — and closes the loop on every logged outcome: schedule updated, contact record corrected, task closed, and the care team notified, all from one entry.",
+    "eyebrow": "RADIANT AI CAPABILITY"
+  }
+]

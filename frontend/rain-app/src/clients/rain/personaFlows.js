@@ -3,6 +3,11 @@ import whitehorseChatFlows from '@/clients/rain/data/whitehorse/chatFlows.json';
 import tomleyChatFlows from '@/clients/rain/data/tomley/chatFlows.json';
 import nairChatFlows from '@/clients/rain/data/nair/chatFlows.json';
 import yazzieChatFlows from '@/clients/rain/data/yazzie/chatFlows.json';
+import brooksChatFlows from '@/clients/rain/data/brooks/chatFlows.json';
+import hollowayChatFlows from '@/clients/rain/data/holloway/chatFlows.json';
+import okaforChatFlows from '@/clients/rain/data/okafor/chatFlows.json';
+import hargroveChatFlows from '@/clients/rain/data/hargrove/chatFlows.json';
+import bellChatFlows from '@/clients/rain/data/bell/chatFlows.json';
 
 /**
  * RAIN persona flow configs. Each maps navigation chips explicitly, with
@@ -181,10 +186,128 @@ const yazzieConfig = {
   actionConfirmMap: {},
 };
 
+// ─── PRD v0.2 wave (UC-01 smart scheduling, UC-02 population health) ────────
+
+const brooksConfig = {
+  chatFlows: brooksChatFlows,
+  chipToFlowKey: {
+    'Yes, walk me through them': 'turn_1_noshow',
+    'Next signal': '__next_signal__',
+    'Walk me through the no-show risk list': 'turn_1_noshow',
+    'Which booked visits carry the highest no-show risk?': 'turn_1_noshow',
+    'Which visits can switch to telehealth?': 'turn_2_telehealth',
+    'Build reminder plans for the high-risk visits': 'turn_3_reminders',
+    'Show me the telehealth slot gap': 'signal_slots',
+    'Show me the lapsed coverage list': 'signal_eligibility',
+    'Show me open telehealth slots across nearby clinics': 'q_open_slots',
+    "Run eligibility checks for this week's bookings": 'q_eligibility',
+    'Which patients have no SMS consent on file?': 'q_consent',
+    'Who has not confirmed their visit yet?': 'q_unconfirmed',
+    "Show me this week's confirmations board": 'q_confirmations',
+    'Send the reminder plans': 'send_plans',
+    'Apply the telehealth switches': 'book_switches',
+    'Create CHW call tasks for the non-responders': 'create_chw_tasks',
+  },
+  signalSequence: ['turn_1_noshow', 'signal_slots', 'signal_eligibility'],
+  askTurnSequence: ['turn_1_noshow', 'turn_2_telehealth', 'turn_3_reminders'],
+  actionTurnKey: 'turn_3_reminders',
+  actionConfirmMap: {},
+};
+
+const hollowayConfig = {
+  chatFlows: hollowayChatFlows,
+  chipToFlowKey: {
+    'Yes, walk me through them': 'turn_1_calllist',
+    'Next signal': '__next_signal__',
+    "Walk me through today's call list": 'turn_1_calllist',
+    'Plan my field visits for the week': 'turn_2_fieldplan',
+    'Generate the day sheet for tomorrow': 'turn_3_daysheet',
+    'Who has not replied to their reminders?': 'signal_nonresponse',
+    "Which high-risk patients can't be reached by SMS?": 'signal_unreachable',
+    'Which of my patients are highest risk?': 'q_highrisk',
+    'Which patients screened positive for a social need?': 'q_sdoh',
+    'What did outreach close this month?': 'q_closed',
+    'Log an outreach outcome': 'log_outcome',
+    "Update a patient's contact preference": 'update_contact',
+  },
+  signalSequence: ['turn_1_calllist', 'signal_nonresponse', 'signal_unreachable'],
+  askTurnSequence: ['turn_1_calllist', 'turn_2_fieldplan', 'turn_3_daysheet'],
+  actionTurnKey: 'turn_3_daysheet',
+  actionConfirmMap: {},
+};
+
+const okaforConfig = {
+  chatFlows: okaforChatFlows,
+  chipToFlowKey: {
+    'Yes, walk me through them': 'turn_1_schedule',
+    'Next signal': '__next_signal__',
+    "Walk me through this week's schedule": 'turn_1_schedule',
+    'Which of my patients are rising risk?': 'turn_2_risk',
+    'Generate pre-visit summaries for tomorrow': 'turn_3_previsit',
+    'Who has a medication adherence gap before their visit?': 'signal_adherence',
+    'How much of my schedule is telehealth?': 'q_telehealth_share',
+    'Show me the latest remote monitoring readings': 'q_rpm',
+    'Show me the pre-visit summary for my next patient': 'q_previsit_next',
+    'Which visits still need a confirmation?': 'q_unconfirmed',
+    'Order a follow-up for a patient': 'order_followup',
+  },
+  signalSequence: ['turn_1_schedule', 'turn_2_risk', 'signal_adherence'],
+  askTurnSequence: ['turn_1_schedule', 'turn_2_risk', 'turn_3_previsit'],
+  actionTurnKey: 'turn_3_previsit',
+  actionConfirmMap: {},
+};
+
+const hargroveConfig = {
+  chatFlows: hargroveChatFlows,
+  chipToFlowKey: {
+    'Yes, walk me through them': 'turn_1_riskmix',
+    'Next signal': '__next_signal__',
+    'Walk me through the clinic risk mix': 'turn_1_riskmix',
+    'Which care gaps are still open?': 'turn_2_gaps',
+    'Generate the quality report for the board': 'turn_3_report',
+    'How are we trending on care-gap closure?': 'signal_closure',
+    'Where is ED utilization concentrating?': 'signal_ed',
+    'What is our telehealth share trend?': 'q_telehealth_trend',
+    'What is our social-need screening coverage?': 'q_sdoh_coverage',
+    'Compare our measures against county benchmarks': 'q_benchmark',
+    'Assign the open gaps to the outreach team': 'assign_gaps',
+  },
+  signalSequence: ['turn_1_riskmix', 'signal_closure', 'signal_ed'],
+  askTurnSequence: ['turn_1_riskmix', 'turn_2_gaps', 'turn_3_report'],
+  actionTurnKey: 'turn_3_report',
+  actionConfirmMap: {},
+};
+
+const bellConfig = {
+  chatFlows: bellChatFlows,
+  chipToFlowKey: {
+    'Yes, walk me through them': 'turn_1_counties',
+    'Next signal': '__next_signal__',
+    'Which counties concentrate the most care gaps?': 'turn_1_counties',
+    'Compare counties against public benchmarks': 'turn_2_benchmark',
+    'Generate the CMS reporting package': 'turn_3_cms',
+    'Where do broadband dead zones limit telehealth?': 'signal_broadband',
+    'Which clinics diverge from their county ED baseline?': 'signal_ed_divergence',
+    'What public datasets back the county view?': 'q_datasets',
+    'How many clinic sites are telehealth-capable?': 'q_telehealth_sites',
+    'Show me program reach and outcomes by clinic': 'q_reach',
+    'Share the package with the clinic directors': 'share_report',
+  },
+  signalSequence: ['turn_1_counties', 'signal_broadband', 'signal_ed_divergence'],
+  askTurnSequence: ['turn_1_counties', 'turn_2_benchmark', 'turn_3_cms'],
+  actionTurnKey: 'turn_3_cms',
+  actionConfirmMap: {},
+};
+
 export const rainFlowConfigs = {
   rain_delgado: delgadoConfig,
   rain_whitehorse: whitehorseConfig,
   rain_tomley: tomleyConfig,
   rain_nair: nairConfig,
   rain_yazzie: yazzieConfig,
+  rain_brooks: brooksConfig,
+  rain_holloway: hollowayConfig,
+  rain_okafor: okaforConfig,
+  rain_hargrove: hargroveConfig,
+  rain_bell: bellConfig,
 };
