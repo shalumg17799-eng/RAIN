@@ -1030,7 +1030,1182 @@
       "foreign_keys": [],
       "freshness": {},
       "name": "routed_actions"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "appointment_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "slot_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "Status vocabulary: active, pending, approved, closed, rejected (synthetic data). There is no booked status -- every row in this table is a booked appointment.",
+          "name": "status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "booked_via",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "booked_at",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "No-show risk score on a 0-100000 scale (synthetic generator); >= 70000 counts as high risk.",
+          "name": "no_show_risk",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.appointment"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "coverage_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "county_fips",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "zcta",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "technology",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "max_down_mbps",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "max_up_mbps",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "served_flag",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.broadband_coverage"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "claim_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "encounter_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "claim_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "service_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "allowed_amount",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "ed_flag",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        },
+        {
+          "description": "",
+          "name": "admission_flag",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.claim"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "clinic_site_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "site_name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "site_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "address",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "county_fips",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "latitude",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "longitude",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "telehealth_capable",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.clinic_site"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "condition_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "icd10_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "snomed_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "onset_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.condition"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "preference_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "channel",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "language",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "consent_flag",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        },
+        {
+          "description": "",
+          "name": "updated_at",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.contact_preference"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "county_metric_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "county_fips",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "metric_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "metric_name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "value",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "year",
+          "nullable": true,
+          "primary_key": false,
+          "type": "bigint"
+        },
+        {
+          "description": "",
+          "name": "source_dataset",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.county_metric"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "check_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "appointment_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "payer",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "Coverage status; active means the coverage check verified active coverage.",
+          "name": "coverage_status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "response_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "checked_at",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.eligibility_check"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "encounter_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "clinic_site_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "encounter_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "start_time",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "end_time",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "telehealth_flag",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.encounter"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "medication_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "rxnorm_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "start_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "end_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "adherence_ratio",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.medication"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "task_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "task_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "priority_score",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "assigned_to",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "Status vocabulary: active, pending, approved, closed, rejected. Open tasks are status IN (active, pending); closed tasks are status = closed.",
+          "name": "status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "created_at",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "closed_at",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.outreach_task"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "mrn",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "first_name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "last_name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "birth_date",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "sex",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "race",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "ethnicity",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "language",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "zip_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "county_fips",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "phone",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.patient"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "npi",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "first_name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "last_name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "specialty",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "clinic_site_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.provider"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "message_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "appointment_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "channel",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "language",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "template",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "sent_at",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "Delivery status; pending means sent and awaiting delivery or reply.",
+          "name": "delivery_status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "response",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.reminder_message"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "risk_score_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "model_name",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "Overall risk score on a 0-1 scale; >= 0.7 counts as high risk.",
+          "name": "score",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "cohort",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "computed_at",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.risk_score"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "reading_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "loinc_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "value_systolic",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "value_diastolic",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "value_numeric",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "unit",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "reading_time",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "device_type",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.rpm_reading"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "schedule_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "provider_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "clinic_site_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "service_category",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "horizon_start",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "horizon_end",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.schedule"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "screening_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "domain",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "loinc_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "z_code",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "response",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "screened_at",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.sdoh_screening"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "slot_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "schedule_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "slot_start",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "slot_end",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "Status vocabulary: active, pending, approved, closed, rejected. Open/available slots are status IN (active, pending).",
+          "name": "status",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "telehealth_flag",
+          "nullable": true,
+          "primary_key": false,
+          "type": "boolean"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.slot"
+    },
+    {
+      "columns": [
+        {
+          "description": "",
+          "name": "travel_time_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "patient_zcta",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "clinic_site_id",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        },
+        {
+          "description": "",
+          "name": "drive_minutes",
+          "nullable": true,
+          "primary_key": false,
+          "type": "double precision"
+        },
+        {
+          "description": "",
+          "name": "computed_at",
+          "nullable": true,
+          "primary_key": false,
+          "type": "text"
+        }
+      ],
+      "description": "",
+      "foreign_keys": [],
+      "freshness": {},
+      "name": "synthetic.travel_time"
     }
   ],
-  "version": "2f2fa1ebaf21"
+  "version": "8b4ad69efa21"
 }

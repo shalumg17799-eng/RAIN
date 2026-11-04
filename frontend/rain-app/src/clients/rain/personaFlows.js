@@ -8,6 +8,7 @@ import hollowayChatFlows from '@/clients/rain/data/holloway/chatFlows.json';
 import okaforChatFlows from '@/clients/rain/data/okafor/chatFlows.json';
 import hargroveChatFlows from '@/clients/rain/data/hargrove/chatFlows.json';
 import bellChatFlows from '@/clients/rain/data/bell/chatFlows.json';
+import martinezChatFlows from '@/clients/rain/data/martinez/chatFlows.json';
 
 /**
  * RAIN persona flow configs. Each maps navigation chips explicitly, with
@@ -299,6 +300,28 @@ const bellConfig = {
   actionConfirmMap: {},
 };
 
+const martinezConfig = {
+  chatFlows: martinezChatFlows,
+  chipToFlowKey: {
+    'Yes, walk me through them': 'turn_1_nextvisit',
+    'Next signal': '__next_signal__',
+    'When is my next visit and is it confirmed?': 'turn_1_nextvisit',
+    'Can I switch my visit to telehealth?': 'turn_2_telehealth',
+    'Is my coverage active?': 'turn_3_coverage',
+    'Why am I getting these reminders?': 'signal_reminders',
+    'Show me the telehealth option for my visit': 'signal_slots',
+    'How do I confirm by text?': 'q_confirm_text',
+    'What happens if I miss my visit?': 'q_miss',
+    'Confirm my visit': 'confirm_visit',
+    'Switch me to telehealth': 'switch_telehealth',
+    'Reschedule my visit': 'reschedule_visit',
+  },
+  signalSequence: ['turn_1_nextvisit', 'signal_slots', 'signal_reminders'],
+  askTurnSequence: ['turn_1_nextvisit', 'turn_2_telehealth', 'turn_3_coverage'],
+  actionTurnKey: 'turn_3_coverage',
+  actionConfirmMap: {},
+};
+
 export const rainFlowConfigs = {
   rain_delgado: delgadoConfig,
   rain_whitehorse: whitehorseConfig,
@@ -310,4 +333,5 @@ export const rainFlowConfigs = {
   rain_okafor: okaforConfig,
   rain_hargrove: hargroveConfig,
   rain_bell: bellConfig,
+  rain_martinez: martinezConfig,
 };

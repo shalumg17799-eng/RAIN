@@ -75,14 +75,22 @@ def render_access_sql(app: AppProfile, table_columns: Mapping[str, Sequence[str]
     Re-running after the tables were recreated restores all grants, policies and views.
     """
     schema = default_schema_of(app) or "public"
-    public = q(schema)
     out: list[str] = []
     roles = list(app.roles)
     sql_table_names: dict[str, str] = {}
+    # A profile may reference tables outside the default schema by qualifying
+    # them ('synthetic.appointment'); every statement below must then target
+    # that table's real schema, not the default one.
+    sql_table_schemas: dict[str, str] = {}
     for role in roles:
         for profile_name in app.roles[role].tables:
             normalized = normalize_table(profile_name, schema)
             sql_table_names.setdefault(normalized, profile_name.split(".")[-1])
+            parts = normalized.split(".")
+            sql_table_schemas.setdefault(normalized, parts[-2] if len(parts) > 1 else schema)
+
+    def qualified(table: str) -> str:
+        return f"{q(sql_table_schemas[table])}.{q(sql_table_names[table])}"
 
     for role in roles:
         for schema_name in (naming.per_user_view_schema(role), naming.views_schema(role)):
@@ -96,37 +104,38 @@ def render_access_sql(app: AppProfile, table_columns: Mapping[str, Sequence[str]
             if access.row_filter:
                 filtered_tables.add(table)
     for table in sorted(filtered_tables):
-        out.append(f"ALTER TABLE {public}.{q(sql_table_names[table])} ENABLE ROW LEVEL SECURITY")
+        out.append(f"ALTER TABLE {qualified(table)} ENABLE ROW LEVEL SECURITY")
 
     for role in roles:
         user_role = q(naming.per_user_role(role))
         views_role = q(naming.views_role(role))
-        out.append(f"GRANT USAGE ON SCHEMA {public} TO {user_role}")
+        role_schemas = sorted({sql_table_schemas[t] for t in _tables(app, role)}) or [schema]
+        for role_schema in role_schemas:
+            out.append(f"GRANT USAGE ON SCHEMA {q(role_schema)} TO {user_role}")
         for table, access in _tables(app, role).items():
             visible = _visible(access, table_columns[table])
             masked = bool(access.masks)
-            sql_table = q(sql_table_names[table])
             if masked:
                 view_schema = q(naming.per_user_view_schema(role))
                 where = f" WHERE {rls_filter(access.row_filter)}" if access.row_filter else ""
                 out.append(
                     f"CREATE VIEW {view_schema}.{q(table)} AS SELECT "
-                    f"{_select_list(visible, access)} FROM {public}.{sql_table}{where}"
+                    f"{_select_list(visible, access)} FROM {qualified(table)}{where}"
                 )
                 out.append(f"GRANT USAGE ON SCHEMA {view_schema} TO {user_role}")
                 out.append(f"GRANT SELECT ON {view_schema}.{q(table)} TO {user_role}")
             else:
                 if access.columns == "*":
-                    out.append(f"GRANT SELECT ON {public}.{sql_table} TO {user_role}")
+                    out.append(f"GRANT SELECT ON {qualified(table)} TO {user_role}")
                 else:
                     cols = ", ".join(q(c) for c in visible)
-                    out.append(f"GRANT SELECT ({cols}) ON {public}.{sql_table} TO {user_role}")
+                    out.append(f"GRANT SELECT ({cols}) ON {qualified(table)} TO {user_role}")
                 if table in filtered_tables:
                     condition = rls_filter(access.row_filter) if access.row_filter else "true"
                     policy = q(f"insights_{role}_{table}")
-                    out.append(f"DROP POLICY IF EXISTS {policy} ON {public}.{sql_table}")
+                    out.append(f"DROP POLICY IF EXISTS {policy} ON {qualified(table)}")
                     out.append(
-                        f"CREATE POLICY {policy} ON {public}.{sql_table} FOR SELECT "
+                        f"CREATE POLICY {policy} ON {qualified(table)} FOR SELECT "
                         f"TO {user_role} USING ({condition})"
                     )
 
@@ -135,7 +144,7 @@ def render_access_sql(app: AppProfile, table_columns: Mapping[str, Sequence[str]
             sp_where = f" WHERE {rls_filter(access.row_filter)}" if access.row_filter else ""
             out.append(
                 f"CREATE VIEW {sp_schema}.{q(table)} AS SELECT {_select_list(visible, access)} "
-                f"FROM {public}.{sql_table}{sp_where}"
+                f"FROM {qualified(table)}{sp_where}"
             )
         out.append(f"GRANT USAGE ON SCHEMA {q(naming.views_schema(role))} TO {views_role}")
         out.append(
@@ -144,16 +153,16 @@ def render_access_sql(app: AppProfile, table_columns: Mapping[str, Sequence[str]
 
     # the predicates fallback: broad read access, filters applied by the application
     union = sorted({t for role in roles for t in _tables(app, role)})
-    out.append(f"GRANT USAGE ON SCHEMA {public} TO {q(naming.PREDICATE_ROLE)}")
+    for union_schema in sorted({sql_table_schemas[t] for t in union} or {schema}):
+        out.append(f"GRANT USAGE ON SCHEMA {q(union_schema)} TO {q(naming.PREDICATE_ROLE)}")
     for table in union:
-        sql_table = q(sql_table_names[table])
-        out.append(f"GRANT SELECT ON {public}.{sql_table} TO {q(naming.PREDICATE_ROLE)}")
+        out.append(f"GRANT SELECT ON {qualified(table)} TO {q(naming.PREDICATE_ROLE)}")
         if table in filtered_tables:
             # row-level security is on for the other roles; here the application applies the filter
             policy = q(f"{naming.PREDICATE_ROLE}_{table}")
-            out.append(f"DROP POLICY IF EXISTS {policy} ON {public}.{sql_table}")
+            out.append(f"DROP POLICY IF EXISTS {policy} ON {qualified(table)}")
             out.append(
-                f"CREATE POLICY {policy} ON {public}.{sql_table} FOR SELECT "
+                f"CREATE POLICY {policy} ON {qualified(table)} FOR SELECT "
                 f"TO {q(naming.PREDICATE_ROLE)} USING (true)"
             )
     return out

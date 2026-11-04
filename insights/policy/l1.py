@@ -26,7 +26,7 @@ from sqlglot.errors import OptimizeError, SqlglotError
 from sqlglot.optimizer.qualify import qualify
 from sqlglot.optimizer.scope import Scope, traverse_scope
 
-from insights.catalog.entitlements import AllowedObjects, default_schema_of
+from insights.catalog.entitlements import AllowedObjects, default_schema_of, source_schemas
 from insights.contracts.common import JsonScalar
 from insights.contracts.enums import PolicyDecisionKind, PolicyLayer
 from insights.contracts.profile import AppProfile
@@ -110,6 +110,26 @@ def _identifier_key(identifier: exp.Expression | str, dialect: str) -> str:
     The checked SQL itself keeps its quoting, so execution still hits the physical table."""
     name = identifier.name if isinstance(identifier, exp.Identifier) else str(identifier)
     return name.lower()
+
+
+def _with_bare_aliases(allowed: AllowedObjects) -> AllowedObjects:
+    """Alias each schema-qualified entitlement ('synthetic.appointment') under its bare
+    table name too, so the qualifier-stripped SQL still resolves. A bare name that
+    several entitled tables share stays un-aliased (ambiguous on purpose)."""
+    bare_counts: dict[str, int] = {}
+    for key in allowed.tables:
+        bare = key.split(".")[-1]
+        bare_counts[bare] = bare_counts.get(bare, 0) + 1
+    tables = dict(allowed.tables)
+    physical = dict(allowed.physical)
+    for key, columns in allowed.tables.items():
+        bare = key.split(".")[-1]
+        if bare == key or bare_counts[bare] > 1 or bare in allowed.tables:
+            continue
+        tables[bare] = columns
+        if key in allowed.physical:
+            physical[bare] = allowed.physical[key]
+    return AllowedObjects(allowed.role, tables, physical)
 
 
 def table_key(table: exp.Table, dialect: str, default_schema: str | None) -> str:
@@ -284,6 +304,13 @@ def check_sql(
     except (SqlglotError, RecursionError):
         return _deny(["too_complex"])
 
+    # The checked SQL drops schema qualifiers below (the binding's search path
+    # resolves them at run time), so entitlements keyed 'schema.table' must
+    # also answer to the bare table name. A bare name shared by two entitled
+    # schemas is left unaliased: an unqualified reference to it would be
+    # ambiguous and fails instead of guessing.
+    allowed = _with_bare_aliases(allowed)
+
     denials: list[str] = []
     for table in udtf:
         if not denylist.table_function_allowed(*_func_names(table)):
@@ -293,7 +320,12 @@ def check_sql(
             denials.append("catalog_not_allowed")
         elif table.db and denylist.schema_denied(table.db):
             denials.append("system_schema")
-        elif table.db and table.db.lower() != (default_schema or "").lower():
+        elif table.db and table.db.lower() not in {
+            # every schema the source declares is addressable, not just the
+            # default -- entitlements still decide which tables inside it
+            s.lower()
+            for s in (source_schemas(app) or ((default_schema,) if default_schema else ()))
+        }:
             denials.append("schema_not_allowed")
         elif table_key(table, dialect, default_schema) not in allowed.tables:
             denials.append("table_not_allowed")
@@ -311,7 +343,13 @@ def check_sql(
         for table in real_work:
             table.set("db", None)
             table.set("catalog", None)
-        schema = {name: dict(columns) for name, columns in allowed.tables.items()}
+        # only bare names: the AST was just stripped of qualifiers, and sqlglot
+        # would read a dotted key as a nested schema path
+        schema = {
+            name: dict(columns)
+            for name, columns in allowed.tables.items()
+            if "." not in name
+        }
         qualified = qualify(
             work,
             schema=schema,

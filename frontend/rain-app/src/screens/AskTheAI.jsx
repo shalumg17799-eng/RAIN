@@ -42,6 +42,7 @@ const PERSONA_ID_MAP = {
   rain_okafor: 'samuel',
   rain_hargrove: 'linda',
   rain_bell: 'marcus',
+  rain_martinez: 'rosa',
 };
 
 
@@ -126,6 +127,7 @@ function usePersonaCapabilityCallouts(personaId) {
       rain_okafor: () => import('@/clients/rain/data/okafor/capabilityCallouts.json'),
       rain_hargrove: () => import('@/clients/rain/data/hargrove/capabilityCallouts.json'),
       rain_bell: () => import('@/clients/rain/data/bell/capabilityCallouts.json'),
+      rain_martinez: () => import('@/clients/rain/data/martinez/capabilityCallouts.json'),
     };
     const loader = calloutImports[personaId];
     if (loader) {

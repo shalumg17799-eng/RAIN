@@ -50,6 +50,46 @@ def _query_all(queries: dict) -> dict:
     return out
 
 
+def get_rosa_live_kpis() -> dict:
+    """First-person patient tiles, anchored to Rosa's own synthetic record
+    (prdv2_personas.ROSA_PATIENT_ID) -- per-patient queries, not panel ones."""
+    from prdv2_personas import ROSA_PATIENT_ID as PID
+    live = _query_all({
+        "upcoming_visits": f"SELECT COUNT(*) FROM synthetic.appointment WHERE patient_id = '{PID}'",
+        "pending_confirm": f"SELECT COUNT(*) FROM synthetic.appointment WHERE patient_id = '{PID}' AND status = 'pending'",
+        "reminders_received": f"SELECT COUNT(*) FROM synthetic.reminder_message WHERE patient_id = '{PID}'",
+        "sms_consent_status": f"SELECT CASE WHEN BOOL_OR(consent_flag) THEN 'Yes' ELSE 'No' END FROM synthetic.contact_preference WHERE patient_id = '{PID}'",
+        "coverage_status": f"SELECT INITCAP(MAX(coverage_status)) FROM synthetic.eligibility_check WHERE patient_id = '{PID}'",
+        "telehealth_slots": "SELECT COUNT(*) FROM synthetic.slot WHERE telehealth_flag AND status IN ('active','pending')",
+    })
+    return live
+
+
+def get_rosa_live_signals() -> dict:
+    from prdv2_personas import ROSA_PATIENT_ID as PID
+    live = _query_all({
+        "visits": f"SELECT COUNT(*) FROM synthetic.appointment WHERE patient_id = '{PID}'",
+        "pending": f"SELECT COUNT(*) FROM synthetic.appointment WHERE patient_id = '{PID}' AND status = 'pending'",
+        "slots": "SELECT COUNT(*) FROM synthetic.slot WHERE telehealth_flag AND status IN ('active','pending')",
+        "reminders": f"SELECT COUNT(*) FROM synthetic.reminder_message WHERE patient_id = '{PID}'",
+        "replies": f"SELECT COUNT(*) FROM synthetic.reminder_message WHERE patient_id = '{PID}' AND delivery_status IN ('approved','closed')",
+    })
+    return {
+        "SIG-RAIN-ROSA-001": {
+            "affected_count": live["pending"],
+            "metrics": {"visits_on_file": live["visits"], "pending": live["pending"]},
+        },
+        "SIG-RAIN-ROSA-002": {
+            "affected_count": live["slots"],
+            "metrics": {"open_telehealth_slots": live["slots"]},
+        },
+        "SIG-RAIN-ROSA-003": {
+            "affected_count": live["reminders"],
+            "metrics": {"reminders_sent": live["reminders"], "replies": live["replies"]},
+        },
+    }
+
+
 def get_kayla_live_kpis() -> dict:
     return _query_all({
         "booked_visits": "SELECT COUNT(*) FROM synthetic.appointment",
@@ -207,6 +247,7 @@ def get_marcus_live_signals() -> dict:
 
 
 PRDV2_LIVE_KPI_FUNCS = {
+    "rosa": get_rosa_live_kpis,
     "kayla": get_kayla_live_kpis,
     "denise": get_denise_live_kpis,
     "samuel": get_samuel_live_kpis,
@@ -215,6 +256,7 @@ PRDV2_LIVE_KPI_FUNCS = {
 }
 
 PRDV2_LIVE_SIGNAL_FUNCS = {
+    "rosa": get_rosa_live_signals,
     "kayla": get_kayla_live_signals,
     "denise": get_denise_live_signals,
     "samuel": get_samuel_live_signals,

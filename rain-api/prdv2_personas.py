@@ -12,9 +12,13 @@ personas from that table:
     linda   Dr. Linda Hargrove  Clinic medical / quality director UC-02
     marcus  Marcus Bell         State RHTP program manager        UC-02
 
-Rosa Martinez (rural patient) is served by the patient-facing mobile route,
-not an operator persona; Hannah Lee (payer / MCO analyst) is Phase 2 in the
-PRD and is deliberately not registered here.
+Rosa Martinez (rural patient, UC-01) is registered as persona "rosa": her
+briefing is first-person -- anchored to one real synthetic patient record
+(PATIENT000149: a pending visit in the high no-show band, three reminders
+with no reply yet, SMS consent on file, active coverage), so every tile and
+signal is a live per-patient query, not a panel aggregate. Hannah Lee
+(payer / MCO analyst) is Phase 2 in the PRD and is deliberately not
+registered here.
 
 Signal cards match signal_data.py's schema field-for-field; KPI tiles match
 ultra_adapter.ULTRA_KPI_DATA's tile schema. Every static number is the
@@ -23,11 +27,100 @@ re-computes the same numbers live per request), and the MVP runs on
 synthetic and public data only, per the v0.2 policy.
 """
 
-PRDV2_PERSONA_IDS = {"kayla", "denise", "samuel", "linda", "marcus"}
+PRDV2_PERSONA_IDS = {"kayla", "denise", "samuel", "linda", "marcus", "rosa"}
+
+# The synthetic patient record Rosa's first-person briefing is anchored to.
+ROSA_PATIENT_ID = "PATIENT000149"
 
 _TS = "2026-11-02T06:00:00+00:00"
 
 PRDV2_SIGNALS = {
+    "rosa": [
+        {
+            "id": "SIG-RAIN-ROSA-001",
+            "type": "visit_confirmation_due",
+            "title": "Your Next Visit Still Needs a Confirmation",
+            "description": "One of your two booked visits is still pending and sits in the high no-show band of the pattern profile -- mostly because of the long drive. The reminder ladder is running for it (72, 24 and 3 hours, in your preferred language): reply YES to any text, or answer the voice call, and the clinic sees the confirmation instantly.",
+            "metric_text": "1 pending visit awaiting your reply",
+            "severity": "critical",
+            "impact": "high",
+            "trend": "stable",
+            "primary": True,
+            "chip_text": "When is my next visit and is it confirmed?",
+            "metric_value": 1,
+            "metric_unit": "count",
+            "threshold_breached": 1,
+            "affected_count": 1,
+            "metrics": {"visits_on_file": 2, "pending": 1, "reminder_touches": 3},
+            "sources": ["Scheduling System", "Reminder Engine", "Pattern Profiles"],
+            "confidence": {
+                "score": 92,
+                "rationale": "Read straight from your appointment rows in the loaded synthetic schema: one pending visit whose no-show risk sits above the 70,000 high-band threshold, with the BR-01 reminder ladder attached.",
+                "threshold": 80,
+                "model_version": "no-show-rules-v0.2",
+                "validated_at": _TS,
+            },
+            "status": "active",
+            "timestamp": _TS,
+            "evaluated_at": _TS,
+        },
+        {
+            "id": "SIG-RAIN-ROSA-002",
+            "type": "telehealth_option_open",
+            "title": "A Telehealth Option Is Open for Your Visit",
+            "description": "39 telehealth slots are open across nearby clinics, and your visit reason is telehealth-eligible. With your SMS consent on file, the 24-hour reminder will carry the offer: reply T and the visit converts to video with the link and a device checklist -- no 60-plus-minute drive.",
+            "metric_text": "39 telehealth slots open near you",
+            "severity": "warning",
+            "impact": "medium",
+            "trend": "stable",
+            "primary": False,
+            "chip_text": "Can I switch my visit to telehealth?",
+            "metric_value": 39,
+            "metric_unit": "count",
+            "threshold_breached": 25,
+            "affected_count": 39,
+            "metrics": {"open_telehealth_slots": 39, "sms_consent": 1},
+            "sources": ["Slot Inventory", "Contact Preferences", "Reminder Engine"],
+            "confidence": {
+                "score": 88,
+                "rationale": "Open telehealth slots are read live from the slot inventory; your consent flag comes from your own contact-preference rows, per the TCPA rule.",
+                "threshold": 75,
+                "model_version": "visit-mode-rules-v0.2",
+                "validated_at": _TS,
+            },
+            "status": "active",
+            "timestamp": _TS,
+            "evaluated_at": _TS,
+        },
+        {
+            "id": "SIG-RAIN-ROSA-003",
+            "type": "reminders_unanswered",
+            "title": "Reminders Sent -- No Reply Yet",
+            "description": "Three reminders about your upcoming visit have gone out on your consented channels and none has a reply yet. At the 24-hour cut-off the platform routes a call to a care coordinator instead of letting the visit drop -- nothing is ever cancelled for not replying.",
+            "metric_text": "3 reminders, 0 replies",
+            "severity": "warning",
+            "impact": "medium",
+            "trend": "stable",
+            "primary": False,
+            "chip_text": "Why am I getting these reminders?",
+            "metric_value": 3,
+            "metric_unit": "count",
+            "threshold_breached": 2,
+            "affected_count": 3,
+            "metrics": {"reminders_sent": 3, "replies": 0},
+            "sources": ["Reminder Engine", "Contact Preferences"],
+            "confidence": {
+                "score": 90,
+                "rationale": "Counted from your own reminder_message rows: three sends, none with a confirmed reply status. The CHW escalation at the 24-hour mark is the BR-06 rule.",
+                "threshold": 80,
+                "model_version": "reminder-rules-v0.2",
+                "validated_at": _TS,
+            },
+            "status": "active",
+            "timestamp": _TS,
+            "evaluated_at": _TS,
+        },
+    ],
     "kayla": [
         {
             "id": "SIG-RAIN-KAYLA-001",
@@ -464,6 +557,14 @@ PRDV2_SIGNALS = {
 # equal the current synthetic-schema counts; prdv2_live_data overlays the same
 # numbers live per request, so static and live agree by construction.
 PRDV2_ULTRA_KPIS = {
+    "rosa": [
+        {"id": "upcoming_visits", "label": "My Visits on File", "value": "2", "trend": "Scheduling System", "positive": True, "icon": "CalendarCheck", "iconColor": "text-blue-600", "iconBg": "bg-blue-500/10", "chipText": "When is my next visit and is it confirmed?"},
+        {"id": "pending_confirm", "label": "Visits Awaiting My Confirmation", "value": "1", "trend": "Reply YES to confirm", "positive": False, "icon": "AlertTriangle", "iconColor": "text-red-600", "iconBg": "bg-red-500/10", "chipText": "When is my next visit and is it confirmed?"},
+        {"id": "reminders_received", "label": "Reminders Sent to Me", "value": "3", "trend": "SMS + voice, EN/ES", "positive": True, "icon": "MessageSquare", "iconColor": "text-blue-600", "iconBg": "bg-blue-500/10", "chipText": "Why am I getting these reminders?"},
+        {"id": "sms_consent_status", "label": "My SMS Consent", "value": "Yes", "trend": "Contact Preferences (TCPA)", "positive": True, "icon": "ShieldCheck", "iconColor": "text-emerald-600", "iconBg": "bg-emerald-500/10", "chipText": "How do I confirm by text?"},
+        {"id": "coverage_status", "label": "My Coverage Status", "value": "Active", "trend": "Eligibility Service (270/271)", "positive": True, "icon": "ClipboardList", "iconColor": "text-emerald-600", "iconBg": "bg-emerald-500/10", "chipText": "Is my coverage active?"},
+        {"id": "telehealth_slots", "label": "Telehealth Slots Open Near Me", "value": "39", "trend": "Slot Inventory", "positive": True, "icon": "Video", "iconColor": "text-violet-600", "iconBg": "bg-violet-500/10", "chipText": "Can I switch my visit to telehealth?"},
+    ],
     "kayla": [
         {"id": "booked_visits", "label": "Booked Visits on the Schedule", "value": "200", "trend": "Scheduling System", "positive": True, "icon": "CalendarCheck", "iconColor": "text-blue-600", "iconBg": "bg-blue-500/10", "chipText": "Show me this week's confirmations board"},
         {"id": "high_no_show", "label": "Visits at High No-Show Risk", "value": "53", "trend": "Pattern Profiles + Reminder Engine", "positive": False, "icon": "AlertTriangle", "iconColor": "text-red-600", "iconBg": "bg-red-500/10", "chipText": "Which booked visits carry the highest no-show risk?"},

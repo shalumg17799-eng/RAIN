@@ -32,12 +32,10 @@ This is what actually closes RK's feedback: the graph now knows not just
 specific signal card is backed by which real table, right now."
 """
 
-import sys
-sys.path.insert(0, "/home/claude/rain_api_v2")
-
 from signal_data import RAIN_SIGNALS
 from ultra_adapter import ULTRA_KPI_DATA
 from rural_health_data import CASCADE_ROOT, CASCADE_BRANCHES, COUNTY_RISK_SUMMARY
+from prdv2_personas import PRDV2_SIGNALS, PRDV2_ULTRA_KPIS
 
 PERSONA_INFO = {
     "maria": {"name": "Dr. Maria Delgado-Reyes", "role": "Rural Health Medical Director"},
@@ -45,7 +43,17 @@ PERSONA_INFO = {
     "james": {"name": "James Tomley", "role": "Operations Lead"},
     "priya": {"name": "Dr. Priya Nair", "role": "Population Health Analyst"},
     "david": {"name": "David Yazzie", "role": "Data & Interoperability Lead"},
+    # PRD v0.2 wave (doc/prd/RAIN_Platform_PRD_v0.2.docx section 2)
+    "kayla": {"name": "Kayla Brooks", "role": "Clinic Scheduler / Front Desk"},
+    "denise": {"name": "Denise Holloway", "role": "Community Health Worker / Care Coordinator"},
+    "samuel": {"name": "Dr. Samuel Okafor", "role": "Rural Primary Care Provider"},
+    "linda": {"name": "Dr. Linda Hargrove", "role": "Quality / Population Health Director"},
+    "marcus": {"name": "Marcus Bell", "role": "State RHTP Program Manager"},
+    "rosa": {"name": "Rosa Martínez", "role": "Rural Patient"},
 }
+
+ALL_SIGNALS = {**RAIN_SIGNALS, **PRDV2_SIGNALS}
+ALL_KPIS = {**ULTRA_KPI_DATA, **PRDV2_ULTRA_KPIS}
 
 # Which upper-ontology concept each signal/KPI represents. Judgment calls,
 # made explicit here rather than left implicit -- reasonable first pass,
@@ -72,6 +80,43 @@ CONCEPT_MAP = {
     "unresolved_refs": "C-PROVIDER",
     "SIG-RAIN-DAVID-001": "C-PROVIDER", "SIG-RAIN-DAVID-002": "C-RISK-SIGNAL",
     "SIG-RAIN-DAVID-003": "C-PROVIDER",
+    # --- PRD v0.2 wave. Same kind of judgment calls as above; 'Metric' and
+    # 'Location' are upper-ontology concepts whose concept_id equals the name.
+    # Kayla (UC-01 smart scheduling)
+    "SIG-RAIN-KAYLA-001": "C-RISK-SIGNAL", "SIG-RAIN-KAYLA-002": "C-ACCESS-BARRIER",
+    "SIG-RAIN-KAYLA-003": "C-ACCESS-BARRIER",
+    "booked_visits": "C-EPISODE", "high_no_show": "C-RISK-SIGNAL",
+    "open_telehealth_slots": "C-ACCESS-BARRIER", "eligibility_active": "C-CONSTITUENT",
+    "reminders_sent": "C-CONSTITUENT", "sms_consent": "C-REGULATORY-TEST",
+    # Denise (CHW outreach / escalation)
+    "SIG-RAIN-DENISE-001": "C-ACCESS-BARRIER", "SIG-RAIN-DENISE-002": "C-RISK-SIGNAL",
+    "SIG-RAIN-DENISE-003": "C-ACCESS-BARRIER",
+    "open_tasks": "C-ACCESS-BARRIER", "high_risk": "C-RISK-SIGNAL",
+    "pending_replies": "C-RISK-SIGNAL", "sdoh_screened": "C-CONSTITUENT",
+    "tasks_closed": "C-EPISODE", "no_sms": "C-ACCESS-BARRIER",
+    # Samuel (provider panel)
+    "SIG-RAIN-SAMUEL-001": "C-EPISODE", "SIG-RAIN-SAMUEL-002": "C-RISK-SIGNAL",
+    "SIG-RAIN-SAMUEL-003": "C-RISK-SIGNAL",
+    "panel_size": "C-CONSTITUENT", "visits_week": "C-EPISODE",
+    "telehealth_share": "C-ACCESS-BARRIER", "high_risk_panel": "C-RISK-SIGNAL",
+    "low_adherence": "C-RISK-SIGNAL", "rpm_readings": "C-EPISODE",
+    # Linda (UC-02 quality / population health)
+    "SIG-RAIN-LINDA-001": "C-RISK-SIGNAL", "SIG-RAIN-LINDA-002": "C-EPISODE",
+    "SIG-RAIN-LINDA-003": "C-RISK-SIGNAL",
+    "open_gaps": "C-EPISODE", "gaps_closed": "C-EPISODE",
+    "ed_claims": "C-RISK-SIGNAL", "sdoh_coverage": "C-CONSTITUENT",
+    # Marcus (state RHTP benchmarks)
+    "SIG-RAIN-MARCUS-001": "Metric", "SIG-RAIN-MARCUS-002": "C-ACCESS-BARRIER",
+    "SIG-RAIN-MARCUS-003": "C-RISK-SIGNAL",
+    "counties": "Location", "metric_records": "Metric",
+    "unserved_broadband": "C-ACCESS-BARRIER", "clinic_sites": "Location",
+    "telehealth_sites": "C-ACCESS-BARRIER",
+    # Rosa (rural patient, first-person UC-01)
+    "SIG-RAIN-ROSA-001": "C-CONSTITUENT", "SIG-RAIN-ROSA-002": "C-ACCESS-BARRIER",
+    "SIG-RAIN-ROSA-003": "C-RISK-SIGNAL",
+    "upcoming_visits": "C-EPISODE", "pending_confirm": "C-RISK-SIGNAL",
+    "reminders_received": "C-CONSTITUENT", "sms_consent_status": "C-REGULATORY-TEST",
+    "coverage_status": "C-CONSTITUENT", "telehealth_slots": "C-ACCESS-BARRIER",
 }
 
 # Only the fields VERIFIED live via real SQL today (see maria/sarah/james/
@@ -93,6 +138,39 @@ COMPUTED_FROM_MAP = {
     "SIG-RAIN-JAMES-001": "TransportRequest", "SIG-RAIN-JAMES-003": "EMSCoverage",
     "SIG-RAIN-PRIYA-003": "ConnectivityRegistry",
     "unresolved_refs": "ProviderReferenceIssue", "SIG-RAIN-DAVID-001": "ProviderReferenceIssue",
+    # --- PRD v0.2 wave: every id below is live-SQL backed by prdv2_live_data.py
+    # against the synthetic schema, so every one gets a COMPUTED_FROM edge to
+    # the primary table its query reads ('synthetic.<table>' names them apart
+    # from the public-schema systems above).
+    "SIG-RAIN-KAYLA-001": "synthetic.appointment", "SIG-RAIN-KAYLA-002": "synthetic.slot",
+    "SIG-RAIN-KAYLA-003": "synthetic.eligibility_check",
+    "booked_visits": "synthetic.appointment", "high_no_show": "synthetic.appointment",
+    "open_telehealth_slots": "synthetic.slot", "eligibility_active": "synthetic.eligibility_check",
+    "reminders_sent": "synthetic.reminder_message", "sms_consent": "synthetic.contact_preference",
+    "SIG-RAIN-DENISE-001": "synthetic.outreach_task", "SIG-RAIN-DENISE-002": "synthetic.reminder_message",
+    "SIG-RAIN-DENISE-003": "synthetic.contact_preference",
+    "open_tasks": "synthetic.outreach_task", "high_risk": "synthetic.risk_score",
+    "pending_replies": "synthetic.reminder_message", "sdoh_screened": "synthetic.sdoh_screening",
+    "tasks_closed": "synthetic.outreach_task", "no_sms": "synthetic.contact_preference",
+    "SIG-RAIN-SAMUEL-001": "synthetic.encounter", "SIG-RAIN-SAMUEL-002": "synthetic.risk_score",
+    "SIG-RAIN-SAMUEL-003": "synthetic.medication",
+    "panel_size": "synthetic.patient", "visits_week": "synthetic.encounter",
+    "telehealth_share": "synthetic.encounter", "high_risk_panel": "synthetic.risk_score",
+    "low_adherence": "synthetic.medication", "rpm_readings": "synthetic.rpm_reading",
+    "SIG-RAIN-LINDA-001": "synthetic.risk_score", "SIG-RAIN-LINDA-002": "synthetic.outreach_task",
+    "SIG-RAIN-LINDA-003": "synthetic.claim",
+    "open_gaps": "synthetic.outreach_task", "gaps_closed": "synthetic.outreach_task",
+    "ed_claims": "synthetic.claim", "sdoh_coverage": "synthetic.sdoh_screening",
+    "SIG-RAIN-MARCUS-001": "synthetic.county_metric", "SIG-RAIN-MARCUS-002": "synthetic.broadband_coverage",
+    "SIG-RAIN-MARCUS-003": "synthetic.claim",
+    "counties": "synthetic.county_metric", "metric_records": "synthetic.county_metric",
+    "unserved_broadband": "synthetic.broadband_coverage", "clinic_sites": "synthetic.clinic_site",
+    "telehealth_sites": "synthetic.clinic_site",
+    "SIG-RAIN-ROSA-001": "synthetic.appointment", "SIG-RAIN-ROSA-002": "synthetic.slot",
+    "SIG-RAIN-ROSA-003": "synthetic.reminder_message",
+    "upcoming_visits": "synthetic.appointment", "pending_confirm": "synthetic.appointment",
+    "reminders_received": "synthetic.reminder_message", "sms_consent_status": "synthetic.contact_preference",
+    "coverage_status": "synthetic.eligibility_check", "telehealth_slots": "synthetic.slot",
 }
 
 # Everything else, across all 5 personas, is genuinely not row-computable --
@@ -107,7 +185,12 @@ CONSTANT_REASON = "No live SQL query reproduces this value; documented as a fixe
 
 # Systems used above that aren't in the graph yet from the original
 # ontology-mapping skill run -- legitimate new coverage, not invented.
-NEW_SYSTEMS = {"TransportRequest", "EMSCoverage", "ProviderReferenceIssue"}
+# The synthetic.* entries are the v0.2 planned-schema tables the PRD
+# publish already registered as Table nodes; here they also become
+# SourceSystem nodes so COMPUTED_FROM provenance can point at them.
+NEW_SYSTEMS = {"TransportRequest", "EMSCoverage", "ProviderReferenceIssue"} | {
+    s for s in COMPUTED_FROM_MAP.values() if s.startswith("synthetic.")
+}
 
 
 def esc(s):
@@ -127,13 +210,17 @@ def build():
     out.append(f"MERGE (:Constant {{reason: '{esc(CONSTANT_REASON)}'}});")
 
     out.append("\n// --- Persona nodes ---")
+    # MERGE on id only: the graph's existing persona nodes carry richer
+    # role strings (and HAS_CACHED_QUESTION / SERVES edges) from earlier
+    # loads -- matching on all properties would fork a duplicate node.
     for pid, info in PERSONA_INFO.items():
         out.append(
-            f"MERGE (:Persona {{id: '{pid}', name: '{esc(info['name'])}', role: '{esc(info['role'])}'}});"
+            f"MERGE (p:Persona {{id: '{pid}'}}) "
+            f"ON CREATE SET p.name = '{esc(info['name'])}', p.role = '{esc(info['role'])}';"
         )
 
     out.append("\n// --- Signal nodes + HAS_SIGNAL + REPRESENTS + (COMPUTED_FROM or, honestly, DOCUMENTED_AS) ---")
-    for pid, signals in RAIN_SIGNALS.items():
+    for pid, signals in ALL_SIGNALS.items():
         for sig in signals:
             sid, title, sev, count = sig["id"], esc(sig["title"]), sig["severity"], sig.get("affected_count")
             # MERGE can't match on a null property value -- create the
@@ -152,7 +239,7 @@ def build():
                 out.append(f"MATCH (s:Signal {{id: '{sid}'}}), (k:Constant) MERGE (s)-[:DOCUMENTED_AS]->(k);")
 
     out.append("\n// --- KPI nodes + HAS_KPI + REPRESENTS + (COMPUTED_FROM or, honestly, DOCUMENTED_AS) ---")
-    for pid, kpis in ULTRA_KPI_DATA.items():
+    for pid, kpis in ALL_KPIS.items():
         for kpi in kpis:
             kid, label, value = kpi["id"], esc(kpi["label"]), esc(kpi["value"])
             out.append(f"MERGE (:KPI {{id: '{pid}_{kid}', label: '{label}', value: '{value}'}});")
@@ -211,7 +298,9 @@ def build():
 
 if __name__ == "__main__":
     cypher = build()
-    with open("build_persona_graph.cypher", "w") as f:
+    # utf-8 explicitly: persona names carry accents (Martínez), and the
+    # docker seeder (deploy/scripts/seed_neo4j.py) reads this file as utf-8
+    with open("build_persona_graph.cypher", "w", encoding="utf-8") as f:
         f.write(cypher)
     n_statements = cypher.count(";")
     print(f"Wrote build_persona_graph.cypher: {n_statements} statements")

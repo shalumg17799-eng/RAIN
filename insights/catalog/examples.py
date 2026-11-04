@@ -58,6 +58,21 @@ def tables_read_by(sql: str, dialect: str) -> list[str]:
     return sorted(names)
 
 
+def strip_schemas(sql: str, dialect: str) -> str:
+    """The SQL with schema/catalog qualifiers removed from every real table, so it can be
+    checked against a flat (bare-name) schema mapping the way L1 checks it."""
+    try:
+        root = sqlglot.parse_one(sql, read=dialect)
+    except (SqlglotError, RecursionError):
+        return sql
+    for scope in traverse_scope(root):
+        for source in scope.sources.values():
+            if isinstance(source, exp.Table) and not isinstance(source.this, exp.Func):
+                source.set("db", None)
+                source.set("catalog", None)
+    return root.sql(dialect=dialect)
+
+
 def columns_resolve(sql: str, schema: dict[str, dict[str, str]], dialect: str) -> str | None:
     """None when every column resolves against `schema`, else a short message."""
     try:

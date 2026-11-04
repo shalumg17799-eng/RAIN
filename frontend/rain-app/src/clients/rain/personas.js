@@ -155,4 +155,19 @@ export const rainPersonas = {
       'Automated Action',
     ],
   },
+  // 8 — Rural patient (UC-01): first-person briefing anchored to her own
+  // synthetic record (backend persona "rosa"). English/Spanish, SMS-first.
+  rain_martinez: {
+    id: 'rain_martinez',
+    name: 'Rosa Martínez',
+    initials: 'RM',
+    role: 'Rural Patient',
+    greeting: 'Rosa',
+    capabilities: [
+      'Proactive Intelligence',
+      'Converged Conversation',
+      'Predictive Intelligence',
+      'Automated Action',
+    ],
+  },
 };

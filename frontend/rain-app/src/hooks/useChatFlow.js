@@ -24,6 +24,7 @@ const PERSONA_ID_MAP = {
   rain_okafor: 'samuel',
   rain_hargrove: 'linda',
   rain_bell: 'marcus',
+  rain_martinez: 'rosa',
 };
 
 async function fetchSignalBrief(personaId) {
@@ -49,6 +50,12 @@ const PERSONA_TOKENS = {
   james: import.meta.env.VITE_RAIN_KEY_JAMES,
   priya: import.meta.env.VITE_RAIN_KEY_PRIYA,
   david: import.meta.env.VITE_RAIN_KEY_DAVID,
+  // PRD v0.2 wave -- same key pipeline (apps/keys.local.yaml + persona_keys.env)
+  kayla: import.meta.env.VITE_RAIN_KEY_KAYLA,
+  denise: import.meta.env.VITE_RAIN_KEY_DENISE,
+  samuel: import.meta.env.VITE_RAIN_KEY_SAMUEL,
+  linda: import.meta.env.VITE_RAIN_KEY_LINDA,
+  marcus: import.meta.env.VITE_RAIN_KEY_MARCUS,
 };
 
 // Governed ask with live stage streaming (SSE over fetch). onStage receives
@@ -92,6 +99,13 @@ async function askGoverned(personaId, query, onStage) {
     return null;
   }
 }
+
+// Instant-UI switch: with VITE_RAIN_GOVERNED_ASK=0 in .env.local the chat
+// never calls the governed Insights agent (it costs seconds-to-minutes per
+// question) and plays the scripted flows immediately; signal cards and KPI
+// tiles stay live from the backend either way. Remove the line or set it to
+// 1 to turn the live governed pipeline back on.
+const GOVERNED_ASK_ENABLED = import.meta.env.VITE_RAIN_GOVERNED_ASK !== '0';
 
 // Chips that perform an action (route, hold, schedule) are not questions.
 // Their reply stays the saved confirmation. Every other chip is a question
@@ -249,6 +263,43 @@ export default function useChatFlow(personaId) {
   }, [chatFlows, chipToFlowKey]);
 
   const showDatabaseAnswer = useCallback(async (question, flowKey) => {
+    if (!GOVERNED_ASK_ENABLED) {
+      // Fast live path: the backend's verified business-rule SQL answers
+      // straight from Postgres (public + synthetic schemas) in milliseconds.
+      // No insights agent, no stage strip, no HITL hold.
+      try {
+        const backendId = PERSONA_ID_MAP[personaId];
+        if (backendId) {
+          setIsTyping(true);
+          // A question with a mapped flow has a scripted fallback ready, so
+          // only the millisecond rule tiers run (fast_only); a free-typed
+          // question may also use the backend's deeper live tiers.
+          const res = await fetch(`${API_BASE}/ultra/rain/${backendId}/ask`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: question, fast_only: Boolean(flowKey) }),
+          });
+          const live = res.ok ? await res.json() : null;
+          if (live?.found) {
+            logBackend(`Chat answer for "${question}" from fast POST /ultra/rain/${backendId}/ask -- ${
+              live.source}; sources: ${(live.data_sources_used || []).join(', ') || 'none'}`);
+            if (flowKey) {
+              const sigIdx = signalSequence.indexOf(flowKey);
+              if (sigIdx >= 0) signalIndexRef.current = sigIdx + 1;
+            }
+            addLiveMessage({
+              ai_message: live.ai_message,
+              suggested_chips: live.suggested_chips || [],
+              data_sources_used: live.data_sources_used || [],
+              confidence: live.confidence,
+            }, flowKey);
+            return true;
+          }
+        }
+      } catch { /* backend unreachable -- the scripted flow below still answers */ }
+      logStatic(`Chat answer for "${question}"`, 'chatFlows.json (no live rule matched; governed agent off)');
+      return false; // the caller plays the scripted flow
+    }
     // Governed Insights ask with live stage streaming. The stage strip fills
     // while the agent works; the collected trace is attached to whichever
     // message answers (live result, or the scripted fallback).
@@ -296,7 +347,7 @@ export default function useChatFlow(personaId) {
       if (nextKey) {
         const question = chatFlows[nextKey]?.user_query || chipText;
         if (await showDatabaseAnswer(question, nextKey)) return;
-        logFallback(`Chat answer for "${question}"`, `chatFlows.json [${nextKey}]`, '/api/v2/ask returned no answer');
+        if (GOVERNED_ASK_ENABLED) logFallback(`Chat answer for "${question}"`, `chatFlows.json [${nextKey}]`, '/api/v2/ask returned no answer');
         signalIndexRef.current += 1;
         addAIMessage(nextKey);
         return;
@@ -309,7 +360,7 @@ export default function useChatFlow(personaId) {
 
     if (flowKey && chatFlows[flowKey]) {
       if (dataQuestion) {
-        logFallback(`Chat answer for "${chipText}"`, `chatFlows.json [${flowKey}]`, '/api/v2/ask returned no answer');
+        if (GOVERNED_ASK_ENABLED) logFallback(`Chat answer for "${chipText}"`, `chatFlows.json [${flowKey}]`, '/api/v2/ask returned no answer');
       } else {
         logStatic(`Chat answer for action chip "${chipText}" (action chips are never sent to the backend)`, `chatFlows.json [${flowKey}]`);
       }

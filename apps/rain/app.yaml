@@ -46,6 +46,10 @@ datasources:
   port: 5432
   database: rain
   default_schema: public
+  # synthetic = the PRD v0.2 planned-schema tables (UC-01/UC-02 personas)
+  schemas:
+  - public
+  - synthetic
   user:
     env: PG_USER
   password:
@@ -141,6 +145,96 @@ roles:
         columns: '*'
       ProviderReferenceIssue:
         columns: '*'
+  # --- PRD v0.2 wave (UC-01 smart scheduling + UC-02 population health).
+  # These personas work the synthetic schema only (planned-schema data).
+  kayla:
+    tables:
+      synthetic.appointment:
+        columns: '*'
+      synthetic.slot:
+        columns: '*'
+      synthetic.schedule:
+        columns: '*'
+      synthetic.eligibility_check:
+        columns: '*'
+      synthetic.reminder_message:
+        columns: '*'
+      synthetic.contact_preference:
+        columns: '*'
+      synthetic.patient:
+        columns: '*'
+      synthetic.provider:
+        columns: '*'
+      synthetic.clinic_site:
+        columns: '*'
+      synthetic.travel_time:
+        columns: '*'
+  denise:
+    tables:
+      synthetic.outreach_task:
+        columns: '*'
+      synthetic.risk_score:
+        columns: '*'
+      synthetic.reminder_message:
+        columns: '*'
+      synthetic.contact_preference:
+        columns: '*'
+      synthetic.sdoh_screening:
+        columns: '*'
+      synthetic.patient:
+        columns: '*'
+      synthetic.appointment:
+        columns: '*'
+      synthetic.travel_time:
+        columns: '*'
+  samuel:
+    tables:
+      synthetic.patient:
+        columns: '*'
+      synthetic.encounter:
+        columns: '*'
+      synthetic.risk_score:
+        columns: '*'
+      synthetic.medication:
+        columns: '*'
+      synthetic.rpm_reading:
+        columns: '*'
+      synthetic.condition:
+        columns: '*'
+      synthetic.appointment:
+        columns: '*'
+  linda:
+    tables:
+      synthetic.risk_score:
+        columns: '*'
+      synthetic.outreach_task:
+        columns: '*'
+      synthetic.claim:
+        columns: '*'
+      synthetic.encounter:
+        columns: '*'
+      synthetic.sdoh_screening:
+        columns: '*'
+      synthetic.patient:
+        columns: '*'
+      synthetic.condition:
+        columns: '*'
+      synthetic.county_metric:
+        columns: '*'
+  marcus:
+    tables:
+      synthetic.county_metric:
+        columns: '*'
+      synthetic.broadband_coverage:
+        columns: '*'
+      synthetic.clinic_site:
+        columns: '*'
+      synthetic.claim:
+        columns: '*'
+      synthetic.travel_time:
+        columns: '*'
+      synthetic.encounter:
+        columns: '*'
   patient:
     tables:
       ChronicConditionEnrollment:
@@ -218,3 +312,8 @@ sql_visibility:
     priya: true
     david: true
     patient: false
+    kayla: false
+    denise: false
+    samuel: false
+    linda: false
+    marcus: true

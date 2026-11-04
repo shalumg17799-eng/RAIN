@@ -1,0 +1,105 @@
+{
+  "greeting": {
+    "ai_message": "Hola Rosa — good morning. You have 2 visits on file and 1 of them still needs your confirmation; we've sent 3 reminders and haven't heard back yet. Your SMS consent and coverage are both active, so one YES reply confirms everything. And because the drive is long from your side of the county, 39 telehealth slots are open near you if a video visit is easier. Everything here runs on synthetic and public data. Want me to walk you through your visit?",
+    "suggested_chips": [
+      "Yes, walk me through them",
+      "When is my next visit and is it confirmed?",
+      "Can I switch my visit to telehealth?",
+      "Is my coverage active?"
+    ]
+  },
+  "turn_1_nextvisit": {
+    "user_query": "When is my next visit and is it confirmed?",
+    "ai_message": "You have 2 visits on file and 1 is still waiting on your confirmation. Reply YES to the reminder text or answer the voice call and the clinic sees it instantly — reminders come at 72, 24 and 3 hours in your preferred language, and never between 8pm and 8am.",
+    "suggested_chips": [
+      "Confirm my visit",
+      "Can I switch my visit to telehealth?",
+      "What happens if I miss my visit?"
+    ]
+  },
+  "turn_2_telehealth": {
+    "user_query": "Can I switch my visit to telehealth?",
+    "ai_message": "Yes — 39 telehealth slots are open across nearby clinics and your visit reason is telehealth-eligible. Reply T to the 24-hour reminder and the visit converts to video with the link and a device checklist. No 60-plus-minute drive, no wasted trip.",
+    "suggested_chips": [
+      "Switch me to telehealth",
+      "Is my coverage active?",
+      "How do I confirm by text?"
+    ]
+  },
+  "turn_3_coverage": {
+    "user_query": "Is my coverage active?",
+    "ai_message": "Your coverage check shows Active with your payer — nothing is needed from you before the visit. Even when a coverage check comes back unclear, it never blocks care: the clinic flags it and an enrollment assistant sorts it out.",
+    "suggested_chips": [
+      "Confirm my visit",
+      "Reschedule my visit",
+      "Why am I getting these reminders?"
+    ]
+  },
+  "signal_reminders": {
+    "user_query": "Why am I getting these reminders?",
+    "ai_message": "We've sent 3 reminders about your upcoming visit and none has a reply yet. They arrive at 72, 24 and 3 hours before the visit, in English or Spanish, only on channels you consented to. One YES stops the rest — and if we still haven't heard back at the 24-hour mark, a care coordinator calls to help instead of letting the visit drop.",
+    "suggested_chips": [
+      "Confirm my visit",
+      "How do I confirm by text?",
+      "Next signal"
+    ]
+  },
+  "signal_slots": {
+    "user_query": "Show me the telehealth option for my visit",
+    "ai_message": "39 telehealth slots are open across nearby clinics right now, and your visit qualifies. With your SMS consent on file, the 24-hour reminder carries the offer automatically: reply T, get the video link and a quick device checklist, and skip the drive.",
+    "suggested_chips": [
+      "Switch me to telehealth",
+      "When is my next visit and is it confirmed?",
+      "Next signal"
+    ]
+  },
+  "q_confirm_text": {
+    "user_query": "How do I confirm by text?",
+    "ai_message": "Your SMS consent is on file (Yes), so just reply YES to the reminder text — it confirms your pending visit instantly. Texts only arrive between 8am and 8pm, per the consent rules, and STOP always works.",
+    "suggested_chips": [
+      "Confirm my visit",
+      "Why am I getting these reminders?"
+    ]
+  },
+  "q_miss": {
+    "user_query": "What happens if I miss my visit?",
+    "ai_message": "Nothing gets cancelled for not replying. Your pending visit sits in the high no-show band (1 visit flagged — mostly the long drive), so at the 24-hour mark a care coordinator calls to help instead: reschedule, a telehealth switch, or transport if getting there is the problem.",
+    "suggested_chips": [
+      "Reschedule my visit",
+      "Switch me to telehealth",
+      "Confirm my visit"
+    ]
+  },
+  "confirm_visit": {
+    "user_query": "Confirm my visit",
+    "ai_message": "1 pending visit marked for confirmation — you'll get a text in a moment; reply YES and you're done. The clinic sees it instantly and your reminders stop.",
+    "suggested_chips": [
+      "Can I switch my visit to telehealth?",
+      "Is my coverage active?"
+    ]
+  },
+  "switch_telehealth": {
+    "user_query": "Switch me to telehealth",
+    "ai_message": "Done — your visit is queued for a telehealth switch. With 39 open slots across nearby clinics, the front desk confirms today and sends the video link with a device checklist. If video doesn't work out, the in-person slot is held until the switch is confirmed.",
+    "suggested_chips": [
+      "When is my next visit and is it confirmed?",
+      "Is my coverage active?"
+    ]
+  },
+  "reschedule_visit": {
+    "user_query": "Reschedule my visit",
+    "ai_message": "A reschedule request is on its way to the front desk with your preferred windows. If the drive is the problem, 39 telehealth slots are open as an alternative — reply T to take one. Nothing is cancelled until the new time is confirmed with you.",
+    "suggested_chips": [
+      "Can I switch my visit to telehealth?",
+      "Confirm my visit"
+    ]
+  },
+  "__default__": {
+    "ai_message": "I can help with your visits, reminders, telehealth options and coverage — try one of the chips below, or ask in your own words (English o Español).",
+    "suggested_chips": [
+      "When is my next visit and is it confirmed?",
+      "Can I switch my visit to telehealth?",
+      "Is my coverage active?"
+    ]
+  }
+}

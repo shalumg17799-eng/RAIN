@@ -166,6 +166,16 @@ def get_or_create_state(settings: ServerSettings | None = None) -> ServerState:
     return _server_state
 
 
+class HitlDecisionPayload(BaseModel):
+    """Reviewer's call on a paused run. Module-level on purpose: with
+    `from __future__ import annotations` every type hint is a string, and a
+    function-local model can't be resolved when FastAPI builds the OpenAPI
+    schema -- /openapi.json 500s (PydanticUserError: not fully defined)."""
+    action: str
+    edited_narrative: str | None = None
+    note: str | None = None
+
+
 def get_rain_router(settings: ServerSettings | None = None) -> APIRouter:
     router = APIRouter(tags=["Insights Intelligence Layer"])
     state = get_or_create_state(settings)
@@ -241,11 +251,6 @@ def get_rain_router(settings: ServerSettings | None = None) -> APIRouter:
                 for p in state.hitl.pending()
             ]
         }
-
-    class HitlDecisionPayload(BaseModel):
-        action: str
-        edited_narrative: str | None = None
-        note: str | None = None
 
     @router.post("/hitl/{run_id}")
     def hitl_decide(run_id: str, payload: HitlDecisionPayload, request: Request) -> dict[str, Any]:

@@ -1,0 +1,22 @@
+[
+  {
+    "trigger": "home_load",
+    "capabilityName": "Proactive Intelligence",
+    "description": "RAIN watches your visits, reminders and coverage for you — the pending confirmation, the telehealth option and the unanswered reminders surface here before you have to ask, in English or Spanish, on the channels you consented to."
+  },
+  {
+    "trigger": "ask_turn_1",
+    "capabilityName": "Converged Conversation",
+    "description": "Your visit status, reminder history and confirmation path come back as one answer computed live from your own record — not a form to fill or a phone queue to wait in."
+  },
+  {
+    "trigger": "ask_turn_2",
+    "capabilityName": "Predictive Intelligence",
+    "description": "The pattern profile knows the long drive raises your no-show risk, so the platform lines up the telehealth switch before the visit is at risk — you just reply T."
+  },
+  {
+    "trigger": "ask_turn_3",
+    "capabilityName": "Automated Action",
+    "description": "Confirmations, switches and reschedules fire straight from a reply — the clinic systems update instantly, and anything unclear routes to a person instead of blocking your care."
+  }
+]

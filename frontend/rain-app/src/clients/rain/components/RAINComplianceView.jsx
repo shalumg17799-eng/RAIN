@@ -27,6 +27,7 @@ const PERSONA_ID_MAP = {
   rain_okafor: 'samuel',
   rain_hargrove: 'linda',
   rain_bell: 'marcus',
+  rain_martinez: 'rosa',
 };
 
 // KPI icon name (string, from the backend) -> the real lucide-react

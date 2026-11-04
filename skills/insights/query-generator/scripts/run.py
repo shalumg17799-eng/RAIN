@@ -9,7 +9,12 @@ from pathlib import Path
 from typing import Any
 
 from insights.catalog.bm25 import BM25Index
-from insights.catalog.examples import ReviewedExample, columns_resolve, tables_read_by
+from insights.catalog.examples import (
+    ReviewedExample,
+    columns_resolve,
+    strip_schemas,
+    tables_read_by,
+)
 from insights.catalog.text import stems
 from insights.contracts.enums import Purpose
 from insights.contracts.request import AskContext
@@ -184,6 +189,17 @@ def choose_examples(
 def check_against_sliver(sql: str, sliver: Sliver, dialect: str) -> tuple[list[str], list[str]]:
     """(problems, tables_used). No problems means the SQL is grounded in the sliver."""
     allowed = {t.name.lower(): {c.name.lower(): c.type for c in t.columns} for t in sliver.tables}
+    # A multi-schema sliver names tables 'schema.table', while the parsed SQL
+    # reports bare names -- alias each qualified entry under its bare name when
+    # that is unambiguous, the same rule L1 applies before checking.
+    for name in list(allowed):
+        bare = name.split(".")[-1]
+        if (
+            bare != name
+            and bare not in allowed
+            and sum(1 for n in allowed if n.split(".")[-1] == bare) == 1
+        ):
+            allowed[bare] = allowed[name]
     try:
         tables = tables_read_by(sql, dialect)
     except ValueError as exc:
@@ -193,7 +209,10 @@ def check_against_sliver(sql: str, sliver: Sliver, dialect: str) -> tuple[list[s
         problems.append("the query reads no table")
     if problems:
         return problems, tables
-    column_problem = columns_resolve(sql, allowed, dialect)
+    # qualify() reads a dotted mapping key as a nested path, so the column check
+    # runs on qualifier-stripped SQL against the bare-name entries only.
+    flat = {n: c for n, c in allowed.items() if "." not in n}
+    column_problem = columns_resolve(strip_schemas(sql, dialect), flat, dialect)
     if column_problem:
         problems.append(f"a column does not exist in the sliver: {column_problem}")
     return problems, tables

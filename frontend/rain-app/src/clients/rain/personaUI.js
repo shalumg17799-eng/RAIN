@@ -429,6 +429,47 @@ const bellUI = {
   greetingFlowKey: 'greeting',
 };
 
+const martinezUI = {
+  initialChips: [
+    'When is my next visit and is it confirmed?',
+    'Can I switch my visit to telehealth?',
+    'Is my coverage active?',
+    'Why am I getting these reminders?',
+    'How do I confirm by text?',
+    'What happens if I miss my visit?',
+    'Confirm my visit',
+    'Reschedule my visit',
+  ],
+  goldenPathChip: {
+    greeting: 'When is my next visit and is it confirmed?',
+    turn_1_nextvisit: 'Can I switch my visit to telehealth?',
+    turn_2_telehealth: 'Is my coverage active?',
+    turn_3_coverage: 'Confirm my visit',
+  },
+  flowKeyToCapabilityTrigger: {
+    greeting: 'home_load',
+    turn_1_nextvisit: 'ask_turn_1',
+    signal_reminders: 'ask_turn_1',
+    signal_slots: 'ask_turn_1',
+    turn_2_telehealth: 'ask_turn_2',
+    turn_3_coverage: 'ask_turn_3',
+  },
+  stats: [
+    { id: 'upcoming_visits', label: 'My Visits on File', value: '2', trend: 'Scheduling System', positive: true, icon: CalendarCheck, iconColor: 'text-blue-600', iconBg: 'bg-blue-500/10', chipText: 'When is my next visit and is it confirmed?' },
+    { id: 'pending_confirm', label: 'Visits Awaiting My Confirmation', value: '1', trend: 'Reply YES to confirm', positive: false, icon: AlertTriangle, iconColor: 'text-red-600', iconBg: 'bg-red-500/10', chipText: 'When is my next visit and is it confirmed?' },
+    { id: 'reminders_received', label: 'Reminders Sent to Me', value: '3', trend: 'SMS + voice, EN/ES', positive: true, icon: MessageSquare, iconColor: 'text-blue-600', iconBg: 'bg-blue-500/10', chipText: 'Why am I getting these reminders?' },
+    { id: 'sms_consent_status', label: 'My SMS Consent', value: 'Yes', trend: 'Contact Preferences (TCPA)', positive: true, icon: ShieldCheck, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-500/10', chipText: 'How do I confirm by text?' },
+    { id: 'coverage_status', label: 'My Coverage Status', value: 'Active', trend: 'Eligibility Service (270/271)', positive: true, icon: ClipboardList, iconColor: 'text-emerald-600', iconBg: 'bg-emerald-500/10', chipText: 'Is my coverage active?' },
+    { id: 'telehealth_slots', label: 'Telehealth Slots Open Near Me', value: '39', trend: 'Slot Inventory', positive: true, icon: Video, iconColor: 'text-violet-600', iconBg: 'bg-violet-500/10', chipText: 'Can I switch my visit to telehealth?' },
+  ],
+  signalToChip: {
+    'SIG-RAIN-ROSA-001': 'When is my next visit and is it confirmed?',
+    'SIG-RAIN-ROSA-002': 'Show me the telehealth option for my visit',
+    'SIG-RAIN-ROSA-003': 'Why am I getting these reminders?',
+  },
+  greetingFlowKey: 'greeting',
+};
+
 export const rainUIConfigs = {
   rain_delgado: delgadoUI,
   rain_whitehorse: whitehorseUI,
@@ -440,4 +481,5 @@ export const rainUIConfigs = {
   rain_okafor: okaforUI,
   rain_hargrove: hargroveUI,
   rain_bell: bellUI,
+  rain_martinez: martinezUI,
 };

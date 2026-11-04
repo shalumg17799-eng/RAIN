@@ -33,6 +33,7 @@ export default {
     allowed: [
       'rain_delgado', 'rain_whitehorse', 'rain_tomley', 'rain_nair', 'rain_yazzie',
       'rain_brooks', 'rain_holloway', 'rain_okafor', 'rain_hargrove', 'rain_bell',
+      'rain_martinez',
     ],
     default: 'rain_delgado',
   },

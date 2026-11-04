@@ -548,7 +548,7 @@ _STOPWORDS = {
 # ("RPM transmission completeness by ZIP code") matching the wrong rule --
 # the real cause wasn't a scoring problem, it was asking Tier 0 a question
 # no Tier 0 rule could ever correctly answer.
-_BREAKDOWN_PATTERN = re.compile(r"\bby\s+(zip|feed|county|provider|source|type|region|facility|condition|status|connectivity)\b", re.IGNORECASE)
+_BREAKDOWN_PATTERN = re.compile(r"\bby\s+(zip|feed|county|provider|source|type|region|facility|condition|status|connectivity|clinic)\b", re.IGNORECASE)
 
 # "Cross-reference A with B" / "cross reference A and B" -- asks for a
 # JOIN between two different facts, which no single-fact rule can ever
@@ -581,7 +581,7 @@ def _keywords(text: str) -> set:
     return {w for w in stemmed if len(w) > 2 and w not in _STOPWORDS}
 
 
-def match_known_metric(query: str):
+def match_known_metric(query: str, persona: str = None):
     """Jaccard-similarity match against each rule's term (overlap size
     divided by the union of both word sets), same family of approach as
     Ultra's own frontend matcher but weighted by how much of BOTH sides
@@ -616,6 +616,8 @@ def match_known_metric(query: str):
     for rule in BUSINESS_RULES:
         if not rule["sql"]:
             continue
+        if rule.get("personas") and persona not in rule["personas"]:
+            continue  # persona-scoped rule (PRD v0.2 wave) -- never offered elsewhere
         if query_kind not in rule.get("kinds", (None,)):
             continue
         if rule.get("gate") and not re.search(rule["gate"], query, re.IGNORECASE):
@@ -1128,3 +1130,14 @@ def run_persona_summary(persona: str):
     except Exception as e:
         print(f"[business_rules] persona summary failed for '{persona}': {e}")
         return None
+
+
+# ---- PRD v0.2 persona wave (kayla/denise/samuel/linda/marcus) ---------------
+# Same verified-SQL contract, persona-scoped so they never answer a v0.1
+# persona's question (and vice versa -- the matcher skips persona-scoped
+# rules for everyone else). Defined in their own module; merged here so
+# every matcher above sees one list.
+from prdv2_business_rules import PRDV2_BUSINESS_RULES, PRDV2_BREAKDOWN_RULES
+
+BUSINESS_RULES.extend(PRDV2_BUSINESS_RULES)
+BREAKDOWN_RULES.extend(PRDV2_BREAKDOWN_RULES)
