@@ -1,0 +1,371 @@
+{
+  "signals": [],
+  "kpis": [
+    {
+      "id": "top",
+      "label": "Top priority this week",
+      "value": "46",
+      "detail": "Winnemucca and Battle Mountain",
+      "source": "BP campaign worklist",
+      "icon": "target",
+      "tone": "warning",
+      "chip": "Open my worklist"
+    },
+    {
+      "id": "campaign",
+      "label": "BP campaign patients",
+      "value": "412",
+      "detail": "From Dr. Castellanos",
+      "source": "Worklist hand-off",
+      "icon": "users",
+      "tone": "neutral"
+    },
+    {
+      "id": "noCallback",
+      "label": "No callback yet",
+      "value": "5",
+      "detail": "Called yesterday",
+      "source": "Contact log",
+      "icon": "phone-off",
+      "tone": "warning",
+      "chip": "Who has not answered reminders?"
+    },
+    {
+      "id": "open",
+      "label": "Open patients",
+      "value": "200",
+      "source": "Care team panel",
+      "icon": "clipboard-check",
+      "tone": "neutral"
+    },
+    {
+      "id": "booked",
+      "label": "Booked",
+      "value": "62 of 412",
+      "source": "Scheduling",
+      "icon": "calendar",
+      "tone": "good"
+    },
+    {
+      "id": "controlled",
+      "label": "Controlled",
+      "value": "18",
+      "source": "EHR + remote readings",
+      "icon": "heart-pulse",
+      "tone": "good"
+    }
+  ],
+  "steps": {
+    "chw_brief": {
+      "ai": "Good morning, Teresa. Dr. Castellanos sent you the blood pressure campaign: 412 patients, 46 of them at your two sites marked top priority this week.",
+      "sources": [
+        "BP Campaign Worklist",
+        "Contact Log"
+      ],
+      "chips": [
+        "Open my worklist",
+        "Who is closest to BP control?",
+        "Who has not answered reminders?"
+      ],
+      "next": "Open my worklist",
+      "viz": [
+        "v_tasks"
+      ]
+    },
+    "chw_open": {
+      "asks": [
+        "Open my worklist",
+        "Start with the top priority list"
+      ],
+      "ai": "Opening your Worklist, filtered to your 46 top-priority patients.",
+      "sources": [
+        "BP Campaign Worklist"
+      ],
+      "chips": [
+        "Why is she ranked first?",
+        "Give me talking points in Spanish for this patient",
+        "Who has not answered reminders?"
+      ],
+      "launch": {
+        "workbench": "worklist",
+        "filter": "teresa46",
+        "label": "Worklist",
+        "detail": "your 46 top-priority patients",
+        "auto": true
+      },
+      "viz": [
+        "v_launch_worklist"
+      ]
+    },
+    "chw_closest": {
+      "asks": [
+        "Who is closest to BP control?"
+      ],
+      "ai": "These five of your patients are the most likely to reach control with one recheck.",
+      "sources": [
+        "BP Campaign Worklist",
+        "Remote BP Readings"
+      ],
+      "chips": [
+        "Open my worklist",
+        "Who has not answered reminders?"
+      ],
+      "next": "Open my worklist",
+      "viz": [
+        "v_closest"
+      ],
+      "action": "highlight:teresaTop5"
+    },
+    "chw_noreply": {
+      "asks": [
+        "Who has not answered reminders?",
+        "Who has not called back?"
+      ],
+      "ai": "Nine patients with visits tomorrow have not answered their reminder, and five you called yesterday have not called back, so call both groups today.",
+      "sources": [
+        "Contact Log",
+        "SMS Reminders"
+      ],
+      "chips": [
+        "Open my worklist",
+        "Who is closest to BP control?"
+      ],
+      "next": "Open my worklist",
+      "viz": [
+        "v_noreply_rem",
+        "v_noreply"
+      ]
+    },
+    "chw_progress": {
+      "asks": [
+        "How is the campaign going?"
+      ],
+      "ai": "Here is the campaign so far: bookings and controlled readings update as visits happen.",
+      "sources": [
+        "Scheduling",
+        "EHR (FHIR)",
+        "Remote BP Readings"
+      ],
+      "chips": [
+        "Open my worklist",
+        "Who is closest to BP control?"
+      ],
+      "next": "Open my worklist",
+      "viz": [
+        "v_progress"
+      ]
+    },
+    "chw_ctx_talk": {
+      "asks": [
+        "Give me talking points in Spanish for this patient"
+      ],
+      "ai": "Here are short talking points in Spanish for this patient, with the English beside them.",
+      "sources": [
+        "EHR (FHIR)",
+        "Contact Log"
+      ],
+      "chips": [
+        "Why is she ranked first?",
+        "Book a visit for this patient"
+      ],
+      "viz": [
+        "v_ctx_talk"
+      ]
+    },
+    "chw_ctx_rank": {
+      "asks": [
+        "Why is she ranked first?",
+        "Why is this patient ranked here?",
+        "Explain this ranking"
+      ],
+      "ai": "Here is what puts this patient where they are on your list.",
+      "sources": [
+        "Impactability Score",
+        "EHR (FHIR)"
+      ],
+      "chips": [
+        "Give me talking points in Spanish for this patient",
+        "Book a visit for this patient"
+      ],
+      "viz": [
+        "v_ctx_rank"
+      ]
+    },
+    "chw_ctx_book": {
+      "asks": [
+        "Book a visit for this patient"
+      ],
+      "ai": "Opening Scheduling for this patient, so you can choose a slot while you have them on the phone.",
+      "sources": [
+        "Scheduling"
+      ],
+      "chips": [
+        "Who is closest to BP control?",
+        "Open my worklist"
+      ],
+      "launch": {
+        "workbench": "scheduling",
+        "filter": "selected",
+        "label": "Scheduling",
+        "detail": "for this patient",
+        "auto": true
+      },
+      "viz": [
+        "v_launch_scheduling"
+      ]
+    },
+    "chw_ctx_mode": {
+      "asks": [
+        "Why telehealth for this patient?",
+        "Why this visit mode?"
+      ],
+      "ai": "Here is why this visit mode fits this patient.",
+      "sources": [
+        "Travel Time (OpenStreetMap)",
+        "FCC Broadband",
+        "Eligibility (270/271)"
+      ],
+      "chips": [
+        "What other slots work for an 81-minute drive?",
+        "Open my worklist"
+      ],
+      "viz": [
+        "v_ctx_mode"
+      ]
+    },
+    "chw_ctx_slots": {
+      "asks": [
+        "What other slots work for an 81-minute drive?",
+        "What other slots work for this drive?"
+      ],
+      "ai": "Here are the other slots that work for this patient's drive, sorted by drive time.",
+      "sources": [
+        "EHR Schedule",
+        "HRSA Health Center Sites",
+        "Travel Time (OpenStreetMap)"
+      ],
+      "chips": [
+        "Why telehealth for this patient?",
+        "Open my worklist"
+      ],
+      "viz": [
+        "v_ctx_slots"
+      ]
+    },
+    "chw_ctx_plan": {
+      "asks": [
+        "Explain the reminder plan"
+      ],
+      "ai": "Here is the reminder plan and why it is timed this way.",
+      "sources": [
+        "SMS Reminders",
+        "Contact Log"
+      ],
+      "chips": [
+        "Why telehealth for this patient?",
+        "Open my worklist"
+      ],
+      "viz": [
+        "v_ctx_plan"
+      ]
+    },
+    "__default__": {
+      "ai": "I can help with today's calls: your worklist, who is closest to control, who has not called back, and talking points for a patient.",
+      "sources": [],
+      "chips": [
+        "Open my worklist",
+        "Who is closest to BP control?",
+        "Who has not answered reminders?"
+      ]
+    }
+  },
+  "queries": [
+    "Open my worklist",
+    "Who is closest to BP control?",
+    "Who has not answered reminders?",
+    "How is the campaign going?"
+  ],
+  "viz": {
+    "v_tasks": {
+      "type": "rain.task_briefing",
+      "props": {
+        "role": "chw"
+      }
+    },
+    "v_launch_worklist": {
+      "type": "rain.launch_card",
+      "props": {
+        "step": "chw_open"
+      }
+    },
+    "v_launch_scheduling": {
+      "type": "rain.launch_card",
+      "props": {
+        "step": "chw_ctx_book"
+      }
+    },
+    "v_closest": {
+      "type": "data_table",
+      "props": {
+        "dataset": "teresa_top5"
+      }
+    },
+    "v_noreply": {
+      "type": "data_table",
+      "props": {
+        "dataset": "teresa_noreply"
+      }
+    },
+    "v_progress": {
+      "type": "rain.campaign_progress",
+      "props": {}
+    },
+    "v_ctx_talk": {
+      "type": "context",
+      "props": {
+        "kind": "talk"
+      }
+    },
+    "v_ctx_rank": {
+      "type": "context",
+      "props": {
+        "kind": "rank"
+      }
+    },
+    "v_ctx_mode": {
+      "type": "context",
+      "props": {
+        "kind": "mode"
+      }
+    },
+    "v_ctx_slots": {
+      "type": "context",
+      "props": {
+        "kind": "slots"
+      }
+    },
+    "v_ctx_plan": {
+      "type": "context",
+      "props": {
+        "kind": "plan"
+      }
+    },
+    "v_noreply_rem": {
+      "type": "data_table",
+      "props": {
+        "dataset": "reminders_unconfirmed"
+      }
+    }
+  },
+  "handoffs": [],
+  "workbenches": [
+    {
+      "id": "worklist",
+      "access": "full"
+    },
+    {
+      "id": "scheduling",
+      "access": "full"
+    }
+  ]
+}

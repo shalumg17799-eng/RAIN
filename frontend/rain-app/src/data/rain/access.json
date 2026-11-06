@@ -1,0 +1,280 @@
+{
+  "signals": [],
+  "kpis": [
+    {
+      "id": "bookings",
+      "label": "Bookings waiting",
+      "value": "23",
+      "detail": "From Teresa's worklist",
+      "source": "Worklist hand-off",
+      "icon": "calendar",
+      "tone": "warning",
+      "chip": "Start bookings"
+    },
+    {
+      "id": "unconfirmed",
+      "label": "Unconfirmed tomorrow",
+      "value": "9",
+      "source": "SMS reminders",
+      "icon": "clock",
+      "tone": "warning",
+      "chip": "Show unconfirmed visits for tomorrow"
+    },
+    {
+      "id": "rReplies",
+      "label": "Replied R",
+      "value": "4",
+      "detail": "Need new slots",
+      "source": "SMS reminders",
+      "icon": "message-square",
+      "tone": "warning",
+      "chip": "Handle the R replies"
+    },
+    {
+      "id": "sites",
+      "label": "Booking for",
+      "value": "7 sites",
+      "detail": "Plus 2 telehealth providers",
+      "source": "EHR schedule",
+      "icon": "building",
+      "tone": "neutral"
+    }
+  ],
+  "steps": {
+    "acc_brief": {
+      "ai": "Good morning, Brandon. 23 bookings are waiting from Teresa's worklist, 9 visits tomorrow are still unconfirmed, and 4 patients replied R and need new slots.",
+      "sources": [
+        "Worklist Hand-off",
+        "SMS Reminders",
+        "EHR Schedule"
+      ],
+      "chips": [
+        "Start bookings",
+        "Show unconfirmed visits for tomorrow",
+        "Handle the R replies"
+      ],
+      "next": "Start bookings",
+      "viz": [
+        "v_tasks"
+      ]
+    },
+    "acc_start": {
+      "asks": [
+        "Start bookings",
+        "Start with the bookings"
+      ],
+      "ai": "Opening Scheduling at your first booking, Linda Garcia's telehealth BP recheck, so you can choose a slot and confirm.",
+      "sources": [
+        "Worklist Hand-off",
+        "EHR Schedule"
+      ],
+      "chips": [
+        "Why telehealth for this patient?",
+        "What other slots work for an 81-minute drive?",
+        "Explain the reminder plan"
+      ],
+      "launch": {
+        "workbench": "scheduling",
+        "filter": "next",
+        "label": "Scheduling",
+        "detail": "starting with your first booking",
+        "auto": true
+      },
+      "viz": [
+        "v_launch_scheduling"
+      ]
+    },
+    "acc_unconfirmed": {
+      "asks": [
+        "Show unconfirmed visits for tomorrow"
+      ],
+      "ai": "9 visits tomorrow have no reply yet, so each now has a call task back on Teresa's worklist.",
+      "sources": [
+        "SMS Reminders",
+        "EHR Schedule"
+      ],
+      "chips": [
+        "Handle the R replies",
+        "Start bookings",
+        "Open Reminders"
+      ],
+      "next": "Start bookings",
+      "viz": [
+        "v_unconfirmed"
+      ]
+    },
+    "acc_r": {
+      "asks": [
+        "Handle the R replies"
+      ],
+      "ai": "4 patients replied R, so each gets three new slots by SMS and the first reply books it.",
+      "sources": [
+        "SMS Reminders",
+        "EHR Schedule"
+      ],
+      "chips": [
+        "Start bookings",
+        "Show unconfirmed visits for tomorrow",
+        "Open Reminders"
+      ],
+      "next": "Start bookings",
+      "viz": [
+        "v_rreplies"
+      ]
+    },
+    "acc_open_reminders": {
+      "asks": [
+        "Open Reminders"
+      ],
+      "ai": "Opening Reminders with every patient's plan and SMS log.",
+      "sources": [
+        "SMS Reminders"
+      ],
+      "chips": [
+        "Start bookings",
+        "Handle the R replies"
+      ],
+      "launch": {
+        "workbench": "reminders",
+        "filter": "all",
+        "label": "Reminders",
+        "detail": "plans and SMS logs",
+        "auto": true
+      },
+      "viz": [
+        "v_launch_reminders"
+      ]
+    },
+    "acc_ctx_mode": {
+      "asks": [
+        "Why telehealth for this patient?",
+        "Why this visit mode?"
+      ],
+      "ai": "Here is why this visit mode fits this patient.",
+      "sources": [
+        "Travel Time (OpenStreetMap)",
+        "FCC Broadband",
+        "Eligibility (270/271)"
+      ],
+      "chips": [
+        "What other slots work for an 81-minute drive?",
+        "Explain the reminder plan"
+      ],
+      "viz": [
+        "v_ctx_mode"
+      ]
+    },
+    "acc_ctx_slots": {
+      "asks": [
+        "What other slots work for an 81-minute drive?",
+        "What other slots work for this drive?"
+      ],
+      "ai": "Here are the other slots that work for this patient's drive, sorted by drive time.",
+      "sources": [
+        "EHR Schedule",
+        "HRSA Health Center Sites",
+        "Travel Time (OpenStreetMap)"
+      ],
+      "chips": [
+        "Why telehealth for this patient?",
+        "Explain the reminder plan"
+      ],
+      "viz": [
+        "v_ctx_slots"
+      ]
+    },
+    "acc_ctx_plan": {
+      "asks": [
+        "Explain the reminder plan"
+      ],
+      "ai": "Here is the reminder plan and why it is timed this way.",
+      "sources": [
+        "SMS Reminders",
+        "Contact Log"
+      ],
+      "chips": [
+        "Why telehealth for this patient?",
+        "What other slots work for an 81-minute drive?"
+      ],
+      "viz": [
+        "v_ctx_plan"
+      ]
+    },
+    "__default__": {
+      "ai": "I can help with today's bookings, tomorrow's unconfirmed visits, the R replies and each patient's reminder plan.",
+      "sources": [],
+      "chips": [
+        "Start bookings",
+        "Show unconfirmed visits for tomorrow",
+        "Handle the R replies"
+      ]
+    }
+  },
+  "queries": [
+    "Start bookings",
+    "Show unconfirmed visits for tomorrow",
+    "Handle the R replies",
+    "Open Reminders"
+  ],
+  "viz": {
+    "v_tasks": {
+      "type": "rain.task_briefing",
+      "props": {
+        "role": "access"
+      }
+    },
+    "v_launch_scheduling": {
+      "type": "rain.launch_card",
+      "props": {
+        "step": "acc_start"
+      }
+    },
+    "v_launch_reminders": {
+      "type": "rain.launch_card",
+      "props": {
+        "step": "acc_open_reminders"
+      }
+    },
+    "v_unconfirmed": {
+      "type": "data_table",
+      "props": {
+        "dataset": "reminders_unconfirmed"
+      }
+    },
+    "v_rreplies": {
+      "type": "data_table",
+      "props": {
+        "dataset": "reminders_r"
+      }
+    },
+    "v_ctx_mode": {
+      "type": "context",
+      "props": {
+        "kind": "mode"
+      }
+    },
+    "v_ctx_slots": {
+      "type": "context",
+      "props": {
+        "kind": "slots"
+      }
+    },
+    "v_ctx_plan": {
+      "type": "context",
+      "props": {
+        "kind": "plan"
+      }
+    }
+  },
+  "handoffs": [],
+  "workbenches": [
+    {
+      "id": "scheduling",
+      "access": "full"
+    },
+    {
+      "id": "reminders",
+      "access": "full"
+    }
+  ]
+}

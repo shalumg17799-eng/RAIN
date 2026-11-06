@@ -3,6 +3,7 @@ Creates/replaces tables only inside that schema; app tables in public are untouc
 Usage: load_public_data.py <repo_root>"""
 import csv
 import io
+import os
 import re
 import sys
 from pathlib import Path
@@ -58,7 +59,8 @@ def read_rows(path, delim):
     return header, rows
 
 
-conn = psycopg2.connect(host="127.0.0.1", port=5432, dbname="rain", user="postgres", password="root")
+conn = psycopg2.connect(host="127.0.0.1", port=5432, dbname=os.getenv("PG_DB", "rain"),
+                        user="postgres", password="root")
 conn.autocommit = True
 cur = conn.cursor()
 cur.execute("CREATE SCHEMA IF NOT EXISTS public_data")

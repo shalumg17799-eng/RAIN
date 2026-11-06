@@ -1,0 +1,423 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`persona chat cards render identically > rain/rain_access 1`] = `
+{
+  "acc_brief": [
+    "div#c266c487b4",
+  ],
+  "acc_ctx_mode": [
+    "Callout#479ead9d4e",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "acc_ctx_plan": [
+    "Stack#a64e1c759f",
+    "Callout#ebbb47c14f",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "acc_ctx_slots": [
+    "Stack#e302889703",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "acc_open_reminders": [
+    "div#936266fadd",
+  ],
+  "acc_r": [
+    "Stack#16694d8376",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "acc_start": [
+    "div#7beb24224c",
+  ],
+  "acc_unconfirmed": [
+    "Stack#31abbc3bc0",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+}
+`;
+
+exports[`persona chat cards render identically > rain/rain_ceo 1`] = `
+{
+  "ceo_2027": [
+    "Chart#caa9bb24e0",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "ceo_approve": [
+    "div#321039d172",
+  ],
+  "ceo_assign": [
+    "div#329d3afa67",
+  ],
+  "ceo_board": [
+    "div#d471a0c9e7",
+    "div#321039d172",
+  ],
+  "ceo_brief": [
+    "div#de30afb258",
+  ],
+  "ceo_coding": [
+    "div#84f849e407",
+  ],
+  "ceo_cohort": [
+    "div#501463a9f0",
+  ],
+  "ceo_ctx_gap": [
+    "Callout#8213726c16",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "ceo_ctx_lvm": [
+    "Grid#5675491f1b",
+    "Text#957acfb9d2",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "ceo_ctx_measure": [
+    "Grid#cba9b78841",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "ceo_ctx_segment": [
+    "Grid#cbc882c5d9",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "ceo_ctx_site": [
+    "Grid#c19e4f2968",
+    "Text#34a0c4eff6",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "ceo_ctx_source": [
+    "Grid#7456938a7b",
+    "Text#2d66403d17",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "ceo_edit": [
+    "div#f86a1e1c53",
+  ],
+  "ceo_gap": [
+    "div#9541459e66",
+    "div#48cfc0444d",
+  ],
+  "ceo_gate": [
+    "div#09c1e1bbf7",
+  ],
+  "ceo_lvc": [
+    "Stack#745e9b7c58",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "ceo_nothing": [
+    "div#5923c8bbe3",
+  ],
+  "ceo_open_gate": [
+    "div#a4dc63156f",
+  ],
+  "ceo_open_lvc": [
+    "div#fedfa9be93",
+  ],
+  "ceo_open_vi": [
+    "div#aaee41abe2",
+  ],
+  "ceo_recover": [
+    "div#9b76697d26",
+  ],
+  "ceo_sites": [
+    "div#50ec58259f",
+  ],
+  "ceo_spend": [
+    "div#34f7d37515",
+  ],
+}
+`;
+
+exports[`persona chat cards render identically > rain/rain_chw 1`] = `
+{
+  "chw_brief": [
+    "div#080d4d8623",
+  ],
+  "chw_closest": [
+    "Stack#5af06e8d7f",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "chw_ctx_book": [
+    "div#9de8d6b3b5",
+  ],
+  "chw_ctx_mode": [
+    "Callout#479ead9d4e",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "chw_ctx_plan": [
+    "Stack#a64e1c759f",
+    "Callout#ebbb47c14f",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "chw_ctx_rank": [
+    "Callout#42b26bba09",
+    "Grid#637b257391",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "chw_ctx_slots": [
+    "Stack#e302889703",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "chw_ctx_talk": [
+    "Stack#1aa3f08abe",
+    "Callout#f1b30207cf",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "chw_noreply": [
+    "Stack#31abbc3bc0",
+    "Stack#9377a73335",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "chw_open": [
+    "div#5864a0b4d4",
+  ],
+  "chw_progress": [
+    "div#1ade7cf77d",
+  ],
+}
+`;
+
+exports[`persona chat cards render identically > rain/rain_cio 1`] = `
+{
+  "cio_57": [
+    "Stack#5112f806f3",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cio_adt": [
+    "div#4a9964762f",
+  ],
+  "cio_banner": [
+    "div#632d804c6c",
+  ],
+  "cio_brief": [
+    "div#50d41d673c",
+    "Grid#f87086fa1c",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cio_card": [
+    "div#e6946413a8",
+  ],
+  "cio_cosign": [
+    "div#1a831f3e31",
+  ],
+  "cio_ctx_feature": [
+    "Callout#64b94aca78",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cio_ctx_source": [
+    "Grid#7456938a7b",
+    "Text#2d66403d17",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cio_features": [
+    "Stack#40c0964e05",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cio_fix": [
+    "div#896a2a6f70",
+    "Grid#3a5314cf11",
+    "Stack#b2238bc45b",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cio_match": [
+    "Stack#e32929a7fe",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cio_open_ds": [
+    "div#cd95950133",
+  ],
+  "cio_packet": [
+    "div#6e845c73e9",
+    "div#caa5634adf",
+  ],
+  "cio_public": [
+    "Stack#ce1e910c7e",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cio_signoff": [
+    "div#1a831f3e31",
+  ],
+  "cio_social": [
+    "Chart#4123302ffd",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cio_stale": [
+    "Stack#2de6f6f560",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cio_subgroup": [
+    "div#30e04943ea",
+    "Chart#1ba70425be",
+    "div#05382aba33",
+    "div#c98c042761",
+    "div#db2e31394e",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+}
+`;
+
+exports[`persona chat cards render identically > rain/rain_cmo 1`] = `
+{
+  "cmo_412": [
+    "Stack#9e72c11979",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_a1c": [
+    "Callout#cb13ea266a",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_approve": [
+    "div#86a7eaf9d4",
+  ],
+  "cmo_brief": [
+    "div#d90f62ebe0",
+  ],
+  "cmo_campaign": [
+    "div#763c8e8d30",
+    "div#c5167b182d",
+  ],
+  "cmo_close": [
+    "div#251962015f",
+    "Chart#59a1e68d55",
+    "Grid#c75b3f4869",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_coding": [
+    "Stack#ff3ace6191",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_ctx_feature": [
+    "Callout#64b94aca78",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_ctx_gap": [
+    "Callout#8213726c16",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_ctx_lvm": [
+    "Grid#5675491f1b",
+    "Text#957acfb9d2",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_ctx_measure": [
+    "Grid#cba9b78841",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_ctx_rank": [
+    "Callout#42b26bba09",
+    "Grid#637b257391",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_ctx_segment": [
+    "Grid#cbc882c5d9",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_ctx_site": [
+    "Grid#c19e4f2968",
+    "Text#34a0c4eff6",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_fit": [
+    "Grid#665b071e64",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_note": [
+    "div#941b607dc6",
+  ],
+  "cmo_open_lvc": [
+    "div#bef29e2987",
+  ],
+  "cmo_orders": [
+    "Stack#e619d7edff",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_providers": [
+    "Stack#22ff7e9724",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_sites": [
+    "Chart#65448f035a",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "cmo_targets": [
+    "div#09c1e1bbf7",
+  ],
+  "cmo_winnemucca": [
+    "div#a3c6976d6f",
+    "Chart#44f22da5a3",
+    "div#a5e7bae2f8",
+    "Stack#745e9b7c58",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+}
+`;
+
+exports[`persona chat cards render identically > rain/rain_state 1`] = `
+{
+  "st_12m": [
+    "Chart#df8db4b337",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "st_bb": [
+    "div#97df4f8604",
+  ],
+  "st_brief": [
+    "div#a361c85b76",
+  ],
+  "st_county": [
+    "div#7c22a4a0bf",
+    "div#e79bc683f0",
+  ],
+  "st_csv": [
+    "div#181c1761ef",
+  ],
+  "st_ctx_churchill": [
+    "Grid#87ab0d6a6b",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "st_ctx_elko": [
+    "Grid#d4737c426e",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "st_ctx_humboldt": [
+    "Grid#d32b7b188b",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "st_ctx_lander": [
+    "Grid#8cf2f771a8",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "st_ctx_pershing": [
+    "Grid#990d0994eb",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "st_ctx_whitePine": [
+    "Grid#c87f906735",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "st_funds": [
+    "div#c720b913dd",
+    "Stack#45baa525ff",
+    "Callout#816953215f",
+    "div#268c88e71b",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "st_lvc": [
+    "Chart#c247505dfc",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "st_networks": [
+    "Stack#465f06ae34",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "st_pdf": [
+    "div#b02b2a67e6",
+  ],
+  "st_share": [
+    "div#6c5fe8c08e",
+  ],
+  "st_summary": [
+    "div#bcd6f90958",
+  ],
+  "st_trend": [
+    "div#d3cab2963e",
+  ],
+}
+`;

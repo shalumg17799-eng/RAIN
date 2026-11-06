@@ -1,0 +1,625 @@
+{
+  "signals": [
+    {
+      "id": "SIG-ST-1",
+      "title": "Primary Care Visits Down Since January",
+      "severity": "critical",
+      "description": "Down 14% in Lander and Pershing after the managed care move, while avoidable ED rose.",
+      "metric": "-14% in 2 counties",
+      "sources": [
+        "Aggregated Claims",
+        "HRSA HPSA"
+      ],
+      "chip": "Show me the county view",
+      "primary": true
+    },
+    {
+      "id": "SIG-ST-2",
+      "title": "Low-Value Care Across Networks",
+      "severity": "warning",
+      "description": "About $2.4M a year across 4 networks (18 sites), with the same imaging pattern at locum sites.",
+      "metric": "$2.4M a year",
+      "sources": [
+        "Aggregated Claims"
+      ],
+      "chip": "Where is low-value care concentrated?"
+    },
+    {
+      "id": "SIG-ST-3",
+      "title": "Telehealth Limited by Broadband",
+      "severity": "warning",
+      "description": "Six frontier ZIP codes under 40% video-ready broadband: plan a phone or mobile fallback.",
+      "metric": "6 ZIP areas under 40%",
+      "sources": [
+        "FCC Broadband"
+      ],
+      "chip": "Where does broadband block telehealth?"
+    }
+  ],
+  "kpis": [
+    {
+      "id": "networks",
+      "label": "Participating Networks",
+      "value": "4 (18 sites)",
+      "source": "Grantee registry",
+      "icon": "building",
+      "tone": "neutral",
+      "chip": "Compare networks on quality"
+    },
+    {
+      "id": "members",
+      "label": "Members in View",
+      "value": "31,600",
+      "detail": "De-identified",
+      "source": "Aggregated MCO data",
+      "icon": "users",
+      "tone": "neutral"
+    },
+    {
+      "id": "counties",
+      "label": "Counties",
+      "value": "6 rural",
+      "source": "USDA RUCC",
+      "icon": "layers",
+      "tone": "neutral",
+      "chip": "Show me the county view"
+    },
+    {
+      "id": "hpsa",
+      "label": "Primary Care Shortage Counties",
+      "value": "6 of 6",
+      "source": "HRSA HPSA",
+      "icon": "alert-triangle",
+      "tone": "critical"
+    },
+    {
+      "id": "ed",
+      "label": "Avoidable ED per 1,000",
+      "value": "298",
+      "source": "Aggregated claims",
+      "icon": "activity",
+      "tone": "warning"
+    },
+    {
+      "id": "lowValue",
+      "label": "Low-Value Care (annualized)",
+      "value": "$2.4M",
+      "source": "Low-value care library",
+      "icon": "dollar-sign",
+      "tone": "warning",
+      "chip": "Where is low-value care concentrated?"
+    },
+    {
+      "id": "suppressed",
+      "label": "Suppressed Cells",
+      "value": "Counts under 11",
+      "source": "Privacy rule",
+      "icon": "shield-check",
+      "tone": "neutral"
+    }
+  ],
+  "steps": {
+    "st_brief": {
+      "step": 1,
+      "capability": "Proactive Intelligence",
+      "ai": "Good morning, Dr. Pike. Across your four participating networks I have three signals.",
+      "points": [
+        "Primary care visits fell 14% in Lander and Pershing after the managed care move, while avoidable ED rose.",
+        "About $2.4M a year in low-value care; broadband limits telehealth in six frontier ZIP codes."
+      ],
+      "sources": [
+        "Aggregated Claims",
+        "CDC PLACES",
+        "HRSA HPSA",
+        "USDA RUCC",
+        "Census Boundaries"
+      ],
+      "chips": [
+        "Show me the county view",
+        "Where is low-value care concentrated?",
+        "Where does broadband block telehealth?"
+      ],
+      "next": "Show me the county view",
+      "viz": [
+        "v_map_ed"
+      ]
+    },
+    "st_county": {
+      "step": 2,
+      "capability": "Converged Conversation",
+      "asks": [
+        "Show me the county view",
+        "Show county need side by side"
+      ],
+      "ai": "Here is each county side by side; Lander and Pershing stand out.",
+      "points": [
+        "Lander and Pershing: high hypertension, full shortage areas, the largest visit drop and the most avoidable ED.",
+        "Cells under 11 members are suppressed."
+      ],
+      "sources": [
+        "CDC PLACES",
+        "CDC SVI",
+        "HRSA HPSA",
+        "FCC Broadband",
+        "Census ACS",
+        "Aggregated Claims"
+      ],
+      "chips": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Compare networks on quality",
+        "Show the trend since January"
+      ],
+      "next": "Where should Outcomes Accelerator funds go first?",
+      "launch": {
+        "workbench": "countyExplorer",
+        "filter": "need",
+        "label": "County Explorer",
+        "detail": "the map with layer toggles and the county table"
+      },
+      "viz": [
+        "v_county_table",
+        "v_launch_ce"
+      ]
+    },
+    "st_funds": {
+      "step": 3,
+      "capability": "Predictive Intelligence",
+      "asks": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Model funding options for the Outcomes Accelerator"
+      ],
+      "ai": "I modeled three options, and I would fund A and C together and run B as a no-cost data service.",
+      "points": [
+        "A: care coordinators and telehealth rechecks in Lander and Pershing; avoidable ED down about 12% within a year.",
+        "B: shared low-value care feedback across all four networks; cuts about a third of the $2.4M.",
+        "C: mobile clinic days for the six low-broadband ZIP codes."
+      ],
+      "sources": [
+        "Aggregated Claims",
+        "CDC PLACES",
+        "HRSA HPSA",
+        "FCC Broadband",
+        "RAIN Cost Model"
+      ],
+      "chips": [
+        "Generate the CMS progress summary",
+        "Model a 12-month outcome",
+        "Share with participating networks"
+      ],
+      "next": "Generate the CMS progress summary",
+      "action": "target:lander,pershing",
+      "viz": [
+        "v_options",
+        "v_options_rec",
+        "v_map_target"
+      ]
+    },
+    "st_summary": {
+      "step": 4,
+      "capability": "Automated Action",
+      "asks": [
+        "Generate the CMS progress summary"
+      ],
+      "ai": "Here is the RHTP progress summary: people served, services and outcomes by county, sourced and suppressed.",
+      "points": [
+        "Includes the funding options and county charts, ready as PDF or CSV."
+      ],
+      "sources": [
+        "All aggregated sources"
+      ],
+      "chips": [
+        "Export PDF",
+        "Export CSV",
+        "Share with grantees"
+      ],
+      "next": "Export PDF",
+      "viz": [
+        "v_cms"
+      ]
+    },
+    "st_pdf": {
+      "capability": "Automated Action",
+      "asks": [
+        "Export PDF"
+      ],
+      "ai": "The PDF is ready to save.",
+      "sources": [
+        "All aggregated sources"
+      ],
+      "chips": [
+        "Export CSV",
+        "Share with grantees"
+      ],
+      "viz": [
+        "v_export_pdf"
+      ]
+    },
+    "st_csv": {
+      "capability": "Automated Action",
+      "asks": [
+        "Export CSV"
+      ],
+      "ai": "Here is the CSV of people served, services and outcomes by county, with suppressed cells shown as a dash.",
+      "sources": [
+        "All aggregated sources"
+      ],
+      "chips": [
+        "Export PDF",
+        "Share with grantees"
+      ],
+      "next": "Share with grantees",
+      "viz": [
+        "v_export_csv"
+      ]
+    },
+    "st_share": {
+      "capability": "Automated Action",
+      "asks": [
+        "Share with grantees",
+        "Share with participating networks"
+      ],
+      "ai": "Drafted for the four participating networks, and it sends when you approve.",
+      "sources": [
+        "Grantee Registry"
+      ],
+      "chips": [
+        "Export PDF",
+        "Export CSV"
+      ],
+      "next": "Export PDF",
+      "viz": [
+        "v_handoff_share"
+      ]
+    },
+    "st_lvc": {
+      "capability": "Anomaly Detection",
+      "asks": [
+        "Where is low-value care concentrated?"
+      ],
+      "ai": "$2.4M a year across the four networks, with the same imaging pattern at sites using locum coverage.",
+      "sources": [
+        "Aggregated Claims",
+        "Low-Value Care Library"
+      ],
+      "chips": [
+        "Show me the county view",
+        "Where should Outcomes Accelerator funds go first?"
+      ],
+      "next": "Show me the county view",
+      "viz": [
+        "v_lv_counties"
+      ]
+    },
+    "st_bb": {
+      "capability": "Friction Observability",
+      "asks": [
+        "Where does broadband block telehealth?",
+        "Where does broadband limit telehealth?"
+      ],
+      "ai": "Six frontier ZIP codes have under 40% video-ready broadband, so rechecks there need a phone or mobile fallback.",
+      "sources": [
+        "FCC Broadband",
+        "USDA RUCC",
+        "Census ZCTA"
+      ],
+      "chips": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Show me the county view"
+      ],
+      "next": "Show me the county view",
+      "viz": [
+        "v_map_bb"
+      ]
+    },
+    "st_networks": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Compare networks on quality",
+        "Compare participating networks on quality"
+      ],
+      "ai": "Ruby Valley leads on blood pressure control at 63 percent, and Humboldt River is lowest at 55 percent.",
+      "sources": [
+        "Aggregated Claims",
+        "eCQM Engine",
+        "Grantee Registry"
+      ],
+      "chips": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Show the trend since January"
+      ],
+      "next": "Where should Outcomes Accelerator funds go first?",
+      "viz": [
+        "v_networks"
+      ]
+    },
+    "st_trend": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Show the trend since January",
+        "Which counties lost primary care visits after January?"
+      ],
+      "ai": "Lander and Pershing lost 14 percent of primary care visits since January, while the other four counties lost 2 to 5 percent.",
+      "sources": [
+        "Aggregated Claims",
+        "MCO Eligibility"
+      ],
+      "chips": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Show me the county view"
+      ],
+      "next": "Where should Outcomes Accelerator funds go first?",
+      "viz": [
+        "v_trend"
+      ]
+    },
+    "st_12m": {
+      "capability": "Predictive Intelligence",
+      "asks": [
+        "Model a 12-month outcome"
+      ],
+      "ai": "With A and C funded and B running, avoidable ED falls about 12% in a year in Lander and Pershing, and low-value spend by a third.",
+      "sources": [
+        "RAIN Cost Model",
+        "Aggregated Claims"
+      ],
+      "chips": [
+        "Generate the CMS progress summary",
+        "Share with participating networks"
+      ],
+      "next": "Generate the CMS progress summary",
+      "viz": [
+        "v_12m"
+      ]
+    },
+    "st_ctx_elko": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Elko County: what changed since January?"
+      ],
+      "ai": "Elko County lost 3 percent of primary care visits since January, and avoidable ED sits at 285 per 1,000.",
+      "sources": [
+        "Aggregated Claims",
+        "CDC PLACES"
+      ],
+      "chips": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Show the trend since January"
+      ],
+      "viz": [
+        "v_ctx_county"
+      ]
+    },
+    "st_ctx_humboldt": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Humboldt County: what changed since January?"
+      ],
+      "ai": "Humboldt County lost 5 percent of primary care visits since January, and avoidable ED sits at 296 per 1,000.",
+      "sources": [
+        "Aggregated Claims",
+        "CDC PLACES"
+      ],
+      "chips": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Show the trend since January"
+      ],
+      "viz": [
+        "v_ctx_county"
+      ]
+    },
+    "st_ctx_lander": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Lander County: what changed since January?"
+      ],
+      "ai": "Lander County lost 14 percent of primary care visits since January while avoidable ED rose to 352 per 1,000, the highest of the six.",
+      "sources": [
+        "Aggregated Claims",
+        "CDC PLACES",
+        "HRSA HPSA"
+      ],
+      "chips": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Show the trend since January"
+      ],
+      "viz": [
+        "v_ctx_county"
+      ]
+    },
+    "st_ctx_pershing": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Pershing County: what changed since January?"
+      ],
+      "ai": "Pershing County lost 14 percent of primary care visits since January while avoidable ED rose to 341 per 1,000.",
+      "sources": [
+        "Aggregated Claims",
+        "CDC PLACES",
+        "HRSA HPSA"
+      ],
+      "chips": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Show the trend since January"
+      ],
+      "viz": [
+        "v_ctx_county"
+      ]
+    },
+    "st_ctx_whitePine": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "White Pine County: what changed since January?"
+      ],
+      "ai": "White Pine County lost 4 percent of primary care visits since January, and avoidable ED sits at 289 per 1,000.",
+      "sources": [
+        "Aggregated Claims",
+        "CDC PLACES"
+      ],
+      "chips": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Show the trend since January"
+      ],
+      "viz": [
+        "v_ctx_county"
+      ]
+    },
+    "st_ctx_churchill": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Churchill County: what changed since January?"
+      ],
+      "ai": "Churchill County lost 2 percent of primary care visits since January, and avoidable ED sits at 288 per 1,000.",
+      "sources": [
+        "Aggregated Claims",
+        "CDC PLACES"
+      ],
+      "chips": [
+        "Where should Outcomes Accelerator funds go first?",
+        "Show the trend since January"
+      ],
+      "viz": [
+        "v_ctx_county"
+      ]
+    },
+    "__default__": {
+      "ai": "I can answer on county need, primary care access since January, low-value care, broadband, network quality and the funding options.",
+      "sources": [],
+      "chips": [
+        "Show me the county view",
+        "Where should Outcomes Accelerator funds go first?",
+        "Compare networks on quality"
+      ]
+    }
+  },
+  "queries": [
+    "Show county need side by side",
+    "Which counties lost primary care visits after January?",
+    "Compare participating networks on quality",
+    "Where is low-value care concentrated?",
+    "Where does broadband limit telehealth?",
+    "Model funding options for the Outcomes Accelerator",
+    "Generate the CMS progress summary"
+  ],
+  "viz": {
+    "v_map_ed": {
+      "type": "rain.county_map",
+      "props": {
+        "mode": "ed"
+      }
+    },
+    "v_county_table": {
+      "type": "rain.county_table",
+      "props": {}
+    },
+    "v_launch_ce": {
+      "type": "rain.launch_card",
+      "props": {
+        "step": "st_county"
+      }
+    },
+    "v_options": {
+      "type": "data_table",
+      "props": {
+        "dataset": "options"
+      }
+    },
+    "v_map_target": {
+      "type": "rain.county_map",
+      "props": {
+        "mode": "target"
+      }
+    },
+    "v_cms": {
+      "type": "rain.brief_preview",
+      "props": {
+        "kind": "cms"
+      }
+    },
+    "v_export_pdf": {
+      "type": "rain.export_card",
+      "props": {
+        "format": "pdf"
+      }
+    },
+    "v_export_csv": {
+      "type": "rain.export_card",
+      "props": {
+        "format": "csv"
+      }
+    },
+    "v_handoff_share": {
+      "type": "rain.handoff_cards",
+      "props": {
+        "ids": [
+          "shareNetworks"
+        ]
+      }
+    },
+    "v_lv_counties": {
+      "type": "chart",
+      "props": {
+        "dataset": "county_lowvalue"
+      }
+    },
+    "v_map_bb": {
+      "type": "rain.county_map",
+      "props": {
+        "mode": "broadband"
+      }
+    },
+    "v_networks": {
+      "type": "data_table",
+      "props": {
+        "dataset": "networks"
+      }
+    },
+    "v_trend": {
+      "type": "rain.pc_trend",
+      "props": {}
+    },
+    "v_12m": {
+      "type": "chart",
+      "props": {
+        "dataset": "ed_projection"
+      }
+    },
+    "v_ctx_county": {
+      "type": "context",
+      "props": {
+        "kind": "county"
+      }
+    },
+    "v_options_rec": {
+      "type": "callout",
+      "props": {
+        "title": "Recommendation: fund A and C, run B as a data service",
+        "body": "A has the largest health impact, B has the fastest cost return, and C is the access floor A depends on.",
+        "status": "info"
+      }
+    }
+  },
+  "handoffs": [
+    {
+      "id": "shareNetworks",
+      "title": "Progress summary to the four participating networks",
+      "count": 4,
+      "to": "Participating networks",
+      "workbench": "rhtpReporting",
+      "detail": "Aggregated, de-identified, small cells suppressed"
+    }
+  ],
+  "workbenches": [
+    {
+      "id": "countyExplorer",
+      "access": "full"
+    },
+    {
+      "id": "valueInsights",
+      "access": "full"
+    },
+    {
+      "id": "rhtpReporting",
+      "access": "full"
+    }
+  ]
+}

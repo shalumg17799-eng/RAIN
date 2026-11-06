@@ -1,0 +1,1962 @@
+{
+ "context": {
+  "client": {
+   "id": "rain",
+   "marketId": "sled",
+   "name": "RAIN",
+   "shortName": "RAIN",
+   "logo": "/logos/rain-logo.svg",
+   "primaryColor": "#003366",
+   "navLabels": {
+    "ask": "Ask AI"
+   }
+  },
+  "persona": {
+   "id": "rain_cio",
+   "name": "Raj Malhotra",
+   "initials": "RM",
+   "role": "Chief Information Officer and Data and AI Governance Lead",
+   "layout": "inline",
+   "capabilities": [
+    "Proactive Intelligence",
+    "Converged Conversation",
+    "Anomaly Detection",
+    "Predictive Intelligence",
+    "Friction Observability",
+    "Automated Action"
+   ],
+   "navSlots": [
+    "ask",
+    "modelGovernance",
+    "dataSources"
+   ]
+  },
+  "personas": [
+   {
+    "id": "rain_ceo",
+    "name": "Gregory Haskins, MBA",
+    "role": "Chief Executive Officer"
+   },
+   {
+    "id": "rain_cmo",
+    "name": "Dr. Naomi Castellanos",
+    "role": "Chief Medical Officer and Value-Based Care Quality Lead"
+   },
+   {
+    "id": "rain_cio",
+    "name": "Raj Malhotra",
+    "role": "Chief Information Officer and Data and AI Governance Lead"
+   },
+   {
+    "id": "rain_state",
+    "name": "Dr. Lauren Pike",
+    "role": "Program Lead, Rural Health Outcomes Accelerator"
+   },
+   {
+    "id": "rain_chw",
+    "name": "Teresa Lopez, CHW",
+    "role": "Community Health Worker and Care Coordinator"
+   },
+   {
+    "id": "rain_access",
+    "name": "Brandon Kee",
+    "role": "Patient Access Coordinator"
+   }
+  ],
+  "dataSources": [
+   {
+    "id": "rain-places",
+    "name": "CDC PLACES (2025 release)",
+    "provides": "County and ZCTA prevalence of hypertension, diabetes, screenings and social needs",
+    "usedFor": "Value Insights county view; state view",
+    "description": "County and ZCTA prevalence of hypertension, diabetes, screenings and social needs",
+    "freshness": "2025 release",
+    "recordCount": 1240,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-svi",
+    "name": "CDC/ATSDR Social Vulnerability Index (2022)",
+    "provides": "County and tract vulnerability",
+    "usedFor": "County map layer",
+    "description": "County and tract vulnerability",
+    "freshness": "2022 edition",
+    "recordCount": 704,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-hpsa",
+    "name": "HRSA Health Professional Shortage Areas",
+    "provides": "Primary care and mental health shortage areas",
+    "usedFor": "County map; model access feature",
+    "description": "Primary care and mental health shortage areas",
+    "freshness": "Monthly",
+    "recordCount": 312,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-chr",
+    "name": "County Health Rankings (archived 2025 + March 2026)",
+    "provides": "Static county benchmarks",
+    "usedFor": "Benchmark only (source at risk after Dec 2026)",
+    "description": "Static county benchmarks",
+    "freshness": "March 2026",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-rucc",
+    "name": "USDA Rural-Urban Continuum Codes (2023)",
+    "provides": "County rural classification",
+    "usedFor": "Filters and frontier definition",
+    "description": "County rural classification",
+    "freshness": "2023 edition",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-forhp",
+    "name": "HRSA FORHP rural areas",
+    "provides": "Rural eligibility by county, tract and ZIP",
+    "usedFor": "Frontier ZIP subgroup check",
+    "description": "Rural eligibility by county, tract and ZIP",
+    "freshness": "Annual",
+    "recordCount": 2310,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-zcta",
+    "name": "Census ZCTA relationship and gazetteer files",
+    "provides": "ZIP to county mapping",
+    "usedFor": "Patient ZIP to county",
+    "description": "ZIP to county mapping",
+    "freshness": "2020 vintage",
+    "recordCount": 182,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-boundaries",
+    "name": "Census cartographic boundary files (2024)",
+    "provides": "Map geometry",
+    "usedFor": "All maps",
+    "description": "Map geometry",
+    "freshness": "2024 vintage",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-acs",
+    "name": "Census ACS 5-year (2020 to 2024)",
+    "provides": "Population, language, internet and vehicle access",
+    "usedFor": "Denominators; language preference fallback",
+    "description": "Population, language, internet and vehicle access",
+    "freshness": "2020 to 2024",
+    "recordCount": 3120,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-fcc",
+    "name": "FCC National Broadband Map",
+    "provides": "Broadband availability by location",
+    "usedFor": "Telehealth eligibility; frontier signal",
+    "description": "Broadband availability by location",
+    "freshness": "June 2026 filing",
+    "recordCount": 41800,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-hrsaSites",
+    "name": "HRSA health center sites",
+    "provides": "FQHC site locations",
+    "usedFor": "Slot search and drive time",
+    "description": "FQHC site locations",
+    "freshness": "Weekly",
+    "recordCount": 96,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-cmsHospital",
+    "name": "CMS Hospital General Information and quality",
+    "provides": "Hospital locations, readmissions, unplanned visits",
+    "usedFor": "ED and readmission context",
+    "description": "Hospital locations, readmissions, unplanned visits",
+    "freshness": "Quarterly",
+    "recordCount": 58,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-cmsPos",
+    "name": "CMS Provider of Services file",
+    "provides": "Rural health clinic and critical access hospital locations",
+    "usedFor": "Facility layer",
+    "description": "Rural health clinic and critical access hospital locations",
+    "freshness": "Quarterly",
+    "recordCount": 141,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-nppes",
+    "name": "NPPES NPI Registry",
+    "provides": "Provider directory",
+    "usedFor": "Ordering provider for low-value care",
+    "description": "Provider directory",
+    "freshness": "Weekly",
+    "recordCount": 9870,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-uds",
+    "name": "HRSA Uniform Data System (UDS)",
+    "provides": "Health center quality benchmarks",
+    "usedFor": "Quality targets context",
+    "description": "Health center quality benchmarks",
+    "freshness": "2025 reporting year",
+    "recordCount": 1370,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-geovar",
+    "name": "CMS Medicare Geographic Variation",
+    "provides": "County utilization benchmarks",
+    "usedFor": "Avoidable ED benchmark",
+    "description": "County utilization benchmarks",
+    "freshness": "2024 data year",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-ecqm",
+    "name": "CMS eCQMs (CMS165, CMS122, CMS125, CMS130, CMS2)",
+    "provides": "Measure logic",
+    "usedFor": "Quality gate engine",
+    "description": "Measure logic",
+    "freshness": "2026 specifications",
+    "recordCount": 5,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-synthea",
+    "name": "Synthea (MITRE)",
+    "provides": "Synthetic patients for Nevada counties",
+    "usedFor": "All patient-level records",
+    "description": "Synthetic patients for Nevada counties",
+    "freshness": "Generated for this demo",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-osm",
+    "name": "OpenStreetMap road network (via Geofabrik)",
+    "provides": "Drive time from ZIP centroid to site",
+    "usedFor": "Travel time; scheduling sort",
+    "description": "Drive time from ZIP centroid to site",
+    "freshness": "Weekly",
+    "recordCount": 182,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-mco",
+    "name": "Synthetic MCO eligibility and attribution",
+    "provides": "9,400 attributed members",
+    "usedFor": "Contract population",
+    "description": "9,400 attributed members",
+    "freshness": "Q3 file",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-claims",
+    "name": "Synthetic claims (Synthea output, adjusted to Nevada Medicaid patterns)",
+    "provides": "Cost, utilization, ED and low-value services",
+    "usedFor": "Cost model, low-value care, segmentation",
+    "description": "Cost, utilization, ED and low-value services",
+    "freshness": "Through Q3 (45-day lag)",
+    "recordCount": 412600,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-ehr",
+    "name": "Synthetic EHR (FHIR R4 US Core)",
+    "provides": "Conditions, vitals, labs and orders",
+    "usedFor": "Quality engine, coding recapture",
+    "description": "Conditions, vitals, labs and orders",
+    "freshness": "Today",
+    "recordCount": 1284000,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-rpm",
+    "name": "Synthetic remote BP readings",
+    "provides": "Home cuff readings (systolic and diastolic)",
+    "usedFor": "CMS165 closure",
+    "description": "Home cuff readings (systolic and diastolic)",
+    "freshness": "Today",
+    "recordCount": 18300,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-ops",
+    "name": "Synthetic schedules, eligibility responses and SMS logs",
+    "provides": "Slots, eligibility responses (270/271) and reminder replies",
+    "usedFor": "Care management screens",
+    "description": "Slots, eligibility responses (270/271) and reminder replies",
+    "freshness": "Today",
+    "recordCount": 26900,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-benchmark",
+    "name": "Contract benchmark",
+    "provides": "Expected PMPM, quality gate, sharing rate",
+    "usedFor": "Cost versus expected and the quality gate",
+    "description": "Expected PMPM, quality gate, sharing rate",
+    "freshness": "Contract year 2026",
+    "recordCount": 1,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-library",
+    "name": "Low-value care measure library",
+    "provides": "14 Choosing Wisely and USPSTF-based measures",
+    "usedFor": "Low-value care findings",
+    "description": "14 Choosing Wisely and USPSTF-based measures",
+    "freshness": "Version 2026.3",
+    "recordCount": 14,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-adt",
+    "name": "HIE ADT feed (synthetic)",
+    "provides": "Admit, discharge and transfer events",
+    "usedFor": "Near real time ED signal",
+    "description": "Admit, discharge and transfer events",
+    "freshness": "Under 1 hour",
+    "recordCount": 3420,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-costModel",
+    "name": "RAIN cost model",
+    "provides": "Cost versus expected, gap decomposition",
+    "usedFor": "Value Insights",
+    "description": "Cost versus expected, gap decomposition",
+    "freshness": "Nightly",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-impactability",
+    "name": "RAIN impactability score",
+    "provides": "Ranked rising-risk members",
+    "usedFor": "Outreach worklists",
+    "description": "Ranked rising-risk members",
+    "freshness": "Nightly",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-ecqmEngine",
+    "name": "eCQM engine",
+    "provides": "Measure results on synthetic EHR",
+    "usedFor": "Quality gate tracker",
+    "description": "Measure results on synthetic EHR",
+    "freshness": "Nightly",
+    "recordCount": 5,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   }
+  ]
+ },
+ "briefing": {
+  "greeting": {
+   "id": "cio_brief",
+   "text": "Good morning, Raj. Before the care team starts outreach, one thing needs your attention: the impactability model failed its subgroup check.",
+   "citations": [
+    "Model Card",
+    "Claims",
+    "EHR (FHIR)",
+    "HIE ADT",
+    "USDA RUCC",
+    "HRSA FORHP Rural Areas"
+   ],
+   "components": [
+    {
+     "type": "rain.model_card",
+     "version": 1,
+     "props": {
+      "points": [
+       "Frontier ZIPs rank 18% lower than similar town members; 57 high-need frontier members miss the top 300.",
+       "Also: the usual 45-day claims lag and low social needs coverage."
+      ]
+     }
+    },
+    {
+     "type": "grid",
+     "version": 1,
+     "props": {
+      "columns": 3,
+      "children": [
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Claims (MCO)",
+         "value": "45 days",
+         "caption": "Through Q3",
+         "status": "warning"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "HIE ADT",
+         "value": "Under 1 hour",
+         "caption": "Near real time",
+         "status": "good"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "EHR (FHIR R4)",
+         "value": "Today",
+         "caption": "Nightly",
+         "status": "good"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Show me the subgroup result",
+    "How stale is our data?",
+    "Show me social needs coverage"
+   ],
+   "capability": "Proactive Intelligence",
+   "confidence": 92
+  },
+  "signals": [
+   {
+    "id": "SIG-CIO-1",
+    "title": "Risk Model Under-Ranks Frontier Patients",
+    "description": "Frontier ZIPs rank 18% lower than similar town members; 57 high-need miss the top 300.",
+    "status": "critical",
+    "metricText": "18% gap · 57 missing",
+    "sources": [
+     "Model Card",
+     "HRSA FORHP"
+    ],
+    "primary": true
+   },
+   {
+    "id": "SIG-CIO-2",
+    "title": "Claims Feed Lag",
+    "description": "Claims arrive 45 days late. The near real-time ADT feed can fill the ED gap.",
+    "status": "warning",
+    "metricText": "45 days · ADT under 1 hour",
+    "sources": [
+     "Pipeline Monitor",
+     "HIE ADT"
+    ]
+   },
+   {
+    "id": "SIG-CIO-3",
+    "title": "Social Needs Data Coverage",
+    "description": "Only 38% of members screened, which limits transport and housing signals.",
+    "status": "warning",
+    "metricText": "38% screened",
+    "sources": [
+     "Screening Tool"
+    ]
+   }
+  ],
+  "kpis": [
+   {
+    "id": "sources",
+    "label": "Connected Sources",
+    "value": "19 public + 6 synthetic",
+    "trendText": "Data Sources registry",
+    "icon": "database",
+    "chip": "How fresh is each data source?"
+   },
+   {
+    "id": "claimsLag",
+    "label": "Claims Lag",
+    "value": "45 days",
+    "trendText": "Pipeline monitor",
+    "icon": "clock",
+    "chip": "How stale is our data?"
+   },
+   {
+    "id": "adtLag",
+    "label": "ADT Lag",
+    "value": "Under 1 hour",
+    "trendText": "HIE feed",
+    "icon": "timer"
+   },
+   {
+    "id": "subgroup",
+    "label": "Subgroup Check",
+    "value": "Failed",
+    "trendText": "Frontier ZIPs · Model card",
+    "icon": "shield-alert",
+    "chip": "Show me the subgroup result"
+   },
+   {
+    "id": "missing",
+    "label": "Members Missing from Top 300",
+    "value": "57",
+    "trendText": "Subgroup check",
+    "icon": "users",
+    "chip": "Show the 57 members"
+   },
+   {
+    "id": "social",
+    "label": "Social Needs Coverage",
+    "value": "38%",
+    "trendText": "Screening tool",
+    "icon": "clipboard-check",
+    "chip": "Show me social needs coverage"
+   },
+   {
+    "id": "freshness",
+    "label": "Data Freshness",
+    "value": "Q3 claims, ADT today",
+    "trendText": "All views",
+    "icon": "calendar-clock"
+   }
+  ],
+  "chips": [
+   "Show me the subgroup result",
+   "How stale is our data?",
+   "Show me social needs coverage",
+   "Show the model card",
+   "Did the risk model pass its subgroup check?",
+   "How fresh is each data source?",
+   "Which members are missing social needs screening?",
+   "What public data feeds the county view?",
+   "Show records that failed patient matching",
+   "Generate the governance packet"
+  ]
+ },
+ "turns": {
+  "cio_brief": {
+   "id": "cio_brief",
+   "text": "Good morning, Raj. Before the care team starts outreach, one thing needs your attention: the impactability model failed its subgroup check.",
+   "citations": [
+    "Model Card",
+    "Claims",
+    "EHR (FHIR)",
+    "HIE ADT",
+    "USDA RUCC",
+    "HRSA FORHP Rural Areas"
+   ],
+   "components": [
+    {
+     "type": "rain.model_card",
+     "version": 1,
+     "props": {
+      "points": [
+       "Frontier ZIPs rank 18% lower than similar town members; 57 high-need frontier members miss the top 300.",
+       "Also: the usual 45-day claims lag and low social needs coverage."
+      ]
+     }
+    },
+    {
+     "type": "grid",
+     "version": 1,
+     "props": {
+      "columns": 3,
+      "children": [
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Claims (MCO)",
+         "value": "45 days",
+         "caption": "Through Q3",
+         "status": "warning"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "HIE ADT",
+         "value": "Under 1 hour",
+         "caption": "Near real time",
+         "status": "good"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "EHR (FHIR R4)",
+         "value": "Today",
+         "caption": "Nightly",
+         "status": "good"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Show me the subgroup result",
+    "How stale is our data?",
+    "Show me social needs coverage"
+   ],
+   "capability": "Proactive Intelligence",
+   "confidence": 92
+  },
+  "cio_subgroup": {
+   "id": "cio_subgroup",
+   "text": "The model uses past utilization as a main input, so frontier members are ranked lower in every condition group.",
+   "citations": [
+    "Model Card",
+    "Claims",
+    "EHR (FHIR)",
+    "Travel Time (OpenStreetMap)",
+    "FCC Broadband",
+    "Census ZCTA"
+   ],
+   "components": [
+    {
+     "type": "rain.key_points",
+     "version": 1,
+     "props": {
+      "points": [
+       "Frontier members have 31% fewer primary care visits: a 74-minute median drive, and 190 have no broadband.",
+       "Fewer visits mean fewer claims, which the model reads as lower risk.",
+       "Same conditions and labs, ranked lower in every group: the known cost-as-proxy bias."
+      ]
+     }
+    },
+    {
+     "type": "chart",
+     "version": 1,
+     "props": {
+      "kind": "bar",
+      "title": "Average risk rank by condition group (percentile), frontier vs town",
+      "series": [
+       {
+        "name": "Town",
+        "points": [
+         {
+          "label": "Hypertension",
+          "value": 62
+         },
+         {
+          "label": "Diabetes",
+          "value": 66
+         },
+         {
+          "label": "COPD or asthma",
+          "value": 58
+         },
+         {
+          "label": "Heart failure",
+          "value": 74
+         },
+         {
+          "label": "Depression",
+          "value": 55
+         }
+        ]
+       },
+       {
+        "name": "Frontier",
+        "points": [
+         {
+          "label": "Hypertension",
+          "value": 51
+         },
+         {
+          "label": "Diabetes",
+          "value": 54
+         },
+         {
+          "label": "COPD or asthma",
+          "value": 48
+         },
+         {
+          "label": "Heart failure",
+          "value": 61
+         },
+         {
+          "label": "Depression",
+          "value": 45
+         }
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "type": "rain.drive_scatter",
+     "version": 1,
+     "props": {}
+    },
+    {
+     "type": "rain.county_map",
+     "version": 1,
+     "props": {
+      "mode": "frontier"
+     }
+    },
+    {
+     "type": "rain.launch_card",
+     "version": 1,
+     "props": {
+      "step": "cio_subgroup"
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "What changes if we fix it?",
+    "Which features cause it?",
+    "Show the 57 members"
+   ],
+   "capability": "Anomaly Detection",
+   "confidence": 92
+  },
+  "cio_fix": {
+   "id": "cio_fix",
+   "text": "Access-adjusted features bring the frontier gap from 18% to 3%, inside the release threshold.",
+   "citations": [
+    "Model Card",
+    "HRSA HPSA",
+    "FCC Broadband",
+    "Travel Time (OpenStreetMap)",
+    "eCQM Engine"
+   ],
+   "components": [
+    {
+     "type": "rain.key_points",
+     "version": 1,
+     "props": {
+      "points": [
+       "57 frontier members enter the top 300; 57 lower-need town members leave.",
+       "41 of the 57 are in the BP denominator, which helps the quality gate.",
+       "Ranking accuracy holds steady."
+      ]
+     }
+    },
+    {
+     "type": "grid",
+     "version": 1,
+     "props": {
+      "columns": 2,
+      "children": [
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Frontier gap",
+         "value": "18% to 3%",
+         "caption": "Threshold 5%",
+         "status": "good"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Top 300",
+         "value": "57 in, 57 out",
+         "caption": "High-need frontier enter",
+         "status": "info"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Count toward CMS165",
+         "value": "41",
+         "caption": "Now reached by outreach",
+         "status": "good"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Accuracy (AUC)",
+         "value": "0.81",
+         "caption": "Holds steady"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "Sample of the 57 entering and 57 leaving the top 300, de-identified",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "id",
+           "label": "Member"
+          },
+          {
+           "key": "change",
+           "label": "Change"
+          },
+          {
+           "key": "condition",
+           "label": "Condition"
+          },
+          {
+           "key": "drive",
+           "label": "Drive",
+           "align": "right"
+          },
+          {
+           "key": "rank",
+           "label": "Rank before to after",
+           "align": "right"
+          }
+         ],
+         "rows": [
+          {
+           "id": "F-1000",
+           "change": "Enters top 300",
+           "condition": "Heart failure",
+           "drive": "114 min",
+           "rank": "359 to 160"
+          },
+          {
+           "id": "F-1013",
+           "change": "Enters top 300",
+           "condition": "Hypertension",
+           "drive": "100 min",
+           "rank": "434 to 289"
+          },
+          {
+           "id": "F-1026",
+           "change": "Enters top 300",
+           "condition": "Hypertension and diabetes",
+           "drive": "109 min",
+           "rank": "625 to 280"
+          },
+          {
+           "id": "F-1039",
+           "change": "Enters top 300",
+           "condition": "Hypertension and diabetes",
+           "drive": "81 min",
+           "rank": "506 to 238"
+          },
+          {
+           "id": "T-2000",
+           "change": "Leaves top 300",
+           "condition": "Hypertension",
+           "drive": "33 min",
+           "rank": "250 to 345"
+          },
+          {
+           "id": "T-2011",
+           "change": "Leaves top 300",
+           "condition": "Hypertension",
+           "drive": "24 min",
+           "rank": "298 to 346"
+          },
+          {
+           "id": "T-2022",
+           "change": "Leaves top 300",
+           "condition": "Hypertension",
+           "drive": "28 min",
+           "rank": "246 to 327"
+          },
+          {
+           "id": "T-2033",
+           "change": "Leaves top 300",
+           "condition": "COPD or asthma",
+           "drive": "27 min",
+           "rank": "248 to 358"
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Generate the governance packet",
+    "Notify Dr. Castellanos",
+    "Set a data freshness banner"
+   ],
+   "capability": "Predictive Intelligence",
+   "confidence": 92
+  },
+  "cio_packet": {
+   "id": "cio_packet",
+   "text": "Here is the governance packet: the updated model card, the subgroup results before and after, the feature change log and a sign-off page for you and Dr. Castellanos.",
+   "citations": [
+    "Model Card",
+    "Data Quality Monitor",
+    "HIE ADT"
+   ],
+   "components": [
+    {
+     "type": "rain.brief_preview",
+     "version": 1,
+     "props": {
+      "kind": "packet",
+      "points": [
+       "Until you sign, the care team sees the current ranking with a pending-fix banner.",
+       "Also drafted: ADT-based ED alerts to cover the 45-day claims lag."
+      ]
+     }
+    },
+    {
+     "type": "rain.banner_preview",
+     "version": 1,
+     "props": {
+      "kind": "pendingFix"
+     }
+    }
+   ],
+   "chips": [
+    "Sign off and release",
+    "Send to Dr. Castellanos for co-sign",
+    "Request ADT alerts"
+   ],
+   "capability": "Automated Action",
+   "confidence": 92
+  },
+  "cio_signoff": {
+   "id": "cio_signoff",
+   "text": "Signed: the release now waits only on Dr. Castellanos's co-sign, and the care team keeps the pending-fix banner until then.",
+   "citations": [
+    "Model Card"
+   ],
+   "components": [
+    {
+     "type": "rain.signoff",
+     "version": 1,
+     "props": {}
+    }
+   ],
+   "chips": [
+    "Send to Dr. Castellanos for co-sign",
+    "Request ADT alerts",
+    "How fresh is each data source?"
+   ],
+   "capability": "Automated Action",
+   "confidence": 92
+  },
+  "cio_cosign": {
+   "id": "cio_cosign",
+   "text": "Sent to Dr. Castellanos for co-sign in Model Governance.",
+   "citations": [
+    "Model Card"
+   ],
+   "components": [
+    {
+     "type": "rain.signoff",
+     "version": 1,
+     "props": {}
+    }
+   ],
+   "chips": [
+    "Sign off and release",
+    "Request ADT alerts"
+   ],
+   "capability": "Automated Action",
+   "confidence": 92
+  },
+  "cio_adt": {
+   "id": "cio_adt",
+   "text": "Drafted: a request to route HIE ADT events into the ED signal, so new ED visits show the same day.",
+   "citations": [
+    "HIE ADT",
+    "Pipeline Monitor"
+   ],
+   "components": [
+    {
+     "type": "rain.brief_preview",
+     "version": 1,
+     "props": {
+      "kind": "adt"
+     }
+    }
+   ],
+   "chips": [
+    "Sign off and release",
+    "How fresh is each data source?"
+   ],
+   "capability": "Automated Action",
+   "confidence": 92
+  },
+  "cio_stale": {
+   "id": "cio_stale",
+   "text": "Claims trail by 45 days; the ADT feed is under an hour old and can fill the ED gap.",
+   "citations": [
+    "Pipeline Monitor",
+    "HIE ADT",
+    "Data Sources Registry"
+   ],
+   "components": [
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "Key feeds and their lag",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "feed",
+           "label": "Feed"
+          },
+          {
+           "key": "lag",
+           "label": "Lag"
+          },
+          {
+           "key": "affects",
+           "label": "What it delays"
+          },
+          {
+           "key": "state",
+           "label": "Status",
+           "kind": "status"
+          }
+         ],
+         "rows": [
+          {
+           "feed": "MCO claims",
+           "lag": "45 days",
+           "affects": "ED, low-value care, cost",
+           "state": "Warning"
+          },
+          {
+           "feed": "HIE ADT",
+           "lag": "Under 1 hour",
+           "affects": "ED visits (same day)",
+           "state": "Good"
+          },
+          {
+           "feed": "EHR (FHIR R4)",
+           "lag": "Nightly",
+           "affects": "Quality measures, vitals, labs",
+           "state": "Good"
+          },
+          {
+           "feed": "Remote BP readings",
+           "lag": "Hourly",
+           "affects": "CMS165 closure",
+           "state": "Good"
+          },
+          {
+           "feed": "MCO eligibility",
+           "lag": "Monthly",
+           "affects": "Attribution",
+           "state": "Good"
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Request ADT alerts",
+    "Show me the subgroup result",
+    "Open Data Sources"
+   ],
+   "capability": "Friction Observability",
+   "confidence": 92
+  },
+  "cio_social": {
+   "id": "cio_social",
+   "text": "Only 38% of members have a social needs screening, which limits transport and housing signals.",
+   "citations": [
+    "Screening Tool",
+    "EHR (FHIR)"
+   ],
+   "components": [
+    {
+     "type": "chart",
+     "version": 1,
+     "props": {
+      "kind": "bar",
+      "unit": "%",
+      "title": "Members with a social needs screening, by site (network 38%)",
+      "series": [
+       {
+        "name": "Screened",
+        "points": [
+         {
+          "label": "Elko",
+          "value": 44
+         },
+         {
+          "label": "Wells",
+          "value": 31
+         },
+         {
+          "label": "Winnemucca",
+          "value": 35
+         },
+         {
+          "label": "Battle Mountain",
+          "value": 29
+         },
+         {
+          "label": "Lovelock",
+          "value": 33
+         },
+         {
+          "label": "Ely",
+          "value": 41
+         },
+         {
+          "label": "Fallon",
+          "value": 42
+         }
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Show me the subgroup result",
+    "How fresh is each data source?"
+   ],
+   "capability": "Friction Observability",
+   "confidence": 92
+  },
+  "cio_features": {
+   "id": "cio_features",
+   "text": "Prior-year cost and primary care visits carry 41 percent of the weight, and both read thin claims history as low risk.",
+   "citations": [
+    "Model Card"
+   ],
+   "components": [
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "Feature list, v1.3: prior-year cost and visits carry 41% of the weight",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "feature",
+           "label": "Feature"
+          },
+          {
+           "key": "weight",
+           "label": "Weight",
+           "align": "right"
+          },
+          {
+           "key": "note",
+           "label": "How it treats frontier members"
+          }
+         ],
+         "rows": [
+          {
+           "feature": "Prior-year allowed cost",
+           "weight": "24%",
+           "note": "Reads thin claims history as low risk; the main source of the frontier gap."
+          },
+          {
+           "feature": "Primary care visits, last 12 months",
+           "weight": "17%",
+           "note": "Frontier members have 31% fewer visits because sites are far, not because they are healthier."
+          },
+          {
+           "feature": "ED visits, last 12 months",
+           "weight": "14%",
+           "note": "Trails reality by the 45-day claims lag; ADT alerts would close it."
+          },
+          {
+           "feature": "Chronic condition count",
+           "weight": "13%",
+           "note": "Clinical signal; behaves the same in town and frontier."
+          },
+          {
+           "feature": "Latest BP and HbA1c",
+           "weight": "12%",
+           "note": "Clinical signal; behaves the same in town and frontier."
+          },
+          {
+           "feature": "Open care gaps",
+           "weight": "8%",
+           "note": "Counts gaps the EHR can see."
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "What changes if we fix it?",
+    "Show the 57 members"
+   ],
+   "capability": "Anomaly Detection",
+   "confidence": 92
+  },
+  "cio_57": {
+   "id": "cio_57",
+   "text": "These are the 57 high-need frontier members the current model leaves out of the top 300, de-identified.",
+   "citations": [
+    "Model Card",
+    "Claims",
+    "EHR (FHIR)"
+   ],
+   "components": [
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "8 of the 57 high-need frontier members, de-identified; 41 are in the BP denominator",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "id",
+           "label": "Member"
+          },
+          {
+           "key": "change",
+           "label": "Change"
+          },
+          {
+           "key": "condition",
+           "label": "Condition"
+          },
+          {
+           "key": "drive",
+           "label": "Drive",
+           "align": "right"
+          },
+          {
+           "key": "rank",
+           "label": "Rank before to after",
+           "align": "right"
+          }
+         ],
+         "rows": [
+          {
+           "id": "F-1000",
+           "change": "Enters top 300",
+           "condition": "Heart failure",
+           "drive": "114 min",
+           "rank": "359 to 160"
+          },
+          {
+           "id": "F-1013",
+           "change": "Enters top 300",
+           "condition": "Hypertension",
+           "drive": "100 min",
+           "rank": "434 to 289"
+          },
+          {
+           "id": "F-1026",
+           "change": "Enters top 300",
+           "condition": "Hypertension and diabetes",
+           "drive": "109 min",
+           "rank": "625 to 280"
+          },
+          {
+           "id": "F-1039",
+           "change": "Enters top 300",
+           "condition": "Hypertension and diabetes",
+           "drive": "81 min",
+           "rank": "506 to 238"
+          },
+          {
+           "id": "F-1052",
+           "change": "Enters top 300",
+           "condition": "COPD or asthma",
+           "drive": "109 min",
+           "rank": "581 to 146"
+          },
+          {
+           "id": "F-1065",
+           "change": "Enters top 300",
+           "condition": "Hypertension and diabetes",
+           "drive": "91 min",
+           "rank": "347 to 276"
+          },
+          {
+           "id": "F-1078",
+           "change": "Enters top 300",
+           "condition": "Hypertension",
+           "drive": "108 min",
+           "rank": "401 to 282"
+          },
+          {
+           "id": "F-1091",
+           "change": "Enters top 300",
+           "condition": "Heart failure",
+           "drive": "85 min",
+           "rank": "665 to 272"
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "What changes if we fix it?",
+    "Generate the governance packet"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "cio_banner": {
+   "id": "cio_banner",
+   "text": "Done: every view now shows that claims run through Q3 with a 45-day lag and ADT is current to today.",
+   "citations": [
+    "Pipeline Monitor"
+   ],
+   "components": [
+    {
+     "type": "rain.banner_preview",
+     "version": 1,
+     "props": {
+      "kind": "freshness"
+     }
+    }
+   ],
+   "chips": [
+    "Generate the governance packet",
+    "How fresh is each data source?"
+   ],
+   "capability": "Automated Action",
+   "confidence": 92
+  },
+  "cio_card": {
+   "id": "cio_card",
+   "text": "The impactability score ranks rising-risk members for outreach, and version 1.3 failed its subgroup check on frontier ZIP codes.",
+   "citations": [
+    "Model Card"
+   ],
+   "components": [
+    {
+     "type": "rain.model_card",
+     "version": 1,
+     "props": {}
+    }
+   ],
+   "chips": [
+    "Show me the subgroup result",
+    "Which features cause it?"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "cio_public": {
+   "id": "cio_public",
+   "text": "Six public sources feed the county view: PLACES, SVI, HRSA shortage areas, FCC broadband, USDA rural codes and Census boundaries.",
+   "citations": [
+    "Data Sources Registry"
+   ],
+   "components": [
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "Public sources behind the county view",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "source",
+           "label": "Source"
+          },
+          {
+           "key": "layer",
+           "label": "Used for"
+          }
+         ],
+         "rows": [
+          {
+           "source": "CDC PLACES (2025 release)",
+           "layer": "Hypertension and diabetes prevalence"
+          },
+          {
+           "source": "CDC/ATSDR SVI (2022)",
+           "layer": "Social vulnerability layer"
+          },
+          {
+           "source": "HRSA Health Professional Shortage Areas",
+           "layer": "Shortage-area layer"
+          },
+          {
+           "source": "FCC National Broadband Map",
+           "layer": "Broadband layer"
+          },
+          {
+           "source": "USDA Rural-Urban Continuum Codes (2023)",
+           "layer": "Rural filter and frontier definition"
+          },
+          {
+           "source": "Census cartographic boundary files (2024)",
+           "layer": "Map geometry"
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "How fresh is each data source?",
+    "Open Data Sources"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "cio_match": {
+   "id": "cio_match",
+   "text": "214 records failed patient matching this month, and they are queued for review rather than dropped.",
+   "citations": [
+    "Data Quality Monitor",
+    "MCO Eligibility",
+    "EHR (FHIR)"
+   ],
+   "components": [
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "Records that failed patient matching this month (214)",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "reason",
+           "label": "Reason"
+          },
+          {
+           "key": "count",
+           "label": "Records",
+           "kind": "number"
+          },
+          {
+           "key": "next",
+           "label": "Next step"
+          }
+         ],
+         "rows": [
+          {
+           "reason": "Missing date of birth",
+           "count": 92,
+           "next": "Request from the plan file"
+          },
+          {
+           "reason": "Address changed",
+           "count": 61,
+           "next": "Match on name and date of birth"
+          },
+          {
+           "reason": "Name spelling differs",
+           "count": 38,
+           "next": "Steward review"
+          },
+          {
+           "reason": "Duplicate member ID",
+           "count": 23,
+           "next": "Merge review"
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "How fresh is each data source?",
+    "Show me the subgroup result"
+   ],
+   "capability": "Friction Observability",
+   "confidence": 92
+  },
+  "cio_open_ds": {
+   "id": "cio_open_ds",
+   "text": "Opening Data Sources, where you can check each feed's freshness and select one to ask about it.",
+   "citations": [
+    "Data Sources Registry"
+   ],
+   "components": [
+    {
+     "type": "rain.launch_card",
+     "version": 1,
+     "props": {
+      "step": "cio_open_ds"
+     }
+    }
+   ],
+   "chips": [
+    "How stale is our data?",
+    "Show me the subgroup result"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "cio_ctx_feature": {
+   "id": "cio_ctx_feature",
+   "text": "Here is what this model feature reads and how it treats frontier members.",
+   "citations": [
+    "Model Card"
+   ],
+   "components": [
+    {
+     "type": "callout",
+     "version": 1,
+     "props": {
+      "title": "Prior-year allowed cost · weight 24% · Current",
+      "body": "Reads thin claims history as low risk; the main source of the frontier gap.",
+      "status": "warning"
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "What changes if we fix it?",
+    "Which features cause it?"
+   ],
+   "capability": "Anomaly Detection",
+   "confidence": 92
+  },
+  "cio_ctx_source": {
+   "id": "cio_ctx_source",
+   "text": "Here is what this source provides, how fresh it is and what reads it.",
+   "citations": [
+    "Data Sources Registry"
+   ],
+   "components": [
+    {
+     "type": "grid",
+     "version": 1,
+     "props": {
+      "columns": 2,
+      "children": [
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Label",
+         "value": "Synthetic",
+         "caption": "Synthetic MCO eligibility and attribution"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Records",
+         "value": "9,400"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Freshness",
+         "value": "Q3 file"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "text",
+     "version": 1,
+     "props": {
+      "text": "9,400 attributed members. Used for: Contract population."
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "How fresh is each data source?",
+    "What public data feeds the county view?"
+   ],
+   "capability": "Friction Observability",
+   "confidence": 92
+  },
+  "__default__": {
+   "id": "__default__",
+   "text": "I can answer on the risk model and its subgroup check, data freshness, social needs coverage, patient matching and the public sources.",
+   "citations": [],
+   "components": [],
+   "chips": [
+    "Show me the subgroup result",
+    "How stale is our data?",
+    "Show the model card"
+   ],
+   "confidence": 60
+  }
+ },
+ "match": {
+  "chipToFlowKey": {
+   "Show me the subgroup result": "cio_subgroup",
+   "show me the subgroup result": "cio_subgroup",
+   "Did the risk model pass its subgroup check?": "cio_subgroup",
+   "did the risk model pass its subgroup check?": "cio_subgroup",
+   "did the risk model pass its subgroup check": "cio_subgroup",
+   "What changes if we fix it?": "cio_fix",
+   "what changes if we fix it?": "cio_fix",
+   "what changes if we fix it": "cio_fix",
+   "Generate the governance packet": "cio_packet",
+   "generate the governance packet": "cio_packet",
+   "Sign off and release": "cio_signoff",
+   "sign off and release": "cio_signoff",
+   "Send to Dr. Castellanos for co-sign": "cio_cosign",
+   "send to dr. castellanos for co-sign": "cio_cosign",
+   "send to dr castellanos for co-sign": "cio_cosign",
+   "Notify Dr. Castellanos": "cio_cosign",
+   "notify dr. castellanos": "cio_cosign",
+   "notify dr castellanos": "cio_cosign",
+   "Request ADT alerts": "cio_adt",
+   "request adt alerts": "cio_adt",
+   "How stale is our data?": "cio_stale",
+   "how stale is our data?": "cio_stale",
+   "how stale is our data": "cio_stale",
+   "How fresh is each data source?": "cio_stale",
+   "how fresh is each data source?": "cio_stale",
+   "how fresh is each data source": "cio_stale",
+   "Show me social needs coverage": "cio_social",
+   "show me social needs coverage": "cio_social",
+   "Which members are missing social needs screening?": "cio_social",
+   "which members are missing social needs screening?": "cio_social",
+   "which members are missing social needs screening": "cio_social",
+   "Which features cause it?": "cio_features",
+   "which features cause it?": "cio_features",
+   "which features cause it": "cio_features",
+   "Show the 57 members": "cio_57",
+   "show the 57 members": "cio_57",
+   "Set a data freshness banner": "cio_banner",
+   "set a data freshness banner": "cio_banner",
+   "Show the model card": "cio_card",
+   "show the model card": "cio_card",
+   "What public data feeds the county view?": "cio_public",
+   "what public data feeds the county view?": "cio_public",
+   "what public data feeds the county view": "cio_public",
+   "Show records that failed patient matching": "cio_match",
+   "show records that failed patient matching": "cio_match",
+   "Open Data Sources": "cio_open_ds",
+   "open data sources": "cio_open_ds",
+   "Explain this feature": "cio_ctx_feature",
+   "explain this feature": "cio_ctx_feature",
+   "Explain this source": "cio_ctx_source",
+   "explain this source": "cio_ctx_source"
+  },
+  "strictMatch": true,
+  "signalSequence": [],
+  "flows": {
+   "cio_brief": {
+    "user_query": "",
+    "corpus": " good morning, raj. before the care team starts outreach, one thing needs your attention: the impactability model failed its subgroup check. "
+   },
+   "cio_subgroup": {
+    "user_query": "Show me the subgroup result",
+    "corpus": "show me the subgroup result the model uses past utilization as a main input, so frontier members are ranked lower in every condition group. "
+   },
+   "cio_fix": {
+    "user_query": "What changes if we fix it?",
+    "corpus": "what changes if we fix it? access-adjusted features bring the frontier gap from 18% to 3%, inside the release threshold. "
+   },
+   "cio_packet": {
+    "user_query": "Generate the governance packet",
+    "corpus": "generate the governance packet here is the governance packet: the updated model card, the subgroup results before and after, the feature change log and a sign-off page for you and dr. castellanos. "
+   },
+   "cio_signoff": {
+    "user_query": "Sign off and release",
+    "corpus": "sign off and release signed: the release now waits only on dr. castellanos's co-sign, and the care team keeps the pending-fix banner until then. "
+   },
+   "cio_cosign": {
+    "user_query": "Send to Dr. Castellanos for co-sign",
+    "corpus": "send to dr. castellanos for co-sign sent to dr. castellanos for co-sign in model governance. "
+   },
+   "cio_adt": {
+    "user_query": "Request ADT alerts",
+    "corpus": "request adt alerts drafted: a request to route hie adt events into the ed signal, so new ed visits show the same day. "
+   },
+   "cio_stale": {
+    "user_query": "How stale is our data?",
+    "corpus": "how stale is our data? claims trail by 45 days; the adt feed is under an hour old and can fill the ed gap. "
+   },
+   "cio_social": {
+    "user_query": "Show me social needs coverage",
+    "corpus": "show me social needs coverage only 38% of members have a social needs screening, which limits transport and housing signals. "
+   },
+   "cio_features": {
+    "user_query": "Which features cause it?",
+    "corpus": "which features cause it? prior-year cost and primary care visits carry 41 percent of the weight, and both read thin claims history as low risk. "
+   },
+   "cio_57": {
+    "user_query": "Show the 57 members",
+    "corpus": "show the 57 members these are the 57 high-need frontier members the current model leaves out of the top 300, de-identified. "
+   },
+   "cio_banner": {
+    "user_query": "Set a data freshness banner",
+    "corpus": "set a data freshness banner done: every view now shows that claims run through q3 with a 45-day lag and adt is current to today. "
+   },
+   "cio_card": {
+    "user_query": "Show the model card",
+    "corpus": "show the model card the impactability score ranks rising-risk members for outreach, and version 1.3 failed its subgroup check on frontier zip codes. "
+   },
+   "cio_public": {
+    "user_query": "What public data feeds the county view?",
+    "corpus": "what public data feeds the county view? six public sources feed the county view: places, svi, hrsa shortage areas, fcc broadband, usda rural codes and census boundaries. "
+   },
+   "cio_match": {
+    "user_query": "Show records that failed patient matching",
+    "corpus": "show records that failed patient matching 214 records failed patient matching this month, and they are queued for review rather than dropped. "
+   },
+   "cio_open_ds": {
+    "user_query": "Open Data Sources",
+    "corpus": "open data sources opening data sources, where you can check each feed's freshness and select one to ask about it. "
+   },
+   "cio_ctx_feature": {
+    "user_query": "Explain this feature",
+    "corpus": "explain this feature here is what this model feature reads and how it treats frontier members. "
+   },
+   "cio_ctx_source": {
+    "user_query": "Explain this source",
+    "corpus": "explain this source here is what this source provides, how fresh it is and what reads it. "
+   },
+   "__default__": {
+    "user_query": "",
+    "corpus": " i can answer on the risk model and its subgroup check, data freshness, social needs coverage, patient matching and the public sources. "
+   }
+  }
+ }
+}

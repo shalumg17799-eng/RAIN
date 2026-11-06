@@ -1,0 +1,218 @@
+{
+  "ret_greeting": {
+    "ai_message": "3 retention signals surfaced overnight. Want me to walk through them?",
+    "suggested_chips": [
+      "Yes, walk me through them",
+      "Show me the churn signals",
+      "Which members are most at risk of leaving?"
+    ],
+    "data_sources_used": [],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+  "ret_signal_1_churn_surge": {
+    "ai_message": "First: 312 members crossed the 70% churn probability threshold this week — up 58% from 198 last week. Einstein's model attributes the surge to a combination of rate dissatisfaction (CD and auto loan) and declining digital engagement. The average churn probability for this cohort is 76%. Total lifetime value at risk: $11.9M.",
+    "suggested_chips": [
+      "Show me the churn signals",
+      "Which segments are driving this?",
+      "Next signal"
+    ],
+    "data_sources_used": ["Salesforce Einstein", "Salesforce Data Cloud"],
+    "capability": "Proactive Intelligence",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["churn_model"]
+  },
+  "ret_signal_2_engagement_decay": {
+    "ai_message": "Second: digital engagement continues to decay — 1,243 members have not logged into any digital channel in 90+ days. This cohort grew 14% in the last month alone. 62% are single-product holders, which correlates with 2x higher churn risk compared to multi-product members. The total LTV at risk for this group is $34.1M.",
+    "suggested_chips": [
+      "What's driving disengagement this month?",
+      "Show me the engagement trend",
+      "Next signal"
+    ],
+    "data_sources_used": ["Salesforce Data Cloud", "Snowflake"],
+    "capability": "Proactive Intelligence",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["engagement_trends"]
+  },
+  "ret_signal_3_retiree_disengage": {
+    "ai_message": "Third: the military retiree segment NPS dropped 13 points — from 52 to 39 — over the last 6 months. This is your highest-LTV segment with an average lifetime value of $172,000. Top detractor themes from Genesys transcripts: 'CD rate not competitive' (36%) and 'no loyalty recognition' (29%). This segment holds $31.6M in CD balances at risk of moving to Navy Federal or USAA.",
+    "suggested_chips": [
+      "Which members are most at risk of leaving?",
+      "Show me the retiree sentiment details",
+      "Model the retention impact"
+    ],
+    "data_sources_used": ["Genesys Cloud", "Salesforce Data Cloud"],
+    "capability": "Proactive Intelligence",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["segments", "nps_data"]
+  },
+  "ret_turn_1_churn_signals": {
+    "ai_message": "I've pulled data from Einstein, Data Cloud, Snowflake, and Genesys to give you the full churn picture.\n\nOver the last 12 weeks, the number of high-risk members (>70% churn probability) has grown from 142 to 312 — a 120% increase. The acceleration started in Week 8, coinciding with the CD rate changes.\n\n[Churn Risk by Segment]\n[1] Military Retirees: 214 members, 71% avg churn risk, $36.8M LTV at risk\n[2] Single-Product Holders: 487 members, 62% avg churn risk, $18.2M LTV at risk\n[3] First-Time Applicants (Stalled): 312 members, 64% avg churn risk, $11.9M LTV at risk\n[4] Digital Dormant: 1,243 members, 58% avg churn risk, $34.1M LTV at risk\n[5] Young Professionals (<30): 198 members, 55% avg churn risk, $6.3M LTV at risk\n\nTotal LTV at risk across all segments: $82.8M. The military retiree segment has the highest per-member LTV by far ($172K avg).",
+    "suggested_chips": [
+      "Which segments are most at risk?",
+      "What's driving disengagement this month?",
+      "Show me the engagement trend"
+    ],
+    "data_sources_used": ["Salesforce Einstein", "Salesforce Data Cloud", "Snowflake", "Genesys Cloud"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [
+      {
+        "type": "line_chart",
+        "title": "High-Risk Members (>70% Churn) — 12-Week Trend",
+        "dataset_key": "churn_model.weekly_trend"
+      }
+    ],
+    "related_dataset_keys": ["churn_model"]
+  },
+  "ret_turn_2_risk_segments": {
+    "ai_message": "Here's the predictive risk scoring across all retention segments:\n\n[1] Military Retirees — 71% avg churn risk | 214 members | $36.8M LTV\nDriver: CD rate dissatisfaction + loyalty recognition gap\nProjection: Without intervention, 68% likely to close CD within 90 days\n\n[2] First-Time Applicants (Stalled) — 64% avg churn risk | 312 members | $11.9M LTV\nDriver: Application friction + no follow-up\nProjection: 52% likely to abandon USSFCU entirely within 60 days\n\n[3] Single-Product Holders — 62% avg churn risk | 487 members | $18.2M LTV\nDriver: Low engagement + rate comparison shopping\nProjection: 45% likely to attrit within 120 days\n\n[4] Digital Dormant — 58% avg churn risk | 1,243 members | $34.1M LTV\nDriver: No digital activity, declining to branch-only\nProjection: 38% likely to close within 180 days\n\nEinstein models show that targeted outreach historically improves retention by 15.2 percentage points vs. no action (3.1% natural retention lift). The highest-impact intervention would be personalized rate offers for military retirees — historical data shows 40% reactivation rate.",
+    "suggested_chips": [
+      "Model the retention impact",
+      "Show me campaign performance",
+      "Generate a retention brief for leadership"
+    ],
+    "data_sources_used": ["Salesforce Einstein", "Salesforce Data Cloud"],
+    "capability": "Predictive Intelligence",
+    "ui_components_to_render": [
+      {
+        "type": "table",
+        "title": "Retention Risk Segments — Ranked by Churn Probability",
+        "dataset_key": "churn_model.by_segment"
+      }
+    ],
+    "related_dataset_keys": ["churn_model", "segments"]
+  },
+  "ret_turn_3_retention_action": {
+    "ai_message": "Based on the predictive analysis, here are three retention actions I can execute right now:",
+    "suggested_chips": [
+      "Show me campaign performance",
+      "Generate a retention brief for leadership"
+    ],
+    "data_sources_used": ["Salesforce AgentForce", "Salesforce Einstein"],
+    "capability": "Automated Action",
+    "ui_components_to_render": [
+      {
+        "type": "action_cards",
+        "title": "Recommended Retention Actions",
+        "actions": [
+          {
+            "id": "ACT-RET-001",
+            "title": "Generate retention brief for 312 high-churn members",
+            "description": "Create a one-page retention brief summarizing the 312 members who crossed the 70% threshold, their segments, drivers, and recommended interventions. Push to leadership Slack channel.",
+            "system": "Salesforce AgentForce / Slack",
+            "impact": "Enable leadership to prioritize retention budget allocation",
+            "status": "ready"
+          },
+          {
+            "id": "ACT-RET-002",
+            "title": "Build targeted outreach list — personalized rate offers for military retirees",
+            "description": "Create AgentForce segment of 214 military retirees with NPS decline >10 pts and CD balance >$50K. Attach personalized rate match offer based on competitive analysis.",
+            "system": "Salesforce AgentForce",
+            "impact": "Historical 40% reactivation rate for personalized offers — potential to retain $14.7M in CD balances",
+            "status": "ready"
+          },
+          {
+            "id": "ACT-RET-003",
+            "title": "Schedule re-engagement campaign for digital-dormant members",
+            "description": "Launch a 3-touch re-engagement sequence (SMS → Email → Phone) for 1,243 digital-dormant members, prioritized by LTV. Include exclusive rate offer and account review invitation.",
+            "system": "Salesforce AgentForce / Marketing Cloud",
+            "impact": "Expected 18–30% reactivation based on channel mix (SMS: 18%, Phone: 30%)",
+            "status": "ready"
+          }
+        ]
+      }
+    ],
+    "post_confirm_response": {
+      "ACT-RET-001": "Done. Retention brief generated and posted to #retention-leadership Slack channel:\n\n— Title: 'Weekly Retention Alert — 312 High-Risk Members'\n— Segments covered: Military Retirees (214), First-Time Applicants (312), Digital Dormant (1,243)\n— Total LTV at risk: $82.8M\n— Recommended budget allocation: $240K for personalized outreach\n\nThe brief includes a drill-down by segment with churn probability trends and recommended interventions.",
+      "ACT-RET-002": "Done. AgentForce segment created: 'Military Retiree — Retention Priority Q2 2026'\n\n— 214 members added to segment\n— Personalized rate match offers generated based on USAA/Navy Federal competitive rates\n— Outreach channel: Dedicated relationship manager phone call + email follow-up\n— Campaign start: Tomorrow 10:00 AM ET\n— Expected retention: 85–90 members ($14.7M in CD balances preserved)",
+      "ACT-RET-003": "Done. Re-engagement campaign scheduled in Marketing Cloud:\n\n— Campaign: 'Digital Reactivation — Q2 2026'\n— 1,243 members segmented into 3 priority tiers by LTV\n— Sequence: Day 1 SMS → Day 3 Email → Day 7 Phone (for Tier 1 only)\n— Exclusive offer: 0.25% APY bonus on any new product opened within 30 days\n— Expected reactivation: 224–373 members (18–30%)"
+    },
+    "related_dataset_keys": ["segments", "retention_campaigns"]
+  },
+  "ret_churn_drivers": {
+    "ai_message": "Here are the top disengagement drivers this month, ranked by impact:\n\n[1] CD Rate Dissatisfaction — affecting 214 military retirees + 89 other CD holders. Genesys transcripts show 'rate' mentioned in 68% of disengagement-correlated calls. USSFCU's 12-month CD rate (4.75%) is 25 bps below Navy Federal (5.00%) and 15 bps below USAA (4.90%).\n\n[2] Application Friction — 312 first-time applicants stalled at mortgage document upload. 67% are mobile users who experienced the upload timeout. No follow-up outreach was sent.\n\n[3] Low Product Penetration — 487 single-product holders showing declining engagement. Members with 1 product have 2.1x higher churn risk than those with 3+ products.\n\n[4] Digital Channel Neglect — 1,243 members went dormant. 78% of these members last interacted via branch. Digital re-engagement touchpoints were insufficient.\n\n[5] Loyalty Recognition Gap — Military retirees with 15+ year tenure feel their loyalty isn't rewarded. 29% of detractor transcripts mention 'loyalty' or 'tenure'.",
+    "suggested_chips": [
+      "Which segments are most at risk?",
+      "Model the retention impact of outreach"
+    ],
+    "data_sources_used": ["Salesforce Einstein", "Genesys Cloud", "Salesforce Data Cloud"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["churn_model", "engagement_trends"]
+  },
+  "ret_engagement_trend": {
+    "ai_message": "Digital engagement decay over the last 6 months:\n\n[90+ Day Dormant Members]\n— Oct 2025: 824\n— Nov 2025: 891 (+8%)\n— Dec 2025: 942 (+6%)\n— Jan 2026: 1,018 (+8%)\n— Feb 2026: 1,089 (+7%)\n— Mar 2026: 1,243 (+14%) — ACCELERATION\n\nThe March acceleration correlates with reduced in-app engagement campaigns after the Q1 marketing budget reallocation. Meanwhile, active digital users declined from 14,200 to 13,310 — a 6.3% drop.\n\n[Dormancy by Product Count]\n— 1 product: 62% of dormant members (highest churn risk: 0.63)\n— 2 products: 24% of dormant (churn risk: 0.51)\n— 3+ products: 14% of dormant (lowest churn risk: 0.42)\n\nSingle-product holders are clearly the most vulnerable. Cross-sell could reduce their churn risk by 22%.",
+    "suggested_chips": [
+      "Show me campaign performance",
+      "Which segments are most at risk?"
+    ],
+    "data_sources_used": ["Salesforce Data Cloud", "Snowflake"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["engagement_trends"]
+  },
+  "ret_campaign_performance": {
+    "ai_message": "Active retention campaign performance:\n\n[1] CD Rate Loyalty Offer (Military Retirees)\n— Status: On-track | Started: Mar 15\n— Target: 214 members | Response rate: 28.5%\n— Retention lift: 12.3% (vs. 3.1% baseline)\n— Outcome: 61 members retained so far, $10.5M in CD balances preserved\n\n[2] Digital Re-Engagement Push (90+ Day Dormant)\n— Status: UNDERPERFORMING | Started: Mar 20\n— Target: 500 members | Response rate: 11.2%\n— Retention lift: 4.8% (vs. 3.1% baseline) — BELOW THRESHOLD\n— Issue: Email-only channel. Historical data shows SMS + phone outreach achieves 18–30% reactivation.\n\n[3] Cross-Sell to Single-Product (High-Risk)\n— Status: On-track | Started: Mar 25\n— Target: 300 members | Response rate: 19.7%\n— Retention lift: 8.9% (vs. 3.1% baseline)\n— Outcome: 59 members added a second product\n\nThe digital re-engagement campaign needs a channel upgrade — adding SMS and phone would 2–3x the response rate based on historical performance.",
+    "suggested_chips": [
+      "Model the retention impact of outreach",
+      "Generate a retention brief for leadership"
+    ],
+    "data_sources_used": ["Salesforce AgentForce", "Salesforce Data Cloud"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["retention_campaigns"]
+  },
+  "ret_retiree_sentiment": {
+    "ai_message": "Military retiree sentiment deep dive from Genesys transcript analysis:\n\n[Detractor Themes — 214 members, NPS 39]\n[1] 'CD rate not competitive' — 78 interactions (36%)\nMembers comparing USSFCU's 4.75% 12-month CD against Navy Federal (5.00%) and USAA (4.90%). Several mentioned moving $100K+ in balances.\n\n[2] 'No loyalty recognition' — 62 interactions (29%)\nMembers with 15+ years feel their tenure doesn't earn better rates. Quote: 'I've been here 22 years and a new member gets the same rate as me.'\n\n[3] 'Poor maturity communication' — 44 interactions (21%)\nMembers say they weren't notified before CD auto-renewed at a lower rate.\n\n[4] 'Want to speak with manager' — 30 interactions (14%)\nEscalation requests are 3x higher than other segments.\n\n[Sentiment Score: 2.1 out of 5 (very negative)]\n\nThis segment has the highest individual LTV ($172K avg) and holds $31.6M in CD balances. A 25 bps rate match could retain 85–90% of at-risk members based on Einstein's model.",
+    "suggested_chips": [
+      "Model the retention impact of outreach",
+      "Which segments are most at risk?"
+    ],
+    "data_sources_used": ["Genesys Cloud", "Salesforce Einstein"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["segments"]
+  },
+  "ret_impact_model": {
+    "ai_message": "Retention impact modeling — with vs. without targeted outreach:\n\n[Scenario A: No Action (Baseline)]\n— Projected churn in 90 days: 487 members (27.5% of at-risk)\n— LTV lost: $22.8M\n— Natural retention lift: 3.1%\n\n[Scenario B: Targeted Outreach (Recommended)]\n— Projected churn in 90 days: 198 members (11.2% of at-risk)\n— LTV preserved: $16.4M (vs. scenario A)\n— Retention lift: 15.2% (historical average)\n— Cost of outreach: ~$240K\n— ROI: 68:1 (LTV preserved vs. outreach cost)\n\n[Scenario C: Personalized Rate Match + Outreach]\n— Projected churn in 90 days: 124 members (7.0% of at-risk)\n— LTV preserved: $19.8M (vs. scenario A)\n— Retention lift: 20.5%\n— Cost: ~$580K (includes rate concessions)\n— ROI: 34:1\n\nScenario B offers the best ROI. Scenario C is recommended specifically for the military retiree segment where the per-member LTV justifies the rate concession.",
+    "suggested_chips": [
+      "Generate a retention brief for leadership",
+      "Show me campaign performance"
+    ],
+    "data_sources_used": ["Salesforce Einstein", "Salesforce Data Cloud"],
+    "capability": "Predictive Intelligence",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["churn_model", "retention_campaigns"]
+  },
+  "ret_retention_brief": {
+    "ai_message": "Here's your retention brief for leadership:\n\n[RETENTION ALERT — Week of April 1–7, 2026]\n\n[Executive Summary]\n1,769 members are at elevated churn risk, representing $82.8M in lifetime value. Three signals require immediate attention: a churn risk surge (312 members >70%), digital engagement decay (1,243 dormant), and military retiree NPS decline (214 members, -13 pts).\n\n[Key Recommendations]\n[1] Personalized rate match for military retirees — $580K investment to retain $31.6M in CD balances (ROI: 54:1)\n[2] Multi-channel re-engagement for digital-dormant — upgrade from email-only to SMS + phone to 3x response rate\n[3] Cross-sell acceleration for single-product holders — 487 members with 2.1x churn risk reduction potential\n\n[Budget Request]\n— Immediate: $240K for targeted outreach across all segments\n— Q2 allocation: $580K if rate concession approved for military retirees\n\nWant me to format this as a slide deck or email for distribution?",
+    "suggested_chips": [
+      "Show me the churn signals",
+      "Show me campaign performance"
+    ],
+    "data_sources_used": ["Salesforce AgentForce", "All retention sources"],
+    "capability": "Automated Action",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["churn_model", "segments", "retention_campaigns"]
+  },
+  "ret_which_segments_driving": {
+    "ai_message": "The churn surge is being driven by three segments converging:\n\n[1] Military Retirees (214 members) — the trigger\nCD rate changes in Q1 pushed this segment from 58% to 71% avg churn risk. They're the most vocal (NPS -13 pts) and hold the highest individual LTV ($172K).\n\n[2] Single-Product Holders (487 members) — the accelerant\nRate comparison shopping + low engagement creates a compounding effect. These members have no product stickiness — one bad experience and they leave.\n\n[3] First-Time Applicants (312 members) — the friction fallout\nMortgage application friction didn't just cause drop-offs — it created a churn signal. 64% of stalled applicants now show elevated churn risk across all products.\n\nThe overlap matters: 47 military retirees are also showing engagement decay, meaning they're being hit by two churn drivers simultaneously.",
+    "suggested_chips": [
+      "Model the retention impact",
+      "Which segments are most at risk?"
+    ],
+    "data_sources_used": ["Salesforce Einstein", "Salesforce Data Cloud"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["churn_model", "segments"]
+  },
+  "__default__": {
+    "ai_message": "I don't have an answer to that in the retention data I can see.\n\nI can show the churn signals, which members are most at risk of leaving, what's driving disengagement, or model the impact of outreach.",
+    "suggested_chips": [
+      "Show me the churn signals",
+      "Which members are most at risk of leaving?",
+      "What's driving disengagement this month?"
+    ],
+    "capability": "Converged Conversation"
+  }
+}

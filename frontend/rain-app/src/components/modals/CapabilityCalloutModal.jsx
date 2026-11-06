@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+// @ultra-shell: the workspace's capability modal. Rule 5 lets the shell read context.
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useBranding } from '@/context/BrandingContext';
 import ProactiveIntelligenceDiagram from '../capabilities/ProactiveIntelligenceDiagram';
 import TalkToDataDiagram from '../capabilities/TalkToDataDiagram';
 import BehavioralSegmentationDiagram from '../capabilities/BehavioralSegmentationDiagram';
@@ -17,26 +19,32 @@ const capabilityNameToDiagram = {
   'Automated Action': ActionExecutionDiagram,
 };
 
-const radiantSubheads = {
-  'Proactive Intelligence': 'AI-Ops + E2E Observability',
-  'Converged Conversation': 'ConverseAI + Knowledge Hub',
-  'Friction Observability': 'Intelligent CX + Agentic Data Platform',
-  'Predictive Intelligence': 'Predictive AI + Knowledge Graph',
-  'Anomaly Detection': 'Predictive AI + Agentic Data Platform + Agentic AI',
-  'Automated Action': 'Multi-Agent Orchestration + MCP',
+// Which entry of the persona's `capabilityDiagrams` each diagram reads.
+const capabilityNameToKind = {
+  'Proactive Intelligence': 'proactive',
+  'Converged Conversation': 'converged',
+  'Friction Observability': 'friction',
+  'Predictive Intelligence': 'predictive',
+  'Anomaly Detection': 'anomaly',
+  'Automated Action': 'action',
 };
 
-export default function CapabilityCalloutModal({ isOpen, onClose, capability, callouts = [] }) {
+export default function CapabilityCalloutModal({ isOpen, onClose, capability, callouts = [], diagrams }) {
+  const { client } = useBranding();
   const [activeCapability, setActiveCapability] = useState(capability);
-
-  useEffect(() => {
+  // Follow the capability that opened the modal; keep the last one while it
+  // closes (capability goes null) so the exit animation has content.
+  const [openedWith, setOpenedWith] = useState(capability);
+  if (capability !== openedWith) {
+    setOpenedWith(capability);
     if (capability) setActiveCapability(capability);
-  }, [capability]);
+  }
 
   if (!activeCapability) return null;
 
-  const DiagramComponent =
-    activeCapability.capabilityName && capabilityNameToDiagram[activeCapability.capabilityName];
+  // `diagram` lets a tenant show its own label (SCLAC's plain-language names) and keep the platform diagram.
+  const diagramName = activeCapability.diagram ?? activeCapability.capabilityName;
+  const DiagramComponent = diagramName && capabilityNameToDiagram[diagramName];
 
   return (
     <AnimatePresence>
@@ -54,7 +62,7 @@ export default function CapabilityCalloutModal({ isOpen, onClose, capability, ca
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
-            className="bg-white rounded-2xl relative overflow-hidden flex w-full"
+            className="bg-surface rounded-2xl relative overflow-hidden flex w-full"
             style={{
               boxShadow: '0px 24px 48px rgba(0,0,0,0.20)',
               width: '98vw',
@@ -68,15 +76,15 @@ export default function CapabilityCalloutModal({ isOpen, onClose, capability, ca
               className="flex flex-col flex-shrink-0"
               style={{
                 width: '200px',
-                background: '#F7F8FA',
-                borderRight: '1px solid #EBEBEB',
+                background: 'var(--color-surface-2)',
+                borderRight: '1px solid var(--color-border)',
                 padding: '24px 0',
               }}
             >
               <p
                 className="font-semibold px-5 mb-4"
                 style={{
-                  color: '#999',
+                  color: 'var(--color-text-subtle)',
                   fontSize: '10px',
                   textTransform: 'uppercase',
                   letterSpacing: '2px',
@@ -93,8 +101,8 @@ export default function CapabilityCalloutModal({ isOpen, onClose, capability, ca
                       onClick={() => setActiveCapability(cap)}
                       className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-left transition-all cursor-pointer"
                       style={{
-                        background: isActive ? '#E8EEF7' : 'transparent',
-                        color: isActive ? '#003087' : '#555555',
+                        background: isActive ? 'var(--color-brand-subtle)' : 'transparent',
+                        color: isActive ? 'var(--color-brand)' : 'var(--color-text-muted)',
                         boxShadow: 'none',
                         fontWeight: isActive ? 600 : 500,
                       }}
@@ -102,8 +110,8 @@ export default function CapabilityCalloutModal({ isOpen, onClose, capability, ca
                       <span
                         className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold"
                         style={{
-                          background: isActive ? '#003087' : '#E8E8E8',
-                          color: isActive ? '#FFFFFF' : '#888888',
+                          background: isActive ? 'var(--color-brand)' : 'var(--color-border)',
+                          color: isActive ? 'var(--color-brand-fg)' : 'var(--color-text-subtle)',
                         }}
                       >
                         {idx + 1}
@@ -116,21 +124,26 @@ export default function CapabilityCalloutModal({ isOpen, onClose, capability, ca
                 })}
               </div>
 
-              {/* Powered by — bottom of sidebar */}
+              {/* Powered by — bottom of sidebar. Radiant by default; a client
+                  that supplies `footerMark` leads with its own product brand
+                  here too, matching the sidebar footer. */}
               <div className="mt-auto px-5 pt-6">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[10px] text-gray-400 font-medium">Powered by</span>
+                  <span className="text-[10px] text-text-subtle font-medium">
+                    {client?.footerMark?.label ?? 'Powered by'}
+                  </span>
                   <img
-                    src="/radiant-logo.svg"
-                    alt="Radiant Digital"
-                    className="h-3.5 opacity-60"
+                    src={client?.footerMark?.logo ?? '/radiant-logo.svg'}
+                    alt={client?.footerMark?.alt ?? 'Radiant Digital'}
+                    // Client lockups are stacked; Radiant's is horizontal.
+                    className={client?.footerMark ? 'h-7 opacity-90' : 'h-3.5 opacity-60'}
                   />
                 </div>
               </div>
             </div>
 
             {/* Right — Title + Architecture diagram */}
-            <div className="flex-1 flex flex-col overflow-hidden" style={{ background: '#FAFAFA' }}>
+            <div className="flex-1 flex flex-col overflow-hidden" style={{ background: 'var(--color-surface-2)' }}>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeCapability.trigger}
@@ -145,7 +158,7 @@ export default function CapabilityCalloutModal({ isOpen, onClose, capability, ca
                   <button
                     onClick={onClose}
                     className="absolute top-14 right-5 z-10 px-5 py-2 rounded-lg text-sm font-semibold text-white transition-colors cursor-pointer hover:opacity-90"
-                    style={{ backgroundColor: '#003087' }}
+                    style={{ backgroundColor: 'var(--color-brand)' }}
                   >
                     Continue
                   </button>
@@ -156,8 +169,22 @@ export default function CapabilityCalloutModal({ isOpen, onClose, capability, ca
                     style={{ overflow: 'hidden' }}
                   >
                     {DiagramComponent ? (
-                      <DiagramComponent capability={activeCapability} />
-                    ) : null}
+                      <DiagramComponent content={diagrams?.[capabilityNameToKind[diagramName]]} clientName={client?.shortName} />
+                    ) : (
+                      // Capabilities without a bespoke architecture diagram (e.g. the
+                      // governance capabilities) fall back to a readable description.
+                      <div className="h-full flex items-center justify-center p-8">
+                        <div className="max-w-xl text-center">
+                          {activeCapability.eyebrow && (
+                            <p className="text-[11px] font-bold uppercase tracking-[2px] text-brand/70 mb-3">
+                              {activeCapability.eyebrow}
+                            </p>
+                          )}
+                          <h2 className="text-2xl font-bold text-text mb-4">{activeCapability.capabilityName}</h2>
+                          <p className="text-sm text-text-muted leading-relaxed">{activeCapability.description}</p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </motion.div>
               </AnimatePresence>

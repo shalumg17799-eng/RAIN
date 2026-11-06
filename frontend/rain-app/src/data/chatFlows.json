@@ -1,0 +1,559 @@
+{
+  "greeting": {
+    "ai_message": "3 signals need your attention. Want me to walk you through them?",
+    "suggested_chips": [
+      "Yes, walk me through them",
+      "What's driving the mortgage drop-off?",
+      "Tell me about the CD complaint cluster"
+    ],
+    "data_sources_used": [],
+    "ui_components_to_render": [],
+    "related_dataset_keys": [
+      "signals"
+    ]
+  },
+  "signal_1_mortgage": {
+    "ai_message": "First: mortgage application completions dropped 41% at step 4 \u2014 income verification. This started 72 hours ago. It correlates with a document upload exception in your UiPath automation workflow. 847 members were affected this week.",
+    "suggested_chips": [
+      "Show me the full member journey",
+      "Who are these members?",
+      "What should we do?",
+      "Next signal"
+    ],
+    "data_sources_used": [
+      "UiPath",
+      "Salesforce Data Cloud"
+    ],
+    "ui_components_to_render": [
+      {
+        "type": "bar_chart",
+        "title": "Step 4 Completion Rate \u2014 Last 7 Days",
+        "dataset_key": "mortgage_funnel.daily_data",
+        "config": {
+          "x_axis": "date",
+          "y_axis": "steps[3].completion_rate",
+          "highlight_color": "#CC0000"
+        }
+      }
+    ],
+    "related_dataset_keys": [
+      "mortgage_funnel",
+      "behavioral_analytics"
+    ]
+  },
+  "signal_2_auto_loan": {
+    "ai_message": "Second: Einstein's predictive model is flagging a 3x increase in auto loan inquiry abandonment. The model associates this with rate perception \u2014 members are comparing and leaving. Genesys transcript analysis confirms 'rate' appears in 68% of abandonment-adjacent calls this week.",
+    "suggested_chips": [
+      "Show me the member sentiment",
+      "Which segments?",
+      "Next signal"
+    ],
+    "data_sources_used": [
+      "Salesforce Einstein",
+      "Genesys Cloud"
+    ],
+    "ui_components_to_render": [
+      {
+        "type": "line_chart",
+        "title": "Auto Loan Inquiry-to-Application Rate \u2014 4 Weeks",
+        "dataset_key": "auto_loan_trends.weekly_data",
+        "config": {
+          "x_axis": "week",
+          "y_axis": "abandonment_rate"
+        }
+      }
+    ],
+    "related_dataset_keys": [
+      "auto_loan_trends",
+      "contact_center"
+    ]
+  },
+  "signal_3_cd_complaint": {
+    "ai_message": "Third: a complaint cluster is forming around CD rate transparency. 214 Genesys interactions flagged in the last 5 days. This segment skews toward military retirees \u2014 your highest-tenure members and your strongest NPS drivers.",
+    "suggested_chips": [
+      "Pull the Genesys themes",
+      "How does this affect NPS?",
+      "I'm ready to act"
+    ],
+    "data_sources_used": [
+      "Genesys Cloud",
+      "Voice of Member / NPS"
+    ],
+    "ui_components_to_render": [
+      {
+        "type": "signal_card",
+        "title": "CD Complaint Cluster",
+        "dataset_key": "signals[2]"
+      }
+    ],
+    "related_dataset_keys": [
+      "signals",
+      "segments",
+      "nps_data"
+    ]
+  },
+  "turn_1_mortgage_dropoff": {
+    "user_query": "What's driving the mortgage drop-off?",
+    "ai_response": "The drop-off is concentrated at step 4 \u2014 income verification. Here is what your data shows across three sources simultaneously:\n\n[UiPath] Document upload automation exception spike \u2014 started March 15.\n[Salesforce Data Cloud] Members exit after 3+ failed upload attempts.\n[Genesys Cloud] 23% increase in calls mentioning 'document' or 'upload' this week.\n\nThis points to a process failure, not a product or rate issue. Want me to identify which members were affected and what they have in common?",
+    "suggested_chips": [
+      "Yes, show me who's affected",
+      "What's the revenue impact?",
+      "Help me act on this"
+    ],
+    "data_sources_used": [
+      "UiPath",
+      "Salesforce Data Cloud",
+      "Genesys Cloud"
+    ],
+    "ui_components_to_render": [
+      {
+        "type": "bar_chart",
+        "title": "Drop-Off Rate by Application Step",
+        "dataset_key": "behavioral_analytics.mortgage_application_funnel",
+        "config": {
+          "x_axis": "page",
+          "y_axis": "drop_off_rate",
+          "highlight_step": 4,
+          "highlight_color": "#CC0000"
+        }
+      }
+    ],
+    "related_dataset_keys": [
+      "mortgage_funnel",
+      "behavioral_analytics",
+      "contact_center"
+    ],
+    "capability": "Converged Conversation / Member 360"
+  },
+  "turn_2_segmentation": {
+    "user_query": "Yes, show me who's affected",
+    "ai_response": "The affected members share a distinct profile: first-time mortgage applicants, ages 28 to 42, who applied via mobile. 61% already hold at least one other USSFCU product \u2014 they are existing members, not new prospects.\n\nEinstein flags 312 of these members as moderate churn risk \u2014 meaning a poor mortgage experience here could cost you the relationship entirely.\n\nWant me to create a targeted segment in Salesforce AgentForce so your team can reach out before they disengage?",
+    "suggested_chips": [
+      "Yes, create the segment",
+      "Not yet \u2014 show me more"
+    ],
+    "data_sources_used": [
+      "Salesforce Data Cloud",
+      "Salesforce Einstein",
+      "USSFCU Member CRM"
+    ],
+    "ui_components_to_render": [
+      {
+        "type": "table",
+        "title": "Affected Member Segment Breakdown",
+        "dataset_key": "segments[0]",
+        "columns": [
+          "age_band",
+          "channel",
+          "product_tenure",
+          "count",
+          "churn_risk_score"
+        ],
+        "data": [
+          {
+            "age_band": "28\u201332",
+            "channel": "Mobile",
+            "product_tenure": "1\u20132 years",
+            "count": 287,
+            "churn_risk_score": 0.68
+          },
+          {
+            "age_band": "33\u201337",
+            "channel": "Mobile",
+            "product_tenure": "2\u20134 years",
+            "count": 341,
+            "churn_risk_score": 0.62
+          },
+          {
+            "age_band": "38\u201342",
+            "channel": "Mobile",
+            "product_tenure": "3\u20135 years",
+            "count": 219,
+            "churn_risk_score": 0.59
+          }
+        ]
+      }
+    ],
+    "related_dataset_keys": [
+      "members",
+      "segments",
+      "mortgage_funnel"
+    ],
+    "capability": "Friction Observability"
+  },
+  "turn_3_predictive": {
+    "user_query": "Which members are most at risk of leaving?",
+    "ai_response": "Based on Einstein's churn model and behavioral signals across your data sources, here are the three highest-risk segments right now:\n\n[1] Military retirees with only one product \u2014 churn risk 71%, driven by CD rate dissatisfaction.\n[2] First-time mortgage applicants who stalled at step 4 \u2014 churn risk 64%, driven by process friction.\n[3] Members with no digital login in 90 days \u2014 churn risk 58%, driven by low engagement.\n\nThe military retiree segment is most urgent \u2014 they represent your highest lifetime value and strongest NPS advocates.\n\nWant me to model the estimated retention impact of a targeted outreach?",
+    "suggested_chips": [
+      "Yes, model the impact",
+      "Pull the Genesys themes for that segment",
+      "Scan for anomalies across systems"
+    ],
+    "data_sources_used": [
+      "Salesforce Einstein",
+      "Salesforce Data Cloud",
+      "Genesys Cloud",
+      "Voice of Member / NPS"
+    ],
+    "ui_components_to_render": [
+      {
+        "type": "table",
+        "title": "Highest-Risk Segments \u2014 Churn Prediction",
+        "columns": [
+          "rank",
+          "segment",
+          "churn_risk",
+          "driver",
+          "size",
+          "lifetime_value_index"
+        ],
+        "data": [
+          {
+            "rank": 1,
+            "segment": "Military Retirees \u2014 CD Dissatisfied",
+            "churn_risk": "71%",
+            "driver": "CD rate dissatisfaction",
+            "size": 214,
+            "lifetime_value_index": "Very High"
+          },
+          {
+            "rank": 2,
+            "segment": "Mortgage Step-4 Stalled",
+            "churn_risk": "64%",
+            "driver": "Process friction (upload failure)",
+            "size": 847,
+            "lifetime_value_index": "Moderate"
+          },
+          {
+            "rank": 3,
+            "segment": "No Digital Login 90+ Days",
+            "churn_risk": "58%",
+            "driver": "Low engagement / dormancy",
+            "size": 1243,
+            "lifetime_value_index": "Low-Moderate"
+          }
+        ]
+      }
+    ],
+    "related_dataset_keys": [
+      "segments",
+      "nps_data",
+      "members"
+    ],
+    "capability": "Predictive Intelligence"
+  },
+  "turn_4_actions": {
+    "user_query": "Help me act on this",
+    "ai_response": "Based on everything we've covered, here are three actions I can execute right now. I'll confirm each one before I proceed:\n\n[1] Create a JIRA ticket \u2014 'Mortgage Step 4 UiPath Exception' \u2014 assigned to Data Engineering.\n[2] Schedule a 45-minute friction review with your team with agenda drafted from today's signals.\n[3] Generate a one-page member friction brief formatted for your leadership team.",
+    "suggested_chips": [
+      "Generate a member friction brief",
+      "Scan for anomalies across systems"
+    ],
+    "data_sources_used": [
+      "Salesforce AgentForce",
+      "UiPath"
+    ],
+    "ui_components_to_render": [
+      {
+        "type": "action_cards",
+        "title": "Recommended Actions",
+        "actions": [
+          {
+            "id": "ACT-001",
+            "title": "Create JIRA Ticket",
+            "description": "Mortgage Step 4 UiPath Exception \u2014 assigned to Data Engineering",
+            "system": "JIRA",
+            "status": "pending_confirmation",
+            "buttons": [
+              "Confirm",
+              "Edit First"
+            ]
+          },
+          {
+            "id": "ACT-002",
+            "title": "Schedule Friction Review",
+            "description": "45-minute review with agenda drafted from today's signals",
+            "system": "Calendar / Salesforce",
+            "status": "pending_confirmation",
+            "buttons": [
+              "Confirm",
+              "Edit First"
+            ]
+          },
+          {
+            "id": "ACT-003",
+            "title": "Run Cross-System Anomaly Scan",
+            "description": "Real-time scan across transactions, contact center, and workflows for unusual patterns",
+            "system": "Predictive AI + Agentic Data Platform",
+            "status": "pending_confirmation",
+            "buttons": [
+              "Confirm",
+              "Edit First"
+            ]
+          }
+        ]
+      }
+    ],
+    "post_confirm_response": {
+      "jira": "Done. Ticket created: PF-2847. Assigned to Data Engineering with priority P1. Want me to notify the engineering team in Slack?",
+      "calendar": "Done. Meeting scheduled for tomorrow at 2:00 PM. Agenda includes: mortgage drop-off root cause, auto loan abandonment trend, CD complaint cluster review. Calendar invite sent to your team.",
+      "anomaly_scan": "Running cross-system anomaly scan now. Checking transaction patterns, contact center volume, UiPath workflow exceptions, and cross-system correlations. Results coming in..."
+    },
+    "related_dataset_keys": [
+      "signals",
+      "segments",
+      "mortgage_funnel"
+    ],
+    "capability": "Automated Action"
+  },
+  "turn_5_anomaly_detection": {
+    "user_query": "Scan for anomalies across systems",
+    "ai_response": "I've run a cross-system anomaly scan across all connected data sources. Here's what I found in the last 48 hours:\n\n[Transaction Monitor] 4 accounts showing deposits just below the $10,000 BSA reporting threshold — classic structuring pattern. Risk score: 94.\n[Volume Monitor] Contact center call volume spiked 42% between 2–4 PM yesterday. Genesys transcripts show 78% mention 'CD rate' or 'early withdrawal'.\n[Exception Monitor] UiPath mortgage workflow has thrown 312 exceptions since Tuesday — all at the document upload step.\n[Pattern Correlator] The CD complaint cluster and the contact center spike are linked — same member cohort, same 48-hour window.\n\nAll signals are prioritized by member impact and regulatory exposure. Want me to escalate the flagged accounts or dig deeper into any of these?",
+    "suggested_chips": [
+      "Escalate flagged accounts",
+      "Show the full audit trail",
+      "Help me act on this"
+    ],
+    "data_sources_used": [
+      "Salesforce Data Cloud",
+      "Genesys Cloud",
+      "UiPath",
+      "Fraud & Risk Signal Feed"
+    ],
+    "ui_components_to_render": [
+      {
+        "type": "anomaly_table",
+        "title": "Cross-System Anomaly Scan — Last 48 Hours",
+        "columns": ["source", "anomaly", "risk_score", "status", "members_affected"],
+        "data": [
+          {
+            "source": "Transaction Monitor",
+            "anomaly": "Structuring pattern — deposits below $10K threshold",
+            "risk_score": 94,
+            "status": "Escalated (SAR filed)",
+            "members_affected": 4
+          },
+          {
+            "source": "Volume Monitor",
+            "anomaly": "Contact center spike — 42% above baseline",
+            "risk_score": 72,
+            "status": "Under review",
+            "members_affected": 214
+          },
+          {
+            "source": "Exception Monitor",
+            "anomaly": "UiPath document upload failures — mortgage step 4",
+            "risk_score": 85,
+            "status": "JIRA PF-2847 created",
+            "members_affected": 847
+          },
+          {
+            "source": "Pattern Correlator",
+            "anomaly": "CD complaint cluster linked to contact center spike",
+            "risk_score": 78,
+            "status": "Correlated — same cohort",
+            "members_affected": 214
+          },
+          {
+            "source": "Compliance Scanner",
+            "anomaly": "2 cross-border wire anomalies — out-of-pattern transfers",
+            "risk_score": 91,
+            "status": "Under investigation",
+            "members_affected": 2
+          }
+        ]
+      }
+    ],
+    "related_dataset_keys": [
+      "risk_signals",
+      "signals",
+      "contact_center",
+      "mortgage_funnel"
+    ],
+    "capability": "Anomaly Detection"
+  },
+  "revenue_impact": {
+    "ai_response": "Based on current pipeline data, the 847 stalled mortgage applications represent approximately $212M in potential loan volume. At USSFCU's average mortgage margin, that's roughly $3.2M in revenue at risk. Additionally, 61% of these members hold other USSFCU products — if they churn, the total relationship value at risk climbs to $8.7M over the next 24 months.",
+    "suggested_chips": ["Yes, show me who's affected", "Help me act on this"],
+    "data_sources_used": ["Salesforce Data Cloud", "USSFCU Member CRM"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["mortgage_funnel", "members"]
+  },
+  "recommendation": {
+    "ai_response": "Based on the data across all three signals, here's what I'd recommend prioritizing:\n\n[1] Immediate: Fix the UiPath document upload exception — this is a process failure affecting 847 members right now. I can create a JIRA ticket for Data Engineering.\n[2] This week: Launch targeted outreach to the 214 military retirees in the CD complaint cluster. They're your highest-value segment and NPS is dropping fast.\n[3] This month: Conduct an auto loan rate competitiveness review. The 3x abandonment increase is rate-driven and will accelerate without intervention.\n\nWant me to start executing on these?",
+    "suggested_chips": ["Help me act on this", "Yes, show me who's affected"],
+    "data_sources_used": ["Salesforce Einstein", "Salesforce Data Cloud"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals", "segments"]
+  },
+  "model_retention_impact": {
+    "ai_response": "I've modeled the retention impact using Einstein's churn prediction data:\n\nIf you do nothing:\n— Military retirees: projected 18% churn within 90 days (38 members, $5.6M in deposits at risk)\n— Mortgage step-4 stalled: projected 31% churn within 60 days (263 members, $65.7M in loan pipeline)\n— Low engagement: projected 12% churn within 120 days (149 members)\n\nWith targeted outreach:\n— Military retirees: churn reduced to 6% (saving ~$4.7M in deposits)\n— Mortgage step-4: churn reduced to 14% (recovering ~$44M in pipeline)\n— ROI on outreach campaign: estimated 12:1\n\nWant me to set up the outreach actions?",
+    "suggested_chips": ["Help me act on this", "Scan for anomalies across systems"],
+    "data_sources_used": ["Salesforce Einstein", "Salesforce Data Cloud"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["segments", "members"]
+  },
+  "create_segment_confirm": {
+    "ai_response": "Done. I've created a new segment in Salesforce AgentForce:\n\nSegment name: \"Mortgage Step-4 Stalled — Mobile\"\nSize: 847 members\nCriteria: First-time mortgage applicants, ages 28–42, mobile channel, 3+ failed upload attempts\nChurn risk: Moderate to High (avg 64%)\n\nThe segment is now available in AgentForce for your retention team. Want me to draft a member outreach message for this group?",
+    "suggested_chips": ["Draft member outreach message", "Help me act on this"],
+    "data_sources_used": ["Salesforce AgentForce"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["segments"]
+  },
+  "member_sentiment": {
+    "ai_response": "Here's the sentiment picture across your member base right now:\n\nOverall NPS has declined from 52 to 44 over the past 6 months. The two sharpest drops are:\n\n[1] Military retirees: NPS fell 13 points (52 → 39). Top detractor theme: CD rate transparency and feeling undervalued.\n[2] First-time mortgage applicants: NPS fell 13 points (44 → 31). Top detractor theme: document upload failures and lack of status updates.\n\nYour strongest segments — Active Multi-Product (NPS 58) and Digital-First (NPS 61) — are holding steady, but the declining segments represent your highest lifetime value.",
+    "suggested_chips": ["Which members are most at risk of leaving?", "Help me act on this"],
+    "data_sources_used": ["Voice of Member / NPS", "Genesys Cloud"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["nps_data", "segments"]
+  },
+  "nps_impact": {
+    "ai_response": "The CD complaint cluster is having a significant NPS impact. Military retiree NPS has dropped 13 points in just 6 weeks — from 52 to 39. This is your highest-tenure segment (avg 19.4 years) with an average CD balance of $147,500.\n\nThe top detractor themes from Genesys transcripts are:\n— CD rate transparency at maturity\n— Rate communication timing\n— Feeling undervalued as long-term members\n\nIf this trend continues, you could see NPS drop below 30 within 4 weeks for this segment.",
+    "suggested_chips": ["I'm ready to act", "Which members are most at risk of leaving?"],
+    "data_sources_used": ["Voice of Member / NPS", "Genesys Cloud"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["nps_data", "signals"]
+  },
+  "genesys_themes": {
+    "ai_response": "Here are the top themes from Genesys transcript analysis for the CD complaint cluster over the last 5 days:\n\n[1] \"Rate change notification\" — 89 interactions (42%). Members say they weren't told rates were changing at maturity.\n[2] \"Competitive rate comparison\" — 64 interactions (30%). Members mention Navy Federal or USAA CD rates.\n[3] \"Long-term loyalty not recognized\" — 47 interactions (22%). Members with 15+ years feel their tenure isn't valued.\n[4] \"Rollover process confusion\" — 14 interactions (7%). Members unclear on automatic rollover terms.\n\n68% of these callers have been members for more than 10 years.",
+    "suggested_chips": ["How does this affect NPS?", "I'm ready to act"],
+    "data_sources_used": ["Genesys Cloud"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["contact_center"]
+  },
+  "escalate_flagged_accounts": {
+    "ai_response": "Done. I've escalated the 4 structuring-pattern accounts and 2 cross-border wire anomalies to your BSA/AML compliance team:\n\n— SAR filing confirmed for the 4 structuring accounts (already filed automatically)\n— Investigation ticket created for the 2 wire anomalies — assigned to Compliance Operations\n— Full audit trail attached to each case with transaction timestamps, amounts, and pattern analysis\n— Slack notification sent to #compliance-alerts with case summaries\n\nAll actions are logged in the audit trail for NCUA exam readiness. Your compliance team will receive the full case packages within 5 minutes.",
+    "suggested_chips": ["Show the full audit trail", "How does our NCUA posture compare to last quarter?"],
+    "data_sources_used": ["Fraud & Risk Signal Feed", "Salesforce AgentForce"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["risk_signals"]
+  },
+  "anomaly_audit_trail": {
+    "ai_response": "Here's the full audit trail for all flagged anomalies in the last 48 hours:\n\n[SAR-2847] Structuring Pattern — 4 accounts\n— Detected: March 29, 2:14 AM by Transaction Monitor agent\n— Pattern: 7 deposits across 4 accounts, all between $9,200–$9,800 within 6 hours\n— Auto-escalated: March 29, 2:15 AM (SAR filed within 60 seconds of detection)\n— Compliance review: Complete\n\n[INV-1203] Cross-Border Wire Anomalies — 2 accounts\n— Detected: March 29, 8:42 AM by Transaction Monitor agent\n— Pattern: Out-of-pattern international transfers totaling $24,500 from dormant accounts\n— Correlated: March 29, 8:43 AM by Pattern Correlator (linked to dormant account reactivation)\n— Status: Under investigation, ticket assigned\n\n[EXC-0847] UiPath Mortgage Upload Failure — 847 members\n— Detected: March 27, 11:00 PM by Exception Monitor agent\n— Pattern: Document upload automation exception at income verification step\n— JIRA ticket: PF-2847 created, assigned to Data Engineering\n\nAll entries include full explainability reasoning and source attribution for regulatory audit.",
+    "suggested_chips": ["How does our NCUA posture compare to last quarter?"],
+    "data_sources_used": ["Fraud & Risk Signal Feed", "UiPath", "Salesforce Data Cloud"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["risk_signals"]
+  },
+  "risk_anomaly_explanation": {
+    "ai_response": "The transaction anomaly cluster is driven by three primary patterns:\n\n[1] Structuring behavior — 4 accounts showing deposits just below the $10,000 reporting threshold. Risk score: 94. Already escalated with SAR filed.\n[2] Cross-border wire anomalies — 2 accounts with out-of-pattern international transfers totaling $24,500. Risk score: 91. Under investigation.\n[3] Dormant account reactivation — 2 accounts inactive for 12+ months suddenly processing large withdrawals. Risk score: 78.\n\nUiPath's automated monitoring flagged these within 4 hours of the transactions. Einstein's fraud model confirms all three patterns correlate with known BSA/AML typologies.",
+    "suggested_chips": ["How does our NCUA posture compare to last quarter?", "Generate a board-level risk summary"],
+    "data_sources_used": ["Salesforce Einstein", "UiPath", "Fraud & Risk Signal Feed"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["risk_signals"]
+  },
+  "ncua_comparison": {
+    "ai_response": "Your NCUA readiness score is currently 78/100 — down from 84 last quarter. Here's the breakdown:\n\n[Improving] Capital Adequacy: 91 (up from 88)\n[Stable] BSA/AML Compliance: 82\n[Stable] Cybersecurity Posture: 87\n[Stable] Fair Lending: 76\n[Declining] Consumer Complaint Resolution: 64 (down from 72) — this is being dragged down by the CD complaint cluster\n[Declining] Operational Risk: 71 (down from 78) — driven by the UiPath automation exception\n\nThe next NCUA exam window is June 2026. You have 4 open findings and 11 closed. The complaint resolution decline is the most likely area of examiner focus.",
+    "suggested_chips": ["Generate a board-level risk summary"],
+    "data_sources_used": ["Fraud & Risk Signal Feed", "Genesys Cloud"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["risk_signals"]
+  },
+  "board_risk_summary": {
+    "ai_response": "I'll generate a board-level risk summary covering:\n\n— Credit risk posture (stable, delinquency below industry average)\n— Transaction anomaly clusters (14 active, 3 escalated with SARs)\n— BSA/AML compliance status (3 active investigations)\n— Regulatory readiness trajectory (78/100, declining in 2 areas)\n— 90-day complaint trend (42 → 82, driven by CD rate transparency)\n— Recommended board-level actions\n\nWhat format would you like?",
+    "suggested_chips": ["PowerPoint slide", "One-page PDF", "Email draft for my team"],
+    "data_sources_used": ["All connected sources"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["risk_signals"]
+  },
+  "show_something_else": {
+    "ai_response": "Of course. Here's what else I can help with this morning:\n\n[1] Your overall NPS trend — it's been declining for 6 months, from 52 to 44.\n[2] Member engagement metrics — 1,243 members haven't logged in digitally in 90+ days.\n[3] Contact center volume — call volume is up 18% this week, driven by CD rate inquiries.\n\nWhat would you like to explore?",
+    "suggested_chips": ["Show me the member sentiment", "Which members are most at risk of leaving?", "Help me act on this"],
+    "data_sources_used": ["Salesforce Data Cloud", "Genesys Cloud", "Voice of Member / NPS"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["nps_data", "segments", "contact_center"]
+  },
+  "show_journey_from_home": {
+    "ai_response": "Here's the full member journey map. I've identified friction hotspots across 5 of the 6 phases:\n\n[Phase 2] Product Consideration — auto loan rate comparison drop-off is 3x higher than 4 weeks ago.\n[Phase 3] Application & Enrollment — 62% of mobile mortgage applicants stall at income verification. This is the most critical friction point.\n[Phase 4] Onboarding — 34% of new members don't complete account activation within 7 days.\n[Phase 5] Engagement — single-product members show 2x churn risk.\n[Phase 6] Loyalty — military retiree NPS has declined 13 points.\n\nI'd recommend starting with Phase 3 — the mortgage drop-off is affecting 847 members this week. Want me to dig into that?",
+    "suggested_chips": ["What's driving the mortgage drop-off?", "Which members are most at risk of leaving?", "Help me act on this"],
+    "data_sources_used": ["Salesforce Data Cloud", "UiPath", "Genesys Cloud", "Web & Mobile Behavioral Analytics"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals", "segments"]
+  },
+  "draft_outreach": {
+    "ai_response": "Here's a draft outreach message for the 847 affected mortgage applicants:\n\nSubject: We noticed an issue with your mortgage application — let us help\n\nHi [First Name],\n\nWe noticed you recently experienced difficulty uploading documents during your mortgage application with USSFCU. We sincerely apologize for the inconvenience — this was caused by a technical issue on our end that has been resolved.\n\nYour application is still active, and we'd love to help you complete it. You can:\n— Resume your application online at ussfcu.org/mortgage\n— Call us at 1-800-247-5626 for guided assistance\n— Schedule a callback at a time that works for you\n\nAs a thank you for your patience, we're offering a 0.125% rate reduction on your mortgage when you complete your application this month.\n\nWarm regards,\nThe USSFCU Mortgage Team\n\nWant me to send this to your marketing team for review, or adjust the message?",
+    "suggested_chips": ["Send to marketing team", "Help me act on this"],
+    "data_sources_used": ["Salesforce AgentForce", "USSFCU Member CRM"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["segments", "members"]
+  },
+  "genesys_themes_segment": {
+    "ai_response": "Here are the Genesys transcript themes specifically for the military retiree segment with churn risk above 70%:\n\n[1] \"CD rate not competitive\" — 78 interactions (36%). Members comparing USSFCU CD rates unfavorably against Navy Federal and USAA.\n[2] \"No loyalty recognition\" — 62 interactions (29%). Members with 15+ years feel their tenure doesn't earn better rates.\n[3] \"Poor maturity communication\" — 44 interactions (21%). Members say they weren't notified before CD auto-renewed at a lower rate.\n[4] \"Want to speak with manager\" — 30 interactions (14%). Escalation requests are 3x higher than other segments.\n\nSentiment score for this segment: 2.1 out of 5 (very negative). The key driver is the perception that long-term loyalty is not being rewarded. Want me to model the retention impact of targeted outreach?",
+    "suggested_chips": ["Yes, model the impact", "Help me act on this"],
+    "data_sources_used": ["Genesys Cloud", "Salesforce Einstein"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["contact_center", "segments"]
+  },
+  "slack_notify_confirm": {
+    "ai_response": "Done. I've posted a notification in #data-engineering-alerts with the following:\n\n\"🔴 P1 JIRA ticket PF-2847 created: Mortgage Step 4 UiPath Exception. 847 members affected. Document upload automation workflow failing since March 15. Assigned to Data Engineering. See ticket for full root cause analysis.\"\n\nThe team has been notified. What else would you like to do?",
+    "suggested_chips": ["Scan for anomalies across systems", "Help me act on this"],
+    "data_sources_used": ["Salesforce AgentForce"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+  "active_members_overview": {
+    "ai_response": "USSFCU currently has 2,304 active members — up 12% year-over-year. Here's the full picture:\n\n[Membership Breakdown]\n— In good standing: 1,457 members (63%) — no risk signals\n— Recently acquired (last 90 days): 312 members (14%) — onboarding phase\n— Flagged at-risk: 535 members (23%) — churn signals detected\n\n[At-Risk Segments Requiring Attention]\n[1] Mortgage Step-4 Stalled — 847 applicants (not yet members) affected by a document upload failure in the application pipeline\n[2] Military Retirees — CD Dissatisfied — 214 active members (churn risk 71%), carrying $31.6M in CD balances\n[3] No Digital Login 90+ Days — 1,243 active members (churn risk 58%) showing disengagement signals\n\nThe +12% growth is strong, but the at-risk cohorts represent $212M in pipeline and $31.6M in existing balances. Would you like to see who's most at risk?",
+    "suggested_chips": ["Which members are most at risk of leaving?", "What's driving the mortgage drop-off?", "Help me act on this"],
+    "data_sources_used": ["Salesforce Einstein", "Salesforce Data Cloud", "USSFCU Member CRM"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["segments", "members"]
+  },
+  "alerts_overview": {
+    "ai_response": "There are 3 active signals across your environment right now. Let me summarize each:\n\n[Signal 1 — Critical] Mortgage application completions dropped 41% at step 4. A UiPath document upload exception is affecting 847 members. Started 72 hours ago.\n\n[Signal 2 — Warning] Einstein's predictive model flagged a 3x increase in auto loan inquiry abandonment. Rate perception is the driver — 68% of abandonment-adjacent calls mention 'rate.'\n\n[Signal 3 — Critical] A complaint cluster is forming around CD rate transparency. 214 Genesys interactions in 5 days, skewing toward military retirees — your highest-value segment.\n\nSignals 1 and 3 are critical priority. Want me to walk through them in detail?",
+    "suggested_chips": ["Yes, walk me through them", "What's driving the mortgage drop-off?", "Tell me about the CD complaint cluster"],
+    "data_sources_used": ["Salesforce Data Cloud", "Genesys Cloud", "UiPath", "Salesforce Einstein"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+  "processes_overview": {
+    "ai_response": "Your UiPath automation environment is monitoring 456,000+ process executions across USSFCU's operations. Here's the current status:\n\n[Mortgage Workflows] 312 exceptions since Tuesday — all at the document upload step (income verification). This is the primary issue driving Signal 1. Overall uptime: 96.2% (below 99.2% target).\n\n[Loan Processing] 142,000 executions this week. Running clean — 99.8% success rate.\n\n[Account Servicing] 98,000 executions. 12 minor exceptions in address change workflows — auto-recovered.\n\n[Fraud Monitoring] 24/7 transaction scanning active. Detected 4 structuring-pattern accounts and 2 cross-border wire anomalies in the last 48 hours.\n\nThe mortgage workflow exception is the only critical issue. I've already flagged it as part of your morning signals. Want me to scan for deeper anomalies across all systems?",
+    "suggested_chips": ["Scan for anomalies across systems", "What's driving the mortgage drop-off?", "Help me act on this"],
+    "data_sources_used": ["UiPath", "Fraud & Risk Signal Feed"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals", "risk_signals"]
+  },
+  "member_friction_brief": {
+    "ai_response": "Done. I've generated a one-page member friction brief for your leadership team. Here's a summary of what's included:\n\n— Executive Summary: 3 active friction signals affecting 2,304 members with $220M+ at risk\n— Signal 1: Mortgage step-4 drop-off (847 members, process failure, P1 JIRA created)\n— Signal 2: Auto loan abandonment spike (3x increase, rate-driven)\n— Signal 3: CD complaint cluster (214 military retirees, NPS -13 points)\n— Recommended Actions: UiPath fix (immediate), military retiree outreach (this week), rate review (this month)\n— Data Sources: UiPath, Salesforce Data Cloud, Genesys Cloud, Einstein, Voice of Member\n\nThe brief has been saved to your Salesforce workspace and is ready to share. Want me to email it to your team?",
+    "suggested_chips": ["Send to marketing team", "Help me act on this"],
+    "data_sources_used": ["Salesforce AgentForce", "All connected sources"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals", "segments"]
+  },
+  "report_powerpoint": {
+    "ai_response": "Done. I've generated a board-level risk summary as a PowerPoint presentation with 6 slides:\n\n[Slide 1] Executive Risk Dashboard — overall posture score 78/100 with trend arrows\n[Slide 2] Credit Risk — delinquency trends, portfolio exposure by product\n[Slide 3] Operational Risk — UiPath exception summary, process uptime metrics\n[Slide 4] Compliance & BSA/AML — SAR filings, active investigations, NCUA readiness\n[Slide 5] Member Experience Risk — NPS trends, complaint clusters, churn projections\n[Slide 6] Recommended Board Actions — prioritized remediation roadmap\n\nThe presentation has been saved to your Salesforce workspace. Want me to do anything else?",
+    "suggested_chips": ["Help me act on this", "Scan for anomalies across systems"],
+    "data_sources_used": ["All connected sources"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["risk_signals"]
+  },
+  "report_pdf": {
+    "ai_response": "Done. I've generated a one-page PDF board risk summary covering:\n\n— NCUA Readiness: 78/100 (down from 84, declining in complaint resolution and operational risk)\n— Active Anomalies: 14 clusters detected, 3 escalated with SARs filed\n— BSA/AML: 3 active investigations, all within resolution timeline\n— Member Impact: 2,304 at-risk members across 3 segments, $220M+ exposure\n— Key Metric: Military retiree NPS dropped 13 points in 6 weeks\n— Next Steps: 4 open findings to address before June 2026 NCUA exam window\n\nThe PDF has been saved to your Salesforce workspace and is ready for distribution. Want me to do anything else?",
+    "suggested_chips": ["Help me act on this", "Scan for anomalies across systems"],
+    "data_sources_used": ["All connected sources"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["risk_signals"]
+  },
+  "report_email": {
+    "ai_response": "Done. I've drafted a board risk summary email for your team:\n\nSubject: Weekly Risk Summary — March 29, 2026\n\nTeam,\n\nAttached is this week's risk posture summary. Key highlights:\n\n• NCUA readiness at 78/100 — two categories declining (complaint resolution, operational risk)\n• 3 critical signals active: mortgage drop-off (847 members), auto loan abandonment (3x increase), CD complaint cluster (214 military retirees)\n• BSA/AML: 3 active investigations on track, 2 SARs filed this week\n• Recommended immediate action: UiPath mortgage workflow fix (JIRA PF-2847 created)\n\nPlease review before our Thursday governance call.\n\nBest,\n[Your Name]\n\nThe draft is ready in Salesforce. Want me to send it now or adjust the message?",
+    "suggested_chips": ["Send to marketing team", "Help me act on this"],
+    "data_sources_used": ["Salesforce AgentForce", "All connected sources"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["risk_signals"]
+  },
+  "send_to_marketing": {
+    "ai_response": "Done. I've sent the outreach draft to your marketing team via Salesforce AgentForce with the subject \"Review: Mortgage Step-4 Affected Member Outreach.\" The message includes the draft copy, the segment criteria (847 members, ages 28–42, mobile channel), and the 0.125% rate reduction offer for approval.\n\nYour marketing team will receive it within the next 5 minutes. Want me to do anything else?",
+    "suggested_chips": ["Scan for anomalies across systems", "Help me act on this"],
+    "data_sources_used": ["Salesforce AgentForce"],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["segments"]
+  },
+  "__default__": {
+    "ai_message": "I don't have an answer to that in the data I can see.\n\nI can walk you through today's signals, explain the mortgage drop-off, show which members are most at risk of leaving, or scan for anomalies across systems.",
+    "suggested_chips": [
+      "Yes, walk me through them",
+      "What's driving the mortgage drop-off?",
+      "Which members are most at risk of leaving?"
+    ],
+    "capability": "Converged Conversation"
+  }
+}

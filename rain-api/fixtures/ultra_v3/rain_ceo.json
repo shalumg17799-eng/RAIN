@@ -1,0 +1,1704 @@
+{
+ "context": {
+  "client": {
+   "id": "rain",
+   "marketId": "sled",
+   "name": "RAIN",
+   "shortName": "RAIN",
+   "logo": "/logos/rain-logo.svg",
+   "primaryColor": "#003366",
+   "navLabels": {
+    "ask": "Ask AI"
+   }
+  },
+  "persona": {
+   "id": "rain_ceo",
+   "name": "Gregory Haskins, MBA",
+   "initials": "GH",
+   "role": "Chief Executive Officer",
+   "layout": "inline",
+   "capabilities": [
+    "Proactive Intelligence",
+    "Converged Conversation",
+    "Anomaly Detection",
+    "Predictive Intelligence",
+    "Friction Observability",
+    "Automated Action"
+   ],
+   "navSlots": [
+    "ask",
+    "valueInsights",
+    "qualityGate",
+    "lowValueCare",
+    "dataSources"
+   ]
+  },
+  "personas": [
+   {
+    "id": "rain_ceo",
+    "name": "Gregory Haskins, MBA",
+    "role": "Chief Executive Officer"
+   },
+   {
+    "id": "rain_cmo",
+    "name": "Dr. Naomi Castellanos",
+    "role": "Chief Medical Officer and Value-Based Care Quality Lead"
+   },
+   {
+    "id": "rain_cio",
+    "name": "Raj Malhotra",
+    "role": "Chief Information Officer and Data and AI Governance Lead"
+   },
+   {
+    "id": "rain_state",
+    "name": "Dr. Lauren Pike",
+    "role": "Program Lead, Rural Health Outcomes Accelerator"
+   },
+   {
+    "id": "rain_chw",
+    "name": "Teresa Lopez, CHW",
+    "role": "Community Health Worker and Care Coordinator"
+   },
+   {
+    "id": "rain_access",
+    "name": "Brandon Kee",
+    "role": "Patient Access Coordinator"
+   }
+  ],
+  "dataSources": [
+   {
+    "id": "rain-places",
+    "name": "CDC PLACES (2025 release)",
+    "provides": "County and ZCTA prevalence of hypertension, diabetes, screenings and social needs",
+    "usedFor": "Value Insights county view; state view",
+    "description": "County and ZCTA prevalence of hypertension, diabetes, screenings and social needs",
+    "freshness": "2025 release",
+    "recordCount": 1240,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-svi",
+    "name": "CDC/ATSDR Social Vulnerability Index (2022)",
+    "provides": "County and tract vulnerability",
+    "usedFor": "County map layer",
+    "description": "County and tract vulnerability",
+    "freshness": "2022 edition",
+    "recordCount": 704,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-hpsa",
+    "name": "HRSA Health Professional Shortage Areas",
+    "provides": "Primary care and mental health shortage areas",
+    "usedFor": "County map; model access feature",
+    "description": "Primary care and mental health shortage areas",
+    "freshness": "Monthly",
+    "recordCount": 312,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-chr",
+    "name": "County Health Rankings (archived 2025 + March 2026)",
+    "provides": "Static county benchmarks",
+    "usedFor": "Benchmark only (source at risk after Dec 2026)",
+    "description": "Static county benchmarks",
+    "freshness": "March 2026",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-rucc",
+    "name": "USDA Rural-Urban Continuum Codes (2023)",
+    "provides": "County rural classification",
+    "usedFor": "Filters and frontier definition",
+    "description": "County rural classification",
+    "freshness": "2023 edition",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-forhp",
+    "name": "HRSA FORHP rural areas",
+    "provides": "Rural eligibility by county, tract and ZIP",
+    "usedFor": "Frontier ZIP subgroup check",
+    "description": "Rural eligibility by county, tract and ZIP",
+    "freshness": "Annual",
+    "recordCount": 2310,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-zcta",
+    "name": "Census ZCTA relationship and gazetteer files",
+    "provides": "ZIP to county mapping",
+    "usedFor": "Patient ZIP to county",
+    "description": "ZIP to county mapping",
+    "freshness": "2020 vintage",
+    "recordCount": 182,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-boundaries",
+    "name": "Census cartographic boundary files (2024)",
+    "provides": "Map geometry",
+    "usedFor": "All maps",
+    "description": "Map geometry",
+    "freshness": "2024 vintage",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-acs",
+    "name": "Census ACS 5-year (2020 to 2024)",
+    "provides": "Population, language, internet and vehicle access",
+    "usedFor": "Denominators; language preference fallback",
+    "description": "Population, language, internet and vehicle access",
+    "freshness": "2020 to 2024",
+    "recordCount": 3120,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-fcc",
+    "name": "FCC National Broadband Map",
+    "provides": "Broadband availability by location",
+    "usedFor": "Telehealth eligibility; frontier signal",
+    "description": "Broadband availability by location",
+    "freshness": "June 2026 filing",
+    "recordCount": 41800,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-hrsaSites",
+    "name": "HRSA health center sites",
+    "provides": "FQHC site locations",
+    "usedFor": "Slot search and drive time",
+    "description": "FQHC site locations",
+    "freshness": "Weekly",
+    "recordCount": 96,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-cmsHospital",
+    "name": "CMS Hospital General Information and quality",
+    "provides": "Hospital locations, readmissions, unplanned visits",
+    "usedFor": "ED and readmission context",
+    "description": "Hospital locations, readmissions, unplanned visits",
+    "freshness": "Quarterly",
+    "recordCount": 58,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-cmsPos",
+    "name": "CMS Provider of Services file",
+    "provides": "Rural health clinic and critical access hospital locations",
+    "usedFor": "Facility layer",
+    "description": "Rural health clinic and critical access hospital locations",
+    "freshness": "Quarterly",
+    "recordCount": 141,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-nppes",
+    "name": "NPPES NPI Registry",
+    "provides": "Provider directory",
+    "usedFor": "Ordering provider for low-value care",
+    "description": "Provider directory",
+    "freshness": "Weekly",
+    "recordCount": 9870,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-uds",
+    "name": "HRSA Uniform Data System (UDS)",
+    "provides": "Health center quality benchmarks",
+    "usedFor": "Quality targets context",
+    "description": "Health center quality benchmarks",
+    "freshness": "2025 reporting year",
+    "recordCount": 1370,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-geovar",
+    "name": "CMS Medicare Geographic Variation",
+    "provides": "County utilization benchmarks",
+    "usedFor": "Avoidable ED benchmark",
+    "description": "County utilization benchmarks",
+    "freshness": "2024 data year",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-ecqm",
+    "name": "CMS eCQMs (CMS165, CMS122, CMS125, CMS130, CMS2)",
+    "provides": "Measure logic",
+    "usedFor": "Quality gate engine",
+    "description": "Measure logic",
+    "freshness": "2026 specifications",
+    "recordCount": 5,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-synthea",
+    "name": "Synthea (MITRE)",
+    "provides": "Synthetic patients for Nevada counties",
+    "usedFor": "All patient-level records",
+    "description": "Synthetic patients for Nevada counties",
+    "freshness": "Generated for this demo",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-osm",
+    "name": "OpenStreetMap road network (via Geofabrik)",
+    "provides": "Drive time from ZIP centroid to site",
+    "usedFor": "Travel time; scheduling sort",
+    "description": "Drive time from ZIP centroid to site",
+    "freshness": "Weekly",
+    "recordCount": 182,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-mco",
+    "name": "Synthetic MCO eligibility and attribution",
+    "provides": "9,400 attributed members",
+    "usedFor": "Contract population",
+    "description": "9,400 attributed members",
+    "freshness": "Q3 file",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-claims",
+    "name": "Synthetic claims (Synthea output, adjusted to Nevada Medicaid patterns)",
+    "provides": "Cost, utilization, ED and low-value services",
+    "usedFor": "Cost model, low-value care, segmentation",
+    "description": "Cost, utilization, ED and low-value services",
+    "freshness": "Through Q3 (45-day lag)",
+    "recordCount": 412600,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-ehr",
+    "name": "Synthetic EHR (FHIR R4 US Core)",
+    "provides": "Conditions, vitals, labs and orders",
+    "usedFor": "Quality engine, coding recapture",
+    "description": "Conditions, vitals, labs and orders",
+    "freshness": "Today",
+    "recordCount": 1284000,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-rpm",
+    "name": "Synthetic remote BP readings",
+    "provides": "Home cuff readings (systolic and diastolic)",
+    "usedFor": "CMS165 closure",
+    "description": "Home cuff readings (systolic and diastolic)",
+    "freshness": "Today",
+    "recordCount": 18300,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-ops",
+    "name": "Synthetic schedules, eligibility responses and SMS logs",
+    "provides": "Slots, eligibility responses (270/271) and reminder replies",
+    "usedFor": "Care management screens",
+    "description": "Slots, eligibility responses (270/271) and reminder replies",
+    "freshness": "Today",
+    "recordCount": 26900,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-benchmark",
+    "name": "Contract benchmark",
+    "provides": "Expected PMPM, quality gate, sharing rate",
+    "usedFor": "Cost versus expected and the quality gate",
+    "description": "Expected PMPM, quality gate, sharing rate",
+    "freshness": "Contract year 2026",
+    "recordCount": 1,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-library",
+    "name": "Low-value care measure library",
+    "provides": "14 Choosing Wisely and USPSTF-based measures",
+    "usedFor": "Low-value care findings",
+    "description": "14 Choosing Wisely and USPSTF-based measures",
+    "freshness": "Version 2026.3",
+    "recordCount": 14,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-adt",
+    "name": "HIE ADT feed (synthetic)",
+    "provides": "Admit, discharge and transfer events",
+    "usedFor": "Near real time ED signal",
+    "description": "Admit, discharge and transfer events",
+    "freshness": "Under 1 hour",
+    "recordCount": 3420,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-costModel",
+    "name": "RAIN cost model",
+    "provides": "Cost versus expected, gap decomposition",
+    "usedFor": "Value Insights",
+    "description": "Cost versus expected, gap decomposition",
+    "freshness": "Nightly",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-impactability",
+    "name": "RAIN impactability score",
+    "provides": "Ranked rising-risk members",
+    "usedFor": "Outreach worklists",
+    "description": "Ranked rising-risk members",
+    "freshness": "Nightly",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-ecqmEngine",
+    "name": "eCQM engine",
+    "provides": "Measure results on synthetic EHR",
+    "usedFor": "Quality gate tracker",
+    "description": "Measure results on synthetic EHR",
+    "freshness": "Nightly",
+    "recordCount": 5,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   }
+  ]
+ },
+ "briefing": {
+  "greeting": {
+   "id": "ceo_brief",
+   "text": "Good morning, Gregory. Your Q3 reconciliation from High Desert Health Plan is in, and I have flagged three signals.",
+   "citations": [
+    "Claims",
+    "MCO Eligibility",
+    "Contract Benchmark",
+    "eCQM Engine",
+    "Low-Value Care Library"
+   ],
+   "components": [
+    {
+     "type": "rain.pmpm_trend",
+     "version": 1,
+     "props": {
+      "points": [
+       "$412 vs $386 PMPM: 6.7% above expected.",
+       "Quality gate at 2 of the 3 measures needed, 58 days left.",
+       "$618K a year in low-value care. Most of the gap is explainable, and part is recoverable this year."
+      ]
+     }
+    }
+   ],
+   "chips": [
+    "Break down the gap",
+    "Show me the quality gate",
+    "Where is the low-value care?"
+   ],
+   "capability": "Proactive Intelligence",
+   "confidence": 92
+  },
+  "signals": [
+   {
+    "id": "SIG-CEO-1",
+    "title": "Cost Running Above Expected",
+    "description": "$412 vs $386 PMPM across 9,400 members: 6.7% above expected, about $2.9M a year.",
+    "status": "critical",
+    "metricText": "+6.7% · about $2.9M a year",
+    "sources": [
+     "Claims",
+     "Contract Benchmark"
+    ],
+    "primary": true
+   },
+   {
+    "id": "SIG-CEO-2",
+    "title": "Quality Gate at Risk",
+    "description": "Meets 2 of the 3 measures needed. BP control is 7 points short, 58 days left.",
+    "status": "critical",
+    "metricText": "2 of 5 met · needs 3",
+    "sources": [
+     "eCQM Engine",
+     "EHR (FHIR)"
+    ]
+   },
+   {
+    "id": "SIG-CEO-3",
+    "title": "Low-Value Care Spend",
+    "description": "2,140 services across 14 measures. Low back pain imaging is the largest item.",
+    "status": "warning",
+    "metricText": "$618K a year",
+    "sources": [
+     "Claims",
+     "Low-Value Care Library"
+    ]
+   }
+  ],
+  "kpis": [
+   {
+    "id": "members",
+    "label": "Attributed Members",
+    "value": "9,400",
+    "trendText": "MCO eligibility",
+    "icon": "users"
+   },
+   {
+    "id": "pmpm",
+    "label": "Actual vs. Expected PMPM",
+    "value": "$412 / $386",
+    "trendText": "Claims + contract benchmark",
+    "icon": "dollar-sign"
+   },
+   {
+    "id": "above",
+    "label": "Above Expected",
+    "value": "+6.7%",
+    "trendText": "RAIN cost model",
+    "icon": "trending-up"
+   },
+   {
+    "id": "gate",
+    "label": "Quality Measures Met",
+    "value": "2 of 5",
+    "trendText": "eCQM engine",
+    "icon": "target",
+    "chip": "Show me the quality gate"
+   },
+   {
+    "id": "lowValue",
+    "label": "Low-Value Care (annualized)",
+    "value": "$618K",
+    "trendText": "Low-value care library",
+    "icon": "alert-triangle",
+    "chip": "Where is the low-value care?"
+   },
+   {
+    "id": "ed",
+    "label": "Avoidable ED per 1,000",
+    "value": "312",
+    "trendText": "Benchmark 251 · Claims + CMS Geographic Variation",
+    "icon": "activity"
+   },
+   {
+    "id": "days",
+    "label": "Days Left in Contract Year",
+    "value": "58",
+    "trendText": "Contract calendar",
+    "icon": "clock"
+   }
+  ],
+  "chips": [
+   "Break down the gap",
+   "Show me the quality gate",
+   "Where is the low-value care?",
+   "Why are we above expected cost?",
+   "Which members drive the most spend?",
+   "How close are we to the quality gate?",
+   "What happens if we do nothing?",
+   "Compare our sites on cost per member",
+   "Generate the board brief"
+  ]
+ },
+ "turns": {
+  "ceo_brief": {
+   "id": "ceo_brief",
+   "text": "Good morning, Gregory. Your Q3 reconciliation from High Desert Health Plan is in, and I have flagged three signals.",
+   "citations": [
+    "Claims",
+    "MCO Eligibility",
+    "Contract Benchmark",
+    "eCQM Engine",
+    "Low-Value Care Library"
+   ],
+   "components": [
+    {
+     "type": "rain.pmpm_trend",
+     "version": 1,
+     "props": {
+      "points": [
+       "$412 vs $386 PMPM: 6.7% above expected.",
+       "Quality gate at 2 of the 3 measures needed, 58 days left.",
+       "$618K a year in low-value care. Most of the gap is explainable, and part is recoverable this year."
+      ]
+     }
+    }
+   ],
+   "chips": [
+    "Break down the gap",
+    "Show me the quality gate",
+    "Where is the low-value care?"
+   ],
+   "capability": "Proactive Intelligence",
+   "confidence": 92
+  },
+  "ceo_gap": {
+   "id": "ceo_gap",
+   "text": "The $26 PMPM gap has four parts, and roughly half of it is a documentation fix.",
+   "citations": [
+    "Claims",
+    "EHR (FHIR)",
+    "MCO Eligibility",
+    "Contract Benchmark",
+    "CMS Medicare Geographic Variation"
+   ],
+   "components": [
+    {
+     "type": "rain.waterfall",
+     "version": 1,
+     "props": {
+      "points": [
+       "$12 coding gap, not spending: 73 high-need members not recaptured, so expected cost is about 3.1% low.",
+       "$8 excess avoidable ED: 312 vs 251 per 1,000, mostly uncontrolled hypertension and diabetes with no primary care visit in six months.",
+       "$5.50 low-value care and $0.50 noise.",
+       "Most of the ED and low-value care traces to about 1,180 rising-risk members who can still change."
+      ]
+     }
+    },
+    {
+     "type": "rain.segment_pyramid",
+     "version": 1,
+     "props": {}
+    }
+   ],
+   "chips": [
+    "What can we still recover by December 31?",
+    "Who are the 1,180?",
+    "Open in Value Insights"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "ceo_recover": {
+   "id": "ceo_recover",
+   "text": "Three moves, in order of speed.",
+   "citations": [
+    "RAIN Cost Model",
+    "eCQM Engine",
+    "Impactability Score",
+    "Travel Time (OpenStreetMap)",
+    "Contract Benchmark"
+   ],
+   "components": [
+    {
+     "type": "rain.scenario_panel",
+     "version": 1,
+     "props": {
+      "points": [
+       "1. Recapture coding for the 73: the benchmark moves to about $398, halving the gap on paper.",
+       "2. Get about 180 more BP readings controlled. Home cuffs count for CMS165, so telehealth works for the 268 who drive over an hour. That reaches 3 of 5.",
+       "3. Start outreach to the top 300 now: about $1.1M avoided over 12 months, mostly in 2027."
+      ]
+     }
+    }
+   ],
+   "chips": [
+    "Generate the board brief",
+    "Assign outreach for the top 300",
+    "Send the coding list to Dr. Castellanos"
+   ],
+   "capability": "Predictive Intelligence",
+   "confidence": 92
+  },
+  "ceo_board": {
+   "id": "ceo_board",
+   "text": "Here is a one-page board brief: the checkpoint, the four-part gap, three moves with owners, and the 2027 position.",
+   "citations": [
+    "All executive data sources"
+   ],
+   "components": [
+    {
+     "type": "rain.brief_preview",
+     "version": 1,
+     "props": {
+      "kind": "board",
+      "points": [
+       "Two hand-offs are ready: the top 300 outreach worklist for the care team, and the 73-member coding list for Dr. Castellanos."
+      ]
+     }
+    },
+    {
+     "type": "rain.handoff_cards",
+     "version": 1,
+     "props": {
+      "ids": [
+       "outreach300",
+       "coding73"
+      ]
+     }
+    }
+   ],
+   "chips": [
+    "Approve both hand-offs",
+    "Edit the brief",
+    "Show me the 2027 projection"
+   ],
+   "capability": "Automated Action",
+   "confidence": 92
+  },
+  "ceo_approve": {
+   "id": "ceo_approve",
+   "text": "Both hand-offs are approved: the top 300 are on the care team's Worklist and the 73-member coding list is with Dr. Castellanos.",
+   "citations": [
+    "Impactability Score",
+    "EHR (FHIR)"
+   ],
+   "components": [
+    {
+     "type": "rain.handoff_cards",
+     "version": 1,
+     "props": {
+      "ids": [
+       "outreach300",
+       "coding73"
+      ]
+     }
+    }
+   ],
+   "chips": [
+    "Show me the 2027 projection",
+    "Edit the brief",
+    "How close are we to the quality gate?"
+   ],
+   "capability": "Automated Action",
+   "confidence": 92
+  },
+  "ceo_gate": {
+   "id": "ceo_gate",
+   "text": "You meet 2 of the 5 measures and need 3; blood pressure control is the closest miss, 7 points short.",
+   "citations": [
+    "eCQM Engine",
+    "EHR (FHIR)"
+   ],
+   "components": [
+    {
+     "type": "rain.quality_tracker",
+     "version": 1,
+     "props": {}
+    }
+   ],
+   "chips": [
+    "What can we still recover by December 31?",
+    "Break down the gap",
+    "Open Quality Gate and Campaigns"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "ceo_open_gate": {
+   "id": "ceo_open_gate",
+   "text": "Opening Quality Gate and Campaigns, where you can follow each measure while Dr. Castellanos approves the campaigns.",
+   "citations": [
+    "eCQM Engine"
+   ],
+   "components": [
+    {
+     "type": "rain.launch_card",
+     "version": 1,
+     "props": {
+      "step": "ceo_open_gate"
+     }
+    }
+   ],
+   "chips": [
+    "What can we still recover by December 31?",
+    "Break down the gap"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "ceo_lvc": {
+   "id": "ceo_lvc",
+   "text": "$618K a year across 2,140 services and 14 measures, and imaging for uncomplicated low back pain is the largest item at $162K.",
+   "citations": [
+    "Claims",
+    "Low-Value Care Library",
+    "Provider Directory (NPPES)"
+   ],
+   "components": [
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "The five largest of 14 low-value measures (2,140 services, $618K a year in all)",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "measure",
+           "label": "Measure"
+          },
+          {
+           "key": "basis",
+           "label": "Basis"
+          },
+          {
+           "key": "services",
+           "label": "Services",
+           "kind": "number"
+          },
+          {
+           "key": "spend",
+           "label": "Annual spend",
+           "align": "right"
+          }
+         ],
+         "rows": [
+          {
+           "measure": "Imaging for uncomplicated low back pain",
+           "basis": "Choosing Wisely",
+           "services": 410,
+           "spend": "$162K"
+          },
+          {
+           "measure": "Vitamin D screening in low-risk adults",
+           "basis": "Choosing Wisely",
+           "services": 520,
+           "spend": "$96K"
+          },
+          {
+           "measure": "Preoperative testing before low-risk surgery",
+           "basis": "Choosing Wisely",
+           "services": 260,
+           "spend": "$88K"
+          },
+          {
+           "measure": "Annual EKG in low-risk adults",
+           "basis": "USPSTF",
+           "services": 300,
+           "spend": "$64K"
+          },
+          {
+           "measure": "Imaging for uncomplicated headache",
+           "basis": "Choosing Wisely",
+           "services": 120,
+           "spend": "$58K"
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Compare our sites on cost per member",
+    "Break down the gap",
+    "Open Low-Value Care"
+   ],
+   "capability": "Anomaly Detection",
+   "confidence": 92
+  },
+  "ceo_open_lvc": {
+   "id": "ceo_open_lvc",
+   "text": "Opening Low-Value Care, sorted by annual spend; select a measure to ask me about it.",
+   "citations": [
+    "Low-Value Care Library"
+   ],
+   "components": [
+    {
+     "type": "rain.launch_card",
+     "version": 1,
+     "props": {
+      "step": "ceo_open_lvc"
+     }
+    }
+   ],
+   "chips": [
+    "Break down the gap",
+    "Compare our sites on cost per member"
+   ],
+   "capability": "Anomaly Detection",
+   "confidence": 92
+  },
+  "ceo_cohort": {
+   "id": "ceo_cohort",
+   "text": "The 1,180 are rising-risk members: not yet high cost, but trending there with conditions that respond to care.",
+   "citations": [
+    "Impactability Score",
+    "Claims",
+    "EHR (FHIR)"
+   ],
+   "components": [
+    {
+     "type": "rain.segment_pyramid",
+     "version": 1,
+     "props": {
+      "focus": "impactable",
+      "points": [
+       "Uncontrolled BP or HbA1c, open gaps, missed visits, an avoidable ED visit or a social barrier.",
+       "The top 300 are ranked for outreach first."
+      ]
+     }
+    }
+   ],
+   "chips": [
+    "Assign outreach for the top 300",
+    "What can we still recover by December 31?",
+    "Open in Value Insights"
+   ],
+   "capability": "Predictive Intelligence",
+   "confidence": 92
+  },
+  "ceo_open_vi": {
+   "id": "ceo_open_vi",
+   "text": "Opening Value Insights on the cost gap; select a part of the gap and I will explain it.",
+   "citations": [
+    "RAIN Cost Model"
+   ],
+   "components": [
+    {
+     "type": "rain.launch_card",
+     "version": 1,
+     "props": {
+      "step": "ceo_open_vi"
+     }
+    }
+   ],
+   "chips": [
+    "What can we still recover by December 31?",
+    "Who are the 1,180?"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "ceo_assign": {
+   "id": "ceo_assign",
+   "text": "The top 300 impactable members are ready as an outreach worklist for the care team; approve to send.",
+   "citations": [
+    "Impactability Score"
+   ],
+   "components": [
+    {
+     "type": "rain.handoff_cards",
+     "version": 1,
+     "props": {
+      "ids": [
+       "outreach300"
+      ]
+     }
+    }
+   ],
+   "chips": [
+    "Generate the board brief",
+    "Send the coding list to Dr. Castellanos",
+    "Approve both hand-offs"
+   ],
+   "capability": "Automated Action",
+   "confidence": 92
+  },
+  "ceo_coding": {
+   "id": "ceo_coding",
+   "text": "The 73 high-need members with conditions not yet recaptured this year are ready for Dr. Castellanos; approve to send.",
+   "citations": [
+    "EHR (FHIR)",
+    "Claims"
+   ],
+   "components": [
+    {
+     "type": "rain.handoff_cards",
+     "version": 1,
+     "props": {
+      "ids": [
+       "coding73"
+      ]
+     }
+    }
+   ],
+   "chips": [
+    "Generate the board brief",
+    "Assign outreach for the top 300",
+    "Approve both hand-offs"
+   ],
+   "capability": "Automated Action",
+   "confidence": 92
+  },
+  "ceo_edit": {
+   "id": "ceo_edit",
+   "text": "The brief is open for editing; change any line, then approve the hand-offs when it reads right.",
+   "citations": [
+    "All executive data sources"
+   ],
+   "components": [
+    {
+     "type": "rain.brief_preview",
+     "version": 1,
+     "props": {
+      "kind": "board",
+      "editable": true
+     }
+    }
+   ],
+   "chips": [
+    "Approve both hand-offs",
+    "Show me the 2027 projection"
+   ],
+   "capability": "Automated Action",
+   "confidence": 92
+  },
+  "ceo_2027": {
+   "id": "ceo_2027",
+   "text": "With the three moves the gap closes through 2027, with $1.1M avoided; doing nothing carries it into renegotiation.",
+   "citations": [
+    "RAIN Cost Model",
+    "Impactability Score",
+    "Contract Benchmark"
+   ],
+   "components": [
+    {
+     "type": "chart",
+     "version": 1,
+     "props": {
+      "kind": "line",
+      "unit": "%",
+      "title": "Gap to expected cost by quarter, through 2027",
+      "series": [
+       {
+        "name": "Do nothing",
+        "points": [
+         {
+          "label": "Q4 2026",
+          "value": 6.7
+         },
+         {
+          "label": "Q1 2027",
+          "value": 6.9
+         },
+         {
+          "label": "Q2 2027",
+          "value": 7.1
+         },
+         {
+          "label": "Q3 2027",
+          "value": 7.2
+         },
+         {
+          "label": "Q4 2027",
+          "value": 7.4
+         }
+        ]
+       },
+       {
+        "name": "Three moves",
+        "points": [
+         {
+          "label": "Q4 2026",
+          "value": 3.5
+         },
+         {
+          "label": "Q1 2027",
+          "value": 3
+         },
+         {
+          "label": "Q2 2027",
+          "value": 2.4
+         },
+         {
+          "label": "Q3 2027",
+          "value": 1.8
+         },
+         {
+          "label": "Q4 2027",
+          "value": 1.2
+         }
+        ]
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Generate the board brief",
+    "Approve both hand-offs"
+   ],
+   "capability": "Predictive Intelligence",
+   "confidence": 92
+  },
+  "ceo_nothing": {
+   "id": "ceo_nothing",
+   "text": "The gap stays at 6.7%, the gate fails at 2 of 5, and 2027 renegotiation starts with no shared savings.",
+   "citations": [
+    "RAIN Cost Model",
+    "eCQM Engine",
+    "Contract Benchmark"
+   ],
+   "components": [
+    {
+     "type": "rain.scenario_panel",
+     "version": 1,
+     "props": {
+      "focus": "nothing"
+     }
+    }
+   ],
+   "chips": [
+    "What can we still recover by December 31?",
+    "Generate the board brief"
+   ],
+   "capability": "Predictive Intelligence",
+   "confidence": 92
+  },
+  "ceo_spend": {
+   "id": "ceo_spend",
+   "text": "236 high-need members (2.5%) account for 41% of spend, and 73 of them are not yet recaptured this year.",
+   "citations": [
+    "Claims",
+    "EHR (FHIR)",
+    "MCO Eligibility"
+   ],
+   "components": [
+    {
+     "type": "rain.segment_pyramid",
+     "version": 1,
+     "props": {
+      "focus": "highNeed"
+     }
+    }
+   ],
+   "chips": [
+    "Send the coding list to Dr. Castellanos",
+    "Who are the 1,180?",
+    "Break down the gap"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "ceo_sites": {
+   "id": "ceo_sites",
+   "text": "Battle Mountain and Winnemucca run highest per member, at $437 and $431 against the network's $412.",
+   "citations": [
+    "Claims",
+    "MCO Eligibility"
+   ],
+   "components": [
+    {
+     "type": "rain.site_compare",
+     "version": 1,
+     "props": {
+      "metric": "pmpm"
+     }
+    }
+   ],
+   "chips": [
+    "Where is the low-value care?",
+    "Open in Value Insights",
+    "Break down the gap"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "ceo_ctx_site": {
+   "id": "ceo_ctx_site",
+   "text": "Here is how this site compares with the network on cost, members and low-value care.",
+   "citations": [
+    "Claims",
+    "MCO Eligibility"
+   ],
+   "components": [
+    {
+     "type": "grid",
+     "version": 1,
+     "props": {
+      "columns": 2,
+      "children": [
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Winnemucca PMPM",
+         "value": "$431",
+         "caption": "Network $412",
+         "status": "warning"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Members",
+         "value": "1,700"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Low-value care",
+         "value": "$196K",
+         "caption": "A year"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "LBP imaging",
+         "value": "27%",
+         "caption": "Network 9%",
+         "status": "critical"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "text",
+     "version": 1,
+     "props": {
+      "text": "Covered by rotating locum clinicians."
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Compare our sites on cost per member",
+    "Where is the low-value care?"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "ceo_ctx_gap": {
+   "id": "ceo_ctx_gap",
+   "text": "Here is what sits behind this part of the $26 gap.",
+   "citations": [
+    "RAIN Cost Model"
+   ],
+   "components": [
+    {
+     "type": "callout",
+     "version": 1,
+     "props": {
+      "title": "Coding gap: $12 of the $26 PMPM gap",
+      "body": "Not spending: 73 high-need members not yet recaptured.",
+      "status": "info"
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "What can we still recover by December 31?",
+    "Who are the 1,180?"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "ceo_ctx_segment": {
+   "id": "ceo_ctx_segment",
+   "text": "Here is who is in this segment and what the plan is for them.",
+   "citations": [
+    "Impactability Score",
+    "Claims"
+   ],
+   "components": [
+    {
+     "type": "grid",
+     "version": 1,
+     "props": {
+      "columns": 2,
+      "children": [
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Impactable, rising risk",
+         "value": "1,180",
+         "caption": "12.6% of members"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Share of spend",
+         "value": "27%"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Plan",
+         "value": "Ranked outreach, top 300 first"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Assign outreach for the top 300",
+    "What can we still recover by December 31?"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "ceo_ctx_measure": {
+   "id": "ceo_ctx_measure",
+   "text": "Here is where this measure stands against its target and what would move it.",
+   "citations": [
+    "eCQM Engine"
+   ],
+   "components": [
+    {
+     "type": "grid",
+     "version": 1,
+     "props": {
+      "columns": 2,
+      "children": [
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "CMS165 now",
+         "value": "58%",
+         "caption": "Controlling high blood pressure",
+         "status": "critical"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Target",
+         "value": "65% or higher"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Projected Dec 31",
+         "value": "66%"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "What can we still recover by December 31?",
+    "How close are we to the quality gate?"
+   ],
+   "capability": "Converged Conversation",
+   "confidence": 92
+  },
+  "ceo_ctx_lvm": {
+   "id": "ceo_ctx_lvm",
+   "text": "Here is what this measure counts, where it happens and what it costs.",
+   "citations": [
+    "Low-Value Care Library",
+    "Claims"
+   ],
+   "components": [
+    {
+     "type": "grid",
+     "version": 1,
+     "props": {
+      "columns": 2,
+      "children": [
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Services",
+         "value": "410",
+         "caption": "Imaging for uncomplicated low back pain"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Annual spend",
+         "value": "$162K"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Basis",
+         "value": "Choosing Wisely"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "text",
+     "version": 1,
+     "props": {
+      "text": "Counted when a service is likely wasteful or wasteful; necessary services are excluded."
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Where is the low-value care?",
+    "Compare our sites on cost per member"
+   ],
+   "capability": "Anomaly Detection",
+   "confidence": 92
+  },
+  "ceo_ctx_source": {
+   "id": "ceo_ctx_source",
+   "text": "Here is what this source provides, how fresh it is and what reads it.",
+   "citations": [
+    "Data Sources Registry"
+   ],
+   "components": [
+    {
+     "type": "grid",
+     "version": 1,
+     "props": {
+      "columns": 2,
+      "children": [
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Label",
+         "value": "Synthetic",
+         "caption": "Synthetic MCO eligibility and attribution"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Records",
+         "value": "9,400"
+        }
+       },
+       {
+        "type": "stat",
+        "version": 1,
+        "props": {
+         "label": "Freshness",
+         "value": "Q3 file"
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "text",
+     "version": 1,
+     "props": {
+      "text": "9,400 attributed members. Used for: Contract population."
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Break down the gap",
+    "Where is the low-value care?"
+   ],
+   "capability": "Friction Observability",
+   "confidence": 92
+  },
+  "__default__": {
+   "id": "__default__",
+   "text": "I can answer from the contract checkpoint: the cost gap, the quality gate, low-value care, your sites and the board brief.",
+   "citations": [],
+   "components": [],
+   "chips": [
+    "Break down the gap",
+    "Show me the quality gate",
+    "Where is the low-value care?"
+   ],
+   "confidence": 60
+  }
+ },
+ "match": {
+  "chipToFlowKey": {
+   "Break down the gap": "ceo_gap",
+   "break down the gap": "ceo_gap",
+   "Why are we above expected cost?": "ceo_gap",
+   "why are we above expected cost?": "ceo_gap",
+   "why are we above expected cost": "ceo_gap",
+   "What can we still recover by December 31?": "ceo_recover",
+   "what can we still recover by december 31?": "ceo_recover",
+   "what can we still recover by december 31": "ceo_recover",
+   "Generate the board brief": "ceo_board",
+   "generate the board brief": "ceo_board",
+   "Approve both hand-offs": "ceo_approve",
+   "approve both hand-offs": "ceo_approve",
+   "Show me the quality gate": "ceo_gate",
+   "show me the quality gate": "ceo_gate",
+   "How close are we to the quality gate?": "ceo_gate",
+   "how close are we to the quality gate?": "ceo_gate",
+   "how close are we to the quality gate": "ceo_gate",
+   "Open Quality Gate and Campaigns": "ceo_open_gate",
+   "open quality gate and campaigns": "ceo_open_gate",
+   "Where is the low-value care?": "ceo_lvc",
+   "where is the low-value care?": "ceo_lvc",
+   "where is the low-value care": "ceo_lvc",
+   "Open Low-Value Care": "ceo_open_lvc",
+   "open low-value care": "ceo_open_lvc",
+   "Who are the 1,180?": "ceo_cohort",
+   "who are the 1,180?": "ceo_cohort",
+   "who are the 1180": "ceo_cohort",
+   "Open in Value Insights": "ceo_open_vi",
+   "open in value insights": "ceo_open_vi",
+   "Assign outreach for the top 300": "ceo_assign",
+   "assign outreach for the top 300": "ceo_assign",
+   "Send the coding list to Dr. Castellanos": "ceo_coding",
+   "send the coding list to dr. castellanos": "ceo_coding",
+   "send the coding list to dr castellanos": "ceo_coding",
+   "Edit the brief": "ceo_edit",
+   "edit the brief": "ceo_edit",
+   "Show me the 2027 projection": "ceo_2027",
+   "show me the 2027 projection": "ceo_2027",
+   "What happens if we do nothing?": "ceo_nothing",
+   "what happens if we do nothing?": "ceo_nothing",
+   "what happens if we do nothing": "ceo_nothing",
+   "Which members drive the most spend?": "ceo_spend",
+   "which members drive the most spend?": "ceo_spend",
+   "which members drive the most spend": "ceo_spend",
+   "Compare our sites on cost per member": "ceo_sites",
+   "compare our sites on cost per member": "ceo_sites",
+   "Explain this site": "ceo_ctx_site",
+   "explain this site": "ceo_ctx_site",
+   "Explain this gap bar": "ceo_ctx_gap",
+   "explain this gap bar": "ceo_ctx_gap",
+   "Explain this segment": "ceo_ctx_segment",
+   "explain this segment": "ceo_ctx_segment",
+   "Explain this measure": "ceo_ctx_measure",
+   "explain this measure": "ceo_ctx_measure",
+   "Explain this low-value measure": "ceo_ctx_lvm",
+   "explain this low-value measure": "ceo_ctx_lvm",
+   "Explain this source": "ceo_ctx_source",
+   "explain this source": "ceo_ctx_source"
+  },
+  "strictMatch": true,
+  "signalSequence": [],
+  "flows": {
+   "ceo_brief": {
+    "user_query": "",
+    "corpus": " good morning, gregory. your q3 reconciliation from high desert health plan is in, and i have flagged three signals. "
+   },
+   "ceo_gap": {
+    "user_query": "Break down the gap",
+    "corpus": "break down the gap the $26 pmpm gap has four parts, and roughly half of it is a documentation fix. "
+   },
+   "ceo_recover": {
+    "user_query": "What can we still recover by December 31?",
+    "corpus": "what can we still recover by december 31? three moves, in order of speed. "
+   },
+   "ceo_board": {
+    "user_query": "Generate the board brief",
+    "corpus": "generate the board brief here is a one-page board brief: the checkpoint, the four-part gap, three moves with owners, and the 2027 position. "
+   },
+   "ceo_approve": {
+    "user_query": "Approve both hand-offs",
+    "corpus": "approve both hand-offs both hand-offs are approved: the top 300 are on the care team's worklist and the 73-member coding list is with dr. castellanos. "
+   },
+   "ceo_gate": {
+    "user_query": "Show me the quality gate",
+    "corpus": "show me the quality gate you meet 2 of the 5 measures and need 3; blood pressure control is the closest miss, 7 points short. "
+   },
+   "ceo_open_gate": {
+    "user_query": "Open Quality Gate and Campaigns",
+    "corpus": "open quality gate and campaigns opening quality gate and campaigns, where you can follow each measure while dr. castellanos approves the campaigns. "
+   },
+   "ceo_lvc": {
+    "user_query": "Where is the low-value care?",
+    "corpus": "where is the low-value care? $618k a year across 2,140 services and 14 measures, and imaging for uncomplicated low back pain is the largest item at $162k. "
+   },
+   "ceo_open_lvc": {
+    "user_query": "Open Low-Value Care",
+    "corpus": "open low-value care opening low-value care, sorted by annual spend; select a measure to ask me about it. "
+   },
+   "ceo_cohort": {
+    "user_query": "Who are the 1,180?",
+    "corpus": "who are the 1,180? the 1,180 are rising-risk members: not yet high cost, but trending there with conditions that respond to care. "
+   },
+   "ceo_open_vi": {
+    "user_query": "Open in Value Insights",
+    "corpus": "open in value insights opening value insights on the cost gap; select a part of the gap and i will explain it. "
+   },
+   "ceo_assign": {
+    "user_query": "Assign outreach for the top 300",
+    "corpus": "assign outreach for the top 300 the top 300 impactable members are ready as an outreach worklist for the care team; approve to send. "
+   },
+   "ceo_coding": {
+    "user_query": "Send the coding list to Dr. Castellanos",
+    "corpus": "send the coding list to dr. castellanos the 73 high-need members with conditions not yet recaptured this year are ready for dr. castellanos; approve to send. "
+   },
+   "ceo_edit": {
+    "user_query": "Edit the brief",
+    "corpus": "edit the brief the brief is open for editing; change any line, then approve the hand-offs when it reads right. "
+   },
+   "ceo_2027": {
+    "user_query": "Show me the 2027 projection",
+    "corpus": "show me the 2027 projection with the three moves the gap closes through 2027, with $1.1m avoided; doing nothing carries it into renegotiation. "
+   },
+   "ceo_nothing": {
+    "user_query": "What happens if we do nothing?",
+    "corpus": "what happens if we do nothing? the gap stays at 6.7%, the gate fails at 2 of 5, and 2027 renegotiation starts with no shared savings. "
+   },
+   "ceo_spend": {
+    "user_query": "Which members drive the most spend?",
+    "corpus": "which members drive the most spend? 236 high-need members (2.5%) account for 41% of spend, and 73 of them are not yet recaptured this year. "
+   },
+   "ceo_sites": {
+    "user_query": "Compare our sites on cost per member",
+    "corpus": "compare our sites on cost per member battle mountain and winnemucca run highest per member, at $437 and $431 against the network's $412. "
+   },
+   "ceo_ctx_site": {
+    "user_query": "Explain this site",
+    "corpus": "explain this site here is how this site compares with the network on cost, members and low-value care. "
+   },
+   "ceo_ctx_gap": {
+    "user_query": "Explain this gap bar",
+    "corpus": "explain this gap bar here is what sits behind this part of the $26 gap. "
+   },
+   "ceo_ctx_segment": {
+    "user_query": "Explain this segment",
+    "corpus": "explain this segment here is who is in this segment and what the plan is for them. "
+   },
+   "ceo_ctx_measure": {
+    "user_query": "Explain this measure",
+    "corpus": "explain this measure here is where this measure stands against its target and what would move it. "
+   },
+   "ceo_ctx_lvm": {
+    "user_query": "Explain this low-value measure",
+    "corpus": "explain this low-value measure here is what this measure counts, where it happens and what it costs. "
+   },
+   "ceo_ctx_source": {
+    "user_query": "Explain this source",
+    "corpus": "explain this source here is what this source provides, how fresh it is and what reads it. "
+   },
+   "__default__": {
+    "user_query": "",
+    "corpus": " i can answer from the contract checkpoint: the cost gap, the quality gate, low-value care, your sites and the board brief. "
+   }
+  }
+ }
+}

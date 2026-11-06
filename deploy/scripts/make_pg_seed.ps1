@@ -28,4 +28,14 @@ Remove-Item "$out\_roles_raw.sql"
 & "$PgBin\pg_dump.exe" -U $AdminUser -h localhost -d rain --no-owner --encoding=UTF8 -f "$out\02-rain.sql"
 if ($LASTEXITCODE -ne 0) { throw "pg_dump failed" }
 
-Write-Host "Wrote $out\01-roles.sql and $out\02-rain.sql"
+# The PRD v0.3 wave's own database (rain_v3): --create emits CREATE DATABASE + its ACL
+# (CONNECT for rain_app) and reconnects, so it seeds as 03 after the rain db. The host
+# pg_dump bakes the Windows locale into CREATE DATABASE, which the Linux container
+# rejects — rewrite it to encoding-only (template0 default locale).
+& "$PgBin\pg_dump.exe" -U $AdminUser -h localhost -d rain_v3 --create --no-owner --encoding=UTF8 -f "$out\03-rain-v3.sql"
+if ($LASTEXITCODE -ne 0) { throw "pg_dump rain_v3 failed" }
+$v3 = Get-Content "$out\03-rain-v3.sql"
+$v3 = $v3 -replace "^CREATE DATABASE rain_v3 .*$", "CREATE DATABASE rain_v3 WITH TEMPLATE = template0 ENCODING = 'UTF8';"
+[IO.File]::WriteAllLines((Join-Path (Get-Location) "$out\03-rain-v3.sql"), $v3)  # UTF-8, no BOM
+
+Write-Host "Wrote $out\01-roles.sql, $out\02-rain.sql and $out\03-rain-v3.sql"

@@ -1,15 +1,13 @@
+import { UpArrow } from './FlowArrow';
 
-export default function BehavioralSegmentationDiagram() {
-
-  /* Arrow points UPWARD — matching original SVG: data flows up from sources → platform → AI */
-  const UpArrow = () => (
-    <div className="flex justify-center flex-shrink-0" style={{ height: 'min(2.2vh, 20px)' }}>
-      <svg width="14" height="100%" viewBox="0 0 14 24" fill="none" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="7,0 2,8 12,8" fill="#003087" />
-        <line x1="7" y1="7" x2="7" y2="24" stroke="#003087" strokeWidth="1.8" strokeDasharray="4 3" />
-      </svg>
-    </div>
-  );
+/**
+ * Capability deep-dive diagram: BehavioralSegmentation. What it says for a tenant comes in as
+ * `content` (the manifest's `capabilityDiagrams.friction`); without it the diagram
+ * shows the generic platform story under the client's short name.
+ */
+// `clientName` is the client's short name, from the modal that draws the diagram.
+export default function BehavioralSegmentationDiagram({ content, clientName } = {}) {
+  const clientShort = (clientName || 'USSFCU').toUpperCase();
 
   const fs = {
     eyebrow:  'clamp(9px,  min(1.5vh, 1.2vw),  16px)',
@@ -24,44 +22,44 @@ export default function BehavioralSegmentationDiagram() {
     small:    'clamp(9px,  min(1.3vh, 1vw),    14px)',
   };
 
-  const clientConfig = {
-    bodyText: 'The AI maps where rural care delivery gets stuck — transport queue backlogs, telehealth scheduling gaps, referral leakage, and inter-facility handoff failures across long frontier distances.',
+  const clientConfig = content ?? {
+    bodyText: 'The AI identifies which members are at risk, behaving differently, or showing early signals of friction or churn, without manual tagging or report-building.',
     adpSubtitle: 'Unified member profiles across Salesforce and non-Salesforce systems',
     ontologyDesc: "'Member' means one thing",
     enrichmentDesc: 'Adds behavioral context',
-    gapText: 'Each rural Nevada health system reports within its own data. When a maternal risk signal in the EHR correlates with a transport shortage, a chronic-care continuity loss, a telehealth dead zone, or a data-quality break, no native tool connects those signals across systems.',
-    withText: 'Cross-system intelligence that reads across clinical, telehealth, RPM, claims, transportation, public health, and SDOH data to surface correlated insights and recommended actions before you ask.',
-    sourcesLabel: 'RAIN DATA SOURCES',
-    primarySources: ['Clinical EHR', 'Maternal Registry', 'RPM Platform', 'Claims & Encounters'],
-    secondarySources: ['Telehealth (ECHO NV)', 'EMS / NEMT', 'SDOH Data', 'State HIE'],
-    deployedAt: 'Verizon',
-    deployedDesc: 'Multi-agent orchestration across network ops',
+    gapText: 'Segments are manually built in Marketing Cloud. No cross-platform behavioral detection.',
+    withText: 'AI continuously surfaces where friction is forming and which members are affected.',
+    sourcesLabel: `${clientShort} DATA SOURCES`,
+    primarySources: ['Data Cloud', 'Financial Services Cloud', 'Marketing Cloud', 'Service Cloud'],
+    secondarySources: ['Genesys Cloud', 'Snowflake', 'Blend', 'ICE/LOS'],
+    deployedAt: 'Radiant Solutions Lab',
+    deployedDesc: 'Across multiple engagements',
   };
 
   return (
     <div
       className="w-full h-full flex flex-col"
-      style={{ fontFamily: 'Inter, Helvetica, Arial, sans-serif', background: '#FFFFFF', padding: '2.4vh 2vw 2vh' }}
+      style={{ fontFamily: 'Inter, Helvetica, Arial, sans-serif', background: 'var(--color-surface)', padding: '2.4vh 2vw 2vh' }}
     >
       {/* ── TOP: Capability Identity ── */}
       <div className="flex-shrink-0" style={{ marginBottom: '0.6vh' }}>
-        <p style={{ fontSize: fs.eyebrow, color: '#CC0000', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', margin: '0 0 0.4vh 0' }}>
+        <p style={{ fontSize: fs.eyebrow, color: 'var(--color-critical)', fontWeight: 700, letterSpacing: '2px', textTransform: 'uppercase', margin: '0 0 0.4vh 0' }}>
           RADIANT AI CAPABILITY
         </p>
-        <h2 style={{ fontSize: fs.title, color: '#003087', fontWeight: 800, margin: '0 0 0.2vh 0', lineHeight: 1.15 }}>
+        <h2 style={{ fontSize: fs.title, color: 'var(--color-brand)', fontWeight: 800, margin: '0 0 0.2vh 0', lineHeight: 1.15 }}>
           Friction Observability
         </h2>
-        <p style={{ fontSize: fs.subtitle, color: '#666666', fontWeight: 500, margin: '0 0 0.3vh 0' }}>
+        <p style={{ fontSize: fs.subtitle, color: 'var(--color-text-muted)', fontWeight: 500, margin: '0 0 0.3vh 0' }}>
           Powered by Intelligent CX + Agentic Data Platform + KAG
         </p>
-        <p style={{ fontSize: fs.body, color: '#333333', fontWeight: 400, margin: 0, lineHeight: 1.5 }}>
+        <p style={{ fontSize: fs.body, color: 'var(--color-text)', fontWeight: 400, margin: 0, lineHeight: 1.5 }}>
           {clientConfig.bodyText}
         </p>
       </div>
 
-      <div style={{ borderBottom: '1px solid #E0E0E0', marginTop: '0.6vh', marginBottom: '1.2vh', flexShrink: 0 }} />
+      <div style={{ borderBottom: '1px solid var(--color-border)', marginTop: '0.6vh', marginBottom: '1.2vh', flexShrink: 0 }} />
 
-      <p className="flex-shrink-0" style={{ fontSize: fs.labelSm, color: '#003087', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', margin: '0 0 0.5vh 0' }}>
+      <p className="flex-shrink-0" style={{ fontSize: fs.labelSm, color: 'var(--color-brand)', fontWeight: 700, letterSpacing: '1.5px', textTransform: 'uppercase', margin: '0 0 0.5vh 0' }}>
         UNDERLYING ARCHITECTURE
       </p>
 
@@ -72,25 +70,26 @@ export default function BehavioralSegmentationDiagram() {
         <div className="flex" style={{ flex: '3 1 0', minHeight: 0, gap: 'min(1vw, 10px)' }}>
           <div
             className="flex-1 flex flex-col"
-            style={{ background: 'rgba(0, 48, 135, 0.07)', border: '1.5px solid #003087', borderRadius: '8px', padding: 'min(1.2vh, 10px) min(1.2%, 12px)' }}
+            style={{ background: 'color-mix(in srgb, var(--color-brand) 7%, transparent)', border: '1.5px solid var(--color-brand)', borderRadius: '8px', padding: 'min(1.2vh, 10px) min(1.2%, 12px)' }}
           >
             <div className="flex items-baseline flex-shrink-0" style={{ marginBottom: 'min(0.8vh, 8px)', gap: 'min(1vw, 12px)' }}>
-              <span style={{ fontSize: fs.label, color: '#003087', fontWeight: 700, letterSpacing: '1.5px', whiteSpace: 'nowrap' }}>INTELLIGENT CX</span>
-              <span style={{ fontSize: fs.labelSm, color: '#666666', fontWeight: 400 }}>KAG-powered segmentation across VOC, behavior, and operational data</span>
+              {/* Optional per-client overrides (the Comptroller's personas set them); absent, the defaults render as before. */}
+              <span style={{ fontSize: fs.label, color: 'var(--color-brand)', fontWeight: 700, letterSpacing: '1.5px', whiteSpace: 'nowrap' }}>{clientConfig.topLabel ?? 'INTELLIGENT CX'}</span>
+              <span style={{ fontSize: fs.labelSm, color: 'var(--color-text-muted)', fontWeight: 400 }}>{clientConfig.topSubtitle ?? 'KAG-powered segmentation across VOC, behavior, and operational data'}</span>
             </div>
             <div className="flex flex-1 min-h-0" style={{ gap: 'min(0.6vw, 8px)' }}>
-              {[
+              {(clientConfig.topCards ?? [
                 { name: 'Pattern Detection', desc: 'Identifies emerging behavioral clusters across all sources' },
                 { name: 'Segment Profiling', desc: 'Auto-generates segment attributes, size, and risk' },
                 { name: 'Signal Mapping', desc: 'Links segments to friction, churn, and NPS drivers' },
-              ].map((item) => (
+              ]).map((item) => (
                 <div
                   key={item.name}
                   className="flex-1 flex flex-col justify-center"
-                  style={{ background: '#FFFFFF', border: '1px solid #003087', borderRadius: '6px', padding: 'min(1.2vh, 10px) min(3%, 14px)' }}
+                  style={{ background: 'var(--color-surface)', border: '1px solid var(--color-brand)', borderRadius: '6px', padding: 'min(1.2vh, 10px) min(3%, 14px)' }}
                 >
-                  <p style={{ fontSize: fs.cardTitle, color: '#003087', fontWeight: 700, margin: '0 0 min(0.4vh, 4px) 0' }}>{item.name}</p>
-                  <p style={{ fontSize: fs.cardDesc, color: '#666666', margin: 0, lineHeight: 1.45 }}>{item.desc}</p>
+                  <p style={{ fontSize: fs.cardTitle, color: 'var(--color-brand)', fontWeight: 700, margin: '0 0 min(0.4vh, 4px) 0' }}>{item.name}</p>
+                  <p style={{ fontSize: fs.cardDesc, color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.45 }}>{item.desc}</p>
                 </div>
               ))}
             </div>
@@ -99,12 +98,12 @@ export default function BehavioralSegmentationDiagram() {
           {/* Responsible AI sidebar */}
           <div
             className="flex flex-col"
-            style={{ width: 'min(24%, 220px)', flexShrink: 0, background: '#FFFFFF', border: '1.5px solid #00897B', borderRadius: '8px', padding: 'min(1.2vh, 10px) min(1.5%, 14px)' }}
+            style={{ width: 'min(24%, 220px)', flexShrink: 0, background: 'var(--color-surface)', border: '1.5px solid #00897B', borderRadius: '8px', padding: 'min(1.2vh, 10px) min(1.5%, 14px)' }}
           >
             <p className="flex-shrink-0" style={{ fontSize: fs.label, color: '#00897B', fontWeight: 700, letterSpacing: '1.5px', margin: '0 0 min(1.2vh, 10px) 0' }}>RESPONSIBLE AI</p>
             <div className="flex-1 flex flex-col justify-around">
-              {['Bias Detection in Cohorts', 'Explainable Risk Definitions', 'HIPAA / HITECH Compliance', 'Health Equity Alignment'].map((item) => (
-                <p key={item} style={{ fontSize: fs.cardDesc, color: '#333333', fontWeight: 600, margin: 0, lineHeight: 1.35 }}>{item}</p>
+              {(clientConfig.responsibleAI ?? ['Bias Detection in Segments', 'Explainable Segment Definitions', 'Fair Lending Compliance', 'NCUA/ECOA Alignment']).map((item) => (
+                <p key={item} style={{ fontSize: fs.cardDesc, color: 'var(--color-text)', fontWeight: 600, margin: 0, lineHeight: 1.35 }}>{item}</p>
               ))}
             </div>
           </div>
@@ -115,11 +114,11 @@ export default function BehavioralSegmentationDiagram() {
         {/* Row 2: Agentic Data Platform */}
         <div
           className="flex flex-col"
-          style={{ flex: '2.8 1 0', minHeight: 0, background: 'rgba(0, 48, 135, 0.04)', border: '1.5px solid #003087', borderRadius: '8px', padding: 'min(1vh, 8px) min(1.2%, 12px)' }}
+          style={{ flex: '2.8 1 0', minHeight: 0, background: 'color-mix(in srgb, var(--color-brand) 4%, transparent)', border: '1.5px solid var(--color-brand)', borderRadius: '8px', padding: 'min(1vh, 8px) min(1.2%, 12px)' }}
         >
           <div className="flex items-baseline flex-shrink-0" style={{ marginBottom: 'min(0.6vh, 6px)', gap: 'min(1vw, 12px)' }}>
-            <span style={{ fontSize: fs.label, color: '#003087', fontWeight: 700, letterSpacing: '1.5px', whiteSpace: 'nowrap' }}>AGENTIC DATA PLATFORM</span>
-            <span style={{ fontSize: fs.labelSm, color: '#666666', fontWeight: 400 }}>{clientConfig.adpSubtitle}</span>
+            <span style={{ fontSize: fs.label, color: 'var(--color-brand)', fontWeight: 700, letterSpacing: '1.5px', whiteSpace: 'nowrap' }}>AGENTIC DATA PLATFORM</span>
+            <span style={{ fontSize: fs.labelSm, color: 'var(--color-text-muted)', fontWeight: 400 }}>{clientConfig.adpSubtitle}</span>
           </div>
           <div className="flex flex-1 min-h-0" style={{ gap: 'min(0.5vw, 7px)' }}>
             {[
@@ -132,10 +131,10 @@ export default function BehavioralSegmentationDiagram() {
               <div
                 key={agent.name}
                 className="flex-1 flex flex-col justify-center"
-                style={{ background: '#FFFFFF', border: '1px solid #003087', borderRadius: '6px', padding: 'min(1vh, 8px) min(2.5%, 12px)' }}
+                style={{ background: 'var(--color-surface)', border: '1px solid var(--color-brand)', borderRadius: '6px', padding: 'min(1vh, 8px) min(2.5%, 12px)' }}
               >
-                <p style={{ fontSize: fs.cardTitle, color: '#003087', fontWeight: 700, margin: '0 0 min(0.3vh, 3px) 0' }}>{agent.name}</p>
-                <p style={{ fontSize: fs.cardDesc, color: '#666666', margin: 0, lineHeight: 1.4 }}>{agent.desc}</p>
+                <p style={{ fontSize: fs.cardTitle, color: 'var(--color-brand)', fontWeight: 700, margin: '0 0 min(0.3vh, 3px) 0' }}>{agent.name}</p>
+                <p style={{ fontSize: fs.cardDesc, color: 'var(--color-text-muted)', margin: 0, lineHeight: 1.4 }}>{agent.desc}</p>
               </div>
             ))}
           </div>
@@ -146,9 +145,9 @@ export default function BehavioralSegmentationDiagram() {
         {/* Row 3: Client Data Sources */}
         <div
           className="flex items-center flex-nowrap"
-          style={{ flex: '1.2 1 0', minHeight: 0, background: '#F4F5F7', border: '1px solid #E0E0E0', borderRadius: '6px', padding: '0 min(1.5%, 14px)', gap: 'min(1.2vw, 16px)' }}
+          style={{ flex: '1.2 1 0', minHeight: 0, background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '6px', padding: '0 min(1.5%, 14px)', gap: 'min(1.2vw, 16px)' }}
         >
-          <p className="flex-shrink-0" style={{ fontSize: fs.labelSm, color: '#666666', fontWeight: 700, letterSpacing: '1px', margin: 0, whiteSpace: 'nowrap' }}>
+          <p className="flex-shrink-0" style={{ fontSize: fs.labelSm, color: 'var(--color-text-muted)', fontWeight: 700, letterSpacing: '1px', margin: 0, whiteSpace: 'nowrap' }}>
             {clientConfig.sourcesLabel}
           </p>
           <div className="flex items-center flex-1 flex-nowrap" style={{ gap: 'min(0.4vw, 5px)', overflow: 'hidden' }}>
@@ -156,7 +155,7 @@ export default function BehavioralSegmentationDiagram() {
               <span
                 key={src}
                 className="flex-shrink-0"
-                style={{ background: '#003087', color: '#FFF', fontSize: fs.pill, fontWeight: 600, padding: 'min(0.4vh, 4px) min(0.7vw, 10px)', borderRadius: '4px', whiteSpace: 'nowrap' }}
+                style={{ background: 'var(--color-brand)', color: 'var(--color-text-inverse)', fontSize: fs.pill, fontWeight: 600, padding: 'min(0.4vh, 4px) min(0.7vw, 10px)', borderRadius: '4px', whiteSpace: 'nowrap' }}
               >
                 {src}
               </span>
@@ -165,7 +164,7 @@ export default function BehavioralSegmentationDiagram() {
               <span
                 key={src}
                 className="flex-shrink-0"
-                style={{ background: '#00897B', color: '#FFF', fontSize: fs.pill, fontWeight: 600, padding: 'min(0.4vh, 4px) min(0.7vw, 10px)', borderRadius: '4px', whiteSpace: 'nowrap' }}
+                style={{ background: '#00897B', color: 'var(--color-text-inverse)', fontSize: fs.pill, fontWeight: 600, padding: 'min(0.4vh, 4px) min(0.7vw, 10px)', borderRadius: '4px', whiteSpace: 'nowrap' }}
               >
                 {src}
               </span>
@@ -176,17 +175,17 @@ export default function BehavioralSegmentationDiagram() {
 
       {/* ── BOTTOM: Gap + Proof ── */}
       <div className="flex-shrink-0" style={{ marginTop: '1vh' }}>
-        <div style={{ borderBottom: '1px solid #E0E0E0', marginBottom: '1vh' }} />
+        <div style={{ borderBottom: '1px solid var(--color-border)', marginBottom: '1vh' }} />
         <div className="flex" style={{ gap: 'min(1vw, 10px)' }}>
           <div
             className="flex-1 flex flex-col justify-center"
-            style={{ background: '#FFF8E1', border: '1px solid #F59E0B', borderRadius: '6px', padding: 'min(0.8vh, 8px) min(1.5%, 14px)' }}
+            style={{ background: 'var(--color-warning-50)', border: '1px solid var(--color-warning-500)', borderRadius: '6px', padding: 'min(0.8vh, 8px) min(1.5%, 14px)' }}
           >
-            <p style={{ fontSize: fs.small, color: '#333333', margin: '0 0 min(0.2vh, 2px) 0', lineHeight: 1.5 }}>
+            <p style={{ fontSize: fs.small, color: 'var(--color-text)', margin: '0 0 min(0.2vh, 2px) 0', lineHeight: 1.5 }}>
               <span style={{ fontWeight: 700 }}>The gap today: </span>
               <span>{clientConfig.gapText}</span>
             </p>
-            <p style={{ fontSize: fs.small, color: '#333333', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: fs.small, color: 'var(--color-text)', margin: 0, lineHeight: 1.5 }}>
               <span style={{ fontWeight: 700 }}>With Friction Observability: </span>
               <span>{clientConfig.withText}</span>
             </p>
@@ -194,13 +193,13 @@ export default function BehavioralSegmentationDiagram() {
 
           <div
             className="flex flex-col justify-center"
-            style={{ width: 'min(24%, 220px)', flexShrink: 0, background: '#F4F5F7', border: '1px solid #E0E0E0', borderRadius: '6px', padding: 'min(0.8vh, 8px) min(1.5%, 14px)' }}
+            style={{ width: 'min(24%, 220px)', flexShrink: 0, background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: '6px', padding: 'min(0.8vh, 8px) min(1.5%, 14px)' }}
           >
-            <p style={{ fontSize: fs.labelSm, color: '#CC0000', fontWeight: 700, letterSpacing: '1px', margin: '0 0 min(0.3vh, 3px) 0' }}>DEPLOYED AT</p>
+            <p style={{ fontSize: fs.labelSm, color: 'var(--color-critical)', fontWeight: 700, letterSpacing: '1px', margin: '0 0 min(0.3vh, 3px) 0' }}>Developed By</p>
             <p style={{ margin: '0 0 min(0.2vh, 2px) 0' }}>
-              <span style={{ fontSize: fs.subtitle, color: '#003087', fontWeight: 800 }}>{clientConfig.deployedAt}</span>
+              <span style={{ fontSize: fs.subtitle, color: 'var(--color-brand)', fontWeight: 800 }}>{clientConfig.deployedAt}</span>
             </p>
-            <p style={{ fontSize: fs.small, color: '#666666', fontWeight: 400, margin: 0, lineHeight: 1.35 }}>
+            <p style={{ fontSize: fs.small, color: 'var(--color-text-muted)', fontWeight: 400, margin: 0, lineHeight: 1.35 }}>
               {clientConfig.deployedDesc}
             </p>
           </div>

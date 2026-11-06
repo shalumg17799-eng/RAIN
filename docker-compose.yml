@@ -8,7 +8,8 @@
 #   rain-api/.env                 host secrets (ANTHROPIC_API_KEY, PG_*, NEO4J_*) - mounted
 #   apps/keys.local.yaml          the /api/v2 bearer keys - mounted
 #   deploy/initdb/*.sql           regenerate from a live DB with deploy/scripts/make_pg_seed.ps1
-#   frontend/rain-app/.env.local  VITE_RAIN_KEY_* persona tokens - baked at frontend BUILD time
+#   frontend/rain-app/Dockerfile  bakes VITE_ULTRA_API_MODE=http + VITE_ULTRA_API_BASE=/api/v3/ui
+#                                 (same-origin through nginx), overriding any .env.local
 #
 # URLs: frontend http://localhost:8181 - backend http://localhost:8000 - neo4j http://localhost:17474
 # Postgres is on host port 55433 (the container seeds itself on FIRST start; reset: compose down -v).

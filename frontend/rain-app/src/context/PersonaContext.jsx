@@ -1,93 +1,106 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from './AuthContext';
-import {
-  personas,
-  CLIENT_PERSONAS,
-  CLIENT_DEFAULT_PERSONA,
-} from '@/clients/registry';
+import { useClient } from './ClientContext';
+import { STORAGE_KEY } from '../config/clients';
+import { getClientPersonas, getMarkets, findClient } from '@core/runtime/registry';
+import { STORAGE_KEYS } from '@core/contract/storageKeys';
 
 const PersonaContext = createContext(null);
 const PersonaListContext = createContext([]);
 
-const SESSION_KEY = 'active_persona';
+const SESSION_KEY = STORAGE_KEYS.activePersona;
 
-// Persona allowlist and default are declared in the RAIN manifest
-// (src/clients/rain/index.js) and aggregated by the registry.
-const FALLBACK_CLIENT_ID = 'rain';
+/**
+ * The switcher's persona record: the registry's identity, flattened the way
+ * the header and screens read it (`persona.name`, `persona.role`…).
+ */
+function toPersona(module) {
+  return {
+    id: module.id,
+    ...module.identity,
+    ...(module.illustrativePersona ? { illustrativePersona: true } : {}),
+  };
+}
+
+/**
+ * Which personas a client offers, in display order, and which one it opens
+ * on — both read from the market registry, the one place a persona is
+ * registered. (This used to be two hand-kept maps here, CLIENT_PERSONAS and
+ * CLIENT_DEFAULT_PERSONA, that had to be kept in step with every client
+ * manifest by a test.) A client the registry does not know falls back to the
+ * first market's default client, which the picker can never produce.
+ */
+function personasFor(clientId) {
+  const modules = getClientPersonas(clientId);
+  if (modules.length) return modules.map(toPersona);
+  const market = getMarkets()[0];
+  return getClientPersonas(market.defaultClientId).map(toPersona);
+}
+
+function defaultIdFor(clientId) {
+  const found = findClient(clientId);
+  if (found) return found.client.defaultPersonaId;
+  const market = getMarkets()[0];
+  return findClient(market.defaultClientId).client.defaultPersonaId;
+}
 
 function getClientIdFromStorage() {
+  // Reads the same `selected_client` key ClientContext and BrandingContext use.
+  // Needed because the initial persona is resolved in a useState initialiser,
+  // where hooks are not available yet.
   try {
-    const auth = JSON.parse(localStorage.getItem('auth_state') || 'null');
-    return auth?.clientId || null;
+    return localStorage.getItem(STORAGE_KEY);
   } catch {
     return null;
   }
 }
 
-function getAllowedIds(clientId) {
-  return CLIENT_PERSONAS[clientId] || CLIENT_PERSONAS[FALLBACK_CLIENT_ID];
-}
-
-function getDefaultId(clientId) {
-  return CLIENT_DEFAULT_PERSONA[clientId] || CLIENT_DEFAULT_PERSONA[FALLBACK_CLIENT_ID];
-}
-
 export function PersonaProvider({ children }) {
   const location = useLocation();
-  const { auth } = useAuth();
-  const clientId = auth?.clientId || null;
+  const { clientId } = useClient();
 
-  const allowedIds = useMemo(() => getAllowedIds(clientId), [clientId]);
-  const defaultId = useMemo(() => getDefaultId(clientId), [clientId]);
+  const allowedPersonas = useMemo(() => personasFor(clientId), [clientId]);
+  const defaultId = useMemo(() => defaultIdFor(clientId), [clientId]);
 
   const [persona, setPersona] = useState(() => {
     // Lazy init: read clientId directly from storage (hooks not available here)
     const cId = getClientIdFromStorage();
-    const allowed = getAllowedIds(cId);
-    const defId = getDefaultId(cId);
+    const allowed = personasFor(cId);
+    const byId = (id) => allowed.find((p) => p.id === id);
 
     const params = new URLSearchParams(window.location.search);
     const urlPersona = params.get('persona');
-    if (urlPersona && personas[urlPersona] && allowed.includes(urlPersona)) {
-      sessionStorage.setItem(SESSION_KEY, urlPersona);
-      return personas[urlPersona];
-    }
+    if (urlPersona && byId(urlPersona)) return byId(urlPersona);
     const stored = sessionStorage.getItem(SESSION_KEY);
-    if (stored && personas[stored] && allowed.includes(stored)) {
-      return personas[stored];
-    }
-    return personas[defId];
+    if (stored && byId(stored)) return byId(stored);
+    return byId(defaultIdFor(cId)) || allowed[0];
   });
 
-  // When client switches, reset to client-default if current persona is not allowed
-  useEffect(() => {
-    if (!allowedIds.includes(persona.id)) {
-      const next = personas[defaultId];
-      sessionStorage.setItem(SESSION_KEY, next.id);
-      setPersona(next);
-    }
-  }, [clientId]); // eslint-disable-line react-hooks/exhaustive-deps
+  // A persona the current client does not offer (the client just switched) gives
+  // way to the client's default, in the same render.
+  if (!allowedPersonas.some((p) => p.id === persona.id)) {
+    setPersona(allowedPersonas.find((p) => p.id === defaultId) || allowedPersonas[0]);
+  }
 
-  // React to URL ?persona= changes (persona switcher navigation)
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const urlPersona = params.get('persona');
-    if (
-      urlPersona &&
-      personas[urlPersona] &&
-      allowedIds.includes(urlPersona) &&
-      urlPersona !== persona.id
-    ) {
-      sessionStorage.setItem(SESSION_KEY, urlPersona);
-      setPersona(personas[urlPersona]);
-    }
-  }, [location.search]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The persona switcher navigates with ?persona=; follow it when it changes.
+  const [seenSearch, setSeenSearch] = useState(location.search);
+  if (location.search !== seenSearch) {
+    setSeenSearch(location.search);
+    const urlPersona = new URLSearchParams(location.search).get('persona');
+    const next = urlPersona && allowedPersonas.find((p) => p.id === urlPersona);
+    if (next && urlPersona !== persona.id) setPersona(next);
+  }
 
-  const allowedPersonas = useMemo(
-    () => allowedIds.map((id) => personas[id]).filter(Boolean),
-    [allowedIds]
-  );
+  // Remember the active persona for this tab (reloads come back to it).
+  useEffect(() => {
+    sessionStorage.setItem(SESSION_KEY, persona.id);
+  }, [persona.id]);
+
+  // Expose active persona id for DemoRunner
+  useEffect(() => {
+    window.__activePersona = persona.id;
+    return () => { window.__activePersona = null; };
+  }, [persona]);
 
   return (
     <PersonaContext.Provider value={persona}>

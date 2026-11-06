@@ -1,0 +1,935 @@
+{
+  "signals": [
+    {
+      "id": "SIG-CMO-1",
+      "title": "BP Control Short of Target",
+      "severity": "critical",
+      "description": "58% vs a 65% target. About 180 more needed; 412 are within 10 points.",
+      "metric": "58% · target 65%",
+      "sources": [
+        "EHR (FHIR)",
+        "eCQM Engine"
+      ],
+      "chip": "Show me the 412 closest to control",
+      "primary": true
+    },
+    {
+      "id": "SIG-CMO-2",
+      "title": "Low-Value Imaging Cluster",
+      "severity": "warning",
+      "description": "$162K a year, 71% from Winnemucca since the April locum rotation.",
+      "metric": "$162K · 71% at one site",
+      "sources": [
+        "Claims",
+        "EHR Orders"
+      ],
+      "chip": "What is happening at Winnemucca?"
+    },
+    {
+      "id": "SIG-CMO-3",
+      "title": "Risk-Coding Recapture Gap",
+      "severity": "warning",
+      "description": "73 high-need members not recaptured this year; expected cost about 3.1% low.",
+      "metric": "73 members · about 3.1%",
+      "sources": [
+        "EHR (FHIR)",
+        "Claims"
+      ],
+      "chip": "Show me the coding list"
+    }
+  ],
+  "kpis": [
+    {
+      "id": "gate",
+      "label": "Quality Measures Met",
+      "value": "2 of 5",
+      "source": "eCQM engine",
+      "icon": "target",
+      "tone": "critical",
+      "chip": "How close are we to each quality target?"
+    },
+    {
+      "id": "bp",
+      "label": "BP Control (CMS165)",
+      "value": "58%",
+      "detail": "Target 65%",
+      "source": "EHR + remote readings",
+      "icon": "heart-pulse",
+      "tone": "critical",
+      "chip": "Show me the 412 closest to control"
+    },
+    {
+      "id": "a1c",
+      "label": "HbA1c >9% (CMS122)",
+      "value": "34%",
+      "detail": "Target 30% or lower",
+      "source": "EHR labs",
+      "icon": "activity",
+      "tone": "warning"
+    },
+    {
+      "id": "crc",
+      "label": "Colorectal Screening (CMS130)",
+      "value": "33%",
+      "detail": "Target 40%",
+      "source": "EHR + claims",
+      "icon": "clipboard-check",
+      "tone": "warning"
+    },
+    {
+      "id": "lowValue",
+      "label": "Low-Value Services",
+      "value": "2,140",
+      "source": "Low-value care library",
+      "icon": "alert-triangle",
+      "tone": "warning",
+      "chip": "Show low-value care by site"
+    },
+    {
+      "id": "coding",
+      "label": "Coding Recapture Open",
+      "value": "73 members",
+      "source": "EHR + claims",
+      "icon": "file-text",
+      "tone": "warning",
+      "chip": "Show me the coding list"
+    },
+    {
+      "id": "social",
+      "label": "Social Needs Screened",
+      "value": "38% of members",
+      "source": "Screening tool",
+      "icon": "users",
+      "tone": "neutral"
+    }
+  ],
+  "steps": {
+    "cmo_brief": {
+      "step": 1,
+      "capability": "Proactive Intelligence",
+      "ai": "Good morning, Dr. Castellanos. Three quality signals today.",
+      "points": [
+        "BP control is 58% and needs 65% in 58 days.",
+        "412 hypertensive members are within 10 points of control, so the target is reachable.",
+        "Also: an imaging cluster at Winnemucca and 73 members to recapture."
+      ],
+      "sources": [
+        "EHR (FHIR)",
+        "eCQM Engine",
+        "Claims",
+        "Low-Value Care Library"
+      ],
+      "chips": [
+        "Show me the 412 closest to control",
+        "What is happening at Winnemucca?",
+        "Show me the coding list"
+      ],
+      "next": "What is happening at Winnemucca?",
+      "viz": [
+        "v_gate"
+      ]
+    },
+    "cmo_winnemucca": {
+      "step": 2,
+      "capability": "Anomaly Detection",
+      "asks": [
+        "What is happening at Winnemucca?"
+      ],
+      "ai": "At Winnemucca, low back pain imaging has run at 27% of eligible visits since April, against 9% across the network.",
+      "points": [
+        "71% of the $162K in low-value imaging comes from Winnemucca.",
+        "No red-flag diagnoses were coded in the flagged cases.",
+        "Three rotating clinicians order at the same rate: a missing order set, not one provider."
+      ],
+      "sources": [
+        "Claims",
+        "EHR Orders",
+        "Provider Directory (NPPES)",
+        "Low-Value Care Library"
+      ],
+      "chips": [
+        "Which gaps can we close in 58 days?",
+        "Draft a Choosing Wisely feedback note for Winnemucca",
+        "Open in Low-Value Care"
+      ],
+      "next": "Which gaps can we close in 58 days?",
+      "viz": [
+        "v_imaging_sites",
+        "v_winnemucca_trend",
+        "v_lvc_top"
+      ]
+    },
+    "cmo_close": {
+      "step": 3,
+      "capability": "Predictive Intelligence",
+      "asks": [
+        "Which gaps can we close in 58 days?",
+        "Project our measures to December 31"
+      ],
+      "ai": "Blood pressure is the one to win.",
+      "points": [
+        "About 210 of the 412 should reach control; 180 gets you to 65%.",
+        "268 drive over an hour: a telehealth recheck with a home cuff counts for CMS165.",
+        "Mailed FIT kits add about 4 points to colorectal screening: worth starting, though short of the gate this year.",
+        "HbA1c will not move enough in 58 days: plan it for Q1."
+      ],
+      "sources": [
+        "EHR (FHIR)",
+        "Remote BP Readings",
+        "Travel Time (OpenStreetMap)",
+        "FCC Broadband",
+        "eCQM Engine"
+      ],
+      "chips": [
+        "Launch the BP campaign",
+        "Start the FIT kit mailing",
+        "Plan HbA1c for Q1"
+      ],
+      "next": "Launch the BP campaign",
+      "viz": [
+        "v_projection",
+        "v_mode_split"
+      ]
+    },
+    "cmo_campaign": {
+      "step": 4,
+      "capability": "Automated Action",
+      "asks": [
+        "Launch the BP campaign"
+      ],
+      "ai": "Here is the blood pressure campaign: the 412 members ranked by likelihood of reaching control, with a recommended visit mode for each.",
+      "points": [
+        "144 in person, 268 telehealth with a home cuff (37 need a cuff shipped).",
+        "Standing orders and a Winnemucca feedback note are ready for review.",
+        "Approving sends the list to the care team's Worklist."
+      ],
+      "sources": [
+        "EHR (FHIR)",
+        "Care Plan Templates",
+        "Low-Value Care Library"
+      ],
+      "chips": [
+        "Approve and send to the Worklist",
+        "Review standing orders",
+        "Edit the provider note"
+      ],
+      "next": "Approve and send to the Worklist",
+      "launch": {
+        "workbench": "qualityGate",
+        "filter": "bp412",
+        "label": "Quality Gate and Campaigns",
+        "detail": "filtered to the 412 near-control members"
+      },
+      "viz": [
+        "v_campaign",
+        "v_launch_campaign"
+      ]
+    },
+    "cmo_approve": {
+      "capability": "Automated Action",
+      "asks": [
+        "Approve and send to the Worklist"
+      ],
+      "ai": "Approved: the 412-member BP campaign is on the care team's Worklist, with Teresa's 46 flagged as top priority this week.",
+      "sources": [
+        "Impactability Score",
+        "EHR (FHIR)"
+      ],
+      "chips": [
+        "Explain this ranking",
+        "Review standing orders",
+        "How close are we to each quality target?"
+      ],
+      "action": "approve:bp412",
+      "viz": [
+        "v_handoff_bp"
+      ]
+    },
+    "cmo_targets": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "How close are we to each quality target?"
+      ],
+      "ai": "Two measures are met: BP is 7 points short, HbA1c poor control 4 points high, and colorectal screening 7 points short.",
+      "sources": [
+        "eCQM Engine",
+        "EHR (FHIR)"
+      ],
+      "chips": [
+        "Which gaps can we close in 58 days?",
+        "Show me the 412 closest to control"
+      ],
+      "next": "Which gaps can we close in 58 days?",
+      "viz": [
+        "v_gate"
+      ]
+    },
+    "cmo_412": {
+      "capability": "Predictive Intelligence",
+      "asks": [
+        "Show me the 412 closest to control",
+        "Which patients are closest to BP control?"
+      ],
+      "ai": "These are the ten of the 412 near-control members most likely to reach control.",
+      "sources": [
+        "EHR (FHIR)",
+        "Remote BP Readings",
+        "Impactability Score"
+      ],
+      "chips": [
+        "Launch the BP campaign",
+        "Which gaps can we close in 58 days?",
+        "Explain this ranking"
+      ],
+      "next": "Which gaps can we close in 58 days?",
+      "viz": [
+        "v_top10"
+      ],
+      "action": "highlight:campaignTop10"
+    },
+    "cmo_coding": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Show me the coding list",
+        "Which members need coding recapture?"
+      ],
+      "ai": "73 high-need members have 2025 conditions not yet recaptured, so expected cost is about 3.1% low.",
+      "sources": [
+        "EHR (FHIR)",
+        "Claims"
+      ],
+      "chips": [
+        "What is happening at Winnemucca?",
+        "Which gaps can we close in 58 days?"
+      ],
+      "next": "What is happening at Winnemucca?",
+      "viz": [
+        "v_coding"
+      ]
+    },
+    "cmo_note": {
+      "capability": "Automated Action",
+      "asks": [
+        "Draft a Choosing Wisely feedback note for Winnemucca",
+        "Draft a provider feedback note",
+        "Edit the provider note",
+        "Draft a note to this provider"
+      ],
+      "ai": "Here is a draft feedback note for the Winnemucca clinicians, framed as a protocol fix rather than individual feedback.",
+      "sources": [
+        "Low-Value Care Library",
+        "EHR Orders"
+      ],
+      "chips": [
+        "Which gaps can we close in 58 days?",
+        "Which providers order the most low-value imaging?"
+      ],
+      "next": "Which gaps can we close in 58 days?",
+      "viz": [
+        "v_note"
+      ]
+    },
+    "cmo_orders": {
+      "capability": "Automated Action",
+      "asks": [
+        "Review standing orders"
+      ],
+      "ai": "Two standing orders cover the campaign: a recheck by video or in person, and a titration step when a reading stays at 140/90 or higher.",
+      "sources": [
+        "Care Plan Templates",
+        "EHR (FHIR)"
+      ],
+      "chips": [
+        "Approve and send to the Worklist",
+        "Edit the provider note"
+      ],
+      "next": "Approve and send to the Worklist",
+      "viz": [
+        "v_orders"
+      ]
+    },
+    "cmo_fit": {
+      "capability": "Predictive Intelligence",
+      "asks": [
+        "Start the FIT kit mailing"
+      ],
+      "ai": "Mailed FIT kits could add about 4 points to colorectal screening; drafted to start now, for next year.",
+      "sources": [
+        "EHR (FHIR)",
+        "Claims"
+      ],
+      "chips": [
+        "Launch the BP campaign",
+        "Plan HbA1c for Q1"
+      ],
+      "next": "Launch the BP campaign",
+      "viz": [
+        "v_fit"
+      ]
+    },
+    "cmo_a1c": {
+      "capability": "Predictive Intelligence",
+      "asks": [
+        "Plan HbA1c for Q1"
+      ],
+      "ai": "HbA1c poor control is 34 percent against a 30 percent ceiling and will not move enough in 58 days, so it is planned for Q1.",
+      "sources": [
+        "EHR Labs",
+        "eCQM Engine"
+      ],
+      "chips": [
+        "Launch the BP campaign",
+        "Start the FIT kit mailing"
+      ],
+      "next": "Launch the BP campaign",
+      "viz": [
+        "v_a1c"
+      ]
+    },
+    "cmo_sites": {
+      "capability": "Anomaly Detection",
+      "asks": [
+        "Show low-value care by site"
+      ],
+      "ai": "Winnemucca carries $196K of the $618K, more than any other site, most of it low back pain imaging.",
+      "sources": [
+        "Claims",
+        "Low-Value Care Library"
+      ],
+      "chips": [
+        "What is happening at Winnemucca?",
+        "Which providers order the most low-value imaging?"
+      ],
+      "next": "What is happening at Winnemucca?",
+      "viz": [
+        "v_lv_sites"
+      ]
+    },
+    "cmo_providers": {
+      "capability": "Anomaly Detection",
+      "asks": [
+        "Which providers order the most low-value imaging?"
+      ],
+      "ai": "The three rotating clinicians at Winnemucca order imaging at 26 to 28%, against 9% network-wide.",
+      "sources": [
+        "EHR Orders",
+        "Provider Directory (NPPES)"
+      ],
+      "chips": [
+        "Draft a Choosing Wisely feedback note for Winnemucca",
+        "What is happening at Winnemucca?"
+      ],
+      "next": "What is happening at Winnemucca?",
+      "viz": [
+        "v_locums"
+      ]
+    },
+    "cmo_open_lvc": {
+      "capability": "Anomaly Detection",
+      "asks": [
+        "Open in Low-Value Care"
+      ],
+      "ai": "Opening Low-Value Care on Winnemucca; select a measure or provider to ask me about it.",
+      "sources": [
+        "Low-Value Care Library"
+      ],
+      "chips": [
+        "Which gaps can we close in 58 days?",
+        "Draft a Choosing Wisely feedback note for Winnemucca"
+      ],
+      "next": "Which gaps can we close in 58 days?",
+      "launch": {
+        "workbench": "lowValueCare",
+        "filter": "winnemucca",
+        "label": "Low-Value Care",
+        "detail": "filtered to Winnemucca",
+        "auto": true
+      },
+      "viz": [
+        "v_launch_lvc"
+      ]
+    },
+    "cmo_ctx_rank": {
+      "capability": "Predictive Intelligence",
+      "asks": [
+        "Explain this ranking",
+        "Why is this patient ranked here?"
+      ],
+      "ai": "Here is what puts this member where they are on the campaign list.",
+      "sources": [
+        "Impactability Score",
+        "EHR (FHIR)"
+      ],
+      "chips": [
+        "Approve and send to the Worklist",
+        "Review standing orders"
+      ],
+      "viz": [
+        "v_ctx_rank"
+      ]
+    },
+    "cmo_ctx_measure": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Explain this measure"
+      ],
+      "ai": "Here is where this measure stands against its target and what would move it.",
+      "sources": [
+        "eCQM Engine"
+      ],
+      "chips": [
+        "Which gaps can we close in 58 days?",
+        "Launch the BP campaign"
+      ],
+      "viz": [
+        "v_ctx_measure"
+      ]
+    },
+    "cmo_ctx_lvm": {
+      "capability": "Anomaly Detection",
+      "asks": [
+        "Explain this low-value measure"
+      ],
+      "ai": "Here is what this measure counts, where it happens and what it costs.",
+      "sources": [
+        "Low-Value Care Library",
+        "Claims"
+      ],
+      "chips": [
+        "Draft a Choosing Wisely feedback note for Winnemucca",
+        "Show low-value care by site"
+      ],
+      "viz": [
+        "v_ctx_lvm"
+      ]
+    },
+    "cmo_ctx_feature": {
+      "capability": "Anomaly Detection",
+      "asks": [
+        "Explain this feature"
+      ],
+      "ai": "Here is what this model feature reads and how it treats frontier members.",
+      "sources": [
+        "Model Card"
+      ],
+      "chips": [
+        "Which gaps can we close in 58 days?"
+      ],
+      "viz": [
+        "v_ctx_feature"
+      ]
+    },
+    "cmo_ctx_site": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Explain this site"
+      ],
+      "ai": "Here is how this site compares with the network on cost, members and low-value care.",
+      "sources": [
+        "Claims",
+        "MCO Eligibility"
+      ],
+      "chips": [
+        "Show low-value care by site",
+        "What is happening at Winnemucca?"
+      ],
+      "viz": [
+        "v_ctx_site"
+      ]
+    },
+    "cmo_ctx_segment": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Explain this segment"
+      ],
+      "ai": "Here is who is in this segment and what the plan is for them.",
+      "sources": [
+        "Impactability Score",
+        "Claims"
+      ],
+      "chips": [
+        "Show me the coding list",
+        "Which gaps can we close in 58 days?"
+      ],
+      "viz": [
+        "v_ctx_segment"
+      ]
+    },
+    "cmo_ctx_gap": {
+      "capability": "Converged Conversation",
+      "asks": [
+        "Explain this gap bar"
+      ],
+      "ai": "Here is what sits behind this part of the $26 gap.",
+      "sources": [
+        "RAIN Cost Model"
+      ],
+      "chips": [
+        "Show me the coding list",
+        "Which gaps can we close in 58 days?"
+      ],
+      "viz": [
+        "v_ctx_gap"
+      ]
+    },
+    "__default__": {
+      "ai": "I can answer on the quality gate, the BP campaign, low-value care by site and provider, and coding recapture.",
+      "sources": [],
+      "chips": [
+        "How close are we to each quality target?",
+        "What is happening at Winnemucca?",
+        "Show me the coding list"
+      ]
+    }
+  },
+  "queries": [
+    "How close are we to each quality target?",
+    "Which patients are closest to BP control?",
+    "Show low-value care by site",
+    "Which providers order the most low-value imaging?",
+    "Which members need coding recapture?",
+    "Project our measures to December 31",
+    "Draft a provider feedback note"
+  ],
+  "viz": {
+    "v_gate": {
+      "type": "rain.quality_tracker",
+      "props": {}
+    },
+    "v_imaging_sites": {
+      "type": "chart",
+      "props": {
+        "dataset": "site_imaging"
+      }
+    },
+    "v_winnemucca_trend": {
+      "type": "rain.annotated_trend",
+      "props": {}
+    },
+    "v_lvc_top": {
+      "type": "data_table",
+      "props": {
+        "dataset": "lv_top5"
+      }
+    },
+    "v_projection": {
+      "type": "chart",
+      "props": {
+        "dataset": "measure_projection"
+      }
+    },
+    "v_mode_split": {
+      "type": "grid",
+      "props": {
+        "dataset": "mode_split"
+      }
+    },
+    "v_campaign": {
+      "type": "rain.campaign_preview",
+      "props": {}
+    },
+    "v_launch_campaign": {
+      "type": "rain.launch_card",
+      "props": {
+        "step": "cmo_campaign"
+      }
+    },
+    "v_launch_lvc": {
+      "type": "rain.launch_card",
+      "props": {
+        "step": "cmo_open_lvc"
+      }
+    },
+    "v_handoff_bp": {
+      "type": "rain.handoff_cards",
+      "props": {
+        "ids": [
+          "bp412"
+        ]
+      }
+    },
+    "v_top10": {
+      "type": "data_table",
+      "props": {
+        "dataset": "campaign_top10"
+      }
+    },
+    "v_coding": {
+      "type": "data_table",
+      "props": {
+        "caption": "6 of the 73 members shown, de-identified",
+        "columns": [
+          {
+            "key": "id",
+            "label": "Member"
+          },
+          {
+            "key": "condition",
+            "label": "Condition not recaptured"
+          },
+          {
+            "key": "last",
+            "label": "Last documented"
+          },
+          {
+            "key": "next",
+            "label": "Next chance"
+          }
+        ],
+        "rows": [
+          {
+            "id": "H-1024",
+            "condition": "Diabetes with chronic kidney disease",
+            "last": "2025",
+            "next": "Visit in 9 days"
+          },
+          {
+            "id": "H-1061",
+            "condition": "Heart failure",
+            "last": "2025",
+            "next": "Telehealth review"
+          },
+          {
+            "id": "H-1088",
+            "condition": "Major depression, recurrent",
+            "last": "2025",
+            "next": "Visit in 14 days"
+          },
+          {
+            "id": "H-1102",
+            "condition": "COPD",
+            "last": "2025",
+            "next": "Telehealth review"
+          },
+          {
+            "id": "H-1139",
+            "condition": "Morbid obesity",
+            "last": "2025",
+            "next": "Visit in 21 days"
+          },
+          {
+            "id": "H-1170",
+            "condition": "Rheumatoid arthritis",
+            "last": "2025",
+            "next": "Telehealth review"
+          }
+        ]
+      }
+    },
+    "v_note": {
+      "type": "rain.brief_preview",
+      "props": {
+        "kind": "note",
+        "editable": true
+      }
+    },
+    "v_orders": {
+      "type": "data_table",
+      "props": {
+        "caption": "Standing orders for the BP campaign, for CMO review",
+        "columns": [
+          {
+            "key": "order",
+            "label": "Standing order"
+          },
+          {
+            "key": "who",
+            "label": "Applies to"
+          },
+          {
+            "key": "state",
+            "label": "Status",
+            "kind": "status"
+          }
+        ],
+        "rows": [
+          {
+            "order": "BP recheck by video with a home cuff reading, or in person",
+            "who": "All 412 members",
+            "state": "Awaiting review"
+          },
+          {
+            "order": "Titrate per protocol when a reading stays at 140/90 or higher",
+            "who": "Members not at control after recheck",
+            "state": "Awaiting review"
+          },
+          {
+            "order": "Ship a validated home cuff before the visit",
+            "who": "37 telehealth members without a cuff",
+            "state": "Awaiting review"
+          }
+        ]
+      }
+    },
+    "v_fit": {
+      "type": "grid",
+      "props": {
+        "columns": 3,
+        "children": [
+          {
+            "type": "stat",
+            "props": {
+              "label": "Colorectal screening now",
+              "value": "33%",
+              "caption": "Target 40%",
+              "status": "warning"
+            }
+          },
+          {
+            "type": "stat",
+            "props": {
+              "label": "Expected gain",
+              "value": "About 4 points",
+              "caption": "Mailed FIT kits",
+              "status": "info"
+            }
+          },
+          {
+            "type": "stat",
+            "props": {
+              "label": "Gate impact this year",
+              "value": "33% to about 37%",
+              "caption": "Short of the 40% target",
+              "status": "neutral"
+            }
+          }
+        ]
+      }
+    },
+    "v_a1c": {
+      "type": "callout",
+      "props": {
+        "title": "HbA1c poor control: planned for Q1",
+        "body": "34 percent against a ceiling of 30 percent. A new HbA1c reflects about three months of treatment, so 58 days is too short to move it.",
+        "status": "info"
+      }
+    },
+    "v_lv_sites": {
+      "type": "chart",
+      "props": {
+        "dataset": "site_lowvalue"
+      }
+    },
+    "v_locums": {
+      "type": "data_table",
+      "props": {
+        "caption": "Winnemucca ordering clinicians since April, de-identified",
+        "columns": [
+          {
+            "key": "who",
+            "label": "Clinician"
+          },
+          {
+            "key": "rate",
+            "label": "Imaging rate",
+            "align": "right"
+          },
+          {
+            "key": "orders",
+            "label": "Orders",
+            "kind": "number"
+          },
+          {
+            "key": "network",
+            "label": "Network rate",
+            "align": "right"
+          }
+        ],
+        "rows": [
+          {
+            "who": "Locum clinician 1",
+            "rate": "27%",
+            "orders": 41,
+            "network": "9%"
+          },
+          {
+            "who": "Locum clinician 2",
+            "rate": "28%",
+            "orders": 38,
+            "network": "9%"
+          },
+          {
+            "who": "Locum clinician 3",
+            "rate": "26%",
+            "orders": 35,
+            "network": "9%"
+          }
+        ]
+      }
+    },
+    "v_ctx_rank": {
+      "type": "context",
+      "props": {
+        "kind": "rank"
+      }
+    },
+    "v_ctx_measure": {
+      "type": "context",
+      "props": {
+        "kind": "measure"
+      }
+    },
+    "v_ctx_lvm": {
+      "type": "context",
+      "props": {
+        "kind": "lvMeasure"
+      }
+    },
+    "v_ctx_feature": {
+      "type": "context",
+      "props": {
+        "kind": "feature"
+      }
+    },
+    "v_ctx_site": {
+      "type": "context",
+      "props": {
+        "kind": "site"
+      }
+    },
+    "v_ctx_segment": {
+      "type": "context",
+      "props": {
+        "kind": "segment"
+      }
+    },
+    "v_ctx_gap": {
+      "type": "context",
+      "props": {
+        "kind": "gap"
+      }
+    }
+  },
+  "handoffs": [
+    {
+      "id": "bp412",
+      "title": "BP campaign (412) to the Worklist",
+      "count": 412,
+      "to": "Care team",
+      "workbench": "worklist",
+      "detail": "Ranked by likelihood of reaching control, with visit mode and cuff status"
+    }
+  ],
+  "workbenches": [
+    {
+      "id": "qualityGate",
+      "access": "full"
+    },
+    {
+      "id": "lowValueCare",
+      "access": "full"
+    },
+    {
+      "id": "valueInsights",
+      "access": "full"
+    },
+    {
+      "id": "modelGovernance",
+      "access": "cosign"
+    },
+    {
+      "id": "worklist",
+      "access": "view"
+    }
+  ]
+}

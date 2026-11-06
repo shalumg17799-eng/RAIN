@@ -1,8 +1,13 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { Zap } from 'lucide-react';
 import InsightMiniCard from '../cards/InsightMiniCard';
+import { devWarn } from '@core/log';
 
-export default function TopInsightsBar({ signals, onInsightClick, visible, signalToChip }) {
+/**
+ * `limit` defaults to the three cards every tenant shows; a persona whose spec
+ * names four priority signals (SCLAC) passes 4. Nothing else changes.
+ */
+export default function TopInsightsBar({ signals, onInsightClick, visible, signalToChip, limit = 3 }) {
   if (!signals || signals.length === 0) return null;
 
   return (
@@ -17,33 +22,25 @@ export default function TopInsightsBar({ signals, onInsightClick, visible, signa
         >
           {/* Section label */}
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-5 h-5 rounded-md bg-[#003087]/8 flex items-center justify-center">
-              <Zap className="w-3 h-3 text-[#003087]" />
+            <div className="w-5 h-5 rounded-md bg-brand/8 flex items-center justify-center">
+              <Zap className="w-3 h-3 text-brand" />
             </div>
-            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">
+            <span className="text-[11px] font-bold text-text-muted uppercase tracking-wider">
               Priority Signals
             </span>
-            <div className="flex-1 h-px bg-gray-100 ml-1" />
+            <div className="flex-1 h-px bg-surface-2 ml-1" />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            {signals.slice(0, 3).map((signal, idx) => (
+          <div className="flex gap-3">
+            {signals.slice(0, limit).map((signal, idx) => (
               <InsightMiniCard
                 key={signal.id}
                 signal={signal}
                 index={idx}
                 onClick={() => {
-                  // Match by position (1st/2nd/3rd signal), not by exact id
-                  // string -- the live backend's signal ids use a different
-                  // naming convention (SIG-RAIN-SARAH-001) than Ultra's own
-                  // static signalToChip map (SIG-RAIN-WHITEHORSE-001), so an
-                  // id-string lookup always misses and silently blocks every
-                  // signal-card click. Position is verified to match the
-                  // same signal on both sides.
-                  const chipKeys = Object.keys(signalToChip || {});
-                  const chipText = signalToChip?.[chipKeys[idx]];
+                  const chipText = signalToChip?.[signal.id];
                   if (!chipText) {
-                    console.warn(`[ConversationGuard] No chip mapped for signal position ${idx} — click blocked.`);
+                    devWarn(`[ConversationGuard] No chip mapped for signal "${signal.id}" — click blocked.`);
                     return;
                   }
                   if (onInsightClick) onInsightClick(chipText);

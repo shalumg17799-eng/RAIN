@@ -1,0 +1,38 @@
+RAIN prototype spec v2 factory extract (platform PRD v0.3 input)
+This is the build-factory input distilled from the prototype specification version 2 for value-based care intelligence: the two use cases, the entities of the planned data layer, and the governing policies. The full document remains the human reference.
+
+The platform gives a rural health center network and its state program one platform for data-driven value-based care insight and for care management workflow, kept visibly separate and connected only through a single approved hand-off.
+
+The platform manages patient and provider records.
+Every patient and every provider belongs to a clinic_site of the participating health centers.
+Contract membership uses attributed_member records, one row per managed care member of the value-based contract.
+Each contract_benchmark sets the expected cost per member per month, the sharing rate and the quality gate for a contract year.
+Cost analysis uses claim and claim_line history for spend, emergency and admission patterns measured against the contract_benchmark.
+Utilization comparisons use utilization_benchmark data for avoidable emergency visit rates by county.
+Clinical history uses encounter, condition, medication, observation and ehr_order records.
+Risk-coding recapture compares each condition across years to find chronic conditions not yet recaptured this year.
+Quality measurement uses quality_measure definitions and quality_measure_result records.
+Care gaps use care_gap records. A care_gap opens when a measure is unmet and closes when a qualifying visit or reading arrives.
+Remote monitoring uses remote_bp_reading data for home blood pressure readings that count toward the blood pressure control measure.
+Member segmentation uses impactability_score records. The impactability_score ranks each member into a segment: impactable rising risk, already expensive, or stable low risk, with a predicted cost avoided per member.
+Low-value care detection scores each claim_line against the low_value_measure library. Each low_value_finding carries its classification, the wasted allowed dollars, the clinic_site and the ordering provider.
+Model governance uses model_card and subgroup_check records.
+Campaigns use campaign and campaign_member records. Each campaign_member carries an outreach rank and a recommended visit mode.
+Care coordination uses outreach_task records. Community health workers get a ranked worklist with the reason for each call.
+The hand-off between insight and workflow uses handoff records, and closed care gaps flow back to the quality gate.
+Smart scheduling uses schedule, slot and appointment records. Rural patients book, confirm or switch to telehealth with fewer wasted trips.
+Reminders use reminder_message and contact_preference data in the patient's own language over text or voice, with pattern-based timing.
+Coverage checks use eligibility_check responses before a visit.
+Social needs use sdoh_screening responses covering the five core social domains.
+County context uses county_metric, shortage_area, rural_classification, broadband_coverage and travel_time data for access and equity views.
+
+Use case 1, value-based care insights: where does cost of care run above the contract_benchmark, which members should the network still reach before costs rise, and which services are low-value?
+Use case 2, care management workflow: who should the care team call today, which visit does each patient need, and how does the team make sure the visit happens?
+
+Policy: the prototype runs on public data and labelled synthetic operational data only, and synthetic data must be labelled as such on every screen.
+Policy: aggregated state views must suppress any cell with fewer than eleven members.
+Policy: the impactability_score is used for outreach only after its subgroup_check passes and a sign-off lands on the model_card.
+Policy: the user must approve anything that sends, books or publishes; the platform flags and routes and clinicians decide.
+Policy: patient text messages must use plain language and never give clinical advice.
+
+The platform also needs a no_show_rate entity that is not yet modelled.

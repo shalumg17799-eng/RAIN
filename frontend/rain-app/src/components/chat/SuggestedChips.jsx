@@ -14,7 +14,7 @@ export default function SuggestedChips({ chips, onChipClick }) {
         <button
           key={idx}
           onClick={() => onChipClick(chip)}
-          className="px-4 py-2 rounded-full text-sm font-medium border border-[#003087]/20 text-[#003087] bg-white hover:bg-[#003087]/5 hover:border-[#003087]/40 transition-all cursor-pointer shadow-sm"
+          className="px-4 py-2 rounded-full text-sm font-medium border border-brand/20 text-brand bg-surface hover:bg-brand/5 hover:border-brand/40 transition-all cursor-pointer shadow-sm"
         >
           {chip}
         </button>

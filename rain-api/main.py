@@ -99,6 +99,10 @@ _OPENAPI_TAGS = [
      "description": "The governed agent (`/api/v2/ask` + HITL): bearer-token auth per persona, SSE stage streaming, L1-L3 policy, used by chat only when `VITE_RAIN_GOVERNED_ASK=1`."},
     {"name": "data",
      "description": "Generated Data API over the `synthetic` + `public_data` schemas (`/api/v2/data/...`), from deploy/scripts/build_data_api.py."},
+    {"name": "data-v3",
+     "description": "Generated Data API for the PRD v0.3 wave over the `rain_v3` database (`/api/v3/data/...`), from deploy/scripts/build_data_api.py."},
+    {"name": "ultra-v3",
+     "description": "Ultra API v1 for the PRD v0.3 frontend (frontend/rain-app) at `/api/v3/ui/...`: context, briefing, ask, actions, catalog for the 7-persona VBC prototype, served from app-exported fixtures (npm run fixtures:backend)."},
     {"name": "Legacy /api/v2 (scripted era)",
      "description": "Pre-governed envelope endpoints still used by `genericApi.js` (`/generic`) and available for `/signals`+`/kpis`. The legacy `/api/v2/ask` here is SHADOWED by the Insights router at runtime and hidden from this spec."},
     {"name": "Ops", "description": "Health and registration checks."},
@@ -116,6 +120,16 @@ app.include_router(get_rain_router(), prefix="/api/v2")
 # deploy/scripts/build_data_api.py; regenerate, don't edit.
 from data_api import router as data_router  # noqa: E402
 app.include_router(data_router, prefix="/api/v2/data")
+
+# Generated data API for the PRD v0.3 wave, served from its own database (rain_v3;
+# override with PG_DB_V3) so the v0.2 layer in the rain db stays untouched.
+from data_api_v3 import router as data_v3_router  # noqa: E402
+app.include_router(data_v3_router, prefix="/api/v3/data")
+
+# Ultra API v1 for the PRD v0.3 frontend (frontend/rain-app http mode:
+# VITE_ULTRA_API_BASE=http://127.0.0.1:8000/api/v3/ui).
+from ultra_v3_api import router as ultra_v3_router  # noqa: E402
+app.include_router(ultra_v3_router, prefix="/api/v3/ui")
 # expose_headers lets the browser's fetch() read X-RAIN-Source, which the
 # frontend logs as proof a response came from this server.
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],

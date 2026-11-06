@@ -1,22 +1,150 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=Lato:ital,wght@0,400;0,700;0,900;1,400&display=swap');
+/* Lato: the California Judicial Branch's Courtyard 3.0 typeface, named only by
+   SCLAC's theme. Browsers fetch a family's files only when a page uses it, so
+   other tenants download nothing extra. */
 
 @import "tailwindcss";
 
+/* ════════════════════════════════════════════════════════════════════
+   DESIGN TOKENS — the single source of truth for the whole platform.
+
+   Everything is a semantic CSS variable, surfaced through Tailwind v4 `@theme`
+   so utilities exist (bg-brand, text-muted, border-border, bg-success-subtle,
+   text-chart-1 …). The ThemeProvider overrides `--color-brand` / fonts / chart
+   palette per active client at runtime; the derived shades (via color-mix)
+   recompute automatically.
+   ════════════════════════════════════════════════════════════════════ */
 @theme {
-  --color-navy: #003087;
-  --color-red-brand: #CC0000;
-  --color-surface: #F4F5F7;
-  --color-body: #333333;
-  --color-green: #00897B;
-  --color-amber: #F59E0B;
+  /* ── Brand (overridden per client at runtime) ───────────────────── */
+  --color-brand: #003087;
+  --color-brand-fg: #ffffff;
+  --color-brand-hover: color-mix(in srgb, var(--color-brand) 85%, #000);
+  --color-brand-subtle: color-mix(in srgb, var(--color-brand) 8%, var(--color-surface));
+  --color-brand-muted: color-mix(in srgb, var(--color-brand) 55%, var(--color-text-muted));
+  --color-brand-ring: color-mix(in srgb, var(--color-brand) 32%, transparent);
+  --color-accent: var(--color-brand);
+
+  /* ── Surfaces ───────────────────────────────────────────────────── */
+  --color-bg: #f4f5f7;
+  --color-surface: #ffffff;
+  --color-surface-2: #f8f9fb;
+  --color-border: #e5e7eb;
+  --color-border-subtle: #f1f3f5;
+  --color-overlay: rgba(10, 22, 51, 0.45);
+
+  /* ── Text ───────────────────────────────────────────────────────── */
+  --color-text: #111827;
+  --color-text-muted: #6b7280;
+  --color-text-subtle: #9ca3af;
+  --color-text-inverse: #ffffff;
+
+  /* ── State ──────────────────────────────────────────────────────── */
+  --color-success: #059669;
+  --color-success-subtle: color-mix(in srgb, var(--color-success) 12%, var(--color-surface));
+  --color-warning: #d97706;
+  --color-warning-subtle: color-mix(in srgb, var(--color-warning) 14%, var(--color-surface));
+  --color-critical: #dc2626;
+  --color-critical-subtle: color-mix(in srgb, var(--color-critical) 12%, var(--color-surface));
+  --color-info: #2563eb;
+  --color-info-subtle: color-mix(in srgb, var(--color-info) 12%, var(--color-surface));
+
+  /* ── Status ramps ───────────────────────────────────────────────────
+     Eleven steps per state, all derived from the one state colour, so a
+     tenant that overrides `critical` re-tints its whole ramp. 600 is the
+     state colour; lighter steps mix it with white, darker ones with black.
+     The mix amounts were fitted once against Tailwind's red, amber, emerald
+     and blue. Text on a pale status background (50/100) uses the 800 step,
+     which keeps every tenant at WCAG AA. */
+  --color-critical-50: color-mix(in srgb, var(--color-critical) 6%, #fff);
+  --color-critical-100: color-mix(in srgb, var(--color-critical) 14%, #fff);
+  --color-critical-200: color-mix(in srgb, var(--color-critical) 25%, #fff);
+  --color-critical-300: color-mix(in srgb, var(--color-critical) 42%, #fff);
+  --color-critical-400: color-mix(in srgb, var(--color-critical) 64%, #fff);
+  --color-critical-500: color-mix(in srgb, var(--color-critical) 82%, #fff);
+  --color-critical-600: var(--color-critical);
+  --color-critical-700: color-mix(in srgb, var(--color-critical) 82%, #000);
+  --color-critical-800: color-mix(in srgb, var(--color-critical) 67%, #000);
+  --color-critical-900: color-mix(in srgb, var(--color-critical) 57%, #000);
+  --color-critical-950: color-mix(in srgb, var(--color-critical) 31%, #000);
+
+  --color-warning-50: color-mix(in srgb, var(--color-warning) 6%, #fff);
+  --color-warning-100: color-mix(in srgb, var(--color-warning) 14%, #fff);
+  --color-warning-200: color-mix(in srgb, var(--color-warning) 25%, #fff);
+  --color-warning-300: color-mix(in srgb, var(--color-warning) 42%, #fff);
+  --color-warning-400: color-mix(in srgb, var(--color-warning) 64%, #fff);
+  --color-warning-500: color-mix(in srgb, var(--color-warning) 82%, #fff);
+  --color-warning-600: var(--color-warning);
+  --color-warning-700: color-mix(in srgb, var(--color-warning) 82%, #000);
+  --color-warning-800: color-mix(in srgb, var(--color-warning) 67%, #000);
+  --color-warning-900: color-mix(in srgb, var(--color-warning) 57%, #000);
+  --color-warning-950: color-mix(in srgb, var(--color-warning) 31%, #000);
+
+  --color-success-50: color-mix(in srgb, var(--color-success) 6%, #fff);
+  --color-success-100: color-mix(in srgb, var(--color-success) 14%, #fff);
+  --color-success-200: color-mix(in srgb, var(--color-success) 25%, #fff);
+  --color-success-300: color-mix(in srgb, var(--color-success) 42%, #fff);
+  --color-success-400: color-mix(in srgb, var(--color-success) 64%, #fff);
+  --color-success-500: color-mix(in srgb, var(--color-success) 82%, #fff);
+  --color-success-600: var(--color-success);
+  --color-success-700: color-mix(in srgb, var(--color-success) 82%, #000);
+  --color-success-800: color-mix(in srgb, var(--color-success) 67%, #000);
+  --color-success-900: color-mix(in srgb, var(--color-success) 57%, #000);
+  --color-success-950: color-mix(in srgb, var(--color-success) 31%, #000);
+
+  --color-info-50: color-mix(in srgb, var(--color-info) 6%, #fff);
+  --color-info-100: color-mix(in srgb, var(--color-info) 14%, #fff);
+  --color-info-200: color-mix(in srgb, var(--color-info) 25%, #fff);
+  --color-info-300: color-mix(in srgb, var(--color-info) 42%, #fff);
+  --color-info-400: color-mix(in srgb, var(--color-info) 64%, #fff);
+  --color-info-500: color-mix(in srgb, var(--color-info) 82%, #fff);
+  --color-info-600: var(--color-info);
+  --color-info-700: color-mix(in srgb, var(--color-info) 82%, #000);
+  --color-info-800: color-mix(in srgb, var(--color-info) 67%, #000);
+  --color-info-900: color-mix(in srgb, var(--color-info) 57%, #000);
+  --color-info-950: color-mix(in srgb, var(--color-info) 31%, #000);
+
+  /* ── Confidence tiers (was utils/confidence.js hardcodes) ────────── */
+  --color-conf-high: #059669;
+  --color-conf-med: #d97706;
+  --color-conf-low: #dc2626;
+
+  /* ── Chart palette — categorical, fixed order. chart-1 = brand. ──── */
+  --color-chart-1: var(--color-brand);
+  --color-chart-2: #8b5cf6;
+  --color-chart-3: #10b981;
+  --color-chart-4: #f59e0b;
+  --color-chart-5: #ef4444;
+  --color-chart-6: #06b6d4;
+  --color-chart-7: #ec4899;
+  --color-chart-8: #64748b;
+  --color-chart-grid: #e5e7eb;
+  --color-chart-axis: #9ca3af;
+
+  /* ── Typography ─────────────────────────────────────────────────── */
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ── Radius ─────────────────────────────────────────────────────── */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+
+  /* ── Motion ─────────────────────────────────────────────────────── */
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 400ms;
 }
 
 body {
-  font-family: 'Inter', sans-serif;
-  color: #333333;
-  background: #F4F5F7;
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg);
   margin: 0;
   -webkit-font-smoothing: antialiased;
+  transition: background-color var(--dur-base) ease, color var(--dur-base) ease;
 }
 
 #root {
@@ -47,15 +175,14 @@ body {
   background: transparent;
 }
 
-/* ── Sleek scrollbar utility — for explicit scroll containers ──────── */
-/* Shows a thin navy-tinted thumb only when the container is hovered    */
+/* ── Sleek scrollbar utility — brand-tinted thumb on hover ─────────── */
 .scrollbar-sleek {
   scrollbar-width: thin;
   scrollbar-color: transparent transparent;
   transition: scrollbar-color 0.25s ease;
 }
 .scrollbar-sleek:hover {
-  scrollbar-color: rgba(0, 48, 135, 0.18) transparent;
+  scrollbar-color: color-mix(in srgb, var(--color-brand) 22%, transparent) transparent;
 }
 .scrollbar-sleek::-webkit-scrollbar {
   width: 3px;
@@ -70,11 +197,49 @@ body {
   transition: background 0.25s ease;
 }
 .scrollbar-sleek:hover::-webkit-scrollbar-thumb {
-  background: rgba(0, 48, 135, 0.18);
+  background: color-mix(in srgb, var(--color-brand) 22%, transparent);
 }
 .scrollbar-sleek:hover::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 48, 135, 0.35);
+  background: color-mix(in srgb, var(--color-brand) 40%, transparent);
 }
 .scrollbar-sleek::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+/* ── Routing Logic flowchart — flowing edges + hover focus ─────────── */
+/* Continuous directional flow along every edge (source → target). The dash
+   period (12) divides the animated offset (24) so the loop is seamless. */
+@keyframes routing-flow {
+  from { stroke-dashoffset: 24; }
+  to   { stroke-dashoffset: 0; }
+}
+.routing-diagram .edgePaths .flowchart-link {
+  /* !important beats Mermaid's id-scoped `.edge-pattern-solid{stroke-dasharray:0}`. */
+  stroke: var(--color-brand-muted) !important;
+  stroke-dasharray: 8 4 !important;
+  animation: routing-flow 1s linear infinite;
+}
+
+/* Nodes read as interactive; opacity eased for the hover focus effect. */
+.routing-diagram .node { cursor: pointer; }
+.routing-diagram .node,
+.routing-diagram .edgePaths .flowchart-link,
+.routing-diagram .edgeLabel {
+  transition: opacity var(--dur-base) ease;
+}
+
+/* Hover focus: dim everything, then re-light the hovered node's downstream
+   route. `rd-dim` is toggled on the container, `rd-hl` on the route elements. */
+.routing-diagram.rd-dim .node,
+.routing-diagram.rd-dim .edgePaths .flowchart-link { opacity: 0.16; }
+.routing-diagram.rd-dim .node.rd-hl,
+.routing-diagram.rd-dim .edgePaths .flowchart-link.rd-hl { opacity: 1; }
+.routing-diagram .edgePaths .flowchart-link.rd-hl { stroke-width: 3px; }
+
+/* Respect users who prefer less motion — freeze the flow. */
+@media (prefers-reduced-motion: reduce) {
+  .routing-diagram .edgePaths .flowchart-link {
+    animation: none;
+    stroke-dasharray: none;
+  }
 }
