@@ -1,0 +1,9 @@
+# Agent spec for build-data-map. Deterministic: no LLM. Builds the lower ontology from the
+# entity model, audits it against the source and catalog schemas, and routes near-miss names
+# back to the entity designer as a bounded refine loop.
+name: build-data-map
+version: 1.0.0
+pack: data
+kind: deterministic
+stage: data_mapping
+escalations: [refine_entity_model]

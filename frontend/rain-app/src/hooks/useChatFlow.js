@@ -1,75 +1,21 @@
 import { useState, useCallback, useRef } from 'react';
-import { getPersonaFlowConfigs } from '../data/personaFlowConfigs';
+import { EMPTY_FLOW_CONFIG, usePersonaFlowConfig } from '../data/flows/load';
 import { useBranding } from '../context/BrandingContext';
-import { logBackend, logFallback, logStatic } from '../utils/dataLog';
-
-// Backend base URL -- set VITE_API_BASE in .env for a deployed backend;
-// defaults to the local dev server.
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://127.0.0.1:8000';
-
-// Ultra's persona ids -> the backend's shorter persona ids. Only RAIN uses
-// the live backend fallback today -- other clients' personaId formats
-// aren't mapped here, so the fallback simply no-ops for them.
-const PERSONA_ID_MAP = {
-  rain_delgado: 'maria',
-  rain_whitehorse: 'sarah',
-  rain_tomley: 'james',
-  rain_nair: 'priya',
-  rain_yazzie: 'david',
-};
-
-async function fetchSignalBrief(personaId) {
-  const backendId = PERSONA_ID_MAP[personaId];
-  if (!backendId) return null;
-  try {
-    const res = await fetch(`${API_BASE}/ultra/rain/${backendId}/signals`);
-    const cards = await res.json();
-    if (!Array.isArray(cards) || cards.length === 0) return null;
-    const text = cards.map((card) => card.description).filter(Boolean).join(' ');
-    return text || null;
-  } catch {
-    return null;
-  }
-}
-
-async function askBackend(personaId, query) {
-  const backendId = PERSONA_ID_MAP[personaId];
-  if (!backendId) return null;
-  try {
-    const res = await fetch(`${API_BASE}/api/v2/ask`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        market: 'healthcare', product: 'rain', persona: backendId,
-        query, conversation_history: [],
-      }),
-    });
-    const data = await res.json();
-    if (!data.ai_message) return null;
-    return data;
-  } catch {
-    return null;
-  }
-}
-
-// Chips that perform an action (route, hold, schedule) are not questions.
-// Their reply stays the saved confirmation. Every other chip is a question
-// and is answered from the database.
-const ACTION_CHIP = /^(activate|schedule|flag|route|review|share|hold|reassign|re-panel|dispatch)\b/i;
-
-function isDataQuestion(text) {
-  const trimmed = (text || '').trim();
-  if (!trimmed) return false;
-  return !ACTION_CHIP.test(trimmed);
-}
+import { devWarn } from '@core/log';
+import { random } from '@core/clock';
 
 let msgIdCounter = 0;
 const nextId = () => `msg-${++msgIdCounter}`;
 
+/**
+ * The screens' chat-drawer conversation, answered from `personaId`'s script
+ * for the current client (the generic `ops` script when omitted). The script
+ * loads on demand; until it arrives `ready` is false and nothing is answered.
+ */
 export default function useChatFlow(personaId) {
   const { clientId } = useBranding();
-  const personaFlowConfigs = getPersonaFlowConfigs(clientId);
-  const config = personaFlowConfigs[personaId];
+  const loaded = usePersonaFlowConfig(clientId, personaId);
+  const config = loaded || EMPTY_FLOW_CONFIG;
   const { chatFlows, chipToFlowKey, askTurnSequence, signalSequence, actionTurnKey, actionConfirmMap } = config;
 
   const [messages, setMessages] = useState([]);
@@ -93,7 +39,7 @@ export default function useChatFlow(personaId) {
     setIsTyping(true);
     setCurrentChips([]);
 
-    const delay = 1500 + Math.random() * 1000;
+    const delay = 1500 + random() * 1000;
     const gen = generationRef.current;
 
     setTimeout(() => {
@@ -128,115 +74,118 @@ export default function useChatFlow(personaId) {
     }, delay);
   }, [chatFlows, askTurnSequence]);
 
-  // Database answer. Follow-up question chips stay the saved list, so the
-  // conversation still offers the next questions. The paragraph is the
-  // database result. flowKey stays empty so the saved charts for that
-  // question are not drawn next to it.
-  const addLiveMessage = useCallback((backendData, flowKey, options = {}) => {
-    const flow = flowKey ? chatFlows[flowKey] : null;
-    const chips = (backendData.suggested_chips && backendData.suggested_chips.length)
-      ? backendData.suggested_chips
-      : (flow?.suggested_chips || []);
-    setIsTyping(true);
-    setCurrentChips([]);
-    const gen = generationRef.current;
-    const delay = 1200 + Math.random() * 800;
-    setTimeout(() => {
-      if (gen !== generationRef.current) return;
-      setIsTyping(false);
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: nextId(),
-          role: 'ai',
-          text: backendData.ai_message,
-          sources: backendData.data_sources_used || [],
-          flowKey: options.keepFlowKey ? flowKey : null,
-          uiComponents: [],
-          confidence: backendData.confidence,
-        },
-      ]);
-      setCurrentChips(chips);
-      if (flowKey) {
-        setCurrentFlowKey(flowKey);
-        const turnIdx = askTurnSequence.indexOf(flowKey);
-        if (turnIdx >= 0) setCurrentTurn(turnIdx + 1);
-      }
-    }, delay);
-  }, [askTurnSequence, chatFlows]);
-
-  const findFlowKey = useCallback((chipText) => {
-    const mapped = chipToFlowKey[chipText];
-    if (mapped && mapped !== '__next_signal__' && chatFlows[mapped]) return mapped;
-    const exact = Object.keys(chatFlows).find((key) => chatFlows[key].user_query === chipText);
-    if (exact) return exact;
-    const chipLower = chipText.toLowerCase();
-    return Object.keys(chatFlows).find((key) => {
-      const query = (chatFlows[key].user_query || '').toLowerCase().trim();
-      if (!query) return false;
-      return query.includes(chipLower) || chipLower.includes(query);
-    }) || null;
-  }, [chatFlows, chipToFlowKey]);
-
-  const showDatabaseAnswer = useCallback(async (question, flowKey) => {
-    const backendResult = await askBackend(personaId, question);
-    if (!backendResult) return false;
-    logBackend(`Chat answer for "${question}" from POST /api/v2/ask -- answered by ${
-      (backendResult.visualization || []).map((v) => v.type).join(', ') || 'narrative only'
-    }; sources: ${(backendResult.data_sources_used || []).join(', ') || 'none'}`);
-    if (flowKey) {
-      const sigIdx = signalSequence.indexOf(flowKey);
-      if (sigIdx >= 0) signalIndexRef.current = sigIdx + 1;
-    }
-    addLiveMessage(backendResult, flowKey);
-    return true;
-  }, [addLiveMessage, personaId, signalSequence]);
-
-  const handleChipClick = useCallback(async (chipText) => {
+  const handleChipClick = useCallback((chipText) => {
     setMessages((prev) => [
       ...prev,
       { id: nextId(), role: 'user', text: chipText },
     ]);
     setCurrentChips([]);
 
-    const signalNav = chipText === 'Next signal'
-      || chipText === 'Yes, walk me through them'
-      || chipToFlowKey[chipText] === '__next_signal__';
-    if (signalNav) {
-      if (chipText === 'Yes, walk me through them') signalIndexRef.current = 0;
+    // Handle signal progression
+    if (chipText === 'Next signal' || chipText === 'Yes, walk me through them') {
+      if (chipText === 'Yes, walk me through them') {
+        signalIndexRef.current = 0;
+      }
       const nextKey = signalSequence[signalIndexRef.current];
       if (nextKey) {
-        const question = chatFlows[nextKey]?.user_query || chipText;
-        if (await showDatabaseAnswer(question, nextKey)) return;
-        logFallback(`Chat answer for "${question}"`, `chatFlows.json [${nextKey}]`, '/api/v2/ask returned no answer');
         signalIndexRef.current += 1;
         addAIMessage(nextKey);
         return;
       }
     }
 
-    const flowKey = findFlowKey(chipText);
-    const dataQuestion = isDataQuestion(chipText);
-    if (dataQuestion && await showDatabaseAnswer(chipText, flowKey)) return;
+    let flowKey = chipToFlowKey[chipText];
+
+    if (flowKey === '__next_signal__') {
+      const nextKey = signalSequence[signalIndexRef.current];
+      if (nextKey) {
+        signalIndexRef.current += 1;
+        addAIMessage(nextKey);
+        return;
+      }
+    }
 
     if (flowKey && chatFlows[flowKey]) {
-      if (dataQuestion) {
-        logFallback(`Chat answer for "${chipText}"`, `chatFlows.json [${flowKey}]`, '/api/v2/ask returned no answer');
-      } else {
-        logStatic(`Chat answer for action chip "${chipText}" (action chips are never sent to the backend)`, `chatFlows.json [${flowKey}]`);
-      }
       const sigIdx = signalSequence.indexOf(flowKey);
-      if (sigIdx >= 0) signalIndexRef.current = sigIdx + 1;
+      if (sigIdx >= 0) {
+        signalIndexRef.current = sigIdx + 1;
+      }
       addAIMessage(flowKey);
       return;
     }
 
+    // Fallback: match by user_query
+    const matchingKey = Object.keys(chatFlows).find(
+      (key) => chatFlows[key].user_query === chipText
+    );
+    if (matchingKey) {
+      addAIMessage(matchingKey);
+      return;
+    }
+
+    // Partial match fallback — requires a non-empty user_query, otherwise
+    // every unmapped chip would silently bind to the first flow whose
+    // user_query is the empty string (chipText.includes('') is always true).
+    const chipLower = chipText.toLowerCase();
+    const partialKey = Object.keys(chatFlows).find(
+      (key) => {
+        const flow = chatFlows[key];
+        const query = (flow.user_query || '').toLowerCase().trim();
+        if (!query) return false;
+        return query.includes(chipLower) || chipLower.includes(query);
+      }
+    );
+    if (partialKey) {
+      addAIMessage(partialKey);
+      return;
+    }
+
+    // Keyword-scored fallback — for free-form input that doesn't substring-match
+    // any user_query (e.g. "tell me about the ABS trigger situation"). Tokenize
+    // the user's text, drop stopwords, then score each flow by how many of the
+    // remaining content words appear in its user_query / ai_message / ai_response.
+    const STOPWORDS = new Set([
+      'the','a','an','is','are','to','for','of','on','in','at','me','my','our','i',
+      'what','show','tell','give','about','this','that','these','those','it','can',
+      'do','does','please','some','any','how','why','where','which','who','and','or','but',
+    ]);
+    const words = chipLower.split(/\W+/).filter((w) => w.length > 2 && !STOPWORDS.has(w));
+    if (words.length > 0) {
+      let bestKey = null;
+      let bestScore = 0;
+      for (const key of Object.keys(chatFlows)) {
+        if (key.startsWith('__')) continue; // skip meta flows like __default__
+        const flow = chatFlows[key];
+        const corpus = `${flow.user_query || ''} ${flow.ai_message || ''} ${flow.ai_response || ''}`.toLowerCase();
+        let score = 0;
+        for (const w of words) if (corpus.includes(w)) score += 1;
+        if (score > bestScore) {
+          bestScore = score;
+          bestKey = key;
+        }
+      }
+      // Require at least 2 keyword hits OR a single hit when the user typed
+      // very few content words — keeps single-word matches (e.g. "trigger") working
+      // while avoiding spurious matches on long off-topic sentences.
+      const minScore = words.length <= 2 ? 1 : 2;
+      if (bestKey && bestScore >= minScore) {
+        addAIMessage(bestKey);
+        return;
+      }
+    }
+
+    // Per-persona default fallback — chatFlows may define a __default__ entry
+    // that responds with a generic "here's what I can help with" message and
+    // a fresh set of suggested chips. Personas without this entry preserve
+    // the existing silent-fail behavior.
     if (chatFlows.__default__) {
       addAIMessage('__default__');
-    } else {
-      console.warn(`[RAIN data] No answer for "${chipText}": the backend gave none and no scripted flow matches.`);
+      return;
     }
-  }, [addAIMessage, chatFlows, chipToFlowKey, findFlowKey, showDatabaseAnswer, signalSequence]);
+
+    devWarn(`[ConversationGuard] No flow mapped for chip "${chipText}" — response blocked.`);
+    return;
+  }, [addAIMessage, chatFlows, chipToFlowKey, signalSequence]);
 
   const handleActionConfirm = useCallback((actionId) => {
     const flow = chatFlows[actionTurnKey];
@@ -248,7 +197,7 @@ export default function useChatFlow(personaId) {
     const responseText = flow.post_confirm_response[confirmConfig.responseKey] || '';
     const nextChips = confirmConfig.nextChips || [];
 
-    // Resolve action-level confidence if the action carried one
+    // Resolve action-level confidence if the action carried one (NFCU only)
     const actions = flow.ui_components_to_render?.find((c) => c.type === 'action_cards')?.actions || [];
     const actionConfidence = actions.find((a) => a.id === actionId)?.confidence;
 
@@ -277,7 +226,6 @@ export default function useChatFlow(personaId) {
 
   const initializeFlow = useCallback((flowKey) => {
     generationRef.current += 1;
-    const gen = generationRef.current;
     setMessages([]);
     setCurrentChips([]);
     setCurrentTurn(0);
@@ -285,31 +233,11 @@ export default function useChatFlow(personaId) {
     setContextPanelData(null);
     setIsTyping(false);
     signalIndexRef.current = 0;
-    // The morning greeting is the live signal sentences. The saved
-    // paragraph stays only when that request fails.
-    if (flowKey === 'greeting' && PERSONA_ID_MAP[personaId]) {
-      setIsTyping(true);
-      fetchSignalBrief(personaId).then((text) => {
-        if (gen !== generationRef.current) return;
-        if (!text) {
-          logFallback('Greeting', 'chatFlows.json [greeting]', 'GET /ultra/rain/{persona}/signals returned nothing');
-          addAIMessage(flowKey);
-          return;
-        }
-        logBackend('Greeting built from live signal descriptions (GET /ultra/rain/{persona}/signals)');
-        addLiveMessage({
-          ai_message: text,
-          suggested_chips: [],
-          data_sources_used: [],
-          confidence: null,
-        }, flowKey, { keepFlowKey: true });
-      });
-      return;
-    }
     addAIMessage(flowKey);
-  }, [addAIMessage, addLiveMessage, personaId]);
+  }, [addAIMessage]);
 
   return {
+    ready: !!loaded,
     messages,
     isTyping,
     currentChips,

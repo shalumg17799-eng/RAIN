@@ -3,6 +3,7 @@
 *.env
 .env.*
 !.env.example
+/apps/keys.local.yaml
 
 # Python
 .venv/
@@ -25,3 +26,18 @@ yarn-error.log*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Archives (share via the folders, never commit zips)
+*.zip
+
+# PRD run artifacts and checkpoints (checkpoints contain PRD content)
+artifacts/
+/apps/keys.local.yaml.*
+/apps/rain/persona_keys.env
+
+# docker: the Postgres seed is derived from the live DB (data!), never source
+/deploy/initdb/
+
+# DIF build-time factory runtime state (runs DB + object store)
+dif.db
+.data/

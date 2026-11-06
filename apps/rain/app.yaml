@@ -1,0 +1,319 @@
+id: rain
+version: 0.2.0
+description: Auto-generated profile for RAIN from live DB & KAG metadata.
+dialect: postgres
+agent:
+  name: insights-orchestrator
+  version: 1.1.0
+allowed_intents:
+- data_query
+- metadata_question
+- out_of_scope
+- needs_clarification
+multi_turn: false
+router:
+  # the KAG now holds the PRD-published ontology: probe it first, catalog stays the fallback
+  path_preference: kag
+  # the hybrid merge only ADDS graph tables/joins/definitions on top of the catalog retrieval,
+  # so a partially-covering concept match is still worth merging in
+  kag_min_coverage: 0.3
+  unsure_policy: needs_clarification
+  max_query_chars: 2000
+  thresholds:
+    embedding_accept: 0.8
+    embedding_margin: 0.05
+    llm_accept: 0.6
+  exemplars:
+    data_query:
+    - how many elevated-risk pregnancies are active
+    - show RPM transmission completeness by ZIP code
+    - how many transport requests are scheduled today
+    - what is prenatal visit completion rate this quarter
+    metadata_question:
+    - what tables hold pregnancy episodes
+    - what does an access barrier mean
+    - which columns describe RPM readings
+    out_of_scope:
+    - generate a marketing email to borrowers
+    - what is the weather today
+    needs_clarification:
+    - show me the numbers
+    - the applications
+datasources:
+- id: main
+  kind: postgres
+  host: localhost
+  port: 5432
+  database: rain
+  default_schema: public
+  # synthetic = the PRD v0.2 planned-schema tables (UC-01/UC-02 personas)
+  schemas:
+  - public
+  - synthetic
+  user:
+    env: PG_USER
+  password:
+    env: PG_PASSWORD
+catalog:
+  kind: snapshot
+  path: catalog/snapshot.json
+glossary_path: glossary.yaml
+join_hints_path: join_hints.yaml
+identity:
+  mode: per_user
+  fallback: service_principal_with_views
+roles:
+  maria:
+    tables:
+      ConnectivityRegistry:
+        columns: '*'
+      Facility:
+        columns: '*'
+      Patient:
+        columns: '*'
+      PregnancyEpisode:
+        columns: '*'
+      Provider:
+        columns: '*'
+      TelehealthSession:
+        columns: '*'
+      TransportRequest:
+        columns: '*'
+  sarah:
+    tables:
+      ChronicConditionEnrollment:
+        columns: '*'
+      ClaimEncounter:
+        columns: '*'
+      MedicationFill:
+        columns: '*'
+      Patient:
+        columns: '*'
+      Provider:
+        columns: '*'
+      RPMReading:
+        columns: '*'
+      SDOHFlag:
+        columns: '*'
+  james:
+    tables:
+      ConnectivityRegistry:
+        columns: '*'
+      DataSourceFeed:
+        columns: '*'
+      EMSCoverage:
+        columns: '*'
+      Facility:
+        columns: '*'
+      TelehealthSession:
+        columns: '*'
+      TransportRequest:
+        columns: '*'
+  priya:
+    tables:
+      ChronicConditionEnrollment:
+        columns: '*'
+      ClaimEncounter:
+        columns: '*'
+      ConnectivityRegistry:
+        columns: '*'
+      EMSCoverage:
+        columns: '*'
+      Facility:
+        columns: '*'
+      MetricTrend:
+        columns: '*'
+      Patient:
+        columns: '*'
+      PregnancyEpisode:
+        columns: '*'
+      SDOHFlag:
+        columns: '*'
+      TransportRequest:
+        columns: '*'
+  david:
+    tables:
+      DataQualityEvent:
+        columns: '*'
+      DataSourceFeed:
+        columns: '*'
+      Facility:
+        columns: '*'
+      MetricTrend:
+        columns: '*'
+      Provider:
+        columns: '*'
+      ProviderReferenceIssue:
+        columns: '*'
+  # --- PRD v0.2 wave (UC-01 smart scheduling + UC-02 population health).
+  # These personas work the synthetic schema only (planned-schema data).
+  kayla:
+    tables:
+      synthetic.appointment:
+        columns: '*'
+      synthetic.slot:
+        columns: '*'
+      synthetic.schedule:
+        columns: '*'
+      synthetic.eligibility_check:
+        columns: '*'
+      synthetic.reminder_message:
+        columns: '*'
+      synthetic.contact_preference:
+        columns: '*'
+      synthetic.patient:
+        columns: '*'
+      synthetic.provider:
+        columns: '*'
+      synthetic.clinic_site:
+        columns: '*'
+      synthetic.travel_time:
+        columns: '*'
+  denise:
+    tables:
+      synthetic.outreach_task:
+        columns: '*'
+      synthetic.risk_score:
+        columns: '*'
+      synthetic.reminder_message:
+        columns: '*'
+      synthetic.contact_preference:
+        columns: '*'
+      synthetic.sdoh_screening:
+        columns: '*'
+      synthetic.patient:
+        columns: '*'
+      synthetic.appointment:
+        columns: '*'
+      synthetic.travel_time:
+        columns: '*'
+  samuel:
+    tables:
+      synthetic.patient:
+        columns: '*'
+      synthetic.encounter:
+        columns: '*'
+      synthetic.risk_score:
+        columns: '*'
+      synthetic.medication:
+        columns: '*'
+      synthetic.rpm_reading:
+        columns: '*'
+      synthetic.condition:
+        columns: '*'
+      synthetic.appointment:
+        columns: '*'
+  linda:
+    tables:
+      synthetic.risk_score:
+        columns: '*'
+      synthetic.outreach_task:
+        columns: '*'
+      synthetic.claim:
+        columns: '*'
+      synthetic.encounter:
+        columns: '*'
+      synthetic.sdoh_screening:
+        columns: '*'
+      synthetic.patient:
+        columns: '*'
+      synthetic.condition:
+        columns: '*'
+      synthetic.county_metric:
+        columns: '*'
+  marcus:
+    tables:
+      synthetic.county_metric:
+        columns: '*'
+      synthetic.broadband_coverage:
+        columns: '*'
+      synthetic.clinic_site:
+        columns: '*'
+      synthetic.claim:
+        columns: '*'
+      synthetic.travel_time:
+        columns: '*'
+      synthetic.encounter:
+        columns: '*'
+  patient:
+    tables:
+      ChronicConditionEnrollment:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      ClaimEncounter:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      MedicationFill:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      Patient:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      PregnancyEpisode:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      RPMReading:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      SDOHFlag:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      TelehealthSession:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+      TransportRequest:
+        columns: '*'
+        row_filter: patient_id = {patient_id}
+model_policy:
+  route:
+    enabled: true
+    model_group: fast
+    temperature: 0.0
+    max_tokens: 200
+  design:
+    enabled: true
+    model_group: strong
+    temperature: 0.0
+    max_tokens: 24000
+  sql:
+    enabled: true
+    model_group: strong
+    temperature: 0.0
+    max_tokens: 1500
+  judge:
+    enabled: false
+    model_group: fast
+    temperature: 0.0
+    max_tokens: 200
+  narrate:
+    enabled: false
+    model_group: fast
+    temperature: 0.0
+    max_tokens: 200
+calendar:
+  timezone: America/New_York
+  week_starts_on: monday
+  fiscal_year_start_month: 1
+limits:
+  max_rows: 1000
+  statement_timeout_ms: 10000
+  max_estimated_cost: 100000.0
+  max_estimated_rows: 5000000
+  max_refines: 2
+  max_tokens: 60000
+  deadline_ms: 180000
+confidence_threshold: 0.65
+sql_visibility:
+  default: false
+  roles:
+    maria: false
+    sarah: false
+    james: false
+    priya: true
+    david: true
+    patient: false
+    kayla: false
+    denise: false
+    samuel: false
+    linda: false
+    marcus: true

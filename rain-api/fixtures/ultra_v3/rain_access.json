@@ -1,0 +1,1062 @@
+{
+ "context": {
+  "client": {
+   "id": "rain",
+   "marketId": "sled",
+   "name": "RAIN",
+   "shortName": "RAIN",
+   "logo": "/logos/rain-logo.svg",
+   "primaryColor": "#003366",
+   "navLabels": {
+    "ask": "Ask AI"
+   }
+  },
+  "persona": {
+   "id": "rain_access",
+   "name": "Brandon Kee",
+   "initials": "BK",
+   "role": "Patient Access Coordinator",
+   "layout": "inline",
+   "capabilities": [
+    "Converged Conversation",
+    "Automated Action"
+   ],
+   "navSlots": [
+    "ask",
+    "scheduling",
+    "reminders"
+   ]
+  },
+  "personas": [
+   {
+    "id": "rain_ceo",
+    "name": "Gregory Haskins, MBA",
+    "role": "Chief Executive Officer"
+   },
+   {
+    "id": "rain_cmo",
+    "name": "Dr. Naomi Castellanos",
+    "role": "Chief Medical Officer and Value-Based Care Quality Lead"
+   },
+   {
+    "id": "rain_cio",
+    "name": "Raj Malhotra",
+    "role": "Chief Information Officer and Data and AI Governance Lead"
+   },
+   {
+    "id": "rain_state",
+    "name": "Dr. Lauren Pike",
+    "role": "Program Lead, Rural Health Outcomes Accelerator"
+   },
+   {
+    "id": "rain_chw",
+    "name": "Teresa Lopez, CHW",
+    "role": "Community Health Worker and Care Coordinator"
+   },
+   {
+    "id": "rain_access",
+    "name": "Brandon Kee",
+    "role": "Patient Access Coordinator"
+   }
+  ],
+  "dataSources": [
+   {
+    "id": "rain-places",
+    "name": "CDC PLACES (2025 release)",
+    "provides": "County and ZCTA prevalence of hypertension, diabetes, screenings and social needs",
+    "usedFor": "Value Insights county view; state view",
+    "description": "County and ZCTA prevalence of hypertension, diabetes, screenings and social needs",
+    "freshness": "2025 release",
+    "recordCount": 1240,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-svi",
+    "name": "CDC/ATSDR Social Vulnerability Index (2022)",
+    "provides": "County and tract vulnerability",
+    "usedFor": "County map layer",
+    "description": "County and tract vulnerability",
+    "freshness": "2022 edition",
+    "recordCount": 704,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-hpsa",
+    "name": "HRSA Health Professional Shortage Areas",
+    "provides": "Primary care and mental health shortage areas",
+    "usedFor": "County map; model access feature",
+    "description": "Primary care and mental health shortage areas",
+    "freshness": "Monthly",
+    "recordCount": 312,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-chr",
+    "name": "County Health Rankings (archived 2025 + March 2026)",
+    "provides": "Static county benchmarks",
+    "usedFor": "Benchmark only (source at risk after Dec 2026)",
+    "description": "Static county benchmarks",
+    "freshness": "March 2026",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-rucc",
+    "name": "USDA Rural-Urban Continuum Codes (2023)",
+    "provides": "County rural classification",
+    "usedFor": "Filters and frontier definition",
+    "description": "County rural classification",
+    "freshness": "2023 edition",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-forhp",
+    "name": "HRSA FORHP rural areas",
+    "provides": "Rural eligibility by county, tract and ZIP",
+    "usedFor": "Frontier ZIP subgroup check",
+    "description": "Rural eligibility by county, tract and ZIP",
+    "freshness": "Annual",
+    "recordCount": 2310,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-zcta",
+    "name": "Census ZCTA relationship and gazetteer files",
+    "provides": "ZIP to county mapping",
+    "usedFor": "Patient ZIP to county",
+    "description": "ZIP to county mapping",
+    "freshness": "2020 vintage",
+    "recordCount": 182,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-boundaries",
+    "name": "Census cartographic boundary files (2024)",
+    "provides": "Map geometry",
+    "usedFor": "All maps",
+    "description": "Map geometry",
+    "freshness": "2024 vintage",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-acs",
+    "name": "Census ACS 5-year (2020 to 2024)",
+    "provides": "Population, language, internet and vehicle access",
+    "usedFor": "Denominators; language preference fallback",
+    "description": "Population, language, internet and vehicle access",
+    "freshness": "2020 to 2024",
+    "recordCount": 3120,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-fcc",
+    "name": "FCC National Broadband Map",
+    "provides": "Broadband availability by location",
+    "usedFor": "Telehealth eligibility; frontier signal",
+    "description": "Broadband availability by location",
+    "freshness": "June 2026 filing",
+    "recordCount": 41800,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-hrsaSites",
+    "name": "HRSA health center sites",
+    "provides": "FQHC site locations",
+    "usedFor": "Slot search and drive time",
+    "description": "FQHC site locations",
+    "freshness": "Weekly",
+    "recordCount": 96,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-cmsHospital",
+    "name": "CMS Hospital General Information and quality",
+    "provides": "Hospital locations, readmissions, unplanned visits",
+    "usedFor": "ED and readmission context",
+    "description": "Hospital locations, readmissions, unplanned visits",
+    "freshness": "Quarterly",
+    "recordCount": 58,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-cmsPos",
+    "name": "CMS Provider of Services file",
+    "provides": "Rural health clinic and critical access hospital locations",
+    "usedFor": "Facility layer",
+    "description": "Rural health clinic and critical access hospital locations",
+    "freshness": "Quarterly",
+    "recordCount": 141,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-nppes",
+    "name": "NPPES NPI Registry",
+    "provides": "Provider directory",
+    "usedFor": "Ordering provider for low-value care",
+    "description": "Provider directory",
+    "freshness": "Weekly",
+    "recordCount": 9870,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-uds",
+    "name": "HRSA Uniform Data System (UDS)",
+    "provides": "Health center quality benchmarks",
+    "usedFor": "Quality targets context",
+    "description": "Health center quality benchmarks",
+    "freshness": "2025 reporting year",
+    "recordCount": 1370,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-geovar",
+    "name": "CMS Medicare Geographic Variation",
+    "provides": "County utilization benchmarks",
+    "usedFor": "Avoidable ED benchmark",
+    "description": "County utilization benchmarks",
+    "freshness": "2024 data year",
+    "recordCount": 17,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-ecqm",
+    "name": "CMS eCQMs (CMS165, CMS122, CMS125, CMS130, CMS2)",
+    "provides": "Measure logic",
+    "usedFor": "Quality gate engine",
+    "description": "Measure logic",
+    "freshness": "2026 specifications",
+    "recordCount": 5,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-synthea",
+    "name": "Synthea (MITRE)",
+    "provides": "Synthetic patients for Nevada counties",
+    "usedFor": "All patient-level records",
+    "description": "Synthetic patients for Nevada counties",
+    "freshness": "Generated for this demo",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-osm",
+    "name": "OpenStreetMap road network (via Geofabrik)",
+    "provides": "Drive time from ZIP centroid to site",
+    "usedFor": "Travel time; scheduling sort",
+    "description": "Drive time from ZIP centroid to site",
+    "freshness": "Weekly",
+    "recordCount": 182,
+    "status": "connected",
+    "kind": "Public",
+    "icon": "layers"
+   },
+   {
+    "id": "rain-mco",
+    "name": "Synthetic MCO eligibility and attribution",
+    "provides": "9,400 attributed members",
+    "usedFor": "Contract population",
+    "description": "9,400 attributed members",
+    "freshness": "Q3 file",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-claims",
+    "name": "Synthetic claims (Synthea output, adjusted to Nevada Medicaid patterns)",
+    "provides": "Cost, utilization, ED and low-value services",
+    "usedFor": "Cost model, low-value care, segmentation",
+    "description": "Cost, utilization, ED and low-value services",
+    "freshness": "Through Q3 (45-day lag)",
+    "recordCount": 412600,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-ehr",
+    "name": "Synthetic EHR (FHIR R4 US Core)",
+    "provides": "Conditions, vitals, labs and orders",
+    "usedFor": "Quality engine, coding recapture",
+    "description": "Conditions, vitals, labs and orders",
+    "freshness": "Today",
+    "recordCount": 1284000,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-rpm",
+    "name": "Synthetic remote BP readings",
+    "provides": "Home cuff readings (systolic and diastolic)",
+    "usedFor": "CMS165 closure",
+    "description": "Home cuff readings (systolic and diastolic)",
+    "freshness": "Today",
+    "recordCount": 18300,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-ops",
+    "name": "Synthetic schedules, eligibility responses and SMS logs",
+    "provides": "Slots, eligibility responses (270/271) and reminder replies",
+    "usedFor": "Care management screens",
+    "description": "Slots, eligibility responses (270/271) and reminder replies",
+    "freshness": "Today",
+    "recordCount": 26900,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-benchmark",
+    "name": "Contract benchmark",
+    "provides": "Expected PMPM, quality gate, sharing rate",
+    "usedFor": "Cost versus expected and the quality gate",
+    "description": "Expected PMPM, quality gate, sharing rate",
+    "freshness": "Contract year 2026",
+    "recordCount": 1,
+    "status": "connected",
+    "kind": "Synthetic",
+    "icon": "database"
+   },
+   {
+    "id": "rain-library",
+    "name": "Low-value care measure library",
+    "provides": "14 Choosing Wisely and USPSTF-based measures",
+    "usedFor": "Low-value care findings",
+    "description": "14 Choosing Wisely and USPSTF-based measures",
+    "freshness": "Version 2026.3",
+    "recordCount": 14,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-adt",
+    "name": "HIE ADT feed (synthetic)",
+    "provides": "Admit, discharge and transfer events",
+    "usedFor": "Near real time ED signal",
+    "description": "Admit, discharge and transfer events",
+    "freshness": "Under 1 hour",
+    "recordCount": 3420,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-costModel",
+    "name": "RAIN cost model",
+    "provides": "Cost versus expected, gap decomposition",
+    "usedFor": "Value Insights",
+    "description": "Cost versus expected, gap decomposition",
+    "freshness": "Nightly",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-impactability",
+    "name": "RAIN impactability score",
+    "provides": "Ranked rising-risk members",
+    "usedFor": "Outreach worklists",
+    "description": "Ranked rising-risk members",
+    "freshness": "Nightly",
+    "recordCount": 9400,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   },
+   {
+    "id": "rain-ecqmEngine",
+    "name": "eCQM engine",
+    "provides": "Measure results on synthetic EHR",
+    "usedFor": "Quality gate tracker",
+    "description": "Measure results on synthetic EHR",
+    "freshness": "Nightly",
+    "recordCount": 5,
+    "status": "connected",
+    "kind": "Engine",
+    "icon": "cpu"
+   }
+  ]
+ },
+ "briefing": {
+  "greeting": {
+   "id": "acc_brief",
+   "text": "Good morning, Brandon. 23 bookings are waiting from Teresa's worklist, 9 visits tomorrow are still unconfirmed, and 4 patients replied R and need new slots.",
+   "citations": [
+    "Worklist Hand-off",
+    "SMS Reminders",
+    "EHR Schedule"
+   ],
+   "components": [
+    {
+     "type": "rain.task_briefing",
+     "version": 1,
+     "props": {
+      "role": "access"
+     }
+    }
+   ],
+   "chips": [
+    "Start bookings",
+    "Show unconfirmed visits for tomorrow",
+    "Handle the R replies"
+   ],
+   "confidence": 92
+  },
+  "signals": [],
+  "kpis": [
+   {
+    "id": "bookings",
+    "label": "Bookings waiting",
+    "value": "23",
+    "trendText": "From Teresa's worklist · Worklist hand-off",
+    "icon": "calendar",
+    "chip": "Start bookings"
+   },
+   {
+    "id": "unconfirmed",
+    "label": "Unconfirmed tomorrow",
+    "value": "9",
+    "trendText": "SMS reminders",
+    "icon": "clock",
+    "chip": "Show unconfirmed visits for tomorrow"
+   },
+   {
+    "id": "rReplies",
+    "label": "Replied R",
+    "value": "4",
+    "trendText": "Need new slots · SMS reminders",
+    "icon": "message-square",
+    "chip": "Handle the R replies"
+   },
+   {
+    "id": "sites",
+    "label": "Booking for",
+    "value": "7 sites",
+    "trendText": "Plus 2 telehealth providers · EHR schedule",
+    "icon": "building"
+   }
+  ],
+  "chips": [
+   "Start bookings",
+   "Show unconfirmed visits for tomorrow",
+   "Handle the R replies",
+   "Open Reminders"
+  ]
+ },
+ "turns": {
+  "acc_brief": {
+   "id": "acc_brief",
+   "text": "Good morning, Brandon. 23 bookings are waiting from Teresa's worklist, 9 visits tomorrow are still unconfirmed, and 4 patients replied R and need new slots.",
+   "citations": [
+    "Worklist Hand-off",
+    "SMS Reminders",
+    "EHR Schedule"
+   ],
+   "components": [
+    {
+     "type": "rain.task_briefing",
+     "version": 1,
+     "props": {
+      "role": "access"
+     }
+    }
+   ],
+   "chips": [
+    "Start bookings",
+    "Show unconfirmed visits for tomorrow",
+    "Handle the R replies"
+   ],
+   "confidence": 92
+  },
+  "acc_start": {
+   "id": "acc_start",
+   "text": "Opening Scheduling at your first booking, Linda Garcia's telehealth BP recheck, so you can choose a slot and confirm.",
+   "citations": [
+    "Worklist Hand-off",
+    "EHR Schedule"
+   ],
+   "components": [
+    {
+     "type": "rain.launch_card",
+     "version": 1,
+     "props": {
+      "step": "acc_start"
+     }
+    }
+   ],
+   "chips": [
+    "Why telehealth for this patient?",
+    "What other slots work for an 81-minute drive?",
+    "Explain the reminder plan"
+   ],
+   "confidence": 92
+  },
+  "acc_unconfirmed": {
+   "id": "acc_unconfirmed",
+   "text": "9 visits tomorrow have no reply yet, so each now has a call task back on Teresa's worklist.",
+   "citations": [
+    "SMS Reminders",
+    "EHR Schedule"
+   ],
+   "components": [
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "9 visits tomorrow with no reply",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "name",
+           "label": "Patient"
+          },
+          {
+           "key": "visit",
+           "label": "Visit"
+          },
+          {
+           "key": "language",
+           "label": "Language"
+          },
+          {
+           "key": "next",
+           "label": "Next step"
+          }
+         ],
+         "rows": [
+          {
+           "name": "Ana Martin",
+           "visit": "Tomorrow, 9:00 AM · Battle Mountain",
+           "language": "English",
+           "next": "Call task on Teresa’s worklist"
+          },
+          {
+           "name": "Jose Walker",
+           "visit": "Tomorrow, 10:30 AM · Battle Mountain",
+           "language": "English",
+           "next": "Call task on Teresa’s worklist"
+          },
+          {
+           "name": "Karen Diaz",
+           "visit": "Tomorrow, 11:00 AM · video",
+           "language": "English",
+           "next": "Call task on Teresa’s worklist"
+          },
+          {
+           "name": "Silvia Thomas",
+           "visit": "Tomorrow, 12:30 PM · Winnemucca",
+           "language": "English",
+           "next": "Call task on Teresa’s worklist"
+          },
+          {
+           "name": "Jose Martin",
+           "visit": "Tomorrow, 1:00 PM · video",
+           "language": "Spanish",
+           "next": "Call task on Teresa’s worklist"
+          },
+          {
+           "name": "Martha Davis",
+           "visit": "Tomorrow, 2:30 PM · video",
+           "language": "Spanish",
+           "next": "Call task on Teresa’s worklist"
+          },
+          {
+           "name": "Patricia Brown",
+           "visit": "Tomorrow, 3:00 PM · Winnemucca",
+           "language": "Spanish",
+           "next": "Call task on Teresa’s worklist"
+          },
+          {
+           "name": "Richard Davis",
+           "visit": "Tomorrow, 4:30 PM · video",
+           "language": "English",
+           "next": "Call task on Teresa’s worklist"
+          },
+          {
+           "name": "Irma Castillo",
+           "visit": "Tomorrow, 5:00 PM · video",
+           "language": "English",
+           "next": "Call task on Teresa’s worklist"
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Handle the R replies",
+    "Start bookings",
+    "Open Reminders"
+   ],
+   "confidence": 92
+  },
+  "acc_r": {
+   "id": "acc_r",
+   "text": "4 patients replied R, so each gets three new slots by SMS and the first reply books it.",
+   "citations": [
+    "SMS Reminders",
+    "EHR Schedule"
+   ],
+   "components": [
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "4 patients replied R",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "name",
+           "label": "Patient"
+          },
+          {
+           "key": "visit",
+           "label": "Visit"
+          },
+          {
+           "key": "language",
+           "label": "Language"
+          },
+          {
+           "key": "next",
+           "label": "Next step"
+          }
+         ],
+         "rows": [
+          {
+           "name": "Maria Perez",
+           "visit": "Mon, Nov 9, 10:00 AM · Battle Mountain",
+           "language": "English",
+           "next": "Three new slots by SMS"
+          },
+          {
+           "name": "Frank Flores",
+           "visit": "Tue, Nov 10, 10:00 AM · Winnemucca",
+           "language": "English",
+           "next": "Three new slots by SMS"
+          },
+          {
+           "name": "Luis Walker",
+           "visit": "Wed, Nov 11, 10:00 AM · Battle Mountain",
+           "language": "English",
+           "next": "Three new slots by SMS"
+          },
+          {
+           "name": "Gary Thomas",
+           "visit": "Thu, Nov 12, 10:00 AM · Battle Mountain",
+           "language": "Spanish",
+           "next": "Three new slots by SMS"
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Start bookings",
+    "Show unconfirmed visits for tomorrow",
+    "Open Reminders"
+   ],
+   "confidence": 92
+  },
+  "acc_open_reminders": {
+   "id": "acc_open_reminders",
+   "text": "Opening Reminders with every patient's plan and SMS log.",
+   "citations": [
+    "SMS Reminders"
+   ],
+   "components": [
+    {
+     "type": "rain.launch_card",
+     "version": 1,
+     "props": {
+      "step": "acc_open_reminders"
+     }
+    }
+   ],
+   "chips": [
+    "Start bookings",
+    "Handle the R replies"
+   ],
+   "confidence": 92
+  },
+  "acc_ctx_mode": {
+   "id": "acc_ctx_mode",
+   "text": "Here is why this visit mode fits this patient.",
+   "citations": [
+    "Travel Time (OpenStreetMap)",
+    "FCC Broadband",
+    "Eligibility (270/271)"
+   ],
+   "components": [
+    {
+     "type": "callout",
+     "version": 1,
+     "props": {
+      "title": "Telehealth recommended",
+      "body": "Telehealth recommended: 81-minute drive, broadband available, visit type eligible. Home cuff readings count for CMS165.",
+      "status": "info"
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "What other slots work for an 81-minute drive?",
+    "Explain the reminder plan"
+   ],
+   "confidence": 92
+  },
+  "acc_ctx_slots": {
+   "id": "acc_ctx_slots",
+   "text": "Here are the other slots that work for this patient's drive, sorted by drive time.",
+   "citations": [
+    "EHR Schedule",
+    "HRSA Health Center Sites",
+    "Travel Time (OpenStreetMap)"
+   ],
+   "components": [
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "Other slots for Linda Garcia, sorted by drive time",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "mode",
+           "label": "Mode"
+          },
+          {
+           "key": "when",
+           "label": "When"
+          },
+          {
+           "key": "drive",
+           "label": "Drive",
+           "align": "right"
+          }
+         ],
+         "rows": [
+          {
+           "mode": "Telehealth (video)",
+           "when": "Thu, Nov 5, 2:00 PM",
+           "drive": "None"
+          },
+          {
+           "mode": "Telehealth (video)",
+           "when": "Thu, Nov 5, 4:30 PM",
+           "drive": "None"
+          },
+          {
+           "mode": "Telehealth (video)",
+           "when": "Fri, Nov 6, 9:00 AM",
+           "drive": "None"
+          },
+          {
+           "mode": "Mobile clinic",
+           "when": "Tue, Nov 10, 10:00 AM",
+           "drive": "14 min"
+          },
+          {
+           "mode": "In person",
+           "when": "Mon, Nov 9, 1:15 PM",
+           "drive": "81 min"
+          },
+          {
+           "mode": "In person",
+           "when": "Wed, Nov 11, 8:30 AM",
+           "drive": "81 min"
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Why telehealth for this patient?",
+    "Explain the reminder plan"
+   ],
+   "confidence": 92
+  },
+  "acc_ctx_plan": {
+   "id": "acc_ctx_plan",
+   "text": "Here is the reminder plan and why it is timed this way.",
+   "citations": [
+    "SMS Reminders",
+    "Contact Log"
+   ],
+   "components": [
+    {
+     "type": "stack",
+     "version": 1,
+     "props": {
+      "children": [
+       {
+        "type": "text",
+        "version": 1,
+        "props": {
+         "text": "Reminder plan for Linda Garcia: Spanish SMS",
+         "size": "sm",
+         "tone": "muted"
+        }
+       },
+       {
+        "type": "data_table",
+        "version": 1,
+        "props": {
+         "columns": [
+          {
+           "key": "when",
+           "label": "When"
+          },
+          {
+           "key": "what",
+           "label": "What"
+          }
+         ],
+         "rows": [
+          {
+           "when": "72 hours before",
+           "what": "Date, time and clinic only; reply C or R"
+          },
+          {
+           "when": "24 hours before",
+           "what": "Confirmation and the video link"
+          },
+          {
+           "when": "3 hours before",
+           "what": "Link resent"
+          },
+          {
+           "when": "Quiet hours",
+           "what": "No texts 8 PM to 8 AM"
+          }
+         ],
+         "stack": true
+        }
+       }
+      ]
+     }
+    },
+    {
+     "type": "callout",
+     "version": 1,
+     "props": {
+      "title": "Why three reminders",
+      "body": "Because of 2 missed visits, an 81-minute drive and no visit in 7 months. No reply by 24 hours before the visit creates a call task on Teresa’s worklist.",
+      "status": "info"
+     }
+    },
+    {
+     "type": "illustrative_note",
+     "version": 1,
+     "props": {
+      "note": "Synthetic data for a demo; every person and organization is fictional."
+     }
+    }
+   ],
+   "chips": [
+    "Why telehealth for this patient?",
+    "What other slots work for an 81-minute drive?"
+   ],
+   "confidence": 92
+  },
+  "__default__": {
+   "id": "__default__",
+   "text": "I can help with today's bookings, tomorrow's unconfirmed visits, the R replies and each patient's reminder plan.",
+   "citations": [],
+   "components": [],
+   "chips": [
+    "Start bookings",
+    "Show unconfirmed visits for tomorrow",
+    "Handle the R replies"
+   ],
+   "confidence": 60
+  }
+ },
+ "match": {
+  "chipToFlowKey": {
+   "Start bookings": "acc_start",
+   "start bookings": "acc_start",
+   "Start with the bookings": "acc_start",
+   "start with the bookings": "acc_start",
+   "Show unconfirmed visits for tomorrow": "acc_unconfirmed",
+   "show unconfirmed visits for tomorrow": "acc_unconfirmed",
+   "Handle the R replies": "acc_r",
+   "handle the r replies": "acc_r",
+   "Open Reminders": "acc_open_reminders",
+   "open reminders": "acc_open_reminders",
+   "Why telehealth for this patient?": "acc_ctx_mode",
+   "why telehealth for this patient?": "acc_ctx_mode",
+   "why telehealth for this patient": "acc_ctx_mode",
+   "Why this visit mode?": "acc_ctx_mode",
+   "why this visit mode?": "acc_ctx_mode",
+   "why this visit mode": "acc_ctx_mode",
+   "What other slots work for an 81-minute drive?": "acc_ctx_slots",
+   "what other slots work for an 81-minute drive?": "acc_ctx_slots",
+   "what other slots work for an 81-minute drive": "acc_ctx_slots",
+   "What other slots work for this drive?": "acc_ctx_slots",
+   "what other slots work for this drive?": "acc_ctx_slots",
+   "what other slots work for this drive": "acc_ctx_slots",
+   "Explain the reminder plan": "acc_ctx_plan",
+   "explain the reminder plan": "acc_ctx_plan"
+  },
+  "strictMatch": true,
+  "signalSequence": [],
+  "flows": {
+   "acc_brief": {
+    "user_query": "",
+    "corpus": " good morning, brandon. 23 bookings are waiting from teresa's worklist, 9 visits tomorrow are still unconfirmed, and 4 patients replied r and need new slots. "
+   },
+   "acc_start": {
+    "user_query": "Start bookings",
+    "corpus": "start bookings opening scheduling at your first booking, linda garcia's telehealth bp recheck, so you can choose a slot and confirm. "
+   },
+   "acc_unconfirmed": {
+    "user_query": "Show unconfirmed visits for tomorrow",
+    "corpus": "show unconfirmed visits for tomorrow 9 visits tomorrow have no reply yet, so each now has a call task back on teresa's worklist. "
+   },
+   "acc_r": {
+    "user_query": "Handle the R replies",
+    "corpus": "handle the r replies 4 patients replied r, so each gets three new slots by sms and the first reply books it. "
+   },
+   "acc_open_reminders": {
+    "user_query": "Open Reminders",
+    "corpus": "open reminders opening reminders with every patient's plan and sms log. "
+   },
+   "acc_ctx_mode": {
+    "user_query": "Why telehealth for this patient?",
+    "corpus": "why telehealth for this patient? here is why this visit mode fits this patient. "
+   },
+   "acc_ctx_slots": {
+    "user_query": "What other slots work for an 81-minute drive?",
+    "corpus": "what other slots work for an 81-minute drive? here are the other slots that work for this patient's drive, sorted by drive time. "
+   },
+   "acc_ctx_plan": {
+    "user_query": "Explain the reminder plan",
+    "corpus": "explain the reminder plan here is the reminder plan and why it is timed this way. "
+   },
+   "__default__": {
+    "user_query": "",
+    "corpus": " i can help with today's bookings, tomorrow's unconfirmed visits, the r replies and each patient's reminder plan. "
+   }
+  }
+ }
+}

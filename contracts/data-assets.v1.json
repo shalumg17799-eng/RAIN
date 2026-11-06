@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dif.radiant.digital/contracts/data-assets.v1.json",
+  "title": "data-assets",
+  "type": "object",
+  "properties": {
+    "scenario": {
+      "type": "string",
+      "enum": [
+        "uc1",
+        "uc2",
+        "uc3"
+      ]
+    },
+    "readiness_status": {
+      "type": "string",
+      "enum": [
+        "synthetic",
+        "schema_only",
+        "validated"
+      ]
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "uri": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "format": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rows": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "synthetic": {
+            "type": "boolean"
+          },
+          "source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "schema_hash": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "landed",
+              "schema_only",
+              "missing"
+            ]
+          },
+          "profile": {
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "synthetic",
+          "status"
+        ]
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "landing_uri": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "provisional_schema": {
+      "type": [
+        "object",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "scenario",
+    "readiness_status",
+    "tables",
+    "assumptions",
+    "gaps"
+  ]
+}

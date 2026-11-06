@@ -1,0 +1,9 @@
+# Agent spec for the upper-ontology-reducer. Deterministic: no LLM. Merges the per-persona
+# curated drafts into one upper ontology, audits concept/mapping coverage, and loops the
+# curation back (bounded by max_refines) when the audit finds gaps.
+name: upper-ontology-reducer
+version: 1.0.0
+pack: data
+kind: deterministic
+stage: ontology_reduction
+escalations: [refine_ontology]

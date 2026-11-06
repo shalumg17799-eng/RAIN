@@ -1,0 +1,81 @@
+{
+  "phases": [
+    {
+      "id": "phase-1",
+      "name": "Awareness & Research",
+      "sentiment": "positive",
+      "sentimentScore": 0.72,
+      "frictionHotspots": []
+    },
+    {
+      "id": "phase-2",
+      "name": "Product Consideration",
+      "sentiment": "neutral",
+      "sentimentScore": 0.58,
+      "frictionHotspots": [
+        {
+          "title": "Auto loan rate comparison drop-off",
+          "description": "Members visiting rate comparison pages exit 3x more frequently than 4 weeks ago",
+          "severity": "warning",
+          "sources": ["Web & Mobile Behavioral Analytics", "Salesforce Einstein"]
+        }
+      ]
+    },
+    {
+      "id": "phase-3",
+      "name": "Application & Enrollment",
+      "sentiment": "negative",
+      "sentimentScore": 0.34,
+      "frictionHotspots": [
+        {
+          "title": "62% of mobile mortgage applicants stall at income verification",
+          "description": "Document upload automation exception in UiPath workflow causing step 4 failures. 847 members affected this week.",
+          "severity": "critical",
+          "sources": ["UiPath", "Salesforce Data Cloud"]
+        }
+      ]
+    },
+    {
+      "id": "phase-4",
+      "name": "Onboarding & Activation",
+      "sentiment": "neutral",
+      "sentimentScore": 0.61,
+      "frictionHotspots": [
+        {
+          "title": "34% of new members don't complete account activation within 7 days",
+          "description": "Activation emails have a 22% open rate. Members who don't activate within 14 days show 4x churn risk.",
+          "severity": "warning",
+          "sources": ["Salesforce Data Cloud", "USSFCU Member CRM"]
+        }
+      ]
+    },
+    {
+      "id": "phase-5",
+      "name": "Ongoing Engagement",
+      "sentiment": "warning",
+      "sentimentScore": 0.45,
+      "frictionHotspots": [
+        {
+          "title": "Members with fewer than 3 products show 2x churn risk",
+          "description": "Single-product members are 2x more likely to churn within 12 months. Cross-sell engagement is declining.",
+          "severity": "warning",
+          "sources": ["Salesforce Einstein"]
+        }
+      ]
+    },
+    {
+      "id": "phase-6",
+      "name": "Loyalty & Advocacy",
+      "sentiment": "negative",
+      "sentimentScore": 0.38,
+      "frictionHotspots": [
+        {
+          "title": "Military retiree NPS has declined 13 points over 6 weeks",
+          "description": "CD rate transparency complaints driving dissatisfaction among highest-tenure, highest-value members.",
+          "severity": "critical",
+          "sources": ["Genesys Cloud", "Voice of Member / NPS"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+name: validation-agent
+version: 1.0.0
+description: Validates any artifact deterministically (contract schema, thresholds, required keys, cross references) and with an LLM judge against a stage rubric; persists a versioned validation_report.
+# input: {subject, rubric, contract?, thresholds?, required_keys?, cross_refs?, context?, judge_threshold?, skip_judge?}
+# The judge runs by default; `skip_judge: true` skips it (a skipped step's output is null, so validation-summary merges
+# the deterministic checks alone). A failed report does not fail the run: the orchestrator routes it to an approval gate.
+steps:
+  - id: check
+    skill: acceptance-check
+    input: {subject: $.input.subject, contract: $.input.contract, thresholds: $.input.thresholds, required_keys: $.input.required_keys, cross_refs: $.input.cross_refs}
+  - id: judge
+    skill: llm-judge
+    unless: $.input.skip_judge
+    input: {subject: $.input.subject, rubric: $.input.rubric, context: $.input.context, threshold: $.input.judge_threshold}
+  - id: summary
+    skill: validation-summary
+    input: {check: $.steps.check.output, judge: $.steps.judge.output}
+output:
+  passed: $.steps.summary.output.passed
+  score: $.steps.summary.output.score
+  checks: $.steps.summary.output.checks
+  findings: $.steps.summary.output.findings
+  judge: $.steps.summary.output.judge
+persist:
+  kind: validation_report
+  from: $.steps.summary.output
+acceptance:
+  schema: validation-report.v1.json
+  required_outputs: [checks]

@@ -1,26 +1,28 @@
+import { STORAGE_KEYS } from '@core/contract/storageKeys';
 export const tierFor = (score) => (score >= 85 ? 'high' : score >= 70 ? 'mid' : 'low');
 
+// Confidence tiers read from theme tokens so they adapt to light/dark and any brand.
 export const colorFor = (tier) => ({
-  high: '#16A34A',
-  mid: '#D97706',
-  low: '#DC2626',
+  high: 'var(--color-conf-high)',
+  mid: 'var(--color-conf-med)',
+  low: 'var(--color-conf-low)',
 }[tier]);
 
 export const bgFor = (tier) => ({
-  high: 'rgba(22, 163, 74, 0.10)',
-  mid: 'rgba(217, 119, 6, 0.10)',
-  low: 'rgba(220, 38, 38, 0.10)',
+  high: 'color-mix(in srgb, var(--color-conf-high) 12%, transparent)',
+  mid: 'color-mix(in srgb, var(--color-conf-med) 12%, transparent)',
+  low: 'color-mix(in srgb, var(--color-conf-low) 12%, transparent)',
 }[tier]);
 
 export const borderFor = (tier) => ({
-  high: 'rgba(22, 163, 74, 0.25)',
-  mid: 'rgba(217, 119, 6, 0.25)',
-  low: 'rgba(220, 38, 38, 0.30)',
+  high: 'color-mix(in srgb, var(--color-conf-high) 28%, transparent)',
+  mid: 'color-mix(in srgb, var(--color-conf-med) 28%, transparent)',
+  low: 'color-mix(in srgb, var(--color-conf-low) 30%, transparent)',
 }[tier]);
 
 export const labelFor = (tier) => ({ high: 'High', mid: 'Moderate', low: 'Low' }[tier]);
 
-export const auditStorageKey = 'rain.audit.v1';
+export const auditStorageKey = STORAGE_KEYS.confidenceAudit;
 
 export function persistEscalation(entry) {
   try {

@@ -1,0 +1,16 @@
+# Agent spec for the governed-executor. Guarded: the four policy layers (L1 parse and denylist,
+# L2 dry run, L3 identity binding, L4 audit) are a deterministic core that NOTHING bypasses —
+# this is the only skill that touches a data source, and it uses no model at all. The agent
+# surface is parameter handling and typed failure labels for the orchestrator's loop decisions.
+name: governed-executor
+version: 1.0.0
+pack: insights
+kind: guarded
+stage: governed_execution
+capabilities:
+  pipeline: nlq
+  stage: governed_execution
+  intents: [data_query]
+  data_sources: [postgres]
+  artifacts: [execution]
+escalations: [policy_denied, access_denied, timeout, error]

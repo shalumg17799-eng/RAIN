@@ -1,0 +1,42 @@
+# PLACEHOLDER for the real Rain business taxonomy. Replace domains, capabilities and keywords with the definitions
+# agreed with Rain (DIF-5 Domain Data Modelling); keep the shape, the domain-enricher scoring reads it as is.
+# Scoring: table-name keyword x3, column-name keyword x1 (max 3), lineage system x1, PRD sentence x1 (max 2),
+# matching domain-model entity x2. Keywords with "_" match as phrases.
+version: rain-1
+domains:
+  - name: Lending
+    capabilities:
+      - name: Loan Origination
+        keywords: [loan, application, applicant, origination, underwriting, product_type, approval, apr, interest, collateral, offer]
+      - name: Loan Servicing
+        keywords: [payment, installment, delinquency, servicing, payoff, amortization, escrow, schedule]
+  - name: Membership
+    capabilities:
+      - name: Member Management
+        keywords: [member, customer, party, joined, enrollment, profile, zip_code, address, contact, household]
+      - name: Identity and Access
+        keywords: [login, credential, identity, kyc, verification, consent, device]
+  - name: Payments
+    capabilities:
+      - name: Payment Processing
+        keywords: [payment, transfer, ach, wire, settlement, remittance, payee, batch]
+      - name: Card Management
+        keywords: [card, authorization, pan, token, merchant, chargeback, dispute]
+  - name: Compliance
+    capabilities:
+      - name: Fair Lending Monitoring
+        keywords: [fair, lending, hmda, disparate, approval_rate, snapshot, regulatory, audit]
+      - name: Regulatory Reporting
+        keywords: [report, reporting, filing, regulator, submission, sar, ctr]
+      - name: Financial Crime
+        keywords: [aml, sanction, screening, alert, suspicious, watchlist, fraud]
+  - name: Operations
+    capabilities:
+      - name: Case Management
+        keywords: [case, ticket, task, queue, workflow, sla, assignment]
+      - name: Branch and Channel
+        keywords: [branch, channel, teller, kiosk, appointment, session]
+  - name: Risk
+    capabilities:
+      - name: Credit Risk
+        keywords: [risk, score, rating, exposure, default, pd, lgd, limit]

@@ -1,0 +1,29 @@
+name: domain-enrichment-agent
+version: 1.0.0
+description: Maps an extracted metadata graph (tables, columns, lineage) to business domains and capabilities, maps domain-model entities to tables/columns, and persists a versioned domain catalog.
+# Used standalone, or as the enrichment sub-agent of dif-pipeline-agent.
+# input: {extraction: {tables, columns, keys?, lineage?}, domain_model?, prd?, taxonomy?}
+# The map step always runs: without a domain_model the semantic-mapper returns an empty, contract-valid result
+# (no mappings, every table an unmapped_table gap), so semantic_mappings / gaps are never null in the output.
+steps:
+  - id: enrich
+    skill: domain-enricher
+    input: {extraction: $.input.extraction, domain_model: $.input.domain_model, prd: $.input.prd, taxonomy: $.input.taxonomy}
+  - id: map
+    skill: semantic-mapper
+    input: {domain_model: $.input.domain_model, extraction: $.input.extraction, prd: $.input.prd, taxonomy: $.input.taxonomy}
+output:
+  domain_catalog: $.steps.enrich.output.domain_catalog
+  tables: $.steps.enrich.output.tables
+  unmapped: $.steps.enrich.output.unmapped
+  confidence: $.steps.enrich.output.confidence
+  domain: $.steps.enrich.output.domain
+  capability: $.steps.enrich.output.capability
+  semantic_mappings: $.steps.map.output
+  gaps: $.steps.map.output.gaps
+persist:
+  kind: domain_catalog
+  from: $.steps.enrich.output.domain_catalog
+acceptance:
+  schema: domain-catalog.v1.json
+  required_outputs: [domain_catalog]

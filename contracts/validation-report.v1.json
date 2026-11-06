@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dif.radiant.digital/contracts/validation-report.v1.json",
+  "title": "validation-report",
+  "type": "object",
+  "properties": {
+    "passed": {
+      "type": "boolean"
+    },
+    "score": {
+      "type": "number"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "detail": {}
+        },
+        "required": [
+          "name",
+          "passed"
+        ]
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "error"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "severity",
+          "message"
+        ]
+      }
+    },
+    "judge": {
+      "type": [
+        "object",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "passed",
+    "score",
+    "checks",
+    "findings"
+  ]
+}

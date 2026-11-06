@@ -1,0 +1,20 @@
+# Agent spec for the skill-router. Guarded: the access pre-check, input screening and the rules
+# layer are deterministic and cannot be bypassed; the model only breaks ties the rules and the
+# embedding layer leave open (purpose `route`), and a gateway failure falls back to rules.
+name: skill-router
+version: 1.0.0
+pack: insights
+kind: guarded
+stage: routing
+purpose: route
+prompt: skills/insights/skill-router/SKILL.md
+output_key: route
+output_schema: router-intent
+token_budget: 2000
+timeout_ms: 15000
+capabilities:
+  pipeline: nlq
+  stage: routing
+  intents: []
+  data_sources: []
+  artifacts: [route]

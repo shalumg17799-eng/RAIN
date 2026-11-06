@@ -1,0 +1,72 @@
+# Denylist for PostgreSQL. Matched case-insensitively. `*` is a glob.
+# This is the application's early exit. The database (roles, grants, row-level security, a read-only
+# transaction, a statement timeout) is the authority and does not depend on this list being complete.
+dialect: postgres
+version: 1
+
+# Functions refused anywhere in a query, including as table-valued functions and schema-qualified.
+functions:
+  - "pg_*"            # pg_sleep, pg_read_file, pg_ls_dir, pg_terminate_backend, pg_stat_*, ...
+  - "lo_*"            # large objects: lo_import, lo_export
+  - "dblink*"         # reaches other databases
+  - "txid_*"
+  - "*_to_xml*"       # query_to_xml, table_to_xml, ... run SQL text inside the database
+  - "xmlparse"
+  - set_config        # would change the session variables row-level security relies on
+  - current_setting   # would read them
+  - version
+  - current_user
+  - session_user
+  - user
+  - current_role
+  - current_database
+  - current_schema
+  - current_schemas
+  - current_catalog
+  - "inet_*"
+  - nextval
+  - currval
+  - setval
+  - lastval
+
+# Functions sqlglot does not know (it parses them as generic calls) are refused unless listed here.
+# Typed functions (count, sum, date_trunc, coalesce, ...) pass unless the lists above name them.
+allow_anonymous_functions:
+  - age
+  - every
+  - isfinite
+  - jsonb_extract_path_text
+  - make_date
+
+# Table-valued functions are refused unless listed here (sqlglot names generate_series like this).
+allow_table_functions:
+  - generate_series
+  - exploding_generate_series
+  - unnest
+
+# Bare keywords PostgreSQL treats as functions (`SELECT user`), which sqlglot reads as a column.
+bare_identifiers:
+  - user
+  - current_user
+  - session_user
+  - current_role
+  - current_catalog
+  - current_schema
+
+# Schemas a query may never name. Any schema starting with pg_ is refused as well.
+schemas:
+  - information_schema
+  - pg_catalog
+  - pg_toast
+schema_prefixes:
+  - pg_
+
+# sqlglot node types refused outright (their class names).
+nodes:
+  - CurrentUser
+  - SessionUser
+  - CurrentCatalog
+  - CurrentSchema
+  - CurrentSchemas
+  - CurrentDatabase
+  - CurrentVersion

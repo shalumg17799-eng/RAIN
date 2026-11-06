@@ -1,0 +1,25 @@
+name: domain-modelling-agent
+version: 1.0.0
+description: Extracts a domain model (entities, attributes, relationships, constraints, glossary with PRD evidence) from a PRD and normalises it into a versioned domain_model artifact (domain-model.v1.json).
+# Plan 5.1. input: {prd, requirements?, domain_model?, glossary?}. Gate 1 lives in the orchestrator after this agent.
+steps:
+  - id: extract
+    skill: domain-model-extractor
+    input: {prd: $.input.prd, requirements: $.input.requirements, domain_model: $.input.domain_model, glossary: $.input.glossary}
+  - id: normalize
+    skill: domain-model-normalizer
+    input: {domain_model: $.steps.extract.output}
+output:
+  entities: $.steps.normalize.output.entities
+  relationships: $.steps.normalize.output.relationships
+  constraints: $.steps.normalize.output.constraints
+  glossary: $.steps.normalize.output.glossary
+  assumptions: $.steps.normalize.output.assumptions
+  confidence: $.steps.normalize.output.confidence
+persist:
+  kind: domain_model
+  from: $.steps.normalize.output
+acceptance:
+  schema: domain-model.v1.json
+  required_outputs: [entities]
+  min_confidence: {path: $.steps.normalize.output.confidence, value: 0.3}

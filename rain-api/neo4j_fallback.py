@@ -378,7 +378,7 @@ def try_live_fallback(query: str, product: str = None, persona: str = None):
     # sometimes writes a fresh, wrong query for a fact we already have a
     # perfect, tested formula for. This tier skips that risk entirely for
     # the facts that have one.
-    known_rule = match_known_metric(query)
+    known_rule = match_known_metric(query, persona=persona)
     if known_rule:
         known_result = run_known_metric(known_rule)
         if known_result:

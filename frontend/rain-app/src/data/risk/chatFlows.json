@@ -1,0 +1,218 @@
+{
+  "risk_greeting": {
+    "ai_message": "3 risk and compliance signals need your attention. Want me to walk through them?",
+    "suggested_chips": [
+      "Yes, walk me through them",
+      "What anomalies were detected overnight?",
+      "Show me our regulatory exposure"
+    ],
+    "data_sources_used": [],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+  "risk_signal_1_structuring": {
+    "ai_message": "First: BSA structuring alert — 4 accounts flagged for repeated cash deposits between $9,000 and $9,900 across multiple branches within 7-day windows. Total suspicious amount: $187,400. Risk score: 92/100. Two SARs have been auto-filed via UiPath. Two additional accounts are under manual review with FinCEN notification pending.",
+    "suggested_chips": [
+      "What anomalies were detected overnight?",
+      "Show me the structuring pattern details",
+      "Next signal"
+    ],
+    "data_sources_used": ["Transaction Monitor", "UiPath"],
+    "capability": "Proactive Intelligence",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["transaction_anomalies"]
+  },
+  "risk_signal_2_wire_anomaly": {
+    "ai_message": "Second: cross-border wire anomaly — 2 dormant accounts (18+ months inactive) reactivated with outbound wires totaling $94,200 to Cayman Islands and Cyprus. Risk score: 88/100. Pattern matches layering typology. Accounts have been frozen pending review. Wire recall attempted for the $52,100 Cayman transfer. Enhanced due diligence initiated.",
+    "suggested_chips": [
+      "Show me the wire transfer timeline",
+      "Who are these account holders?",
+      "Next signal"
+    ],
+    "data_sources_used": ["Transaction Monitor", "Fraud & Risk Feed"],
+    "capability": "Proactive Intelligence",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["transaction_anomalies", "segments"]
+  },
+  "risk_signal_3_ncua_decline": {
+    "ai_message": "Third: NCUA regulatory readiness score declined from 84 to 78 — a 6-point drop quarter-over-quarter. The largest declines are in Consumer Complaint Resolution (74 → 64, now RED) and Operational Risk (78 → 71). Consumer complaints are being driven by CD maturity communication failures. Operational risk increase is linked to a 3x spike in UiPath automation exceptions. The next NCUA exam window is Q3 2026.",
+    "suggested_chips": [
+      "Show me our regulatory exposure",
+      "What's driving the complaint increase?",
+      "What needs escalation?"
+    ],
+    "data_sources_used": ["Compliance DB", "Genesys Cloud"],
+    "capability": "Proactive Intelligence",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["regulatory_readiness"]
+  },
+  "risk_turn_1_anomalies": {
+    "ai_message": "I've pulled data from Transaction Monitor, UiPath, Fraud Feed, and Compliance DB to give you the full anomaly picture.\n\nOvernight scan detected 14 anomalies across 23 accounts, totaling $2.4M in suspicious activity. Here's the breakdown by risk tier:\n\n[Critical (85–100)] 2 anomalies | 6 accounts | $281,600\n— BSA Structuring: 4 accounts, $187,400, risk score 92 — SAR filed\n— Dormant Wire Reactivation: 2 accounts, $94,200, risk score 88 — under investigation\n\n[High (70–84)] 2 anomalies | 11 accounts | $1,425,000\n— Velocity Spike (ACH + Wire): 8 accounts, $1.2M, risk score 74 — monitoring\n— Round-Dollar Wires: 3 accounts, $225,000, risk score 71 — SAR pending\n\n[Medium (50–69)] 2 anomalies | 6 accounts | $121,800\n— Cross-Border ACH (shell companies): 4 accounts, $112,000, risk score 68 — monitoring\n— ATM Cash-Out Spike: 2 accounts, $9,800, risk score 62 — monitoring\n\n3 SARs filed, 2 pending review. The structuring and dormant wire cases require immediate attention.",
+    "suggested_chips": [
+      "Show me the regulatory exposure",
+      "Show me the structuring pattern details",
+      "Flag accounts needing escalation"
+    ],
+    "data_sources_used": ["Transaction Monitor", "UiPath", "Fraud & Risk Feed", "Compliance DB"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [
+      {
+        "type": "table",
+        "title": "Transaction Anomaly Detail — Overnight Scan",
+        "dataset_key": "transaction_anomalies"
+      }
+    ],
+    "related_dataset_keys": ["transaction_anomalies"]
+  },
+  "risk_turn_2_regulatory": {
+    "ai_message": "Here's the NCUA regulatory readiness breakdown by category:\n\n[1] Capital Adequacy — 91/100 (GREEN, stable)\nWell-capitalized across all measures. No concerns.\n\n[2] Cybersecurity — 85/100 (GREEN, improving +1)\nIncident response time improved 12%. Strong posture.\n\n[3] BSA/AML Compliance — 82/100 (AMBER, declining -4)\nSAR filing timeliness slipped from 94% to 89%. The structuring cases need resolution before Q3 exam.\n\n[4] Fair Lending — 79/100 (AMBER, declining -2)\nMortgage approval rate disparity flagged for review. Statistical analysis underway.\n\n[5] Operational Risk — 71/100 (AMBER, declining -7)\nUiPath automation exceptions increased 3x. Root cause: process definition updates lagging behind system changes.\n\n[6] Consumer Complaint Resolution — 64/100 (RED, declining -10)\nResolution time up 40%. CD complaints driving volume. Current avg: 14 days vs. 7-day target.\n\nOverall trend: 4 consecutive quarters of decline (86 → 84 → 82 → 78). The Q3 exam will focus heavily on Consumer Complaints and BSA/AML — both areas where we're losing ground.",
+    "suggested_chips": [
+      "What needs escalation?",
+      "What's driving the complaint increase?",
+      "Generate a board-level risk summary"
+    ],
+    "data_sources_used": ["Compliance DB", "Genesys Cloud", "UiPath"],
+    "capability": "Anomaly Detection",
+    "ui_components_to_render": [
+      {
+        "type": "gauge_panel",
+        "title": "NCUA Regulatory Readiness — By Category",
+        "dataset_key": "regulatory_readiness"
+      }
+    ],
+    "related_dataset_keys": ["regulatory_readiness"]
+  },
+  "risk_turn_3_escalation": {
+    "ai_message": "Based on the anomaly scan and regulatory analysis, here are three actions I can execute right now:",
+    "suggested_chips": [
+      "Generate an audit trail for compliance",
+      "Generate a board-level risk summary"
+    ],
+    "data_sources_used": ["Compliance DB", "Transaction Monitor"],
+    "capability": "Automated Action",
+    "ui_components_to_render": [
+      {
+        "type": "action_cards",
+        "title": "Recommended Risk Actions",
+        "actions": [
+          {
+            "id": "ACT-RISK-001",
+            "title": "File SARs for 2 pending cross-border wire accounts",
+            "description": "Generate and submit SAR filings for the 2 dormant account wire transfers ($94,200 to Cayman Islands and Cyprus). Route to BSA Officer M. Chen for final review. Include transaction timelines and enhanced due diligence findings.",
+            "system": "Compliance DB / FinCEN",
+            "impact": "Meet SAR filing deadline (72-hour window) and maintain BSA/AML compliance score",
+            "status": "ready"
+          },
+          {
+            "id": "ACT-RISK-002",
+            "title": "Generate audit trail for 4 structuring-flagged accounts",
+            "description": "Compile complete transaction histories, branch visit patterns, and UiPath automation logs for the 4 BSA structuring accounts. Attach as evidence package to compliance case ESC-001.",
+            "system": "Transaction Monitor / UiPath / Compliance DB",
+            "impact": "Strengthen examination readiness — complete audit trail reduces exam finding risk by 60%",
+            "status": "ready"
+          },
+          {
+            "id": "ACT-RISK-003",
+            "title": "Create board-level risk summary report",
+            "description": "Generate a board-ready risk summary covering: NCUA readiness trend (4-quarter decline), active anomalies (14), SAR status (3 filed, 2 pending), escalation pipeline (5 open, 2 critical). Include recommended remediation timeline for Q3 exam readiness.",
+            "system": "Compliance DB / All Risk Sources",
+            "impact": "Enable board-level visibility and budget approval for compliance remediation",
+            "status": "ready"
+          }
+        ]
+      }
+    ],
+    "post_confirm_response": {
+      "ACT-RISK-001": "Done. SAR filings generated and routed to BSA Officer M. Chen:\n\n— SAR #2026-04-008: Account ending 7742 — $52,100 wire to Cayman Islands\n— SAR #2026-04-009: Account ending 3391 — $42,100 wire to Cyprus\n— Filing deadline: April 9, 2026 (within 72-hour window)\n— Enhanced due diligence package attached\n— FinCEN submission queued pending BSA Officer approval\n\nBoth accounts remain frozen. Wire recall for $52,100 is in progress with correspondent bank.",
+      "ACT-RISK-002": "Done. Audit trail compiled for 4 structuring-flagged accounts:\n\n— Account ending 4418: 12 deposits ($108,600), 4 branches, 3-week window\n— Account ending 5529: 8 deposits ($78,800), 3 branches, 2-week window\n— Account ending 6103: (linked to 4418) — shared address, same deposit pattern\n— Account ending 7891: 6 deposits ($48,200), 2 branches, 10-day window\n\nEvidence package includes: transaction logs, branch CCTV timestamps, UiPath alert history, and CTR cross-references. Attached to compliance case ESC-001. BSA Officer M. Chen notified.",
+      "ACT-RISK-003": "Done. Board-level risk summary generated:\n\n— Title: 'Q1 2026 Risk & Compliance Summary — Board Review'\n— NCUA Readiness: 78/100 (4-quarter decline from 86)\n— Critical Areas: Consumer Complaints (RED, 64), Operational Risk (AMBER, 71)\n— Active Anomalies: 14 across 23 accounts ($2.4M suspicious)\n— SAR Pipeline: 3 filed, 2 pending\n— Escalations: 5 open (2 critical, 2 high, 1 medium)\n— Remediation Recommendations: 6 items with timeline for Q3 exam readiness\n— Budget Request: $180K for compliance staffing + $95K for UiPath process remediation\n\nReport saved to Compliance DB and shared to #risk-leadership Slack channel."
+    },
+    "related_dataset_keys": ["transaction_anomalies", "regulatory_readiness", "escalation_log"]
+  },
+  "risk_structuring_details": {
+    "ai_message": "Here's the structuring pattern detail for the 4 flagged accounts:\n\n[Account 4418 — Primary Subject]\n— 12 cash deposits over 3 weeks\n— Amount range: $9,100–$9,850 (avg $9,050)\n— 4 different branches: Springfield, Arlington, Fairfax, Alexandria\n— Pattern: Tuesday/Thursday deposits, alternating branches\n— Total: $108,600\n\n[Account 5529 — Secondary Subject]\n— 8 cash deposits over 2 weeks\n— Amount range: $9,000–$9,900 (avg $9,100)\n— 3 branches: Springfield, Fairfax, Tysons\n— Pattern: Monday/Wednesday deposits\n— Total: $78,800\n\n[Account 6103 — Linked to 4418]\n— Same registered address as 4418\n— 4 deposits at 2 branches, all under $9,500\n— Appears to be a secondary layering account\n\n[Account 7891 — Separate Subject]\n— 6 deposits over 10 days, 2 branches\n— Total: $48,200\n— Less sophisticated pattern but same structuring indicators\n\nUiPath flagged all 4 accounts within 6 hours of each other. The first 2 SARs were auto-filed. The remaining 2 are pending BSA Officer review.",
+    "suggested_chips": [
+      "Generate an audit trail for compliance",
+      "Show me the escalation pipeline"
+    ],
+    "data_sources_used": ["Transaction Monitor", "UiPath"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["transaction_anomalies", "segments"]
+  },
+  "risk_wire_timeline": {
+    "ai_message": "Wire transfer timeline for the 2 dormant account reactivations:\n\n[Account 7742 — Cayman Islands Wire]\n— Dormant since: Oct 2024 (18 months)\n— Reactivated: Apr 3, 2026 — online banking login from new IP (VPN detected)\n— Apr 4: Added new international wire beneficiary (Cayman Islands entity)\n— Apr 5: Initiated $52,100 outbound wire to Grand Cayman\n— Apr 6: Wire flagged by Transaction Monitor — account frozen\n— Wire recall initiated — pending correspondent bank response\n\n[Account 3391 — Cyprus Wire]\n— Dormant since: Jul 2024 (21 months)\n— Reactivated: Apr 4, 2026 — branch visit (Alexandria)\n— Apr 5: Added wire beneficiary (Cyprus entity)\n— Apr 5: Initiated $42,100 outbound wire to Limassol, Cyprus\n— Apr 6: Flagged by Fraud Feed — account frozen\n— Enhanced due diligence in progress\n\n[Correlation Notes]\n— Both accounts reactivated within 24 hours of each other\n— Both target high-risk jurisdictions (FATF gray/watchlist adjacent)\n— Wire amounts are just above the $25K enhanced review threshold\n— Pattern consistent with layering typology — potential shell company destinations",
+    "suggested_chips": [
+      "Flag accounts needing escalation",
+      "Show me our regulatory exposure"
+    ],
+    "data_sources_used": ["Transaction Monitor", "Fraud & Risk Feed"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["transaction_anomalies"]
+  },
+  "risk_complaint_drivers": {
+    "ai_message": "Consumer complaint drivers — the category dragging NCUA readiness down the most:\n\n[Complaint Volume: 89 open cases (up 62% QoQ)]\n\n[1] CD Maturity Communication — 34 complaints (38%)\nMembers report not being notified before CD auto-renewed at lower rates. Average resolution: 16 days (target: 7). Root cause: UiPath notification workflow failed for a batch of 340 CDs maturing in March.\n\n[2] Rate Dispute — 22 complaints (25%)\nMembers contest the renewal rate vs. advertised rate. Several cite competitor rates from Navy Federal/USAA. Average resolution: 12 days.\n\n[3] Early Withdrawal Penalty — 18 complaints (20%)\nMembers who weren't notified about auto-renewal are now requesting penalty waivers. Processing bottleneck in compliance review.\n\n[4] Account Access Issues — 15 complaints (17%)\nDigital banking access problems during rate change period. Linked to the UiPath automation exceptions.\n\n[Resolution Metrics]\n— Current avg resolution: 14 days (target: 7 days)\n— NCUA threshold for 'satisfactory': 10 days\n— Complaints resolved within SLA: 41% (down from 72% last quarter)\n\nThe CD notification failure is the single largest driver. Fixing the UiPath workflow would prevent ~40% of new complaints.",
+    "suggested_chips": [
+      "What needs escalation?",
+      "Show me our regulatory exposure"
+    ],
+    "data_sources_used": ["Compliance DB", "Genesys Cloud", "UiPath"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["regulatory_readiness", "escalation_log"]
+  },
+  "risk_bsa_posture": {
+    "ai_message": "BSA/AML posture summary as of today:\n\n[SAR Filing Status]\n— Filed this month: 3 (2 auto-filed via UiPath, 1 manual)\n— Pending review: 2 (round-dollar wire pattern)\n— Filing timeliness: 89% within 30-day window (target: 95%)\n— Year-to-date: 14 SARs filed\n\n[CTR Compliance]\n— Auto-filed CTRs: 456 this month\n— Exception rate: 1.2% (within acceptable range)\n— No CTR backlogs\n\n[Enhanced Due Diligence]\n— Active EDD cases: 3 (2 from dormant wire reactivation, 1 from cross-border ACH)\n— Avg EDD completion time: 8 days (target: 10)\n\n[NCUA BSA/AML Score: 82/100 (AMBER)]\n— Previous: 86\n— Key concern: SAR timeliness slipping (94% → 89%)\n— Exam risk: Moderate — need to close the timeliness gap before Q3\n\n[Automation Health]\n— UiPath SAR auto-filing: Operational (2 auto-filed this week)\n— Transaction monitoring rules: 47 active, 3 under review\n— False positive rate: 22% (improved from 31% last quarter)\n\nOverall: BSA compliance is functional but trending the wrong direction. The 5-point timeliness decline needs corrective action before the Q3 exam.",
+    "suggested_chips": [
+      "What needs escalation?",
+      "Generate a board-level risk summary"
+    ],
+    "data_sources_used": ["Compliance DB", "Transaction Monitor", "UiPath"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["transaction_anomalies", "regulatory_readiness"]
+  },
+  "risk_audit_trail": {
+    "ai_message": "Generating audit trail for the 4 structuring-flagged accounts...\n\n[Audit Trail — Compliance Case ESC-001]\n\nTimeline:\n— Mar 28: Transaction Monitor flagged Account 4418 (3rd deposit >$9K in 7 days)\n— Mar 29: UiPath triggered enhanced monitoring for Account 4418\n— Mar 31: Accounts 5529 and 6103 flagged (cross-reference with 4418 address)\n— Apr 1: Account 7891 flagged independently (separate structuring pattern)\n— Apr 2: UiPath auto-generated SAR for Accounts 4418 and 5529\n— Apr 3: SARs filed with FinCEN (SAR #2026-04-005, #2026-04-006)\n— Apr 5: BSA Officer M. Chen assigned to review remaining 2 accounts\n— Apr 7: Enhanced monitoring continues — no new deposits detected\n\n[Evidence Package]\n— Transaction logs: 30 transactions across 4 accounts\n— Branch visit records: 9 unique branch visits\n— UiPath alert history: 8 alerts triggered\n— CTR cross-reference: 0 CTRs filed (all deposits below $10K threshold — consistent with structuring)\n— Account linkage analysis: Accounts 4418 and 6103 share registered address\n\nThis audit trail is exam-ready. Want me to attach it to the compliance case?",
+    "suggested_chips": [
+      "Show me the escalation pipeline",
+      "Generate a board-level risk summary"
+    ],
+    "data_sources_used": ["Compliance DB", "Transaction Monitor", "UiPath"],
+    "capability": "Automated Action",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["transaction_anomalies", "escalation_log"]
+  },
+  "risk_escalation_status": {
+    "ai_message": "Current escalation pipeline — 5 open items:\n\n[CRITICAL]\n[1] ESC-001: BSA Structuring — 4 Accounts\nAssigned: BSA Officer M. Chen | Status: In Progress\nOpened: Apr 5 | Target: Apr 9\n2 SARs filed. 2 accounts pending review. FinCEN notification pending.\n\n[2] ESC-002: Cross-Border Wire — Dormant Reactivation\nAssigned: Fraud Investigation J. Park | Status: Escalated to Fraud Team\nOpened: Apr 6 | Target: Apr 12\nAccounts frozen. Wire recall in progress ($52,100). Enhanced due diligence initiated.\n\n[HIGH]\n[3] ESC-003: Velocity Spike — 8 Accounts\nAssigned: Transaction Monitoring S. Williams | Status: Under Review\nOpened: Apr 6 | Target: Apr 10\n48-hour enhanced monitoring. No SAR filed yet — awaiting pattern confirmation.\n\n[4] ESC-004: NCUA Consumer Complaint Remediation\nAssigned: Compliance R. Thompson | Status: In Progress\nOpened: Mar 28 | Target: Apr 15\nCD complaint resolution process under review. Goal: 14 days → 7 days before Q3 exam.\n\n[MEDIUM]\n[5] ESC-005: Round-Dollar Wire SAR Review\nAssigned: BSA Officer M. Chen | Status: Pending Review\nOpened: Apr 7 | Target: Apr 11\n3 accounts, SAR draft prepared. Awaiting approval.\n\n[Pipeline Metrics]\n— Avg resolution: 4.2 days | Closed this month: 8\n— On-track: 3 of 5 | At-risk: ESC-004 (approaching target date)",
+    "suggested_chips": [
+      "Generate a board-level risk summary",
+      "Show me our regulatory exposure"
+    ],
+    "data_sources_used": ["Compliance DB"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["escalation_log"]
+  },
+  "risk_board_summary": {
+    "ai_message": "Here's your board-level risk summary:\n\n[Q1 2026 RISK & COMPLIANCE SUMMARY]\n\n[NCUA Regulatory Readiness: 78/100 — AMBER]\n4-quarter decline: 86 → 84 → 82 → 78\nNext exam: Q3 2026\n\n[Critical Findings]\n— Consumer Complaint Resolution: RED (64/100) — resolution time 2x target\n— Operational Risk: AMBER (71/100) — UiPath exceptions 3x normal\n— BSA/AML: AMBER (82/100) — SAR timeliness declining\n\n[Active Risk Landscape]\n— 14 transaction anomalies | 23 accounts | $2.4M suspicious\n— 3 SARs filed | 2 pending\n— 5 open escalations (2 critical)\n— 7 open examination findings | 12 closed YTD\n\n[Recommended Board Actions]\n1. Approve $180K for compliance staffing to close complaint resolution gap\n2. Approve $95K for UiPath process remediation (3x exception rate)\n3. Authorize BSA Officer to file remaining 2 pending SARs\n4. Set Q3 exam readiness target: 85/100 NCUA score\n\n[Timeline to Q3 Exam Readiness]\n— Apr: Close 2 critical escalations + file pending SARs\n— May: Reduce complaint resolution to <10 days\n— Jun: UiPath remediation complete + full dry-run audit\n\nWant me to format this as a presentation or distribute to the risk committee?",
+    "suggested_chips": [
+      "Flag accounts needing escalation",
+      "What anomalies were detected overnight?"
+    ],
+    "data_sources_used": ["Compliance DB", "All Risk Sources"],
+    "capability": "Automated Action",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["regulatory_readiness", "transaction_anomalies", "escalation_log"]
+  },
+  "__default__": {
+    "ai_message": "I don't have an answer to that in the risk data I can see.\n\nI can show the anomalies detected overnight, our regulatory exposure, the accounts needing escalation, or generate an audit trail for compliance.",
+    "suggested_chips": [
+      "What anomalies were detected overnight?",
+      "Show me our regulatory exposure",
+      "Flag accounts needing escalation"
+    ],
+    "capability": "Converged Conversation"
+  }
+}

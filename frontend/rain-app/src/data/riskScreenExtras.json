@@ -1,0 +1,42 @@
+{
+  "creditRiskPosture": {
+    "title": "Credit Risk Posture",
+    "overallScore": "Stable",
+    "delinquencyRate30Day": 0.021,
+    "delinquencyRate60Day": 0.009,
+    "delinquencyRate90Day": 0.004,
+    "chargeOffRate": 0.0018,
+    "trend": "stable",
+    "comparedToIndustry": "Below average risk"
+  },
+  "regulatoryReadiness": {
+    "title": "Regulatory Readiness Score",
+    "score": 78,
+    "maxScore": 100,
+    "status": "amber",
+    "lastExamDate": "2025-09-15",
+    "nextExamWindow": "2026-06",
+    "openFindings": 4,
+    "closedFindings": 11
+  },
+  "complaintTrajectory90Days": [
+    {"date": "2025-12-27", "complaints": 42},
+    {"date": "2026-01-03", "complaints": 38},
+    {"date": "2026-01-10", "complaints": 45},
+    {"date": "2026-01-17", "complaints": 41},
+    {"date": "2026-01-24", "complaints": 47},
+    {"date": "2026-01-31", "complaints": 52},
+    {"date": "2026-02-07", "complaints": 49},
+    {"date": "2026-02-14", "complaints": 56},
+    {"date": "2026-02-21", "complaints": 61},
+    {"date": "2026-02-28", "complaints": 58},
+    {"date": "2026-03-07", "complaints": 67},
+    {"date": "2026-03-14", "complaints": 74},
+    {"date": "2026-03-21", "complaints": 82}
+  ],
+  "riskScreenChips": [
+    "What's driving the transaction anomaly cluster?",
+    "How does our NCUA posture compare to last quarter?",
+    "Generate a board-level risk summary"
+  ]
+}

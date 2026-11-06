@@ -1,0 +1,28 @@
+{
+  "$comment": "Who is a tenant, in one place. eslint.config.js (rule 9: shared code names no client) and scripts/standard-audit.mjs read this file; src/core/runtime/tenants.test.ts fails when a registered client or a folder under src/components is missing from it. npm run scaffold:client adds a new client here.",
+  "clientNames": [
+    "rain"
+  ],
+  "platformClients": {},
+  "tenantFolders": [
+    "rain"
+  ],
+  "sharedComponentFolders": [
+    "brand",
+    "briefing",
+    "capabilities",
+    "cards",
+    "charts",
+    "chat",
+    "common",
+    "compose",
+    "intelligence",
+    "journey",
+    "kpi",
+    "layout",
+    "modals",
+    "process",
+    "tables"
+  ],
+  "otherComponentFolders": {}
+}

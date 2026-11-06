@@ -1,0 +1,65 @@
+name: kag-builder-agent
+version: 1.0.0
+description: Maps the lower ontology, its alignment, the metadata graph, semantic mappings and data assets to KAG records, publishes them idempotently to Neo4j as a release snapshot, validates the release and persists a versioned kag_release artifact.
+# Plan 5.8 / PRD US-014. Generic implementation; to be reconciled with the ontology definitions from DIF-8 / DIF-9.
+# input: {ontology, alignment, extraction?, semantic_mappings?, data_assets?, release?, artifact_versions?}
+# precheck validates the records in memory BEFORE anything is written; publish is skipped when it fails, so an invalid graph never
+# reaches Neo4j. validate then checks the stored release. Without DIF_NEO4J_URI (or on dry runs) publish reports published=false.
+steps:
+  - id: map
+    skill: kag-model-mapper
+    input:
+      ontology: $.input.ontology
+      alignment: $.input.alignment
+      extraction: $.input.extraction
+      semantic_mappings: $.input.semantic_mappings
+      data_assets: $.input.data_assets
+      release: $.input.release
+      artifact_versions: $.input.artifact_versions
+  - id: precheck
+    skill: neo4j-validate
+    input:
+      release: $.steps.map.output.release
+      enterprise: $.steps.map.output.enterprise_id
+      nodes: $.steps.map.output.nodes
+      relationships: $.steps.map.output.relationships
+      in_memory: true
+  - id: publish
+    skill: neo4j-publish
+    when: $.steps.precheck.output.passed
+    input:
+      nodes: $.steps.map.output.nodes
+      relationships: $.steps.map.output.relationships
+      release: $.steps.map.output.release
+      enterprise: $.steps.map.output.enterprise_id
+  - id: validate
+    skill: neo4j-validate
+    input:
+      release: $.steps.map.output.release
+      enterprise: $.steps.map.output.enterprise_id
+      nodes: $.steps.map.output.nodes
+      relationships: $.steps.map.output.relationships
+output:
+  release: $.steps.map.output.release
+  enterprise_id: $.steps.map.output.enterprise_id
+  published: $.steps.publish.output.published
+  dry_run: $.steps.publish.output.dry_run
+  counts: $.steps.map.output.counts
+  validation: $.steps.validate.output
+  precheck: $.steps.precheck.output
+  provenance: $.steps.map.output.provenance
+persist:
+  kind: kag_release
+  from:
+    release: $.steps.map.output.release
+    enterprise_id: $.steps.map.output.enterprise_id
+    published: $.steps.publish.output.published
+    dry_run: $.steps.publish.output.dry_run
+    counts: $.steps.map.output.counts
+    validation: $.steps.validate.output
+    precheck: $.steps.precheck.output
+    provenance: $.steps.map.output.provenance
+acceptance:
+  schema: kag-release.v1.json
+  required_outputs: [counts]
+  required_true: [$.steps.precheck.output.passed, $.steps.validate.output.passed]   # an invalid graph (orphans, missing provenance) fails the stage and is never published

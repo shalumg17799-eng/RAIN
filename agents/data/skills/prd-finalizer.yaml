@@ -1,0 +1,7 @@
+# Agent spec for the prd-finalizer. Deterministic: no LLM. Every route — success or escalation —
+# ends here; it reports honestly what ran, what was produced and what failed.
+name: prd-finalizer
+version: 1.0.0
+pack: data
+kind: deterministic
+stage: finalization

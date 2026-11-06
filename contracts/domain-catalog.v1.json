@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dif.radiant.digital/contracts/domain-catalog.v1.json",
+  "title": "domain-catalog",
+  "type": "object",
+  "properties": {
+    "domain_catalog": {
+      "type": "object",
+      "properties": {
+        "taxonomy_version": {
+          "type": "string"
+        },
+        "domains": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "capabilities": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "tables": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "tables"
+                  ]
+                }
+              }
+            },
+            "required": [
+              "name",
+              "capabilities"
+            ]
+          }
+        }
+      },
+      "required": [
+        "domains"
+      ]
+    },
+    "tables": {
+      "type": "object"
+    },
+    "unmapped": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "semantic_mappings": {
+      "$ref": "#/$defs/mappings"
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "required": [
+    "domain_catalog",
+    "tables",
+    "unmapped",
+    "confidence"
+  ],
+  "$defs": {
+    "mappings": {
+      "type": "object",
+      "properties": {
+        "mappings": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "confidence": {
+          "type": "number"
+        }
+      }
+    }
+  }
+}

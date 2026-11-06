@@ -1,0 +1,240 @@
+{
+  "cx_greeting": {
+    "ai_message": "3 experience signals need your attention. Want me to walk through them?",
+    "suggested_chips": [
+      "Yes, walk me through them",
+      "Where are members hitting friction?",
+      "Show me the journey drop-offs"
+    ],
+    "data_sources_used": [],
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["signals"]
+  },
+  "cx_signal_1_channel_switch": {
+    "ai_message": "First: digital-to-branch channel switching spiked 47% this week — 312 members started online but walked into a branch to finish. The spike is concentrated at the document upload step of the mortgage journey. 64% of switches originated from mobile, and post-switch CSAT averages just 2.9.\n\nThis is a clear signal that the digital experience is failing at a specific step and members are reverting to branch as a workaround.",
+    "suggested_chips": [
+      "Show me channel switching patterns",
+      "Who are these members?",
+      "Next signal"
+    ],
+    "data_sources_used": ["Genesys Cloud", "Service Cloud"],
+    "capability": "Proactive Intelligence",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["channel_switching"]
+  },
+  "cx_signal_2_journey_abandon": {
+    "ai_message": "Second: 423 members abandoned the mortgage application at document upload this week — CSAT for that touchpoint dropped from 3.6 to 2.8 in 5 days. 71% were mobile users. The failure pattern matches a known UiPath automation timeout introduced in release v4.2.1.\n\nUnlike signal 1, these members didn't switch to branch — they abandoned entirely. That's a revenue risk, not just a satisfaction issue.",
+    "suggested_chips": [
+      "Drill into mortgage journey friction",
+      "What's the CSAT trend?",
+      "Next signal"
+    ],
+    "data_sources_used": ["Salesforce Data Cloud", "Genesys Cloud"],
+    "capability": "Proactive Intelligence",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["cx_journey_friction"]
+  },
+  "cx_signal_3_ivr_escalation": {
+    "ai_message": "Third: IVR-to-agent escalations hit 3x normal volume — 267 members pressed zero within 90 seconds. The top driver is CD rate comparison inquiries that the IVR can't handle (53% of escalations). Average wait time after escalation climbed from 2.1 to 5.7 minutes — nearly double the 3-minute SLA.\n\nThis is a different population than signals 1 and 2 — primarily older CD holders (avg age 58) who prefer phone but are hitting a dead end in self-service.",
+    "suggested_chips": [
+      "Show me the escalation breakdown",
+      "Summarize service recovery gaps",
+      "What intervention is needed?"
+    ],
+    "data_sources_used": ["Genesys Cloud", "Service Cloud"],
+    "capability": "Proactive Intelligence",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["service_recovery"]
+  },
+  "cx_turn_1_channel_friction": {
+    "ai_message": "I've pulled data from Genesys, Service Cloud, and Data Cloud to map where members are hitting friction across all channels.\n\nThe biggest friction point is the document upload step of the mortgage journey — 13.7% of digital starters switch to branch at this stage. That's 134 members this week alone, up from 71 last week (89% increase).\n\n[Channel Switch Hotspots — By Journey Stage]\n— Document Upload: 134 switches (13.7% rate) — CRITICAL\n— Income Verification: 62 switches (8.6% rate) — HIGH\n— Personal Info: 42 switches (3.9% rate) — MODERATE\n— Rate Comparison: 31 switches (2.6% rate)\n— Pre-Qualification: 18 switches (1.5% rate)\n\n[By Source Channel]\n— Mobile App: 198 switches (63%) — highest friction source\n— Desktop Web: 87 switches (28%)\n— IVR to Branch: 27 switches (9%)\n\nThe pattern correlates with a mobile app document upload timeout introduced in release v4.2.1 five days ago. Mobile users are averaging 3.2 upload attempts before giving up.",
+    "suggested_chips": [
+      "Show me which journeys underperform",
+      "What's the CSAT impact?",
+      "Who are these members?"
+    ],
+    "data_sources_used": ["Genesys Cloud", "Service Cloud", "Salesforce Data Cloud"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [
+      {
+        "type": "bar_chart",
+        "title": "Channel Switches by Journey Stage",
+        "dataset_key": "channel_switching.by_journey_stage"
+      }
+    ],
+    "related_dataset_keys": ["channel_switching"]
+  },
+  "cx_turn_2_journey_friction": {
+    "ai_message": "Here's the friction breakdown across all active member journeys this week, ranked by severity:\n\n[1] Mortgage Application — 65.9% drop-off | CSAT 2.8 — CRITICAL\nFriction step: Document Upload | 134 channel switches | Trend: Worsening\n\n[2] HELOC Application — 47.6% drop-off | CSAT 3.0 — HIGH\nFriction step: Property Valuation | 12 channel switches | Trend: Worsening\n\n[3] Auto Loan Application — 42.5% drop-off | CSAT 3.4 — MODERATE\nFriction step: Rate Comparison | 67 channel switches | Trend: Worsening\n\n[4] CD Account Opening — 28.9% drop-off | CSAT 3.1 — MODERATE\nFriction step: Rate Selection | 43 channel switches | Trend: Stable\n\n[5] Credit Card Application — 24.5% drop-off | CSAT 3.7 — LOW\nFriction step: Income Documentation | 34 channel switches | Trend: Stable\n\n[6] Checking Account Onboarding — 23.7% drop-off | CSAT 3.9 — LOW\nFriction step: Identity Verification | 22 channel switches | Trend: Improving\n\nMortgage and HELOC together account for 73% of all channel switches. Mortgage is the clear priority — it has the highest volume (1,240 starts), the worst CSAT (2.8), and a known root cause (upload timeout).",
+    "suggested_chips": [
+      "What intervention is needed?",
+      "Drill into mortgage journey friction",
+      "Show me the CSAT trend by journey"
+    ],
+    "data_sources_used": ["Salesforce Data Cloud", "Genesys Cloud", "Service Cloud"],
+    "capability": "Friction Observability",
+    "ui_components_to_render": [
+      {
+        "type": "table",
+        "title": "Journey Friction Breakdown",
+        "dataset_key": "cx_journey_friction.journeys"
+      }
+    ],
+    "related_dataset_keys": ["cx_journey_friction"]
+  },
+  "cx_turn_3_intervention": {
+    "ai_message": "Based on the friction analysis across all three signals, here are three targeted interventions I can execute right now — each one addresses a specific signal:",
+    "suggested_chips": [
+      "Summarize service recovery gaps",
+      "What's the CSAT trend?"
+    ],
+    "data_sources_used": ["Salesforce AgentForce", "Genesys Cloud", "Service Cloud"],
+    "capability": "Automated Action",
+    "ui_components_to_render": [
+      {
+        "type": "action_cards",
+        "title": "Recommended CX Interventions",
+        "actions": [
+          {
+            "id": "ACT-CX-001",
+            "title": "Launch proactive callback for 423 mortgage abandoners",
+            "description": "Build an AgentForce segment of 423 members who abandoned at document upload and trigger proactive callbacks within 24 hours. Callback script acknowledges the upload issue and offers guided phone completion. Targets Signal 2.",
+            "system": "Salesforce AgentForce",
+            "impact": "Recover up to 60% of abandoned applications (est. 250 members)",
+            "status": "ready"
+          },
+          {
+            "id": "ACT-CX-002",
+            "title": "Add 4 agents to CD rate inquiry queue during peak hours",
+            "description": "Submit workforce management request to Genesys Cloud for 4 additional agents on the CD rate inquiry queue during peak hours (10am–2pm). Current 5.7 min wait exceeds 3-min SLA. Targets Signal 3.",
+            "system": "Genesys Cloud / Workforce Management",
+            "impact": "Reduce IVR escalation wait time from 5.7 min to under 3 min",
+            "status": "ready"
+          },
+          {
+            "id": "ACT-CX-003",
+            "title": "Send service recovery SMS to 312 channel-switch members",
+            "description": "Trigger targeted SMS to 312 members who switched from digital to branch with CSAT < 3.0, offering a dedicated mortgage specialist callback. Targets Signal 1.",
+            "system": "Service Cloud / AgentForce",
+            "impact": "Improve post-switch CSAT from 2.9 to 3.4+ (based on recovery benchmarks)",
+            "status": "ready"
+          }
+        ]
+      }
+    ],
+    "post_confirm_response": {
+      "ACT-CX-001": "Done. AgentForce segment created: 'Mortgage Journey Abandoners — April 2026'\n\n— 423 members added to segment\n— Proactive callback campaign scheduled for tomorrow 9:00 AM ET\n— Callback script includes: upload issue acknowledgment + guided phone completion offer\n— Expected recovery: 250–270 applications (60–65%)\n— Tracking dashboard will update in real-time once calls begin",
+      "ACT-CX-002": "Done. Workforce management request submitted to Genesys Cloud:\n\n— 4 additional agents allocated to CD rate inquiry queue\n— Coverage: Peak hours (10am–2pm ET), starting tomorrow\n— Expected wait time reduction: 5.7 min → 2.4 min (within SLA)\n— Auto-expires in 7 days — will recommend extension if volume persists",
+      "ACT-CX-003": "Done. Service recovery SMS campaign triggered:\n\n— 312 channel-switch members with CSAT < 3.0 targeted\n— Message: Offers dedicated mortgage specialist callback within 4 hours\n— Expected response rate: 35–40% (based on similar campaigns)\n— Follow-up email scheduled for non-responders at 48 hours"
+    },
+    "related_dataset_keys": ["segments", "service_recovery"]
+  },
+  "cx_channel_patterns": {
+    "ai_message": "Here's the full channel switching pattern breakdown:\n\n[By Source Channel]\n— Mobile App: 198 switches (63%) — highest friction source\n— Desktop Web: 87 switches (28%)\n— IVR to Branch: 27 switches (9%)\n\n[By Journey Stage]\nDocument Upload accounts for 43% of all channel switches. Members are averaging 3.2 upload attempts before switching to branch.\n\n[Daily Trend — This Week]\n— Apr 1: 32 switches\n— Apr 2: 38 switches\n— Apr 3: 67 switches — PEAK (v4.2.1 deployed)\n— Apr 4: 54 switches\n— Apr 5: 48 switches\n— Apr 6: 41 switches\n— Apr 7: 32 switches (declining, but still 50% above baseline)\n\nThe spike began the day release v4.2.1 went live. The daily trend is declining slightly as some members find branch workarounds, but the root cause (mobile upload timeout) is still active.",
+    "suggested_chips": [
+      "Show me which journeys underperform",
+      "What intervention is needed?"
+    ],
+    "data_sources_used": ["Genesys Cloud", "Service Cloud", "Web & Mobile Analytics"],
+    "capability": "Friction Observability",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["channel_switching"]
+  },
+  "cx_csat_trend": {
+    "ai_message": "CSAT trend by journey over the last 4 weeks:\n\n[Mortgage Application] — steepest decline\nWeek 1: 3.6 → Week 2: 3.4 → Week 3: 3.1 → This week: 2.8\nDown 0.8 points total. Losing 0.2 points per week.\n\n[Auto Loan]\nWeek 1: 3.8 → This week: 3.4 — Down 0.4 points\n\n[CD Account Opening]\nWeek 1: 3.3 → This week: 3.1 — Down 0.2 points\n\n[HELOC Application]\nWeek 1: 3.4 → This week: 3.0 — Down 0.4 points\n\n[Checking Onboarding]\nStable at 3.9 across all 4 weeks\n\n[Credit Card Application]\nStable at 3.7 across all 4 weeks\n\nThe mortgage CSAT decline is accelerating — it dropped 0.3 points in the last week alone (vs. 0.2/week prior). At this rate, it will hit 2.4 by end of month, which triggers the NPS alert threshold and would flag in the next NCUA consumer complaint review.",
+    "suggested_chips": [
+      "What intervention is needed?",
+      "Drill into mortgage journey friction"
+    ],
+    "data_sources_used": ["Genesys Cloud", "Voice of Member / NPS"],
+    "capability": "Friction Observability",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["nps_data"]
+  },
+  "cx_ivr_escalation_detail": {
+    "ai_message": "IVR escalation deep dive — breakdown of the 267 escalations this week:\n\n[By Reason]\n[1] CD rate comparison inquiry — 142 escalations (53%)\nMembers asking 'What rate can you offer me?' — the IVR cannot handle personalized rate negotiation or competitor comparisons.\n\n[2] Mortgage application status — 68 escalations (25%)\nMembers want real-time updates on document processing status.\n\n[3] Account balance dispute — 34 escalations (13%)\nRequires agent verification — cannot be self-served.\n\n[4] Other — 23 escalations (9%)\n\n[Performance After Escalation]\n— Avg time in IVR before pressing 0: 87 seconds\n— Avg wait for live agent: 5.7 minutes (SLA: 3 min)\n— First-call resolution after escalation: 71%\n— CSAT post-escalation: 3.1 (vs. 3.8 for direct agent calls)\n\nThe CD rate inquiry volume is 3x what it was 4 weeks ago. These are primarily rate-sensitive military retiree members (avg age 58, avg tenure 14.6 years) comparing USSFCU against USAA and Navy Federal. The IVR simply wasn't designed for this type of consultative conversation.",
+    "suggested_chips": [
+      "Summarize service recovery gaps",
+      "What intervention is needed?"
+    ],
+    "data_sources_used": ["Genesys Cloud", "Service Cloud"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["service_recovery"]
+  },
+  "cx_service_recovery_gaps": {
+    "ai_message": "Service recovery performance is below target across most channels:\n\n[Overall Recovery Rate: 62% — Target: 85%]\n\n[By Channel — Ranked by Gap]\n— IVR Self-Service: 29.2% recovery — CRITICAL GAP (55.8 pts below target)\n— Mobile App Help: 43.9% recovery — GAP (41.1 pts below target)\n— Email Support: 55.4% recovery — GAP (29.6 pts below target)\n— Chat — Live Agent: 57.1% recovery — GAP (27.9 pts below target)\n— Phone — Live Agent: 70.9% recovery — BELOW TARGET (14.1 pts below)\n— Branch Visit: 80.6% recovery — NEAREST TO TARGET (4.4 pts below)\n\n[By Issue Type]\n— Document Upload Failure: 46.8% recovery — worst across all issue types\n— CD Rate Inquiry: 70.8% recovery\n— Channel Switch Completion: 70.8% recovery\n\nThe IVR self-service gap (29.2% vs. 85% target) is the largest. But the document upload failure recovery (46.8%) is the most impactful because it affects the highest-volume, lowest-CSAT journey. Fixing the upload timeout would prevent the failures; fixing recovery would save members who already hit the issue.",
+    "suggested_chips": [
+      "What intervention is needed?",
+      "Draft proactive outreach message"
+    ],
+    "data_sources_used": ["Service Cloud", "Genesys Cloud"],
+    "capability": "Friction Observability",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["service_recovery"]
+  },
+  "cx_mortgage_friction_detail": {
+    "ai_message": "Mortgage journey friction deep dive — the worst-performing journey this week:\n\n[Overall] 65.9% drop-off rate | 1,240 starts → 423 completions | CSAT: 2.8\n\n[Step-by-Step Drop-Off Analysis]\n— Pre-Qualification: 4.8% drop-off (normal)\n— Product Selection: 7.6% drop-off (normal)\n— Personal Info: 8.3% drop-off (slightly elevated)\n— Document Upload: 26.5% drop-off — CRITICAL FRICTION POINT\n— Income Verification: 12.1% drop-off (elevated — upstream carry-over)\n— Credit Review: 4.2% drop-off (normal)\n— Closing: 2.4% drop-off (normal)\n\n[Root Cause — Document Upload Step]\n— Mobile upload timeout after 45 seconds (introduced in v4.2.1 on Apr 1)\n— Members averaging 3.2 failed upload attempts before giving up\n— Of the members who failed: 134 switched to branch, 289 abandoned entirely\n— The timeout affects PDF files over 2MB — most members' pay stubs and tax returns exceed this\n\n[Impact]\nAt 26.5% drop-off, this single step is responsible for 328 lost completions this week. A permanent fix requires a mobile app release. In the meantime, proactive callback outreach can recover 60%+ of abandoners based on historical benchmarks.",
+    "suggested_chips": [
+      "What intervention is needed?",
+      "Draft proactive outreach message"
+    ],
+    "data_sources_used": ["Salesforce Data Cloud", "Web & Mobile Analytics", "Genesys Cloud"],
+    "capability": "Friction Observability",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["cx_journey_friction", "channel_switching"]
+  },
+  "cx_who_are_members": {
+    "ai_message": "Here's a profile of the affected members across all three signals:\n\n[Signal 1 — Channel Switchers: 312 members]\n— Avg age: 46 | Avg tenure: 8.2 years\n— 64% mobile-first users | Primary journey: Mortgage (58%)\n— Post-switch CSAT: 2.9\n— Profile: Mid-career, digitally comfortable but hit a wall at document upload\n\n[Signal 2 — Journey Abandoners: 423 members]\n— Avg age: 34 | First-time applicants: 67%\n— 71% mobile-first | Avg upload attempts before abandoning: 3.2\n— Post-abandon CSAT: 2.8\n— Profile: Younger, mobile-native, less likely to find a branch workaround\n\n[Signal 3 — IVR Escalators: 267 members]\n— Avg age: 58 | Avg tenure: 14.6 years\n— 82% CD holders | Military retirees: 61%\n— Post-escalation CSAT: 3.1\n— Profile: Long-tenure, high-value, phone-first, comparing CD rates against competitors\n\n[Overlap]\n47 members appear in both signal 1 and signal 2 — they tried mobile, failed at upload, visited a branch, and still didn't complete. These are the most frustrated members and the highest priority for recovery.",
+    "suggested_chips": [
+      "What intervention is needed?",
+      "Show me which journeys underperform"
+    ],
+    "data_sources_used": ["Salesforce Data Cloud", "Service Cloud"],
+    "capability": "Converged Conversation",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["segments"]
+  },
+  "cx_outreach_draft": {
+    "ai_message": "Here's a draft proactive outreach message for the 423 mortgage journey abandoners:\n\n---\n\nSubject: We can help you finish your mortgage application\n\nHi [First Name],\n\nWe noticed you recently had difficulty uploading documents during your mortgage application. We apologize for the inconvenience — our team is aware of the issue and working on a fix.\n\nIn the meantime, we'd like to help you complete your application:\n— Call us at 1-800-247-5626 for guided phone completion\n— Schedule a callback at a time that works for you: [link]\n— Visit your nearest USSFCU branch for in-person assistance\n\nYour application is saved and your progress is intact.\n\nWarm regards,\nThe USSFCU Mortgage Team\n\n---\n\nThis message acknowledges the specific issue (document upload), avoids generic language, and gives three clear resolution paths. Want me to push this to the callback campaign?",
+    "suggested_chips": [
+      "Yes, send to callback campaign",
+      "What intervention is needed?"
+    ],
+    "data_sources_used": ["Salesforce AgentForce"],
+    "capability": "Automated Action",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["segments"]
+  },
+  "cx_send_to_callback": {
+    "ai_message": "Done. Outreach message approved and queued for the proactive callback campaign:\n\n— Campaign: 'Mortgage Recovery — April 2026'\n— Segment: 423 mortgage journey abandoners\n— Channel: Phone callback + SMS notification\n— Start: Tomorrow 9:00 AM ET\n— Estimated recovery: 250–270 applications (60–65%)\n\nI'll track the recovery rate and update you when results come in. What else would you like to address?",
+    "suggested_chips": [
+      "Summarize service recovery gaps",
+      "Show me the escalation breakdown"
+    ],
+    "data_sources_used": ["Salesforce AgentForce", "Service Cloud"],
+    "capability": "Automated Action",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["service_recovery"]
+  },
+  "cx_service_recovery_report": {
+    "ai_message": "Here's your CX Service Recovery Report — Week of April 1–7, 2026:\n\n[Executive Summary]\nOverall service recovery rate: 62% (target: 85%). Three experience signals affected 1,002 members total. Mortgage journey CSAT declined 0.8 points to 2.8 — the steepest drop across all journeys.\n\n[Signal Impact Summary]\n— Signal 1 (Channel Switches): 312 members, CSAT 2.9 — caused by mobile upload timeout\n— Signal 2 (Journey Abandonment): 423 members, CSAT 2.8 — same root cause, no branch fallback\n— Signal 3 (IVR Escalations): 267 members, CSAT 3.1 — CD rate inquiry overload\n\n[Key Findings]\n[1] Mobile upload timeout (v4.2.1) is the single root cause for signals 1 and 2 — affecting 735 members combined.\n[2] IVR self-service recovery rate of 29.2% is the widest gap against the 85% target.\n[3] Branch recovery (80.6%) is the strongest channel but cannot scale to absorb digital overflow.\n\n[Actions Taken]\n— Proactive callback campaign launched for 423 abandoners (est. 60% recovery)\n— 4 additional agents added to CD rate queue (est. wait time: 5.7 min → 2.4 min)\n— Service recovery SMS sent to 312 channel-switch members\n\n[Recommended Next Steps]\n— Engineering: Prioritize mobile upload fix in next sprint\n— Product: Redesign IVR CD rate flow with personalized rate options\n— CX: Expand proactive outreach to HELOC abandoners (47.6% drop-off)\n\nWant me to generate a slide deck for your weekly CX review?",
+    "suggested_chips": [
+      "Where are members hitting friction?",
+      "Show me channel switching patterns"
+    ],
+    "data_sources_used": ["All CX sources"],
+    "capability": "Automated Action",
+    "ui_components_to_render": [],
+    "related_dataset_keys": ["service_recovery", "cx_journey_friction"]
+  },
+  "__default__": {
+    "ai_message": "I don't have an answer to that in the member-experience data I can see.\n\nI can show where members are hitting friction, which journeys underperform this week, channel switching patterns, or what's driving the IVR escalation spike.",
+    "suggested_chips": [
+      "Where are members hitting friction?",
+      "Which journeys underperform this week?",
+      "Show me channel switching patterns"
+    ],
+    "capability": "Converged Conversation"
+  }
+}

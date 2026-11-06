@@ -1,0 +1,8 @@
+# Agent spec for the question-registry-reducer. Deterministic: no LLM. Merges the per-persona
+# fan-out results (highest attempt only) into one question registry, de-duplicates, and
+# escalates when a persona's questions are missing entirely.
+name: question-registry-reducer
+version: 1.0.0
+pack: data
+kind: deterministic
+stage: question_reduction

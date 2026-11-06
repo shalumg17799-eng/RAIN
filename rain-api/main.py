@@ -16,15 +16,23 @@ Run:
 """
 
 import logging
+import os
+import subprocess
+import sys
+import threading
 import time
+from pathlib import Path
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 import json
 from datetime import datetime, timezone
+from insights.api.rain_adapter import get_rain_router
 
 from signal_data import RAIN_SIGNALS, DATA_SOURCES_USED
+from prdv2_personas import PRDV2_SIGNALS, PRDV2_PERSONA_IDS
 from data_sources_detail import DATA_SOURCES_DETAIL, DATA_SOURCES_HEALTH_KPIS
 from rural_health_data import CASCADE_ROOT, CASCADE_BRANCHES, COUNTY_ACCESS_DATA, COUNTY_RISK_SUMMARY
 from ultra_adapter import ultra_signals_for_persona, ultra_data_sources, ultra_kpis_for_persona
@@ -50,7 +58,78 @@ from maria_telehealth_scenario import get_telehealth_scenario
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)-7s [%(name)s] %(message)s")
 log = logging.getLogger("rain.api")
 
-app = FastAPI(title="Radiant V2 API", version="2.0")
+# Swagger UI at /docs (ReDoc at /redoc) is the one place that lists every
+# endpoint AND which frontend screen calls it -- the tags group routes by
+# their consumer, and the table below is the frontend's live call map.
+_API_DESCRIPTION = """
+RAIN backend (FastAPI). **Swagger UI: `/docs` · ReDoc: `/redoc` · raw spec: `/openapi.json`**
+
+### What the frontend calls today (file → endpoint)
+
+| Frontend file / screen | Endpoint(s) | When |
+|---|---|---|
+| `hooks/useChatFlow.js` (chat greeting) | `GET /ultra/rain/{persona}/signals` | every briefing load |
+| `screens/AskTheAI.jsx` + `RAINComplianceView.jsx` | `GET /ultra/rain/{persona}/signals`, `GET /ultra/rain/{persona}/kpis` | briefing cards + KPI tiles |
+| `hooks/useChatFlow.js` (chat answers) | `POST /ultra/rain/{persona}/ask` | every data question while `VITE_RAIN_GOVERNED_ASK=0` (current default) |
+| `hooks/useChatFlow.js` (governed mode) | `POST /api/v2/ask` (SSE), `POST /api/v2/hitl/{run_id}` | only when `VITE_RAIN_GOVERNED_ASK=1`; needs a persona bearer token |
+| `clients/rain/genericApi.js` (pages) | `POST /api/v2/generic` | Data Sources / Risk Signals / component pages |
+| `nair/CascadeDiagram.jsx` | `GET /ultra/rain/cascade` | Rural Health Intelligence page |
+| `nair/NevadaCountyChoropleth.jsx` | `GET /ultra/rain/countyRisk` | county map |
+| `screens/DataSources.jsx` | `GET /ultra/rain/dataSources` | Data Sources page |
+| `ActionPackageCard.jsx` + `Tier1ActionPackage.jsx` | `GET /ultra/rain/{persona}/actionPackage`, `POST .../actionPackage/decision` | action packages (human-gated) |
+| `screens/PrdStudio.jsx` | `GET /ultra/rain/prd/artifacts`, `GET /ultra/rain/prd/stream` (SSE) | PRD Studio |
+
+All eleven personas (maria, sarah, james, priya, david, kayla, denise, samuel,
+linda, marcus, rosa) resolve on the `{persona}` routes. Everything runs on
+synthetic + public data, labelled as such.
+"""
+
+_OPENAPI_TAGS = [
+    {"name": "UI · Briefing (signals & KPIs)",
+     "description": "Feeds every persona's briefing: signal cards and KPI tiles, live Postgres overlay + KAG `verified_live` provenance per card."},
+    {"name": "UI · Chat (fast live ask)",
+     "description": "The chat's current answer path (`VITE_RAIN_GOVERNED_ASK=0`): verified business-rule SQL in milliseconds; deeper live tiers only for free-typed questions (`fast_only=false`)."},
+    {"name": "UI · Pages",
+     "description": "Cascade diagram, county risk map and the Data Sources page, each with live graph provenance."},
+    {"name": "UI · Action packages",
+     "description": "Human-gated action packages: the platform assembles, a named person decides. `preview`/`audit` are available to the UI but currently only `GET` + `decision` are wired."},
+    {"name": "UI · PRD Studio",
+     "description": "PRD pipeline artifacts and the live SSE run stream."},
+    {"name": "Insights Intelligence Layer",
+     "description": "The governed agent (`/api/v2/ask` + HITL): bearer-token auth per persona, SSE stage streaming, L1-L3 policy, used by chat only when `VITE_RAIN_GOVERNED_ASK=1`."},
+    {"name": "data",
+     "description": "Generated Data API over the `synthetic` + `public_data` schemas (`/api/v2/data/...`), from deploy/scripts/build_data_api.py."},
+    {"name": "data-v3",
+     "description": "Generated Data API for the PRD v0.3 wave over the `rain_v3` database (`/api/v3/data/...`), from deploy/scripts/build_data_api.py."},
+    {"name": "ultra-v3",
+     "description": "Ultra API v1 for the PRD v0.3 frontend (frontend/rain-app) at `/api/v3/ui/...`: context, briefing, ask, actions, catalog for the 7-persona VBC prototype, served from app-exported fixtures (npm run fixtures:backend)."},
+    {"name": "Legacy /api/v2 (scripted era)",
+     "description": "Pre-governed envelope endpoints still used by `genericApi.js` (`/generic`) and available for `/signals`+`/kpis`. The legacy `/api/v2/ask` here is SHADOWED by the Insights router at runtime and hidden from this spec."},
+    {"name": "Ops", "description": "Health and registration checks."},
+]
+
+app = FastAPI(
+    title="RAIN API (Radiant V2)",
+    version="2.0",
+    description=_API_DESCRIPTION,
+    openapi_tags=_OPENAPI_TAGS,
+)
+app.include_router(get_rain_router(), prefix="/api/v2")
+
+# Generated data API (synthetic + public_data schemas) - produced by
+# deploy/scripts/build_data_api.py; regenerate, don't edit.
+from data_api import router as data_router  # noqa: E402
+app.include_router(data_router, prefix="/api/v2/data")
+
+# Generated data API for the PRD v0.3 wave, served from its own database (rain_v3;
+# override with PG_DB_V3) so the v0.2 layer in the rain db stays untouched.
+from data_api_v3 import router as data_v3_router  # noqa: E402
+app.include_router(data_v3_router, prefix="/api/v3/data")
+
+# Ultra API v1 for the PRD v0.3 frontend (frontend/rain-app http mode:
+# VITE_ULTRA_API_BASE=http://127.0.0.1:8000/api/v3/ui).
+from ultra_v3_api import router as ultra_v3_router  # noqa: E402
+app.include_router(ultra_v3_router, prefix="/api/v3/ui")
 # expose_headers lets the browser's fetch() read X-RAIN-Source, which the
 # frontend logs as proof a response came from this server.
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
@@ -77,11 +156,14 @@ with open("ask_cache.json") as f:
 PRODUCTS = {
     "rain": {
         "market": "healthcare",
-        "signals": RAIN_SIGNALS,
+        # v0.1 wave + the PRD v0.2 wave (kayla/denise/samuel/linda/marcus).
+        # The v0.2 personas have no ask_cache entries yet -- /api/v2/ask
+        # falls through for them and the UI plays its scripted flows.
+        "signals": {**RAIN_SIGNALS, **PRDV2_SIGNALS},
         "kpis": RAIN_KPIS,
         "ask_cache": ASK_CACHE,
         "data_sources": DATA_SOURCES_USED,
-        "personas": {"maria", "sarah", "james", "priya", "david"},
+        "personas": {"maria", "sarah", "james", "priya", "david"} | PRDV2_PERSONA_IDS,
     },
     # "ussfcu": {...}  <- Charan's own service owns this; not reimplemented
     # here. Registering it would mean pointing at his real backend/DB,
@@ -151,7 +233,7 @@ def resolver_error(components):
     }
 
 
-@app.post("/api/v2/signals")
+@app.post("/api/v2/signals", tags=["Legacy /api/v2 (scripted era)"])
 def get_signals(req: SignalsRequest):
     product = PRODUCTS.get(req.product)
     if not product or req.persona not in product["signals"]:
@@ -168,7 +250,7 @@ def get_signals(req: SignalsRequest):
     )
 
 
-@app.post("/api/v2/kpis")
+@app.post("/api/v2/kpis", tags=["Legacy /api/v2 (scripted era)"])
 def get_kpis(req: KpisRequest):
     product = PRODUCTS.get(req.product)
     if not product or req.persona not in product["kpis"]:
@@ -186,7 +268,7 @@ def get_kpis(req: KpisRequest):
     )
 
 
-@app.post("/api/v2/ask")
+@app.post("/api/v2/ask", include_in_schema=False)  # SHADOWED at runtime by the Insights router (registered first); hidden so /docs shows the live contract
 def ask(req: AskRequest):
     """Every answer is computed live -- no hand-written text is ever returned
     here. The pre-written ask_cache.json (40 example Q&A pairs) is kept only
@@ -357,7 +439,7 @@ GENERIC_RESOLVERS = {
 }
 
 
-@app.post("/api/v2/generic")
+@app.post("/api/v2/generic", tags=["Legacy /api/v2 (scripted era)"])
 def generic(req: GenericRequest):
     product = PRODUCTS.get(req.product)
     if not product:
@@ -391,12 +473,12 @@ def generic(req: GenericRequest):
 # README's "Backend integration" section describes: swap the static
 # import for a fetch to these URLs and the existing components render
 # unchanged.
-@app.get("/ultra/rain/{persona}/signals")
+@app.get("/ultra/rain/{persona}/signals", tags=["UI · Briefing (signals & KPIs)"])
 def ultra_signals(persona: str):
     return ultra_signals_for_persona(persona)
 
 
-@app.get("/ultra/rain/dataSources")
+@app.get("/ultra/rain/dataSources", tags=["UI · Pages"])
 def ultra_data_sources_endpoint():
     sources = ultra_data_sources()
     # Live lookup: how many real ontology field mappings this source
@@ -406,12 +488,70 @@ def ultra_data_sources_endpoint():
     return sources
 
 
-@app.get("/ultra/rain/{persona}/kpis")
+@app.get("/ultra/rain/{persona}/kpis", tags=["UI · Briefing (signals & KPIs)"])
 def ultra_kpis(persona: str):
     return ultra_kpis_for_persona(persona)
 
 
-@app.get("/ultra/rain/cascade")
+class UltraAskRequest(BaseModel):
+    query: str
+    fast_only: bool = False
+    """True for chip clicks: only the millisecond deterministic tiers run,
+    because the UI has a scripted flow ready as fallback. Free-typed
+    questions send False and may also use the LLM-SQL tier (seconds)."""
+
+
+def _deterministic_answer(query: str, persona: str):
+    """The verified-SQL tiers only (summary, breakdown, known metric) --
+    the same first tiers try_live_fallback runs, with no LLM anywhere."""
+    from business_rules import (match_known_metric, run_known_metric,
+                                match_breakdown_rule, run_breakdown_rule,
+                                is_summary_request, run_persona_summary)
+    from persona_scope import normalize_persona
+    p = normalize_persona(persona)
+    if p and is_summary_request(query):
+        result = run_persona_summary(p)
+        if result:
+            return result
+    breakdown = match_breakdown_rule(query, persona=p)
+    if breakdown:
+        result = run_breakdown_rule(breakdown)
+        if result:
+            return result
+    known = match_known_metric(query, persona=p)
+    if known:
+        result = run_known_metric(known)
+        if result:
+            return result
+    return None
+
+
+@app.post("/ultra/rain/{persona}/ask", tags=["UI · Chat (fast live ask)"])
+def ultra_fast_ask(persona: str, req: UltraAskRequest):
+    """Fast live-answer path for the chat UI when the governed agent is off.
+    Verified business-rule SQL answers in milliseconds from Postgres (public
+    + synthetic schemas); the fuller try_live_fallback tiers (incl. LLM SQL)
+    only run for free-typed questions. Same open posture as the other
+    /ultra/rain routes -- no insights-agent run, no HITL hold."""
+    live = _deterministic_answer(req.query, persona)
+    if live is None and not req.fast_only:
+        live = try_live_fallback(req.query, product="rain", persona=persona)
+    found = bool(live) and live.get("source") != "live_not_found"
+    log.info("fast-ask persona=%s fast_only=%s found=%s source=%s", persona,
+             req.fast_only, found, (live or {}).get("source"))
+    if not found:
+        return {"found": False}
+    return {
+        "found": True,
+        "ai_message": live["ai_message"],
+        "suggested_chips": live.get("suggested_chips") or [],
+        "data_sources_used": live.get("data_sources_used") or [],
+        "confidence": live.get("confidence"),
+        "source": live.get("source"),
+    }
+
+
+@app.get("/ultra/rain/cascade", tags=["UI · Pages"])
 def ultra_cascade():
     """Matches CascadeDiagram.jsx's exact branches array, enriched with
     live provenance (concept/persona) pulled straight from the graph."""
@@ -422,7 +562,7 @@ def ultra_cascade():
     return branches
 
 
-@app.get("/ultra/rain/countyRisk")
+@app.get("/ultra/rain/countyRisk", tags=["UI · Pages"])
 def ultra_county_risk():
     """Matches NevadaCountyChoropleth.jsx's exact content shape, with each
     region's provenance pulled live from the graph."""
@@ -468,12 +608,12 @@ def _action_package(persona: str):
     return entry
 
 
-@app.get("/ultra/rain/{persona}/actionPackage")
+@app.get("/ultra/rain/{persona}/actionPackage", tags=["UI · Action packages"])
 def ultra_action_package(persona: str):
     return _action_package(persona)["build"]()
 
 
-@app.post("/ultra/rain/{persona}/actionPackage/preview")
+@app.post("/ultra/rain/{persona}/actionPackage/preview", tags=["UI · Action packages"])
 def ultra_action_package_preview(persona: str, body: ActionInputs):
     """The package as it would look with these inputs applied. Records nothing."""
     entry = _action_package(persona)
@@ -483,7 +623,7 @@ def ultra_action_package_preview(persona: str, body: ActionInputs):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.post("/ultra/rain/{persona}/actionPackage/decision")
+@app.post("/ultra/rain/{persona}/actionPackage/decision", tags=["UI · Action packages"])
 def ultra_action_package_decision(persona: str, body: ActionDecision):
     entry = _action_package(persona)
     try:
@@ -492,17 +632,215 @@ def ultra_action_package_decision(persona: str, body: ActionDecision):
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@app.get("/ultra/rain/{persona}/actionPackage/audit")
+@app.get("/ultra/rain/{persona}/actionPackage/audit", tags=["UI · Action packages"])
 def ultra_action_package_audit(persona: str):
     return _action_package(persona)["audit"]()
 
 
-@app.get("/health")
+# ---------------------------------------------------------------------------
+# PRD artifacts, parsed for the UI: personas, questions, entity model and
+# ontology as structured JSON so PRD Studio can render cards, tables and
+# charts instead of raw YAML. Read-only; every file is optional.
+# ---------------------------------------------------------------------------
+@app.get("/ultra/rain/prd/artifacts", tags=["UI · PRD Studio"])
+def ultra_prd_artifacts():
+    import yaml as _yaml
+
+    out_dir = _PRD_ROOT / "artifacts" / "rain-prd-run"
+
+    def read_yaml(name):
+        p = out_dir / name
+        try:
+            return _yaml.safe_load(p.read_text(encoding="utf-8")) if p.is_file() else None
+        except Exception:
+            return None
+
+    def read_json(name):
+        p = out_dir / name
+        try:
+            return json.loads(p.read_text(encoding="utf-8")) if p.is_file() else None
+        except Exception:
+            return None
+
+    requirements = read_yaml("requirements-ir.yaml")
+    registry = read_yaml("question-registry.yaml") or {}
+    entity = read_yaml("entity-model.yaml") or {}
+    schema_audit = read_json("schema-audit.json") or {}
+    ontology_audit = read_json("ontology-audit.json") or {}
+    upper = read_json("upper-ontology.json") or {}
+    scenario = read_yaml("scenario.yaml") or {}
+
+    if not requirements:
+        return {"available": False}
+
+    questions = [q for q in (registry.get("questions") or []) if isinstance(q, dict)]
+    counts = {}
+    for q in questions:
+        pid = str(q.get("persona_id") or "?")
+        counts[pid] = counts.get(pid, 0) + 1
+
+    personas = []
+    raw_personas = requirements.get("personas") or []
+    if isinstance(raw_personas, dict):
+        raw_personas = list(raw_personas.values())
+    for p in raw_personas:
+        if not isinstance(p, dict):
+            continue
+        pid = str(p.get("id") or p.get("persona_id") or "")
+        personas.append({
+            "id": pid,
+            "name": p.get("name") or pid,
+            "role": p.get("role") or "",
+            "altitude": p.get("altitude") or "",
+            "use_case": p.get("use_case") or "",
+            "is_default": bool(p.get("is_default")),
+            "problems": [str(x) for x in (p.get("problems") or [])][:4],
+            "systems": [str(x) for x in (p.get("primary_systems") or [])][:6],
+            "question_count": counts.get(pid, 0),
+        })
+
+    tables = [t for t in (entity.get("tables") or []) if isinstance(t, dict)]
+    new_tables = [str(t) for t in (schema_audit.get("tables_not_in_source") or [])]
+
+    edge_counts = ontology_audit.get("edge_counts_by_type") or {}
+    mtime = None
+    report_path = out_dir / "run-report.json"
+    if report_path.is_file():
+        mtime = datetime.fromtimestamp(report_path.stat().st_mtime, tz=timezone.utc).isoformat()
+
+    return {
+        "available": True,
+        "generated_at": mtime,
+        "source_document": "RAIN_Prototype_Spec_v1.docx",
+        "personas": personas,
+        "questions": [
+            {"persona_id": str(q.get("persona_id") or ""), "text": str(q.get("text") or ""),
+             "tier": str(q.get("tier") or ""), "is_data_question": bool(q.get("is_data_question"))}
+            for q in questions
+        ],
+        "entity_model": {
+            "table_count": len(tables),
+            "column_count": sum(len(t.get("columns") or []) for t in tables),
+            "table_names": [str(t.get("name") or "") for t in tables],
+            "new_tables": new_tables,
+            "existing_table_count": schema_audit.get("source_table_count"),
+        },
+        "ontology": {
+            "concepts": ontology_audit.get("concept_nodes") or sum(
+                1 for n in (upper.get("nodes") or []) if isinstance(n, dict) and n.get("kind") == "Concept"
+            ),
+            "personas": ontology_audit.get("persona_nodes") or 0,
+            "edges": ontology_audit.get("edge_count") or 0,
+            "edge_counts": edge_counts,
+            "unmapped_concepts": len(ontology_audit.get("unmapped_concepts") or []),
+            "invalid_edges": len(ontology_audit.get("invalid_edge_references") or []),
+        },
+        "scenario": {
+            "present": bool(scenario.get("scenarios")),
+            "synthetic": bool(scenario.get("synthetic")),
+            "count": len(scenario.get("scenarios") or []),
+            "db_state_source": scenario.get("db_state_source"),
+        },
+    }
+
+
+# ---------------------------------------------------------------------------
+# PRD design-pipeline runner: the pipeline subprocess prints one typed StageEvent
+# per line ("EVENT {json}"), relayed verbatim over SSE so the UI renders the real
+# graph, iterations and tool calls. One run at a time; `?demo=1` replays the
+# RECORDED events of the last real run (events.jsonl), time-compressed, with
+# demo:true stamped on every event so it can never be mistaken for a live run.
+# ---------------------------------------------------------------------------
+_PRD_ROOT = Path(__file__).resolve().parents[1]
+_PRD_RUN_LOCK = threading.Lock()
+_PRD_EVENTS_FILE = _PRD_ROOT / "artifacts" / "rain-prd-run" / "events.jsonl"
+_DEMO_STEP_SECONDS = 0.35
+
+
+def _demo_replay():
+    """Yield the last real run's recorded events with demo:true, evenly paced."""
+    if not _PRD_EVENTS_FILE.is_file():
+        yield "event: error\ndata: " + json.dumps({
+            "text": "No recorded run to replay yet - run the real pipeline once first."
+        }) + "\n\n"
+        return
+    lines = [l for l in _PRD_EVENTS_FILE.read_text(encoding="utf-8").splitlines() if l.strip()]
+    for line in lines:
+        try:
+            event = json.loads(line)
+        except ValueError:
+            continue
+        event["demo"] = True
+        yield "event: prd\ndata: " + json.dumps(event) + "\n\n"
+        time.sleep(_DEMO_STEP_SECONDS)
+    yield "event: done\ndata: " + json.dumps({"exit_code": 0, "demo": True}) + "\n\n"
+
+
+@app.get("/ultra/rain/prd/stream", tags=["UI · PRD Studio"])
+def ultra_prd_stream(demo: bool = False):
+    """Start the PRD graph (or replay the last run's recorded events) and stream typed
+    StageEvents as SSE `prd` events, ending with a `done` event carrying the exit code."""
+    if not _PRD_RUN_LOCK.acquire(blocking=False):
+        def busy():
+            yield "event: error\ndata: " + json.dumps({"text": "A PRD run is already in progress."}) + "\n\n"
+        return StreamingResponse(busy(), media_type="text/event-stream")
+
+    if demo:
+        def demo_gen():
+            try:
+                yield from _demo_replay()
+            finally:
+                _PRD_RUN_LOCK.release()
+        return StreamingResponse(demo_gen(), media_type="text/event-stream",
+                                 headers={"Cache-Control": "no-cache"})
+
+    try:
+        # a fresh events file per real run, so the demo replay is exactly one run
+        _PRD_EVENTS_FILE.unlink(missing_ok=True)
+        proc = subprocess.Popen(
+            [sys.executable, "-u", "-m", "insights.prd.pipeline",
+             "--input", "doc/RAIN_Prototype_Spec_v1.docx",
+             "--output", "artifacts/rain-prd-run"],
+            cwd=str(_PRD_ROOT), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0,
+        )
+    except Exception as exc:
+        _PRD_RUN_LOCK.release()
+        raise HTTPException(status_code=500, detail=f"could not start the PRD pipeline: {type(exc).__name__}")
+    log.info("PRD pipeline started (pid=%s)", proc.pid)
+
+    def gen():
+        try:
+            buffer = b""
+            fd = proc.stdout.fileno()
+            while True:
+                chunk = os.read(fd, 4096)
+                if not chunk:
+                    break
+                buffer += chunk
+                while b"\n" in buffer:
+                    raw, buffer = buffer.split(b"\n", 1)
+                    line = raw.decode("utf-8", errors="replace").strip()
+                    if line.startswith("EVENT "):
+                        yield "event: prd\ndata: " + line[6:] + "\n\n"
+            code = proc.wait()
+            yield "event: done\ndata: " + json.dumps({"exit_code": code}) + "\n\n"
+        finally:
+            try:
+                proc.kill()
+            except Exception:
+                pass
+            _PRD_RUN_LOCK.release()
+
+    return StreamingResponse(gen(), media_type="text/event-stream",
+                             headers={"Cache-Control": "no-cache"})
+
+
+@app.get("/health", tags=["Ops"])
 def health():
     return {
         "status": "ok",
         "products_registered": list(PRODUCTS.keys()),
         "rain_personas": sorted(PRODUCTS["rain"]["personas"]),
-        "rain_signals_loaded": sum(len(v) for v in RAIN_SIGNALS.values()),
+        "rain_signals_loaded": sum(len(v) for v in PRODUCTS["rain"]["signals"].values()),
         "rain_ask_cache_size": sum(len(v) for v in ASK_CACHE.values()),
     }

@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://dif.radiant.digital/contracts/kag-release.v1.json",
+  "title": "kag-release",
+  "type": "object",
+  "properties": {
+    "release": {
+      "type": "string"
+    },
+    "enterprise_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "published": {
+      "type": "boolean"
+    },
+    "dry_run": {
+      "type": "boolean"
+    },
+    "counts": {
+      "type": "object",
+      "properties": {
+        "nodes": {
+          "type": "integer"
+        },
+        "relationships": {
+          "type": "integer"
+        },
+        "by_label": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "nodes",
+        "relationships"
+      ]
+    },
+    "validation": {
+      "type": "object",
+      "properties": {
+        "passed": {
+          "type": "boolean"
+        },
+        "issues": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "passed"
+      ]
+    },
+    "provenance": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "artifact_kind": {
+            "type": "string"
+          },
+          "artifact_version": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "release",
+    "published",
+    "counts",
+    "validation"
+  ]
+}

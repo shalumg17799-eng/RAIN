@@ -1,0 +1,4 @@
+USSFCU Compliance Dashboard PRD
+The dashboard shows loan applications and members, and a fair lending snapshot for regulators.
+loan_application data is sourced from core_banking. fair_lending_snapshot is sourced from compliance_dw.
+It also needs a risk_score entity that is not yet modelled.
