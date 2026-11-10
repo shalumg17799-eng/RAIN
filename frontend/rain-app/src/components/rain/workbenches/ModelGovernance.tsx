@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { PenLine, ShieldCheck } from 'lucide-react';
 import { MODEL } from '@/data/rain/_shared/constants';
+import { personaUi } from '@/data/rain/personaUi';
 import type { Access } from '@/data/rain/_shared/contract';
 import { WORKBENCHES } from '@/data/rain/_shared/contract';
 import { FEATURES } from '@/data/rain/_shared/records';
@@ -49,7 +50,7 @@ export default function ModelGovernance({ access }: { access: Access }) {
     >
       {cosign && !released && (
         <p className="rounded-xl border border-border bg-surface-2/60 px-3 py-2 text-[12.5px] text-text-muted">
-          {store.signed.cio ? 'Raj Malhotra has signed the governance packet. Your co-sign releases the access-adjusted ranking to the care team.' : store.cosignRequested ? 'Co-sign requested. It opens once the CIO signs.' : 'Co-sign opens once the CIO signs the governance packet.'}
+          {store.signed.cio ? `${personaUi('cio').identity.name} has signed the governance packet. Your co-sign releases the access-adjusted ranking to the care team.` : store.cosignRequested ? 'Co-sign requested. It opens once the CIO signs.' : 'Co-sign opens once the CIO signs the governance packet.'}
         </p>
       )}
       <div className="grid gap-4 @4xl:grid-cols-2">

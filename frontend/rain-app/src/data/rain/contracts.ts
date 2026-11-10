@@ -1,24 +1,21 @@
 /**
- * The six persona contracts, typed. Each JSON file is read whole and on its
- * own; this module only indexes them (every launch by step id, every hand-off
- * by id) so a card can name its step or hand-off by id alone.
+ * The six persona contracts, typed. Served by the backend (GET /api/v3/ui/data →
+ * section "contracts"); this module only indexes them (every launch by step id,
+ * every hand-off by id) so a card can name its step or hand-off by id alone.
  */
-import ceo from './ceo.json';
-import cmo from './cmo.json';
-import cio from './cio.json';
-import state from './state.json';
-import chw from './chw.json';
-import access from './access.json';
 import type { PersonaKey } from './_shared/constants';
 import type { RainContract, RainHandoff, RainLaunch } from './_shared/contract';
+import { rainValue } from './_shared/backendData';
+
+const contract = (key: PersonaKey) => rainValue<RainContract>('contracts', key);
 
 export const CONTRACTS: Record<PersonaKey, RainContract> = {
-  ceo: ceo as unknown as RainContract,
-  cmo: cmo as unknown as RainContract,
-  cio: cio as unknown as RainContract,
-  state: state as unknown as RainContract,
-  chw: chw as unknown as RainContract,
-  access: access as unknown as RainContract,
+  ceo: contract('ceo'),
+  cmo: contract('cmo'),
+  cio: contract('cio'),
+  state: contract('state'),
+  chw: contract('chw'),
+  access: contract('access'),
 };
 
 const all = Object.values(CONTRACTS);

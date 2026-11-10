@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Signal, Wifi } from 'lucide-react';
 import { useBranding } from '@/context/BrandingContext';
-import { LINDA } from '@/data/rain/_shared/constants';
+import { LINDA, ORG } from '@/data/rain/_shared/constants';
+import { personaUi } from '@/data/rain/personaUi';
 import { markPatientVisit, recordLindaReading, useRainState } from '../shell/store';
 import { DataLabel } from '../shell/rainKit';
 
@@ -24,13 +25,13 @@ interface Msg {
   en: string;
 }
 
-const LINK = 'sierrabasin.example/v/4821';
+const LINK = LINDA.link;
 
 const SCREENS: Array<{ title: { es: string; en: string }; note: string; msgs: Msg[] }> = [
   {
     title: { es: 'Recordatorio 72 horas', en: '72-hour reminder' },
     note: 'Plain language: first name, date, time and clinic only.',
-    msgs: [{ dir: 'out', es: `Hola Linda, tiene una cita por video con Sierra Basin ${LINDA.visit.es}. Responda C para confirmar o R para cambiar la cita.`, en: 'Hi Linda, you have a video visit with Sierra Basin on Thursday, Nov 5 at 2:00 PM. Reply C to confirm or R to change it.' }],
+    msgs: [{ dir: 'out', es: `Hola ${LINDA.first}, tiene una cita por video con ${ORG.networkShort} ${LINDA.visit.es}. Responda C para confirmar o R para cambiar la cita.`, en: `Hi ${LINDA.first}, you have a video visit with ${ORG.networkShort} on ${LINDA.visit.day}, ${LINDA.visit.date} at ${LINDA.visit.time}. Reply C to confirm or R to change it.` }],
   },
   {
     title: { es: 'Respuesta C', en: 'C reply and confirmation' },
@@ -44,14 +45,14 @@ const SCREENS: Array<{ title: { es: string; en: string }; note: string; msgs: Ms
     title: { es: 'Día de la cita', en: 'Day-of reminder' },
     note: 'Link resent. A clinical question goes to the front desk; texts give no clinical advice.',
     msgs: [
-      { dir: 'out', es: `Linda, su cita por video es hoy a las 2:00 PM. Entre aquí: ${LINK}`, en: `Linda, your video visit is today at 2:00 PM. Join here: ${LINK}` },
+      { dir: 'out', es: `${LINDA.first}, su cita por video es hoy a las ${LINDA.visit.time}. Entre aquí: ${LINK}`, en: `${LINDA.first}, your video visit is today at ${LINDA.visit.time}. Join here: ${LINK}` },
       { dir: 'in', es: '¿Tomo mi pastilla antes de la cita?', en: 'Do I take my pill before the visit?' },
       { dir: 'out', es: 'Gracias por preguntar. La recepción le va a llamar pronto. Por texto no damos consejos médicos.', en: 'Thanks for asking. The front desk will call you soon. We do not give medical advice by text.' },
     ],
   },
   {
     title: { es: 'Después de la cita', en: 'After the visit' },
-    note: 'Her home cuff reading closes her BP gap: it shows on Teresa’s progress bar and Dr. Castellanos’s quality tracker.',
+    note: `Her home cuff reading closes her BP gap: it shows on ${personaUi('chw').identity.greeting}’s progress bar and ${personaUi('cmo').identity.greeting}’s quality tracker.`,
     msgs: [
       { dir: 'in', es: `Mi presión hoy: ${LINDA.reading}`, en: `My blood pressure today: ${LINDA.reading}` },
       { dir: 'out', es: `Gracias, Linda. Recibimos su lectura: ${LINDA.reading}. Su próxima cita es en 3 meses. Le mandamos un recordatorio.`, en: `Thank you, Linda. We got your reading: ${LINDA.reading}. Your next visit is in 3 months. We will send you a reminder.` },
@@ -122,14 +123,14 @@ export default function PatientView() {
         <div className="order-1 w-full max-w-[390px]">
           <div className="overflow-hidden rounded-[36px] border-[10px] border-text bg-surface shadow-xl">
             <div className="flex items-center justify-between bg-surface px-5 pb-1 pt-2 text-[11px] font-semibold text-text">
-              <span>2:00</span>
+              <span>{LINDA.visit.time.replace(/\s*[AP]M$/, '')}</span>
               <span className="flex items-center gap-1">
                 <Signal className="h-3 w-3" aria-hidden="true" />
                 <Wifi className="h-3 w-3" aria-hidden="true" />
               </span>
             </div>
             <div className="border-b border-border-subtle bg-surface px-4 pb-2 text-center">
-              <p className="text-[13px] font-bold text-text">Sierra Basin</p>
+              <p className="text-[13px] font-bold text-text">{ORG.networkShort}</p>
               <p className="text-[11px] text-text-subtle">{lang === 'es' ? 'Mensaje de texto' : 'Text message'}</p>
             </div>
             <ol className="flex min-h-[420px] flex-col gap-2 bg-surface-2/60 px-3 py-4" aria-live="polite" lang={lang}>

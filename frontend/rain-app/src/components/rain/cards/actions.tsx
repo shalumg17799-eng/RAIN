@@ -9,6 +9,7 @@ import { CheckCircle2, Download, ExternalLink, FileText, PanelRight, PenLine, Pr
 import { HANDOFFS, LAUNCHES } from '@/data/rain/contracts';
 import { WORKBENCHES, launchHref } from '@/data/rain/_shared/contract';
 import { BP, CODING, COHORT, CONTRACT, COUNTIES, FRESHNESS, GAP, MODEL, OPTIONS, ORG, STATE, num, suppress, usdM } from '@/data/rain/_shared/constants';
+import { personaUi } from '@/data/rain/personaUi';
 import { Button, Pill, RainCard } from '../shell/rainKit';
 import { approve, editBrief, isReleased, sendNote, sign, useRainState } from '../shell/store';
 import { usePanel } from '../shell/panel';
@@ -216,11 +217,11 @@ export function Signoff({ points }: { points?: string[] }) {
     <RainCard eyebrow="Sign-off" title={released ? 'Released to the care team' : 'Release waits on both signatures'} points={points} label={null}>
       <ul className="grid gap-2 @lg:grid-cols-2">
         <li className={`rounded-xl border p-3 ${s.signed.cio ? 'border-success/30 bg-success-subtle' : 'border-border'}`}>
-          <p className="text-[13px] font-semibold text-text">Raj Malhotra, CIO</p>
+          <p className="text-[13px] font-semibold text-text">{personaUi('cio').identity.name}, CIO</p>
           <p className="text-[12px] text-text-muted">{s.signed.cio ? 'Signed' : 'Not signed'}</p>
         </li>
         <li className={`rounded-xl border p-3 ${s.signed.cmo ? 'border-success/30 bg-success-subtle' : 'border-border'}`}>
-          <p className="text-[13px] font-semibold text-text">Dr. Naomi Castellanos, CMO</p>
+          <p className="text-[13px] font-semibold text-text">{personaUi('cmo').identity.name}, CMO</p>
           <p className="text-[12px] text-text-muted">{s.signed.cmo ? 'Co-signed' : s.cosignRequested ? 'Co-sign requested · in Model Governance' : 'Not yet requested'}</p>
         </li>
       </ul>

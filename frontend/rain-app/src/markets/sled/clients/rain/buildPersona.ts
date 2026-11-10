@@ -12,6 +12,7 @@ import { PERSONAS } from '@/data/rain/_shared/constants';
 import type { RainContract } from '@/data/rain/_shared/contract';
 import { WORKBENCHES } from '@/data/rain/_shared/contract';
 import { CAPABILITY_CALLOUTS, CAPABILITY_DIAGRAMS } from '@/data/rain/_shared/capabilities';
+import { announcePersonaQueries } from '@/data/rain/_shared/backendData';
 import { ASK_EVENT } from '@/components/rain/shell/store';
 import RainFooter from '@/components/rain/shell/RainFooter';
 import RainSignals from '@/components/rain/shell/RainSignals';
@@ -44,6 +45,8 @@ function typesIn(specs: Array<{ type: string; props?: unknown }> | undefined, ou
 }
 
 export function buildRainPersona(p: RainPersonaSpec): PersonaManifest {
+  // In the browser console: this persona's synthetic and public data queries on the backend.
+  void announcePersonaQueries(PERSONAS[p.key]);
   const c = p.contract;
   const useCase: 'A' | 'B' = c.signals.length ? 'A' : 'B';
   const set = buildFlows(c, useCase);

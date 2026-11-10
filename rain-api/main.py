@@ -17,10 +17,12 @@ Run:
 
 import logging
 import os
+import socket
 import subprocess
 import sys
 import threading
 import time
+import uuid
 from pathlib import Path
 from typing import Optional
 from fastapi import FastAPI, HTTPException, Request
@@ -103,6 +105,10 @@ _OPENAPI_TAGS = [
      "description": "Generated Data API for the PRD v0.3 wave over the `rain_v3` database (`/api/v3/data/...`), from deploy/scripts/build_data_api.py."},
     {"name": "ultra-v3",
      "description": "Ultra API v1 for the PRD v0.3 frontend (frontend/rain-app) at `/api/v3/ui/...`: context, briefing, ask, actions, catalog for the 7-persona VBC prototype, served from app-exported fixtures (npm run fixtures:backend)."},
+    {"name": "ui-data-v3",
+     "description": "Every value the v0.3 UI shows (`/api/v3/ui/data`): master numbers, records, datasets, map geometry, sources and persona contracts from Postgres `rain_v3.ui_v3.dataset`, with county public figures computed live from `rain_v3.public_data`. Proof headers: X-RAIN-Request-Id, X-RAIN-Data-Sha256, X-RAIN-Data-Source, Server-Timing."},
+    {"name": "persona-queries-v3",
+     "description": "Each persona's 5 synthetic-data and 5 public-data queries (`/api/v3/queries`), run read-only against `rain_v3` and logged with the request id. Proof headers: X-RAIN-Query-Id, X-RAIN-Data-Source, X-RAIN-Rows, Server-Timing."},
     {"name": "Legacy /api/v2 (scripted era)",
      "description": "Pre-governed envelope endpoints still used by `genericApi.js` (`/generic`) and available for `/signals`+`/kpis`. The legacy `/api/v2/ask` here is SHADOWED by the Insights router at runtime and hidden from this spec."},
     {"name": "Ops", "description": "Health and registration checks."},
@@ -130,10 +136,23 @@ app.include_router(data_v3_router, prefix="/api/v3/data")
 # VITE_ULTRA_API_BASE=http://127.0.0.1:8000/api/v3/ui).
 from ultra_v3_api import router as ultra_v3_router  # noqa: E402
 app.include_router(ultra_v3_router, prefix="/api/v3/ui")
-# expose_headers lets the browser's fetch() read X-RAIN-Source, which the
-# frontend logs as proof a response came from this server.
+
+# Every value the v0.3 UI shows (numbers, records, datasets, contracts), from Postgres
+# rain_v3.ui_v3.dataset with live public_data figures: GET /api/v3/ui/data.
+from ui_data_v3 import router as ui_data_v3_router  # noqa: E402
+app.include_router(ui_data_v3_router, prefix="/api/v3/ui")
+
+# Each persona's synthetic-data and public-data queries as read-only endpoints (doc/queries pack).
+from persona_queries_v3 import router as persona_queries_v3_router  # noqa: E402
+app.include_router(persona_queries_v3_router, prefix="/api/v3/queries")
+# expose_headers lets the browser's fetch() read the proof headers, which the
+# frontend logs to the console as proof a response came from this server.
+_HOSTNAME = socket.gethostname()
+PROOF_HEADERS = ["X-RAIN-Source", "X-RAIN-Request-Id", "X-RAIN-Server", "X-RAIN-Data-Source",
+                 "X-RAIN-Data-Sha256", "X-RAIN-Turn", "X-RAIN-Query-Id", "X-RAIN-Rows",
+                 "Server-Timing"]
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"],
-                   expose_headers=["X-RAIN-Source"])
+                   expose_headers=PROOF_HEADERS)
 
 
 @app.middleware("http")
@@ -141,11 +160,14 @@ async def log_requests(request: Request, call_next):
     """One line per request, so every value the UI shows can be traced to a
     server hit. Request bodies are not logged -- /ask carries free text."""
     start = time.perf_counter()
+    request.state.request_id = uuid.uuid4().hex[:12]
     response = await call_next(request)
     response.headers["X-RAIN-Source"] = "rain-api"
+    response.headers.setdefault("X-RAIN-Request-Id", request.state.request_id)
+    response.headers.setdefault("X-RAIN-Server", _HOSTNAME)
     if request.method != "OPTIONS":
-        log.info("%s %s -> %d (%.0f ms)", request.method, request.url.path,
-                 response.status_code, (time.perf_counter() - start) * 1000)
+        log.info("%s %s -> %d (%.0f ms) req=%s", request.method, request.url.path,
+                 response.status_code, (time.perf_counter() - start) * 1000, request.state.request_id)
     return response
 
 with open("ask_cache.json") as f:

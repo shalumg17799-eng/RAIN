@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, BellRing, CheckCircle2, MessageSquareText, Phone, ShieldCheck, Sparkles } from 'lucide-react';
-import { CARE, LINDA } from '@/data/rain/_shared/constants';
+import { CARE, LINDA, ORG } from '@/data/rain/_shared/constants';
 import type { Access } from '@/data/rain/_shared/contract';
 import { WORKBENCHES } from '@/data/rain/_shared/contract';
 import type { Slot } from '@/data/rain/_shared/records';
@@ -31,7 +31,7 @@ export default function Scheduling({ access, filter }: { access: Access; filter:
   const booking = pending.find((b) => b.memberId === member.id);
   const lapsed = booking?.eligibility === 'Lapsed';
   const booked = store.bookings[member.id];
-  const isLinda = member.id === 'M-40107';
+  const isLinda = member.id === LINDA.memberId;
 
   // Linda's slots as listed; anyone else's in-person drive is their own.
   const slots: Slot[] = getSlots().map((s) => (s.mode === 'In person' ? { ...s, driveMin: member.driveMin } : s.mode === 'Mobile clinic' && !isLinda ? { ...s, where: `Mobile clinic, ${member.site}` } : s));
@@ -40,7 +40,7 @@ export default function Scheduling({ access, filter }: { access: Access; filter:
 
   usePaneContext({
     label: `Booking: ${member.name}, ${member.mode === 'Telehealth' ? 'telehealth recheck' : 'in-person recheck'}`,
-    chips: [member.mode === 'Telehealth' ? 'Why telehealth for this patient?' : 'Why this visit mode?', member.driveMin === LINDA.driveMin ? 'What other slots work for an 81-minute drive?' : 'What other slots work for this drive?', 'Explain the reminder plan'],
+    chips: [member.mode === 'Telehealth' ? 'Why telehealth for this patient?' : 'Why this visit mode?', member.driveMin === LINDA.driveMin ? `What other slots work for an ${LINDA.driveMin}-minute drive?` : 'What other slots work for this drive?', 'Explain the reminder plan'],
     kind: 'booking',
     id: member.id,
   });
@@ -110,16 +110,16 @@ export default function Scheduling({ access, filter }: { access: Access; filter:
           </RainCard>
           {!slot && <p className="rounded-xl border border-dashed border-border px-3 py-2 text-[12.5px] text-text-muted">Select a slot to check coverage and confirm the booking.</p>}
           {slot && (
-            <RainCard eyebrow="2. Check coverage" title="High Desert Health Plan">
+            <RainCard eyebrow="2. Check coverage" title={ORG.plan}>
               {lapsed ? (
                 <p className="flex items-start gap-2 rounded-lg border border-warning/40 bg-warning-subtle px-3 py-2 text-[12.5px] text-warning-700">
                   <AlertTriangle className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                  Coverage lapsed with High Desert Health Plan. An enrollment-assist task was created; the booking can still go ahead.
+                  Coverage lapsed with {ORG.plan}. An enrollment-assist task was created; the booking can still go ahead.
                 </p>
               ) : (
                 <p className="flex items-start gap-2 rounded-lg border border-success/30 bg-success-subtle px-3 py-2 text-[12.5px] text-success-700">
                   <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0" aria-hidden="true" />
-                  Active with High Desert Health Plan. Visit type eligible for {slot.mode === 'Telehealth (video)' ? 'telehealth' : 'an in-person visit'}.
+                  Active with {ORG.plan}. Visit type eligible for {slot.mode === 'Telehealth (video)' ? 'telehealth' : 'an in-person visit'}.
                 </p>
               )}
             </RainCard>

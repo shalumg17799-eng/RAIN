@@ -1,8 +1,42 @@
 # RAIN — backend integration
 
-Where every figure, record and answer in RAIN comes from today, and the point
-where a backend replaces it. Today all of it is synthetic data compiled into the
-bundle; nothing calls a server.
+Where every figure, record and answer in RAIN comes from. **All of it comes from
+the backend; nothing is compiled into the bundle.**
+
+## 0. The backend is the only data source
+
+| What | Endpoint | Backend source |
+|---|---|---|
+| Every number, record, dataset, map shape, source, persona contract and persona identity | `GET /api/v3/ui/data?clientId=rain`, loaded once at boot by `src/data/rain/_shared/backendData.ts` before the app module graph is imported (`src/main.jsx`) | Postgres `rain_v3.ui_v3.dataset` (one JSONB row per section/key), seeded from `rain-api/seed/rain_v3_ui_data.json` by `deploy/scripts/load_ui_data.py` |
+| County hypertension, diabetes, SVI and primary care HPSA; record counts of the loaded public sources | same response, `meta.publicOverlay` lists each value and what it replaced | computed live per request from `rain_v3.public_data` (CDC PLACES, CDC/ATSDR SVI, HRSA HPSA, USDA RUCC, HRSA sites, NPPES, Census ZCTA) |
+| Briefing, chat answers, context | `GET /briefing`, `POST /ask`, `GET /context` (http mode) | **built per request** by `rain-api/chat_v3.py` from the same Postgres data (contracts, datasets, records, live public figures); persona queries asked in the chat run live SQL. `rain-api/fixtures/ultra_v3/*.json` are only the golden copy `test_chat_v3_build.py` compares against |
+
+The modules under `src/data/rain/` keep only types, formatters and view logic; every
+value is read with `rainValue(section, key)`, which throws if the backend has not
+delivered it. If `/data` fails, the app shows "RAIN could not load its data from the
+backend" and renders nothing else.
+
+**Proof in the browser console** (printed in every build through `core/log.ts`'s
+`proof` channel): a "Data loaded from the backend" group with the request, the
+backend's `X-RAIN-Source` / `X-RAIN-Server` / `X-RAIN-Request-Id` / `X-RAIN-Data-Source`
+/ `Server-Timing` headers, the SHA-256 of the body from the server
+(`X-RAIN-Data-Sha256`) checked against one computed in the browser, a table of all
+datasets, and the live public values; then one line per `/briefing` and `/ask` call
+naming the backend file and turn; one `RAIN page … ← backend` line per page listing the
+backend datasets it is built from; and, when a persona opens, its backend queries. Inspect
+`window.__RAIN_DATA_PROOF__`, `window.__RAIN_API_CALLS__` and `window.__RAIN_PAGE_DATA__`.
+
+**Persona queries:** `GET /api/v3/queries?persona=rain_cmo` lists a persona's 5 synthetic-data
+and 5 public-data queries, and `GET /api/v3/queries/{id}` runs one read-only against `rain_v3`
+(rain-api `persona_queries_v3.py`, SQL in `doc/queries/rain_v3_persona_queries.sql`). In the
+console: `rainQueries('rain_cmo')`, `rainQuery('CMO-P1')`. Typing a query's question or id (e.g. `CEO-P1`) in
+that persona's Ask AI box makes `POST /ask` run it live and answer with a `data_table` of the rows
+(`turn query:<id>`); scripted chips and questions keep their recorded answers. Per-persona catalog, results and
+backend log lines: `doc/queries/RAIN_v3_persona_backend_queries.md`.
+
+**Tests and Node scripts** hydrate from the backend's seed file (`src/test/setup.js`,
+`scripts/lib/hydrate-from-seed.ts`). To change data, edit the seed and re-run the
+loader; the UI picks it up on the next page load.
 
 ## 1. Two layers, two seams
 

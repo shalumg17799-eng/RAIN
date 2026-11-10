@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { CheckCircle2, Send } from 'lucide-react';
 import { BP, CODING, MEASURES, isMet, num } from '@/data/rain/_shared/constants';
+import { personaUi } from '@/data/rain/personaUi';
 import type { Access } from '@/data/rain/_shared/contract';
 import { WORKBENCHES } from '@/data/rain/_shared/contract';
 import type { CampaignMember, VisitMode } from '@/data/rain/_shared/records';
@@ -80,7 +81,7 @@ export default function QualityGate({ access, filter }: { access: Access; filter
         )
       }
     >
-      {view && <p className="rounded-xl border border-border bg-surface-2/60 px-3 py-2 text-[12.5px] text-text-muted">View only. Dr. Castellanos approves campaigns and standing orders.</p>}
+      {view && <p className="rounded-xl border border-border bg-surface-2/60 px-3 py-2 text-[12.5px] text-text-muted">View only. {personaUi('cmo').identity.greeting} approves campaigns and standing orders.</p>}
       <div className="grid gap-4 @4xl:grid-cols-2">
         <QualityTracker projected selected={measure} onSelect={(id) => { setMeasure(id); setSelected(null); }} />
         <MeasureProjection />

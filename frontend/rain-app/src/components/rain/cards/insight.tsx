@@ -6,7 +6,7 @@
  * never disagree. Used in answers and on the workbenches alike.
  */
 import { Bar as RBar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { CODING, CONTRACT, COHORT, GAP, GAP_TOTAL, LV_MEASURES, MEASURES, PMPM_TREND, SEGMENTS, SITES, isMet, num, usd, usdK, usdM } from '@/data/rain/_shared/constants';
+import { BP, CODING, CONTRACT, COHORT, GAP, GAP_TOTAL, LOW_VALUE, LV_MEASURES, MEASURES, MODEL, PMPM_TREND, SEGMENTS, SITES, SITE_SOCIAL, isMet, num, usd, usdK, usdM } from '@/data/rain/_shared/constants';
 import { Meter, RainCard, Pill } from '../shell/rainKit';
 import { categoryAxis, useWidth } from '../shell/useWidth';
 
@@ -196,13 +196,11 @@ function ScenarioRow({ name, value, pct, tone, emphasis }: { name: string; value
 
 type SiteMetric = 'pmpm' | 'imaging' | 'lowValue' | 'social';
 
-const SOCIAL: Record<string, number> = { elko: 44, wells: 31, winnemucca: 35, battleMountain: 29, lovelock: 33, ely: 41, fallon: 42 };
-
 const SITE_METRIC: Record<SiteMetric, { title: string; eyebrow: string; value: (id: string) => number; fmt: (v: number) => string; ref?: { value: number; label: string }; worst: (v: number) => boolean }> = {
   pmpm: { eyebrow: 'Sites', title: 'Cost per member per month, by site', value: (id) => SITES.find((s) => s.id === id)!.pmpm, fmt: (v) => `$${v}`, ref: { value: CONTRACT.actualPmpm, label: `Network $${CONTRACT.actualPmpm}` }, worst: (v) => v >= 430 },
-  imaging: { eyebrow: 'Low back pain imaging', title: 'Imaging rate by site, share of eligible visits', value: (id) => SITES.find((s) => s.id === id)!.imagingPct, fmt: (v) => `${v}%`, ref: { value: 9, label: 'Network 9%' }, worst: (v) => v >= 20 },
+  imaging: { eyebrow: 'Low back pain imaging', title: 'Imaging rate by site, share of eligible visits', value: (id) => SITES.find((s) => s.id === id)!.imagingPct, fmt: (v) => `${v}%`, ref: { value: LOW_VALUE.networkRatePct, label: `Network ${LOW_VALUE.networkRatePct}%` }, worst: (v) => v >= 20 },
   lowValue: { eyebrow: 'Low-value care', title: 'Low-value spend by site, annualized', value: (id) => SITES.find((s) => s.id === id)!.lowValue / 1000, fmt: (v) => `$${v}K`, worst: (v) => v >= 150 },
-  social: { eyebrow: 'Social needs', title: 'Members with a social needs screening, by site', value: (id) => SOCIAL[id], fmt: (v) => `${v}%`, ref: { value: 38, label: 'Network 38%' }, worst: (v) => v < 33 },
+  social: { eyebrow: 'Social needs', title: 'Members with a social needs screening, by site', value: (id) => SITE_SOCIAL[id], fmt: (v) => `${v}%`, ref: { value: MODEL.socialScreenedPct, label: `Network ${MODEL.socialScreenedPct}%` }, worst: (v) => v < 33 },
 };
 
 export function SiteCompare({ metric = 'pmpm', points, onSelect, selected }: { metric?: SiteMetric; points?: string[]; onSelect?: (id: string) => void; selected?: string | null }) {
@@ -294,7 +292,7 @@ export function QualityTracker({ points, onSelect, selected, projected = false }
               <span className="min-w-0 text-[13px] font-semibold text-text">
                 {m.name} <span className="font-normal text-text-subtle">({m.id}{m.higherIsBetter ? '' : ', lower is better'})</span>
               </span>
-              <Pill tone={ok ? 'good' : 'critical'}>{ok ? 'Met' : m.id === 'CMS165' ? 'Not met: about 180 more' : `Not met: ${gapPts} pts`}</Pill>
+              <Pill tone={ok ? 'good' : 'critical'}>{ok ? 'Met' : m.id === 'CMS165' ? `Not met: about ${BP.needed} more` : `Not met: ${gapPts} pts`}</Pill>
               <span className="col-span-2">
                 <Meter
                   className="h-2.5"

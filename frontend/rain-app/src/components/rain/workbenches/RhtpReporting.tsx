@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import { Download, Printer } from 'lucide-react';
-import { COUNTIES, OPTIONS, STATE, num, usdK } from '@/data/rain/_shared/constants';
+import { COUNTIES, OPTIONS, ORG, STATE, num, usdK } from '@/data/rain/_shared/constants';
 import type { Access } from '@/data/rain/_shared/contract';
 import { WORKBENCHES } from '@/data/rain/_shared/contract';
 import WorkbenchLayout from '../shell/WorkbenchLayout';
@@ -91,7 +91,7 @@ function PrintDocument() {
   return (
     <div className="rain-print-doc hidden bg-surface p-8 text-text print:block">
       <style>{'@media print { #root { display: none !important; } }'}</style>
-      <p className="text-[11px] font-bold uppercase tracking-wide text-brand">RHTP progress summary · Rural Health Outcomes Accelerator</p>
+      <p className="text-[11px] font-bold uppercase tracking-wide text-brand">RHTP progress summary · {ORG.program}</p>
       <h1 className="mt-1 text-xl font-bold">People served, services delivered and outcomes by county</h1>
       <p className="mt-1 text-[12px]">Aggregated and de-identified synthetic data for a demo. Cells under {STATE.suppressUnder} are suppressed.</p>
       <table className="mt-4 w-full border-collapse text-[12px]">

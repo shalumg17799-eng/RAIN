@@ -14,6 +14,7 @@
  *   GET  /catalog
  *   GET  /tts            (proxied by the real app; not served here)
  */
+import './lib/hydrate-from-seed'; // RAIN data: from the backend's seed, before any data module loads
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';

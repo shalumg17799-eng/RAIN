@@ -18,10 +18,18 @@ const H = viewHeight(W);
 
 export type MapLayer = 'ed' | 'places' | 'svi' | 'hpsa' | 'broadband';
 
+/** Colour scale bounds that fit the live public values the backend sends (rounded outward). */
+const bounds = (values: number[], step: number): [number, number] => [
+  Math.floor(Math.min(...values) / step) * step,
+  Math.ceil(Math.max(...values) / step) * step,
+];
+const HTN = bounds(COUNTIES.map((c) => c.htnPct), 1);
+const SVI = bounds(COUNTIES.map((c) => c.svi), 0.05).map((v) => Number(v.toFixed(2))) as [number, number];
+
 const LAYERS: Record<MapLayer, { label: string; source: string; value: (c: County) => number; fmt: (c: County) => string; color: string; lo: number; hi: number; legend: [string, string] }> = {
   ed: { label: 'Avoidable ED', source: 'Aggregated claims', value: (c) => c.edPer1000, fmt: (c) => `${c.edPer1000}`, color: 'var(--color-critical)', lo: 270, hi: 360, legend: ['270 per 1,000', '360'] },
-  places: { label: 'Hypertension (PLACES)', source: 'CDC PLACES', value: (c) => c.htnPct, fmt: (c) => `${c.htnPct}%`, color: 'var(--color-chart-1)', lo: 27, hi: 36, legend: ['27%', '36%'] },
-  svi: { label: 'Vulnerability (SVI)', source: 'CDC/ATSDR SVI', value: (c) => c.svi, fmt: (c) => c.svi.toFixed(2), color: 'var(--color-chart-4)', lo: 0.35, hi: 0.75, legend: ['0.35', '0.75'] },
+  places: { label: 'Hypertension (PLACES)', source: 'CDC PLACES', value: (c) => c.htnPct, fmt: (c) => `${c.htnPct}%`, color: 'var(--color-chart-1)', lo: HTN[0], hi: HTN[1], legend: [`${HTN[0]}%`, `${HTN[1]}%`] },
+  svi: { label: 'Vulnerability (SVI)', source: 'CDC/ATSDR SVI', value: (c) => c.svi, fmt: (c) => c.svi.toFixed(2), color: 'var(--color-chart-4)', lo: SVI[0], hi: SVI[1], legend: [SVI[0].toFixed(2), SVI[1].toFixed(2)] },
   hpsa: { label: 'Shortage area (HPSA)', source: 'HRSA HPSA', value: (c) => (c.hpsa === 'Whole county' ? 1 : 0.45), fmt: (c) => (c.hpsa === 'Whole county' ? 'Whole' : 'Part'), color: 'var(--color-warning)', lo: 0, hi: 1, legend: ['Part of county', 'Whole county'] },
   broadband: { label: 'Broadband (FCC)', source: 'FCC Broadband Map', value: (c) => 100 - c.broadbandPct, fmt: (c) => `${c.broadbandPct}%`, color: 'var(--color-chart-4)', lo: 10, hi: 50, legend: ['More video-ready', 'Less video-ready'] },
 };
@@ -217,7 +225,7 @@ export function CountyTable({ points, onSelect, selected }: { points?: string[];
         ]}
       />
       <p className="mt-2 text-[11.5px] text-text-muted">
-        Sources: CDC PLACES, CDC SVI, HRSA HPSA, FCC Broadband Map, RAIN aggregated claims. PC visits: change since January. ED: avoidable visits. HF: heart failure. A dash is a suppressed cell (fewer than {STATE.suppressUnder}). Prevalence and SVI values are illustrative.
+        Sources: CDC PLACES, CDC SVI, HRSA HPSA, FCC Broadband Map, RAIN aggregated claims. PC visits: change since January. ED: avoidable visits. HF: heart failure. A dash is a suppressed cell (fewer than {STATE.suppressUnder}). Hypertension, diabetes, SVI and shortage areas are live public data served by the backend from CDC PLACES, CDC/ATSDR SVI and HRSA.
       </p>
     </RainCard>
   );

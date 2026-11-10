@@ -9,6 +9,7 @@
  * reads. Plus catalog.json. Re-run after changing a persona contract,
  * answers, or the catalog; the backend picks the new files up on restart.
  */
+import './lib/hydrate-from-seed'; // RAIN data: from the backend's seed, before any data module loads
 import { mkdirSync, writeFileSync, copyFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';

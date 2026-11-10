@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, MessageSquareText, PhoneCall, Send } from 'lucide-react';
-import { CARE, LINDA } from '@/data/rain/_shared/constants';
+import { CARE, LINDA, ORG } from '@/data/rain/_shared/constants';
 import type { Access } from '@/data/rain/_shared/contract';
 import { WORKBENCHES } from '@/data/rain/_shared/contract';
 import type { ReminderRow } from '@/data/rain/_shared/records';
@@ -22,16 +22,16 @@ export default function Reminders({ access, filter }: { access: Access; filter: 
   const store = useRainState();
   const navigate = useNavigate();
   const [view, setView] = useState<View>(filter === 'unconfirmed' || filter === 'r' ? filter : 'all');
-  const [sel, setSel] = useState<string>('M-40107');
+  const [sel, setSel] = useState<string>(LINDA.memberId);
   const [sent, setSent] = useState<Record<string, boolean>>({});
-  const lindaBooked = !!store.bookings['M-40107'];
+  const lindaBooked = !!store.bookings[LINDA.memberId];
 
   const rows: ReminderRow[] = getReminders().map((r) => {
-    if (r.memberId !== 'M-40107') return r;
+    if (r.memberId !== LINDA.memberId) return r;
     const log: ReminderRow['log'] = lindaBooked
       ? [
           { at: 'Today', dir: 'out', text: 'Booking confirmed by Brandon Kee: video visit, Thursday 2:00 PM.' },
-          { at: '72 h before', dir: 'out', text: `Hola Linda, tiene una cita por video con Sierra Basin ${LINDA.visit.es}. Responda C para confirmar o R para cambiar la cita.` },
+          { at: '72 h before', dir: 'out', text: `Hola ${LINDA.first}, tiene una cita por video con ${ORG.networkShort} ${LINDA.visit.es}. Responda C para confirmar o R para cambiar la cita.` },
           { at: '72 h before', dir: 'in', text: 'C' },
           ...(store.lindaReading ? [{ at: 'After the visit', dir: 'in' as const, text: `Mi presión hoy: ${LINDA.reading}` }] : []),
         ]
@@ -119,7 +119,7 @@ export default function Reminders({ access, filter }: { access: Access; filter: 
                 <PhoneCall className="h-3 w-3" aria-hidden="true" /> Call task on Teresa’s worklist
               </Pill>
             )}
-            {row.memberId === 'M-40107' && (
+            {row.memberId === LINDA.memberId && (
               <Button onClick={() => navigate('/patient')}>
                 <MessageSquareText className="h-3.5 w-3.5" aria-hidden="true" /> Open the patient view
               </Button>

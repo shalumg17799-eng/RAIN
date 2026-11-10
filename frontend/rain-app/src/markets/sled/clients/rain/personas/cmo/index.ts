@@ -1,9 +1,10 @@
 import type { PersonaModule } from '@core/types';
+import { personaUi } from '@/data/rain/personaUi';
 
 export const rainCmoPersona: PersonaModule = {
   id: 'rain_cmo',
-  // Keep identical to the manifest's identity: manifests.test.ts asserts it.
-  identity: { name: 'Dr. Naomi Castellanos', initials: 'NC', role: 'Chief Medical Officer and Value-Based Care Quality Lead', greeting: 'Dr. Castellanos' },
+  // Served by the backend (GET /api/v3/ui/data → personas.cmo), the same identity the manifest uses.
+  identity: personaUi('cmo').identity,
   // A fictional persona on a role modelled on rural FQHC leadership (spec).
   illustrativePersona: true,
   load: () => import('./manifest'),

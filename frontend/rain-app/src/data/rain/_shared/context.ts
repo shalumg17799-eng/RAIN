@@ -6,7 +6,7 @@
  */
 import type { ContractSpec } from '@core/contract/spec';
 import { spec } from '@core/catalog/bespoke';
-import { BP, CONTRACT, COUNTIES, GAP, LINDA, LV_MEASURES, MEASURES, SEGMENTS, SITES, isMet, num, siteById, usdK } from './constants';
+import { BP, CONTRACT, COUNTIES, GAP, LINDA, LV_MEASURES, MEASURES, ORG, SEGMENTS, SITES, isMet, num, siteById, usdK } from './constants';
 import { FEATURES, getCampaignMembers, getSlots } from './records';
 import { ALL_SOURCES } from './sources';
 
@@ -21,7 +21,7 @@ type Member = ReturnType<typeof getCampaignMembers>[number];
 function talk(m: Member) {
   const video = m.mode === 'Telehealth';
   return [
-    { es: 'Hola, soy Teresa de Sierra Basin. Llamo por su presión arterial.', en: 'Hi, this is Teresa from Sierra Basin. I am calling about your blood pressure.' },
+    { es: `Hola, soy Teresa de ${ORG.networkShort}. Llamo por su presión arterial.`, en: `Hi, this is Teresa from ${ORG.networkShort}. I am calling about your blood pressure.` },
     video
       ? { es: 'Podemos hacer una cita por video, sin manejar a la clínica.', en: 'We can do a video visit, with no drive to the clinic.' }
       : { es: `Podemos darle una cita en ${m.site}.`, en: `We can book you a visit at ${m.site}.` },
@@ -34,7 +34,7 @@ function talk(m: Member) {
 /** Why a telehealth or in-person visit, from this patient's own facts. */
 export function modeReason(m: Member) {
   if (m.mode !== 'Telehealth') return `In person recommended: ${m.driveMin}-minute drive to ${m.site}.`;
-  return m.id === 'M-40107'
+  return m.id === LINDA.memberId
     ? `Telehealth recommended: ${m.driveMin}-minute drive, broadband available, visit type eligible.`
     : `Telehealth recommended: ${m.driveMin}-minute drive and visit type eligible; a phone visit if video is not possible.`;
 }
@@ -42,7 +42,7 @@ export function modeReason(m: Member) {
 /** The extra 72-hour reminder, and why, from this patient's own facts. */
 export function reminderPlan(m: Member) {
   const article = /^(8|11|18)/.test(String(m.driveMin)) ? 'an' : 'a';
-  const why = [m.id === 'M-40107' ? `${LINDA.missedVisits} missed visits` : '', m.driveMin > 60 ? `${article} ${m.driveMin}-minute drive` : '', m.monthsSinceVisit >= 6 ? `no visit in ${m.monthsSinceVisit} months` : ''].filter(Boolean);
+  const why = [m.id === LINDA.memberId ? `${LINDA.missedVisits} missed visits` : '', m.driveMin > 60 ? `${article} ${m.driveMin}-minute drive` : '', m.monthsSinceVisit >= 6 ? `no visit in ${m.monthsSinceVisit} months` : ''].filter(Boolean);
   return { early: why.length > 0, why, because: why.length > 1 ? `${why.slice(0, -1).join(', ')} and ${why[why.length - 1]}` : (why[0] ?? '') };
 }
 
@@ -77,7 +77,7 @@ export function contextSpecs(kind: ContextKind, selectedId: string | undefined, 
       ];
     if (kind === 'slots') {
       const slots = getSlots()
-        .map((s) => (s.mode === 'In person' ? { ...s, driveMin: m.driveMin } : s.mode === 'Mobile clinic' && m.id !== 'M-40107' ? { ...s, where: `Mobile clinic, ${m.site}` } : s))
+        .map((s) => (s.mode === 'In person' ? { ...s, driveMin: m.driveMin } : s.mode === 'Mobile clinic' && m.id !== LINDA.memberId ? { ...s, where: `Mobile clinic, ${m.site}` } : s))
         .sort((a, b) => a.driveMin - b.driveMin);
       return [
         spec('data_table', {

@@ -36,6 +36,13 @@ password with env vars: `FRONTEND_PORT`, `BACKEND_PORT`, `PG_HOST_PORT`, `NEO4J_
   full dump incl. grants, RLS policies and masked-view schemas). Those files are **gitignored,
   derived data** — regenerate from a live local DB with:
   `powershell -ExecutionPolicy Bypass -File deploy/scripts/make_pg_seed.ps1` (needs `PGPASSWORD`).
+- **RAIN v0.3 UI data** (everything the v0.3 frontend shows) is served by
+  `GET /api/v3/ui/data` from database `rain_v3`. After the stack is up, create and load it once:
+  `docker compose exec postgres psql -U postgres -c "CREATE DATABASE rain_v3"`, load the public
+  datasets and synthetic tables (knowledge-gathering/README.md, "Run it"), then
+  `docker compose exec -e PG_HOST=postgres -e PG_ADMIN_USER=postgres -e PG_ADMIN_PASSWORD=root backend python /app/deploy/scripts/load_ui_data.py`
+  (writes `rain_v3.ui_v3.dataset` from `rain-api/seed/rain_v3_ui_data.json`). Without it the
+  frontend shows "RAIN could not load its data from the backend".
 - **Neo4j** is seeded by the one-shot `neo4j-seed` service from `rain-neo4j-graph/*.cypher`
   (idempotent: skips when personas already exist). Re-run: `docker compose run --rm neo4j-seed`.
 

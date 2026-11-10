@@ -7,17 +7,21 @@
  */
 import { aiTurnSchema } from '../contract/aiTurn';
 import { ApiError } from './recorded';
+import { logBackendCall } from './proof';
 import type { ActionResponse, BriefingResponse, ContextResponse, UltraApi } from './types';
 
 export function createHttpApi(base: string, fetchImpl: typeof fetch = globalThis.fetch.bind(globalThis)): UltraApi {
   const root = base.replace(/\/$/, '');
   async function call<T>(method: 'GET' | 'POST', path: string, body?: unknown, query?: Record<string, string>): Promise<T> {
     const qs = query ? `?${new URLSearchParams(query).toString()}` : '';
+    const t0 = performance.now();
     const res = await fetchImpl(`${root}${path}${qs}`, {
       method,
       headers: body ? { 'Content-Type': 'application/json' } : undefined,
       body: body ? JSON.stringify(body) : undefined,
     });
+    // Proof in the console: every answer names the backend that served it.
+    if (res.headers) logBackendCall(method, `${root}${path}${qs}`, res, Math.round(performance.now() - t0));
     if (!res.ok) throw new ApiError(res.status, `${method} ${path} → ${res.status}`);
     return (await res.json()) as T;
   }

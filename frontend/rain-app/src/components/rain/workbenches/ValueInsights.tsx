@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CONTRACT, COUNTIES, GAP, SEGMENTS, SITES, STATE, num, siteById, usdM } from '@/data/rain/_shared/constants';
+import { CONTRACT, COUNTIES, GAP, ORG, SEGMENTS, SITES, STATE, num, siteById, usdM } from '@/data/rain/_shared/constants';
 import type { Access } from '@/data/rain/_shared/contract';
 import { WORKBENCHES } from '@/data/rain/_shared/contract';
 import WorkbenchLayout from '../shell/WorkbenchLayout';
@@ -30,7 +30,7 @@ export default function ValueInsights({ access, filter, stateScope }: { access: 
   const pane = selSite
     ? { label: `${siteById(selSite)?.name} site`, chips: ['Explain this site', 'Compare our sites on cost per member'], kind: 'site' as const, id: selSite }
     : selSeg
-      ? { label: SEGMENTS.find((s) => s.id === selSeg)!.label, chips: ['Explain this segment', 'Who are the 1,180?'], kind: 'segment' as const, id: selSeg }
+      ? { label: SEGMENTS.find((s) => s.id === selSeg)!.label, chips: ['Explain this segment', `Who are the ${num(SEGMENTS.find((s) => s.id === 'impactable')!.members)}?`], kind: 'segment' as const, id: selSeg }
       : selGap
         ? { label: `Gap part: ${gapLabel}`, chips: ['Explain this gap bar', 'What can we still recover by December 31?'], kind: 'gap' as const, id: selGap }
         : stateScope
@@ -67,7 +67,7 @@ export default function ValueInsights({ access, filter, stateScope }: { access: 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <FilterSelect label="County" value={county} onChange={(v) => { setCounty(v); setSite('all'); }} options={[{ value: 'all', label: 'All counties' }, ...COUNTIES.map((c) => ({ value: c.id, label: c.name }))]} />
         <FilterSelect label="Site" value={site} onChange={setSite} options={[{ value: 'all', label: 'All sites' }, ...SITES.filter((s) => county === 'all' || s.county === county).map((s) => ({ value: s.id, label: s.name }))]} />
-        <FilterSelect label="Payer" value="hdhp" onChange={() => undefined} options={[{ value: 'hdhp', label: 'High Desert Health Plan' }]} />
+        <FilterSelect label="Payer" value="hdhp" onChange={() => undefined} options={[{ value: 'hdhp', label: ORG.plan }]} />
         <FilterSelect label="Segment" value={segment} onChange={(v) => { setSegment(v); setSelSeg(v === 'all' ? null : v); }} options={[{ value: 'all', label: 'All members' }, ...SEGMENTS.map((s) => ({ value: s.id, label: s.label }))]} />
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">

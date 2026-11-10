@@ -1,70 +1,37 @@
 /**
- * Simplified Nevada outlines for RAIN's county maps: the state, the six
- * network counties, the seven sites and the frontier places. Hand-simplified
- * lon/lat polygons, drawn as inline SVG (plan D16): illustrative shapes near
- * the real ones, not legal boundaries.
+ * Map geometry for RAIN's county maps: the state, the six network counties,
+ * the seven sites and the frontier places (simplified lon/lat polygons, drawn
+ * as inline SVG; illustrative shapes near the real ones, not legal boundaries).
+ * The shapes come from the backend (GET /api/v3/ui/data → section "geo");
+ * this module keeps only the projection math.
  */
 import type { CountyId } from './constants';
+import { rainValue } from './backendData';
 
 type LonLat = [number, number];
+const G = <T,>(key: string) => rainValue<T>('geo', key);
 
-export const STATE_OUTLINE: LonLat[] = [
-  [-120.0, 42.0], [-114.04, 42.0], [-114.04, 36.2], [-114.63, 35.0], [-120.0, 39.0],
-];
+export const STATE_OUTLINE = G<LonLat[]>('STATE_OUTLINE');
 
-export const COUNTY_SHAPES: Record<CountyId, LonLat[]> = {
-  humboldt: [[-119.33, 42.0], [-117.02, 42.0], [-117.02, 40.85], [-117.3, 40.52], [-118.78, 40.85], [-119.33, 40.95]],
-  elko: [[-117.02, 42.0], [-114.04, 42.0], [-114.04, 40.12], [-116.0, 40.12], [-116.6, 40.6], [-117.02, 40.85]],
-  lander: [[-117.3, 40.52], [-117.02, 40.85], [-116.6, 40.6], [-116.6, 38.75], [-117.25, 38.75], [-117.5, 39.15], [-117.55, 40.0]],
-  pershing: [[-119.33, 40.95], [-118.78, 40.85], [-117.3, 40.52], [-117.55, 40.0], [-118.75, 39.95], [-119.33, 40.2]],
-  churchill: [[-119.0, 39.92], [-117.55, 40.0], [-117.5, 39.15], [-117.85, 39.07], [-118.75, 39.05], [-119.2, 39.5]],
-  whitePine: [[-115.83, 40.12], [-114.04, 40.12], [-114.04, 38.68], [-115.9, 38.68]],
-};
+export const COUNTY_SHAPES = G<Record<CountyId, LonLat[]>>('COUNTY_SHAPES');
 
 /** Where each county's label sits. */
-export const COUNTY_LABEL: Record<CountyId, LonLat> = {
-  humboldt: [-118.2, 41.45],
-  elko: [-115.5, 41.25],
-  lander: [-117.0, 39.6],
-  pershing: [-118.45, 40.45],
-  churchill: [-118.3, 39.55],
-  whitePine: [-114.95, 39.5],
-};
+export const COUNTY_LABEL = G<Record<CountyId, LonLat>>('COUNTY_LABEL');
 
-export const SITE_POINTS: Record<string, LonLat> = {
-  elko: [-115.76, 40.83],
-  wells: [-114.96, 41.11],
-  winnemucca: [-117.74, 40.97],
-  battleMountain: [-116.93, 40.64],
-  lovelock: [-118.47, 40.18],
-  ely: [-114.89, 39.25],
-  fallon: [-118.78, 39.47],
-};
+export const SITE_POINTS = G<Record<string, LonLat>>('SITE_POINTS');
 
 /** Neighbouring counties outside the network, drawn neutral so the map reads as whole. */
-export const OTHER_COUNTIES: Array<{ name: string; shape: LonLat[]; label: LonLat }> = [
-  { name: 'Washoe', shape: [[-120.0, 42.0], [-119.33, 42.0], [-119.33, 40.2], [-119.0, 39.92], [-119.2, 39.5], [-119.7, 39.3], [-120.0, 39.15]], label: [-119.67, 40.9] },
-  { name: 'Eureka', shape: [[-116.6, 40.6], [-116.0, 40.12], [-115.83, 40.12], [-115.9, 38.68], [-116.6, 38.75]], label: [-116.2, 39.5] },
-];
+export const OTHER_COUNTIES = G<Array<{ name: string; shape: LonLat[]; label: LonLat }>>('OTHER_COUNTIES');
 
 /**
  * Frontier places (by town, not ZIP code). The first six are the low-broadband
  * areas. `side` puts the label left of the dot near the east edge; `dy` moves
  * it down where two labels would touch.
  */
-export const FRONTIER_POINTS: Array<{ name: string; at: LonLat; county: CountyId; lowBroadband: boolean; side?: 'left' | 'right'; dy?: number }> = [
-  { name: 'Jarbidge', at: [-115.43, 41.87], county: 'elko', lowBroadband: true, dy: 14 },
-  { name: 'Denio', at: [-118.63, 41.99], county: 'humboldt', lowBroadband: true },
-  { name: 'Austin', at: [-117.07, 39.49], county: 'lander', lowBroadband: true },
-  { name: 'Imlay', at: [-118.15, 40.66], county: 'pershing', lowBroadband: true },
-  { name: 'Baker', at: [-114.14, 39.01], county: 'whitePine', lowBroadband: true, side: 'left' },
-  { name: 'Owyhee', at: [-116.1, 41.95], county: 'elko', lowBroadband: true },
-  { name: 'Jackpot', at: [-114.67, 41.98], county: 'elko', lowBroadband: false, side: 'left' },
-  { name: 'McDermitt', at: [-117.72, 41.99], county: 'humboldt', lowBroadband: false },
-];
+export const FRONTIER_POINTS = G<Array<{ name: string; at: LonLat; county: CountyId; lowBroadband: boolean; side?: 'left' | 'right'; dy?: number }>>('FRONTIER_POINTS');
 
 /** The view box the maps project into: the north and centre of the state, with a margin for labels. */
-export const VIEW = { minLon: -120.2, maxLon: -113.75, minLat: 38.45, maxLat: 42.3 } as const;
+export const VIEW = G<{ readonly minLon: number; readonly maxLon: number; readonly minLat: number; readonly maxLat: number }>('VIEW');
 
 const K = Math.cos((40.3 * Math.PI) / 180);
 

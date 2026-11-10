@@ -19,3 +19,28 @@ export function devWarn(...args: unknown[]): void {
 export function devError(...args: unknown[]): void {
   if (enabled) console.error(...args);
 }
+
+/**
+ * Data-provenance proof. Unlike the dev channels above, this prints in every
+ * build, production included, on purpose: it is how anyone can confirm in
+ * devtools that every value on screen came from the backend (the boot load in
+ * data/rain/_shared/backendData.ts and each API call in core/api/proof.ts).
+ * Silent under tests.
+ */
+const proofOn = import.meta.env.MODE !== 'test';
+
+export const PROOF_STYLE = {
+  badge: 'background:#0b3d91;color:#fff;padding:2px 6px;border-radius:3px;font-weight:600',
+  alert: 'background:#cf222e;color:#fff;padding:2px 6px;border-radius:3px;font-weight:600',
+  ok: 'color:#1a7f37;font-weight:600',
+  bad: 'color:#cf222e;font-weight:600',
+  bold: 'font-weight:600',
+} as const;
+
+export const proof = {
+  group: (...args: unknown[]) => { if (proofOn) console.group(...args); },
+  log: (...args: unknown[]) => { if (proofOn) console.log(...args); },
+  table: (rows: unknown) => { if (proofOn) console.table(rows); },
+  end: () => { if (proofOn) console.groupEnd(); },
+  error: (...args: unknown[]) => { if (proofOn) console.error(...args); },
+};

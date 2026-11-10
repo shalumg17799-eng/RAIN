@@ -17,6 +17,7 @@
  *   npm run catalog            write the file
  *   npm run catalog -- --check exit 1 if the committed file is out of date
  */
+import './lib/hydrate-from-seed'; // RAIN data: from the backend's seed, before any data module loads
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';

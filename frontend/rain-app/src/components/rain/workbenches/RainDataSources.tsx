@@ -62,13 +62,13 @@ export default function RainDataSources() {
           columns={[
             { key: 'name', label: 'Source', render: (x) => <span className="font-semibold">{x.name}</span> },
             { key: 'kind', label: 'Label', render: (x) => <Pill tone={x.kind === 'Public' ? 'good' : x.kind === 'Synthetic' ? 'warning' : 'neutral'}>{x.kind}</Pill> },
-            { key: 'records', label: 'Records', align: 'right', render: (x) => num(x.recordCount) },
+            { key: 'records', label: 'Records', align: 'right', render: (x) => (x.live ? <span title={`Live row count from the backend: ${x.table}`}>{num(x.recordCount)} <Pill tone="good">Live</Pill></span> : num(x.recordCount)) },
             { key: 'freshness', label: 'Freshness' },
             { key: 'usedFor', label: 'Used for', wideOnly: true, render: (x) => <span className="text-[12px] text-text-muted">{x.usedFor}</span> },
           ]}
         />
         <p className="mt-2 text-[12px] text-text-muted">
-          Record counts are illustrative. Synthetic datasets swap for partner feeds through the same data contract.
+          Every row here is served by the backend. Counts marked Live are row counts of the public datasets loaded in the backend database; the others are illustrative. Synthetic datasets swap for partner feeds through the same data contract.
         </p>
       </RainCard>
     </WorkbenchLayout>

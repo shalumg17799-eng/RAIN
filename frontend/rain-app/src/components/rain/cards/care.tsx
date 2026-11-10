@@ -4,7 +4,7 @@
  */
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, MessageSquare, PhoneCall, Sparkles } from 'lucide-react';
-import { CARE, LINDA } from '@/data/rain/_shared/constants';
+import { CARE, LINDA, TERESA_SITES, siteById } from '@/data/rain/_shared/constants';
 import { getTeresaWorklist } from '@/data/rain/_shared/records';
 import { Button, RainCard } from '../shell/rainKit';
 import { useRainState } from '../shell/store';
@@ -17,7 +17,7 @@ export function TaskBriefing({ role }: { role: 'chw' | 'access' }) {
   if (role === 'chw') {
     const list = getTeresaWorklist();
     return (
-      <RainCard eyebrow="Today's queue" title={`${CARE.teresaTop} top-priority patients at Winnemucca and Battle Mountain`}>
+      <RainCard eyebrow="Today's queue" title={`${CARE.teresaTop} top-priority patients at ${TERESA_SITES.map((id) => siteById(id)?.name).join(' and ')}`}>
         <ul className="space-y-2">
           <li className="flex items-start gap-2 text-[13px]">
             <PhoneCall className="mt-0.5 h-4 w-4 flex-shrink-0 text-brand" aria-hidden="true" />

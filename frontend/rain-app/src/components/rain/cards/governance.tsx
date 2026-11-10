@@ -4,7 +4,7 @@
  * the before and after comparison and the members who change places.
  */
 import { Bar as RBar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from 'recharts';
-import { BP, MODEL } from '@/data/rain/_shared/constants';
+import { BP, CONTRACT, MODEL, num } from '@/data/rain/_shared/constants';
 import type { ModelFeature, SwapRow } from '@/data/rain/_shared/records';
 import { FEATURES, SUBGROUP, getAccessPoints, getSwaps } from '@/data/rain/_shared/records';
 import { Pill, RainCard, ResponsiveTable } from '../shell/rainKit';
@@ -19,7 +19,7 @@ export function ModelCard({ points }: { points?: string[] }) {
   const rows = [
     ['Model', `${MODEL.name} ${released ? MODEL.candidate : MODEL.version}`],
     ['Intended use', 'Rank rising-risk members for care team outreach'],
-    ['Training data', 'Synthetic claims and EHR for 9,400 attributed members'],
+    ['Training data', `Synthetic claims and EHR for ${num(CONTRACT.members)} attributed members`],
     ['Release threshold', `Subgroup gap under ${MODEL.releaseThresholdPct}%`],
     ['Accuracy', `AUC ${MODEL.auc.toFixed(2)} against the clinical review sample`],
     ['Owner', 'CIO, with CMO co-sign'],

@@ -22,3 +22,15 @@ for (const name of ['localStorage', 'sessionStorage']) {
     Object.defineProperty(globalThis, name, { value: memoryStorage(), configurable: true, writable: true });
   }
 }
+
+/* global __dirname -- vitest defines it for setup files */
+// RAIN data comes only from the backend (GET /api/v3/ui/data). Tests hydrate the
+// same data from the backend's seed file, the one loaded into rain_v3.ui_v3.dataset.
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { hydrateRainData } from '../data/rain/_shared/backendData';
+
+hydrateRainData(
+  JSON.parse(readFileSync(resolve(__dirname, '../../../../rain-api/seed/rain_v3_ui_data.json'), 'utf8')),
+  'rain-api/seed/rain_v3_ui_data.json',
+);

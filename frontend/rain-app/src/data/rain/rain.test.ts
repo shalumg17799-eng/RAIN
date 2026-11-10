@@ -376,7 +376,9 @@ function files(dir: string, out: string[] = []): string[] {
 
 describe('RAIN text rules', () => {
   const SRC = join(__dirname, '..', '..');
-  const all = [join(SRC, 'data/rain'), join(SRC, 'components/rain'), join(SRC, 'markets/sled/clients/rain')].flatMap((d) => files(d));
+  // The data itself is served by the backend; its seed is held to the same rules.
+  const SEED = join(SRC, '..', '..', '..', 'rain-api', 'seed', 'rain_v3_ui_data.json');
+  const all = [...[join(SRC, 'data/rain'), join(SRC, 'components/rain'), join(SRC, 'markets/sled/clients/rain')].flatMap((d) => files(d)), SEED];
   const text = all.map((f) => [f, readFileSync(f, 'utf8')] as const);
 
   it('uses no em dash anywhere', () => {

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, CalendarPlus, Inbox, MessageSquareText, Phone, Sparkles } from 'lucide-react';
 import { BP, CARE, LINDA, MODEL } from '@/data/rain/_shared/constants';
+import { personaUi } from '@/data/rain/personaUi';
 import type { Access } from '@/data/rain/_shared/contract';
 import { WORKBENCHES } from '@/data/rain/_shared/contract';
 import type { CampaignMember, ContactStatus, VisitMode } from '@/data/rain/_shared/records';
@@ -37,7 +38,7 @@ export default function Worklist({ access, filter }: { access: Access; filter: s
   const [site, setSite] = useState('all');
   const [mode, setMode] = useState<'all' | VisitMode>('all');
   const [contacted, setContacted] = useState<'all' | 'yes' | 'no'>('all');
-  const [sel, setSel] = useState<string | null>(view ? null : 'M-40107');
+  const [sel, setSel] = useState<string | null>(view ? null : LINDA.memberId);
 
   const base = scope === 'teresa' ? getTeresaWorklist() : getCampaignMembers();
   const status = (m: CampaignMember) => store.contacts[m.id] ?? m.status;
@@ -48,7 +49,7 @@ export default function Worklist({ access, filter }: { access: Access; filter: s
       (contacted === 'all' || (contacted === 'yes' ? status(m) !== 'Not contacted' : status(m) === 'Not contacted')),
   );
   const m = getCampaignMembers().find((x) => x.id === sel);
-  const isLinda = m?.id === 'M-40107';
+  const isLinda = m?.id === LINDA.memberId;
   usePaneContext(
     m
       ? {
@@ -70,7 +71,7 @@ export default function Worklist({ access, filter }: { access: Access; filter: s
       <div className="space-y-2">
         <p className="flex items-start gap-2 rounded-xl bg-brand/[0.06] px-3 py-2 text-[12.5px] text-text">
           <Inbox className="mt-0.5 h-4 w-4 flex-shrink-0 text-brand" aria-hidden="true" />
-          From Dr. Castellanos: BP campaign, {BP.nearControl} patients; {CARE.teresaTop} top priority at your sites this week.
+          From {personaUi('cmo').identity.greeting}: BP campaign, {BP.nearControl} patients; {CARE.teresaTop} top priority at your sites this week.
         </p>
         {store.approved.outreach300 && (
           <p className="flex items-start gap-2 rounded-xl bg-brand/[0.06] px-3 py-2 text-[12.5px] text-text">
