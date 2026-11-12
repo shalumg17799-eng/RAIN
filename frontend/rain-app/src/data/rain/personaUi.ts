@@ -1,6 +1,6 @@
 /**
  * Each persona's identity, input placeholder, greeting subtitle and
- * notifications. Served by the backend (GET /api/v3/ui/data → section "personas").
+ * notifications. Served by the backend (GET /api/v4/ui/data → section "personas").
  */
 import type { PersonaIdentity, PersonaNotification } from '@core/types';
 import type { PersonaKey } from './_shared/constants';

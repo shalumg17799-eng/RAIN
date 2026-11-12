@@ -24,6 +24,7 @@ import cioM from '@/markets/sled/clients/rain/personas/cio/manifest';
 import stateM from '@/markets/sled/clients/rain/personas/state/manifest';
 import chwM from '@/markets/sled/clients/rain/personas/chw/manifest';
 import accessM from '@/markets/sled/clients/rain/personas/access/manifest';
+import lindaM from '@/markets/sled/clients/rain/personas/linda/manifest';
 import { rainAnswers } from '@/markets/sled/clients/rain/answers';
 import { getRainState, resetRainState, approve, book, recordLindaReading, runAction, requestLaunch, sign, isReleased } from '@/components/rain/shell/store';
 import * as C from './_shared/constants';
@@ -37,7 +38,15 @@ import { contextSpecs } from './_shared/context';
 
 const sum = (xs: number[]) => xs.reduce((s, x) => s + x, 0);
 const KEYS = Object.keys(CONTRACTS) as C.PersonaKey[];
-const MANIFESTS: Record<C.PersonaKey, PersonaManifest> = { ceo: ceoM, cmo: cmoM, cio: cioM, state: stateM, chw: chwM, access: accessM };
+const MANIFESTS: Record<C.PersonaKey, PersonaManifest> = {
+  ceo: ceoM,
+  cmo: cmoM,
+  cio: cioM,
+  state: stateM,
+  chw: chwM,
+  access: accessM,
+  linda: lindaM,
+};
 
 // ─── 1. Contract ────────────────────────────────────────────────────────────
 
@@ -84,12 +93,32 @@ describe('RAIN data contract', () => {
       state: [['countyExplorer', 'full'], ['valueInsights', 'full'], ['rhtpReporting', 'full']],
       chw: [['worklist', 'full'], ['scheduling', 'full']],
       access: [['scheduling', 'full'], ['reminders', 'full']],
+      // The patient sees only her own thread.
+      linda: [['patientView', 'full']],
     };
     for (const k of KEYS) {
       expect(CONTRACTS[k].workbenches.map((w) => [w.id, w.access]), k).toEqual(expected[k]);
       expect(MANIFESTS[k].features?.navSlots?.[0], k).toBe('ask');
     }
     expect(rainClient.branding.navLabels?.ask).toBe('Ask AI');
+  });
+});
+
+describe('RAIN patient persona', () => {
+  it('scopes the patient to her own record', () => {
+    expect(CONTRACTS.linda.workbenches[0].scope).toBe('self');
+    expect(C.SCOPES.linda.memberId).toBe(C.PATIENTS.linda.memberId);
+    expect(Object.keys(C.PATIENTS)).toEqual(['linda']);
+    // her answers draw only her own datasets
+    for (const v of Object.values(CONTRACTS.linda.viz)) {
+      const ds = (v.props as { dataset?: string }).dataset;
+      if (ds) expect(ds.startsWith('lg_'), `linda draws ${ds}`).toBe(true);
+    }
+  });
+
+  it('builds the patient as a task briefing', () => {
+    expect(MANIFESTS.linda.signals).toHaveLength(0);
+    expect(MANIFESTS.linda.features?.navSlots).toEqual(['ask', 'patientView']);
   });
 });
 
@@ -234,8 +263,12 @@ describe('RAIN figures reconcile', () => {
 type Flow = { ai_message?: string; suggested_chips?: string[]; capability?: string };
 
 describe('RAIN client', () => {
-  it('lists the six operator personas in the spec order, Gregory Haskins default', () => {
-    expect(rainClient.personas.map((p) => p.identity.name)).toEqual(['Gregory Haskins, MBA', 'Dr. Naomi Castellanos', 'Raj Malhotra', 'Dr. Lauren Pike', 'Teresa Lopez, CHW', 'Brandon Kee']);
+  it('lists the seven personas in switcher order, Gregory Haskins default', () => {
+    expect(rainClient.personas.map((p) => p.identity.name)).toEqual([
+      'Gregory Haskins, MBA', 'Dr. Naomi Castellanos', 'Raj Malhotra', 'Dr. Lauren Pike',
+      'Teresa Lopez, CHW', 'Brandon Kee', 'Linda Garcia',
+    ]);
+    expect(rainClient.personas.map((p) => p.id)).toEqual(Object.values(C.PERSONAS));
     expect(rainClient.defaultPersonaId).toBe('rain_ceo');
     expect(rainClient.branding.primaryColor).toBe('#003366');
   });
@@ -377,7 +410,7 @@ function files(dir: string, out: string[] = []): string[] {
 describe('RAIN text rules', () => {
   const SRC = join(__dirname, '..', '..');
   // The data itself is served by the backend; its seed is held to the same rules.
-  const SEED = join(SRC, '..', '..', '..', 'rain-api', 'seed', 'rain_v3_ui_data.json');
+  const SEED = join(SRC, '..', '..', '..', 'rain-api', 'seed', 'rain_v4_ui_data.json');
   const all = [...[join(SRC, 'data/rain'), join(SRC, 'components/rain'), join(SRC, 'markets/sled/clients/rain')].flatMap((d) => files(d)), SEED];
   const text = all.map((f) => [f, readFileSync(f, 'utf8')] as const);
 

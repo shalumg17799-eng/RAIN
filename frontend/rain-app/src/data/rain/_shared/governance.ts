@@ -1,7 +1,7 @@
 /**
  * The CIO's governance records: the subgroup check, the model features, the
  * 57 members who enter and leave the top 300, and the drive-time scatter.
- * Served by the backend (GET /api/v3/ui/data → section "governance").
+ * Served by the backend (GET /api/v4/ui/data → section "governance").
  * De-identified; every person is fictional.
  */
 import { rainValue } from './backendData';

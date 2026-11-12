@@ -5,7 +5,7 @@ import PrototypeFooter from '@/components/common/PrototypeFooter';
 import { useConversationSession } from '@/context/ConversationSessionContext';
 import { PERSONAS } from '@/data/rain/_shared/constants';
 import { launchHref } from '@/data/rain/_shared/contract';
-import { RESET_THREADS_EVENT, markWorkspaceMounted, resetRainState, setAutoOpen, takePatientVisit, useRainState } from './store';
+import { RESET_THREADS_EVENT, markWorkspaceMounted, resetRainState, setAutoOpen, takePatientVisit, useRainState, resetDemoData } from './store';
 import { usePanel } from './panel';
 
 /**
@@ -74,6 +74,7 @@ export default function RainFooter({ onRestart }: { onRestart: () => void }) {
   const { autoOpen } = useRainState();
   const restartAll = () => {
     resetRainState();
+    void resetDemoData();
     clearThreads(session);
     onRestart();
     if (inPane) navigate('/');

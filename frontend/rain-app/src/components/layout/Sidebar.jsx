@@ -1,6 +1,6 @@
 // @ultra-shell: the shell sidebar (nav from the active persona). Rule 5 lets the shell read context.
 import { NavLink, useLocation } from 'react-router-dom';
-import { BellRing, CalendarPlus, ClipboardList, Database, FileText, Map as MapIcon, MessageSquare, ShieldAlert, ShieldCheck, Target, TrendingUp, X } from 'lucide-react';
+import { BellRing, CalendarPlus, ClipboardList, Database, FileText, Map as MapIcon, MessageSquare, MessageSquareText, ShieldAlert, ShieldCheck, Target, TrendingUp, X } from 'lucide-react';
 import { useBranding } from '@/context/BrandingContext';
 import { usePersona } from '@/context/PersonaContext';
 import { useActivePersona } from '@core/runtime/useActivePersona';
@@ -37,6 +37,7 @@ export default function Sidebar({ open = false, onClose }) {
     worklist: { to: '/worklist', icon: ClipboardList, label: labels.worklist ?? 'Worklist' },
     scheduling: { to: '/scheduling', icon: CalendarPlus, label: labels.scheduling ?? 'Scheduling' },
     reminders: { to: '/reminders', icon: BellRing, label: labels.reminders ?? 'Reminders' },
+    patientView: { to: '/patient', icon: MessageSquareText, label: labels.patientView ?? 'My messages' },
     dataSources: { to: '/data-sources', icon: Database, label: 'Data Sources' },
   };
 

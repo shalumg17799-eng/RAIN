@@ -22,5 +22,9 @@
   {
     "client": "rain",
     "persona": "rain_access"
+  },
+  {
+    "client": "rain",
+    "persona": "rain_linda"
   }
 ]

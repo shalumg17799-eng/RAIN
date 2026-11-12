@@ -9,7 +9,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { BackendDataError, hydrateRainData, loadRainData, rainDataProof, rainValue } from './backendData';
 
-const SEED = JSON.parse(readFileSync(resolve(__dirname, '../../../../../../rain-api/seed/rain_v3_ui_data.json'), 'utf8'));
+const SEED = JSON.parse(readFileSync(resolve(__dirname, '../../../../../../rain-api/seed/rain_v4_ui_data.json'), 'utf8'));
 
 function backend(body: string, status = 200, sha = createHash('sha256').update(body).digest('hex')) {
   return vi.fn(async () =>
@@ -20,7 +20,7 @@ function backend(body: string, status = 200, sha = createHash('sha256').update(b
         'X-RAIN-Source': 'rain-api',
         'X-RAIN-Request-Id': 'req123',
         'X-RAIN-Server': 'backend-1',
-        'X-RAIN-Data-Source': 'postgres://rain_v3/ui_v3.dataset + public_data (live)',
+        'X-RAIN-Data-Source': 'postgres://rain_v4/ui_v3.dataset + public_data (live)',
         'X-RAIN-Data-Sha256': sha,
       },
     }),
@@ -32,17 +32,17 @@ const silence = () => {
 };
 
 describe('RAIN backend data loader', () => {
-  afterAll(() => hydrateRainData(SEED, 'rain-api/seed/rain_v3_ui_data.json'));
+  afterAll(() => hydrateRainData(SEED, 'rain-api/seed/rain_v4_ui_data.json'));
 
   it('adopts exactly what the backend sends and records the proof', async () => {
     silence();
     const served = structuredClone(SEED);
-    served.meta = { source: 'rain-api', server: 'backend-1', dataSource: 'x', database: { name: 'rain_v3', table: 'ui_v3.dataset', rows: 1, seedLoadedAt: 'now' }, publicOverlay: [], counts: {}, records: {}, requestId: 'req123', generatedAt: 'now', dbMs: 1 };
+    served.meta = { source: 'rain-api', server: 'backend-1', dataSource: 'x', database: { name: 'rain_v4', computedFrom: ['synthetic', 'public_data'], configTable: 'ui_v4.dataset', configRows: 1, configLoadedAt: 'now' }, publicOverlay: [], counts: {}, records: {}, requestId: 'req123', generatedAt: 'now', dbMs: 1 };
     served.sections.constants.CONTRACT = { ...served.sections.constants.CONTRACT, members: 12345 };
     const body = JSON.stringify(served);
     const fetchImpl = backend(body);
     const proof = await loadRainData('rain', fetchImpl as unknown as typeof fetch);
-    expect(fetchImpl).toHaveBeenCalledWith('/api/v3/ui/data?clientId=rain', expect.anything());
+    expect(fetchImpl).toHaveBeenCalledWith('/api/v4/ui/data?clientId=rain', expect.anything());
     expect(rainValue<{ members: number }>('constants', 'CONTRACT').members).toBe(12345);
     expect(proof.source).toBe('rain-api');
     expect(proof.requestId).toBe('req123');

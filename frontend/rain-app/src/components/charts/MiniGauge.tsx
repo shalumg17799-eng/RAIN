@@ -1,4 +1,5 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { CHART_START } from '@/components/charts/chartStart';
 
 /**
  * Half-donut gauge. Extracted verbatim from RegulatoryGaugePanel (where it was
@@ -31,7 +32,7 @@ export default function MiniGauge({ score, status, size = 64 }: MiniGaugeProps) 
   ];
   return (
     <div className="relative" style={{ width: size, height: size / 2 + 4 }}>
-      <ResponsiveContainer width="100%" height={size}>
+      <ResponsiveContainer initialDimension={CHART_START} width="100%" height={size}>
         <PieChart>
           <Pie
             data={data}

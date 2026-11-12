@@ -107,6 +107,16 @@ _OPENAPI_TAGS = [
      "description": "Ultra API v1 for the PRD v0.3 frontend (frontend/rain-app) at `/api/v3/ui/...`: context, briefing, ask, actions, catalog for the 7-persona VBC prototype, served from app-exported fixtures (npm run fixtures:backend)."},
     {"name": "ui-data-v3",
      "description": "Every value the v0.3 UI shows (`/api/v3/ui/data`): master numbers, records, datasets, map geometry, sources and persona contracts from Postgres `rain_v3.ui_v3.dataset`, with county public figures computed live from `rain_v3.public_data`. Proof headers: X-RAIN-Request-Id, X-RAIN-Data-Sha256, X-RAIN-Data-Source, Server-Timing."},
+    {"name": "data-v4",
+     "description": "Generated Data API for the PRD v0.4 wave over the `rain_v4` database (`/api/v4/data/...`): 59 synthetic and 24 public tables, from deploy/scripts/build_data_api.py."},
+    {"name": "ultra-v4",
+     "description": "Ultra API v1 for the PRD v0.4 frontend at `/api/v4/ui/...`: context, briefing, ask for the 7 personas (6 operators and the patient Linda Garcia), every answer built per request from Postgres `rain_v4` (persona queries and `query_table` visuals run live)."},
+    {"name": "ui-data-v4",
+     "description": "Every value the v0.4 UI shows (`/api/v4/ui/data`), computed per request by SQL over `rain_v4.synthetic` (row-level synthetic data) and `rain_v4.public_data` (rain-api/metrics_v4.py); persona contracts are templates in `rain_v4.ui_v4.dataset` rendered against it. No number is stored. Proof headers: X-RAIN-Request-Id, X-RAIN-Data-Sha256, X-RAIN-Data-Source, Server-Timing."},
+    {"name": "flow-v4",
+     "description": "The v0.4 write-back flow (`/api/v4/flow/...`): book, contact, reply, reading, handoff, signoff, note; each change is a row in `rain_v4.synthetic` (undo log in `synthetic.flow_event`), the next `/api/v4/ui/data` is recomputed from it; `reset` undoes all."},
+    {"name": "persona-queries-v4",
+     "description": "The v0.4 persona query pack (`/api/v4/queries`): 5 synthetic-data and 5 public-data queries per persona, run read-only against `rain_v4`. Proof headers: X-RAIN-Query-Id, X-RAIN-Data-Source, X-RAIN-Rows, Server-Timing."},
     {"name": "persona-queries-v3",
      "description": "Each persona's 5 synthetic-data and 5 public-data queries (`/api/v3/queries`), run read-only against `rain_v3` and logged with the request id. Proof headers: X-RAIN-Query-Id, X-RAIN-Data-Source, X-RAIN-Rows, Server-Timing."},
     {"name": "Legacy /api/v2 (scripted era)",
@@ -145,6 +155,19 @@ app.include_router(ui_data_v3_router, prefix="/api/v3/ui")
 # Each persona's synthetic-data and public-data queries as read-only endpoints (doc/queries pack).
 from persona_queries_v3 import router as persona_queries_v3_router  # noqa: E402
 app.include_router(persona_queries_v3_router, prefix="/api/v3/queries")
+
+# PRD v0.4 wave (database rain_v4): generated data API, UI data, the Ultra API for the 14 personas,
+# and the persona query pack. Every answer and value is built per request from Postgres.
+from data_api_v4 import router as data_v4_router  # noqa: E402
+app.include_router(data_v4_router, prefix="/api/v4/data")
+from ultra_v4_api import router as ultra_v4_router  # noqa: E402
+app.include_router(ultra_v4_router, prefix="/api/v4/ui")
+from ui_data_v4 import router as ui_data_v4_router  # noqa: E402
+app.include_router(ui_data_v4_router, prefix="/api/v4/ui")
+from persona_queries_v4 import router as persona_queries_v4_router  # noqa: E402
+app.include_router(persona_queries_v4_router, prefix="/api/v4/queries")
+from flow_v4 import router as flow_v4_router  # noqa: E402
+app.include_router(flow_v4_router, prefix="/api/v4/flow")
 # expose_headers lets the browser's fetch() read the proof headers, which the
 # frontend logs to the console as proof a response came from this server.
 _HOSTNAME = socket.gethostname()

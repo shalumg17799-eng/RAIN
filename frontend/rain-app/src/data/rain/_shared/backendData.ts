@@ -3,18 +3,17 @@
  *
  * Every number, record, dataset, map shape, source and persona contract the UI
  * shows is fetched once at boot from `GET {VITE_ULTRA_API_BASE}/data?clientId=rain`
- * (rain-api `ui_data_v3.py`: Postgres `rain_v3.ui_v3.dataset`, with the county
- * public figures computed live from `rain_v3.public_data`). Nothing is bundled:
+ * (rain-api `ui_data_v4.py`: Postgres `rain_v4.ui_v4.dataset`, with the county
+ * public figures computed live from `rain_v4.public_data`). Nothing is bundled:
  * the data modules in this folder read from here, and reading before the
  * backend has answered throws instead of falling back to anything local.
  *
- * Proof is printed to the browser console and kept on `window.__RAIN_DATA_PROOF__`:
- * the request, the backend's proof headers, and the SHA-256 of the body as
- * sent by the server (X-RAIN-Data-Sha256) against the one computed here.
+ * The browser console shows the backend API calls only (core/api/proof.ts). The
+ * load's proof (the backend's proof headers, the SHA-256 of the body as sent by the
+ * server against the one computed here) is kept on `window.__RAIN_DATA_PROOF__`.
  */
 
-import { PROOF_STYLE, proof as log } from '@core/log';
-import { logBackendCall } from '@core/api/proof';
+import { logBackendCall, logBackendFailure } from '@core/api/proof';
 
 export type SectionName = 'contracts' | 'personas' | 'constants' | 'records' | 'governance' | 'geo' | 'sources' | 'capabilities' | 'datasets';
 
@@ -30,7 +29,9 @@ export interface RainDataMeta {
   source: string;
   server: string;
   dataSource: string;
-  database: { name: string; table: string; rows: number; seedLoadedAt: string };
+  /** Numbers are computed from `computedFrom` schemas per request; `configTable` holds templates and config only. */
+  database: { name: string; computedFrom?: string[]; configTable?: string; configRows?: number; configLoadedAt?: string };
+  computed?: { computed: { computed: boolean; ms: number; version: number; ageSeconds: number }; asOf: string; periodEnd: string } | null;
   publicOverlay: PublicOverlayChange[];
   counts: Record<string, number>;
   records: Record<string, number>;
@@ -76,7 +77,7 @@ export class BackendDataError extends Error {
 /** Where the data comes from: the same backend base the conversation uses. */
 export function dataBase(): string {
   const env = import.meta.env as Record<string, string | undefined>;
-  return (env.VITE_RAIN_DATA_BASE || env.VITE_ULTRA_API_BASE || '/api/v3/ui').replace(/\/$/, '');
+  return (env.VITE_RAIN_DATA_BASE || env.VITE_ULTRA_API_BASE || '/api/v4/ui').replace(/\/$/, '');
 }
 
 async function sha256Hex(text: string): Promise<string | null> {
@@ -97,10 +98,13 @@ export async function loadRainData(clientId = 'rain', fetchImpl: typeof fetch = 
   try {
     res = await fetchImpl(url, { cache: 'no-store', headers: { Accept: 'application/json' }, signal: abort.signal });
   } catch (err) {
-    throw new BackendDataError(abort.signal.aborted ? `The backend did not answer within ${timeoutMs / 1000} s` : `The backend did not answer: ${(err as Error).message}`, url);
+    const message = abort.signal.aborted ? `The backend did not answer within ${timeoutMs / 1000} s` : `The backend did not answer: ${(err as Error).message}`;
+    logBackendFailure('GET', url, message, Math.round(performance.now() - t0));
+    throw new BackendDataError(message, url);
   } finally {
     clearTimeout(timer);
   }
+  logBackendCall('GET', url, res, Math.round(performance.now() - t0));
   const text = await res.text();
   if (!res.ok) {
     // A proxy error page is HTML: report its title ("502 Bad Gateway"), not the markup.
@@ -130,7 +134,7 @@ export async function loadRainData(clientId = 'rain', fetchImpl: typeof fetch = 
     meta: body.meta,
     keysRead: [],
   };
-  logProof(proof, body);
+  keepProof(proof);
   return proof;
 }
 
@@ -142,6 +146,58 @@ export function hydrateRainData(data: RainDataSnapshot | { sections: RainDataSna
 
 export function isRainDataLoaded() {
   return snapshot !== null;
+}
+
+type Obj = Record<string, unknown>;
+const isObj = (v: unknown): v is Obj => !!v && typeof v === 'object' && !Array.isArray(v);
+const rowKey = (v: unknown) => (isObj(v) ? (v.id ?? v.memberId) : undefined);
+
+/** Update `target` to equal `source` without replacing it, so every module holding it sees the new values. */
+function mergeInPlace(target: unknown, source: unknown) {
+  if (Array.isArray(target) && Array.isArray(source)) {
+    // Rows keep their identity when their id matches (a selected member stays the same object).
+    const byId = new Map(target.filter(isObj).map((x) => [rowKey(x), x] as const));
+    const next = source.map((s) => {
+      const t = rowKey(s) !== undefined ? byId.get(rowKey(s)) : undefined;
+      if (t && isObj(s)) {
+        mergeInPlace(t, s);
+        return t;
+      }
+      return s;
+    });
+    target.splice(0, target.length, ...next);
+    return;
+  }
+  if (!isObj(target) || !isObj(source)) return;
+  for (const k of Object.keys(target)) if (!(k in source)) delete target[k];
+  for (const [k, v] of Object.entries(source)) {
+    const t = target[k];
+    if (t && v && typeof t === 'object' && typeof v === 'object' && Array.isArray(t) === Array.isArray(v)) mergeInPlace(t, v);
+    else target[k] = v;
+  }
+}
+
+/**
+ * Re-read the backend data after a write-back (flowApi) and update every loaded value in place: the
+ * backend recomputes the numbers from the changed rows, and modules that already hold a value (CARE,
+ * LINDA, the campaign members...) see the new state without a page reload.
+ */
+export async function refreshRainData(clientId = 'rain'): Promise<boolean> {
+  if (!snapshot) return false;
+  const url = `${dataBase()}/data?clientId=${encodeURIComponent(clientId)}`;
+  const t0 = performance.now();
+  const res = await fetch(url, { cache: 'no-store', headers: { Accept: 'application/json' } });
+  logBackendCall('GET', url, res, Math.round(performance.now() - t0));
+  if (!res.ok) return false;
+  const body = (await res.json()) as RainDataSnapshot;
+  const sections = snapshot.sections as Record<string, Record<string, unknown>>;
+  for (const [name, sec] of Object.entries(body.sections)) {
+    if (sections[name]) mergeInPlace(sections[name], sec);
+    else sections[name] = sec;
+  }
+  snapshot.meta = body.meta;
+  if (proof) proof.meta = body.meta;
+  return true;
 }
 
 /** One section of the backend data. Throws if the backend has not delivered it. */
@@ -163,17 +219,12 @@ export function rainValue<T>(section: SectionName, key: string): T {
   return tracked(`${section}.${key}`, value) as T;
 }
 
-// ─── Which backend data each page shows (console, per page) ─────────────────
+// ─── Which backend data each page shows (window.__RAIN_PAGE_DATA__) ─────────
 //
 // Every value handed out above is wrapped so that reading it while a page renders
-// is noted. Once per page and dataset, the console says which backend API and
-// which datasets the page on screen is built from. Reads during module import
-// (before the first render) are not attributed to any page.
+// is noted per page (not printed: the console shows backend API calls only).
+// Reads during module import (before the first render) are not attributed to any page.
 
-const LIVE: Record<string, string> = {
-  'constants.COUNTIES': 'county public fields live from rain_v3.public_data',
-  'sources.PUBLIC_SOURCES': 'record counts live from rain_v3.public_data',
-};
 const proxies = new WeakMap<object, object>();
 const pageSeen = new Map<string, Set<string>>();
 let pending = new Set<string>();
@@ -220,12 +271,6 @@ function flushReads() {
   if (!fresh.length) return;
   fresh.forEach((k) => seen.add(k));
   pageSeen.set(page, seen);
-  const datasets = fresh.map((k) => (LIVE[k] ? `${k} [${LIVE[k]}]` : k)).join(', ');
-  log.log(
-    `%cRAIN%c page ${page} ← backend GET ${proof?.url ?? `${dataBase()}/data`} (request ${proof?.requestId ?? '–'}, ${proof?.dataSource ?? 'backend'}): ${datasets}`,
-    PROOF_STYLE.badge,
-    '',
-  );
 }
 
 /** Start attributing data reads to the page on screen (call just before the first render). */
@@ -248,7 +293,7 @@ interface QuerySummary {
   url: string;
 }
 
-/** The backend's persona query API, next to the UI API: /api/v3/queries. */
+/** The backend's persona query API, next to the UI API: /api/v4/queries. */
 export function queriesBase(): string {
   const env = import.meta.env as Record<string, string | undefined>;
   return (env.VITE_RAIN_QUERIES_BASE || dataBase().replace(/\/ui$/, '/queries')).replace(/\/$/, '');
@@ -262,43 +307,14 @@ async function getJson(url: string) {
   return res.json();
 }
 
-const announced = new Set<string>();
-
-/** When a persona opens: list its backend queries in the console (one API call, logged). */
-export async function announcePersonaQueries(personaId: string) {
-  if (announced.has(personaId) || typeof window === 'undefined' || import.meta.env.MODE === 'test') return;
-  announced.add(personaId);
-  try {
-    const body = (await getJson(`${queriesBase()}?persona=${encodeURIComponent(personaId)}`)) as { count: number; queries: QuerySummary[] };
-    const syn = body.queries.filter((q) => q.data === 'synthetic').length;
-    log.group(
-      `%cRAIN%c ${personaId}: ${body.count} backend queries (${syn} synthetic data, ${body.count - syn} public data). Run one with rainQuery('${body.queries[0]?.id ?? ''}')`,
-      PROOF_STYLE.badge,
-      PROOF_STYLE.bold,
-    );
-    log.table(body.queries.map((q) => ({ id: q.id, data: q.data, question: q.question, api: `GET ${q.url}` })));
-    log.end();
-  } catch {
-    // A convenience listing: the UI's data does not depend on it.
-  }
-}
-
-/** Run one persona query on the backend and print its rows: rainQuery('CMO-P1'). */
+/** Run one persona query on the backend and return its result: await rainQuery('CMO-P1'). */
 export async function rainQuery(id: string) {
-  const body = await getJson(`${queriesBase()}/${encodeURIComponent(id)}`);
-  log.group(`%cRAIN%c query ${body.id} (${body.persona}, ${body.data} data): ${body.rowCount} rows from ${body.schema} in ${body.ms} ms`, PROOF_STYLE.badge, PROOF_STYLE.bold);
-  log.log(body.question);
-  log.log(body.sql);
-  log.table((body.rows as unknown[]).slice(0, 50));
-  log.end();
-  return body;
+  return getJson(`${queriesBase()}/${encodeURIComponent(id)}`);
 }
 
-/** List the backend's persona queries: rainQueries() or rainQueries('rain_cmo'). */
-export async function rainQueries(personaId?: string) {
-  const body = await getJson(personaId ? `${queriesBase()}?persona=${encodeURIComponent(personaId)}` : queriesBase());
-  log.table((body.queries as QuerySummary[]).map((q) => ({ id: q.id, persona: q.persona, data: q.data, question: q.question, api: `GET ${q.url}` })));
-  return body;
+/** List the backend's persona queries: await rainQueries() or rainQueries('rain_cmo'). */
+export async function rainQueries(personaId?: string): Promise<{ count: number; queries: QuerySummary[] }> {
+  return getJson(personaId ? `${queriesBase()}?persona=${encodeURIComponent(personaId)}` : queriesBase());
 }
 
 /** Console helpers: rainQuery(id), rainQueries(persona?), window.__RAIN_PAGE_DATA__. */
@@ -314,35 +330,9 @@ export function rainDataProof(): RainDataProof | null {
   return proof;
 }
 
-// ─── Console proof (through core/log, the app's only console) ───────────────
+// ─── Proof of the boot load (kept on window, not printed) ───────────────────
 
-function countOf(v: unknown): number | string {
-  if (Array.isArray(v)) return v.length;
-  if (v && typeof v === 'object') return `${Object.keys(v).length} fields`;
-  return 1;
-}
-
-function logProof(p: RainDataProof, body: RainDataSnapshot) {
+function keepProof(p: RainDataProof) {
   const g = globalThis as unknown as { __RAIN_DATA_PROOF__?: RainDataProof };
   g.__RAIN_DATA_PROOF__ = p;
-  const m = body.meta;
-  log.group(`%cRAIN%c Data loaded from the backend: ${m.database.rows} datasets, ${(p.bytes / 1024).toFixed(0)} KB in ${p.ms} ms`, PROOF_STYLE.badge, PROOF_STYLE.bold);
-  log.log(`GET ${p.url} → ${p.status} at ${p.loadedAt} (server clock)`);
-  log.log(`X-RAIN-Source: ${p.source} · X-RAIN-Server: ${p.server} · X-RAIN-Request-Id: ${p.requestId} · Server-Timing: ${p.serverTiming}`);
-  log.log(`Data source: ${p.dataSource} (database ${m.database.name}, table ${m.database.table}, ${m.database.rows} rows, seed loaded ${m.database.seedLoadedAt})`);
-  if (p.verified === null) {
-    log.log('%cSHA-256 not compared%c (crypto.subtle needs https or localhost)', PROOF_STYLE.bad, '');
-  } else {
-    log.log(`%cSHA-256 ${p.verified ? 'verified' : 'MISMATCH'}%c server ${p.sha256Header} · browser ${p.sha256Computed}`, p.verified ? PROOF_STYLE.ok : PROOF_STYLE.bad, '');
-  }
-  const rows = Object.entries(body.sections).flatMap(([section, entries]) =>
-    Object.entries(entries).map(([key, value]) => ({ section, key, items: countOf(value) })));
-  log.log(`Every value the UI renders comes from these ${rows.length} backend datasets:`);
-  log.table(rows);
-  if (m.publicOverlay?.length) {
-    log.log(`Public figures computed live by the backend from rain_v3.public_data (${m.publicOverlay.length} values):`);
-    log.table(m.publicOverlay.map((o) => ({ where: o.county ?? o.source, field: o.field, value: o.value, replaced: o.previous })));
-  }
-  log.log('Full proof object: window.__RAIN_DATA_PROOF__');
-  log.end();
 }

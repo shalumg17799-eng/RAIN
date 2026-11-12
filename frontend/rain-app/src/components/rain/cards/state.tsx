@@ -11,6 +11,7 @@ import { COUNTIES, OPTIONS, STATE, num, usdM } from '@/data/rain/_shared/constan
 import { COUNTY_LABEL, COUNTY_SHAPES, FRONTIER_POINTS, OTHER_COUNTIES, SITE_POINTS, STATE_OUTLINE, pathOf, project, viewHeight } from '@/data/rain/_shared/geo';
 import { Pill, RainCard, ResponsiveTable, Segmented } from '../shell/rainKit';
 import { useRainState } from '../shell/store';
+import { CHART_START } from '@/components/charts/chartStart';
 
 const AXIS = { stroke: 'var(--color-chart-axis)', fontSize: 11, tickLine: false } as const;
 const W = 560;
@@ -264,7 +265,7 @@ export function PcTrend({ points }: { points?: string[] }) {
   return (
     <RainCard eyebrow="Since January" title="Primary care visits, indexed to January = 100" points={points} label="Aggregated, de-identified">
       <div className="h-[200px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer initialDimension={CHART_START} width="100%" height="100%">
           <LineChart data={data} margin={{ top: 6, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid stroke="var(--color-chart-grid)" vertical={false} />
             <XAxis dataKey="label" {...AXIS} />

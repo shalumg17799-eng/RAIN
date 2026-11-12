@@ -19,7 +19,8 @@ export type WorkbenchId =
   | 'rhtpReporting'
   | 'worklist'
   | 'scheduling'
-  | 'reminders';
+  | 'reminders'
+  | 'patientView';
 
 export type Access = 'full' | 'view' | 'cosign';
 
@@ -95,7 +96,8 @@ export interface RainContract {
   queries: string[];
   viz: Record<string, RainVizSpec>;
   handoffs: RainHandoff[];
-  workbenches: Array<{ id: WorkbenchId; access: Access }>;
+  /** `scope` pins a workbench to a patient's own record ("self"). */
+  workbenches: Array<{ id: WorkbenchId; access: Access; scope?: string }>;
 }
 
 export interface WorkbenchMeta {
@@ -120,6 +122,8 @@ export const WORKBENCHES: Record<WorkbenchId, WorkbenchMeta> = {
   worklist: { id: 'worklist', nav: 'worklist', path: '/worklist', title: 'Worklist', priority: 'P1', subtitle: 'Call your patients from the top down. Select a patient for their number and reasons, then book the visit or log what happened.' },
   scheduling: { id: 'scheduling', nav: 'scheduling', path: '/scheduling', title: 'Scheduling', priority: 'P1', subtitle: 'Book each waiting patient: choose a slot, check coverage, review the reminders, then confirm.' },
   reminders: { id: 'reminders', nav: 'reminders', path: '/reminders', title: 'Reminders', priority: 'P2', subtitle: 'See who has confirmed. R replies get three new slots by text; no reply by 24 hours before the visit becomes a call for Teresa.' },
+  // The patient persona's own text and voice thread (the /patient view), that patient only.
+  patientView: { id: 'patientView', nav: 'patientView', path: '/patient', title: 'My messages', priority: 'P1', subtitle: 'Your text and voice reminders with the clinic: reply C to confirm, R to change, T for a video visit. You see only your own record.' },
 };
 
 export const workbenchByPath = (path: string) => Object.values(WORKBENCHES).find((w) => w.path === path);

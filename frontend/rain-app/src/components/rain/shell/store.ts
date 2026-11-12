@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { EVENTS } from '@core/contract/events';
-import { CARE } from '@/data/rain/_shared/constants';
+import { CARE, LINDA } from '@/data/rain/_shared/constants';
+import { onFlow, postFlow } from '@/data/rain/_shared/flowApi';
 import type { RainLaunch, WorkbenchId } from '@/data/rain/_shared/contract';
 import { parseAction } from '@/data/rain/_shared/contract';
 import type { ContactStatus } from '@/data/rain/_shared/records';
@@ -15,6 +16,10 @@ import { getCampaignMembers, getTeresaWorklist } from '@/data/rain/_shared/recor
  * render outside the conversation, and an approval in one persona's thread
  * has to show in another persona's workbench (the hand-off is the only data
  * link between Use Case A and B). `resetRainState` returns it to the morning.
+ *
+ * Every care-team action is also written to the backend (flowApi → POST /api/v4/flow/*):
+ * the change is kept in rain_v4.synthetic, the UI data is re-read and recomputed, so another
+ * persona, browser or a reload sees it. `resetDemoData` undoes the backend changes too.
  */
 
 export const ASK_EVENT = EVENTS.rainAsk;
@@ -62,6 +67,8 @@ export interface RainState {
   lindaReading: boolean;
   briefEdits: Record<string, string>;
   sentNotes: Record<string, boolean>;
+  /** Bumped after each backend write-back once the recomputed UI data is in. */
+  dataVersion: number;
 }
 
 const initial = (): RainState => ({
@@ -84,6 +91,7 @@ const initial = (): RainState => ({
   lindaReading: false,
   briefEdits: {},
   sentNotes: {},
+  dataVersion: 0,
 });
 
 let state = initial();
@@ -99,6 +107,9 @@ const subscribe = (l: () => void) => {
     listeners.delete(l);
   };
 };
+
+// A write-back re-read the backend data: re-render whatever shows it.
+onFlow(() => set({ dataVersion: state.dataVersion + 1 }));
 
 export const getRainState = () => state;
 export const useRainState = () => useSyncExternalStore(subscribe, getRainState, getRainState);
@@ -158,6 +169,7 @@ export function approve(...ids: string[]) {
     if (!next[id]) {
       next[id] = true;
       changed = true;
+      void postFlow('handoff', { handoffId: id });
     }
   if (changed) set({ approved: next });
 }
@@ -170,6 +182,7 @@ export function requestLaunch(stepId: string, launch: RainLaunch) {
 export function logContact(memberId: string, status: ContactStatus) {
   if (state.contacts[memberId] === status) return;
   set({ contacts: { ...state.contacts, [memberId]: status } });
+  void postFlow('contact', { memberId, outcome: status });
 }
 
 /** Undo a hand-logged outcome (a misclick, or the patient calls back). */
@@ -177,6 +190,7 @@ export function clearContact(memberId: string) {
   if (!state.contacts[memberId]) return;
   const { [memberId]: _cleared, ...rest } = state.contacts;
   set({ contacts: rest });
+  void postFlow('contact', { memberId, outcome: 'Not contacted' });
 }
 
 export const scheduleMember = (memberId: string | null) => set({ scheduleFor: memberId });
@@ -189,23 +203,33 @@ export function book(memberId: string, slotId: string) {
     contacts: { ...state.contacts, [memberId]: 'Reached and booked' },
     campaign: { ...state.campaign, booked: state.campaign.booked + 1 },
   });
+  void postFlow('book', { memberId, slotId });
 }
 
 /** Linda's home reading closes her gap: one more member controlled. */
 export function recordLindaReading() {
   if (state.lindaReading) return;
   set({ lindaReading: true, campaign: { ...state.campaign, controlled: state.campaign.controlled + 1 } });
+  const [systolic, diastolic] = String(LINDA.reading ?? '').split('/').map(Number);
+  if (systolic && diastolic) void postFlow('reading', { memberId: LINDA.memberId, systolic, diastolic, source: 'home cuff' });
 }
 
 export function sign(who: 'cio' | 'cmo') {
   if (state.signed[who]) return;
   set({ signed: { ...state.signed, [who]: true } });
+  void postFlow('signoff', { who });
 }
 
 export const isReleased = (s: RainState = state) => s.signed.cio && s.signed.cmo;
 
 export const editBrief = (key: string, text: string) => set({ briefEdits: { ...state.briefEdits, [key]: text } });
-export const sendNote = (id: string) => set({ sentNotes: { ...state.sentNotes, [id]: true } });
+export const sendNote = (id: string) => {
+  set({ sentNotes: { ...state.sentNotes, [id]: true } });
+  void postFlow('note', { noteId: id });
+};
+
+/** Reset demo: undo every backend write-back too (the data goes back to the generated morning). */
+export const resetDemoData = () => postFlow('reset');
 
 /** Run a step's `action` (see the persona JSON). */
 export function runAction(action: string | undefined) {

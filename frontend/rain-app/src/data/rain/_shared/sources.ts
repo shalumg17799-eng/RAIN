@@ -1,8 +1,8 @@
 /**
  * RAIN's data foundation for the Data Sources workbench: the public sources,
  * the labelled synthetic datasets, and the RAIN engines that read them. Served
- * by the backend (GET /api/v3/ui/data → section "sources"); the record counts of
- * the public sources loaded in rain_v3.public_data are live row counts
+ * by the backend (GET /api/v4/ui/data → section "sources"); the record counts of
+ * the public sources loaded in rain_v4.public_data are live row counts
  * (`live: true`, with the backing `table`).
  */
 import type { DataSource } from '@core/types';

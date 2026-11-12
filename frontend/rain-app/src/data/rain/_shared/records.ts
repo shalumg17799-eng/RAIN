@@ -1,7 +1,7 @@
 /**
  * Row-level records behind the workbenches: the 412-member blood pressure
  * campaign (which is also Teresa's worklist), Brandon's slots, bookings and
- * reminder log. Served by the backend (GET /api/v3/ui/data → section
+ * reminder log. Served by the backend (GET /api/v4/ui/data → section
  * "records"); these getters are the API seam and only type the rows.
  * Every person here is fictional.
  */
@@ -67,6 +67,8 @@ export interface Slot {
   day: string;
   time: string;
   driveMin: number;
+  /** 'open', or 'booked' for the one slot Linda Garcia already holds (the backend lists it for her story). */
+  status?: 'open' | 'booked';
 }
 
 /** GET /slots?member=… (backend: records.slots). */

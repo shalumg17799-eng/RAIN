@@ -1,22 +1,22 @@
 /**
  * RAIN master numbers: the Q3 value-based contract checkpoint at Sierra Basin
  * Community Health (a fictional FQHC network). Every value here comes from the
- * backend (GET /api/v3/ui/data → Postgres rain_v3.ui_v3.dataset, section
+ * backend (GET /api/v4/ui/data → Postgres rain_v4.ui_v4.dataset, section
  * "constants"); this module only types them and keeps the formatting helpers.
  * The county public fields (htnPct, diabetesPct, svi, hpsa) are computed live
- * by the backend from rain_v3.public_data (CDC PLACES, CDC/ATSDR SVI, HRSA).
+ * by the backend from rain_v4.public_data (CDC PLACES, CDC/ATSDR SVI, HRSA).
  */
 import { rainValue } from './backendData';
 
 const C = <T,>(key: string) => rainValue<T>('constants', key);
 
-export type PersonaKey = 'ceo' | 'cmo' | 'cio' | 'state' | 'chw' | 'access';
+export type PersonaKey = 'ceo' | 'cmo' | 'cio' | 'state' | 'chw' | 'access' | 'linda';
 export type MeasureId = 'CMS2' | 'CMS125' | 'CMS165' | 'CMS122' | 'CMS130';
 export type CountyId = 'elko' | 'humboldt' | 'lander' | 'pershing' | 'whitePine' | 'churchill';
 
 export const ILLUSTRATIVE = C<string>('ILLUSTRATIVE');
 
-/** Persona key → id, in the switcher's order (plan D1). */
+/** Persona key → id, in switcher order. */
 export const PERSONAS = C<Readonly<Record<PersonaKey, string>>>('PERSONAS');
 
 export const ORG = C<{ readonly network: string; readonly networkShort: string; readonly plan: string; readonly program: string; readonly product: string }>('ORG');
@@ -172,3 +172,36 @@ export const LOW_BB_PLACES = C<ReadonlyArray<string>>('LOW_BB_PLACES');
 
 /** Data freshness, shown on every Use Case A view. */
 export const FRESHNESS = C<string>('FRESHNESS');
+
+// ─── the patient persona: data scope, task briefing and own record ──
+
+/** A scoped persona's data scope: the patient sees her own record only. */
+export const SCOPES = C<Readonly<Record<string, { readonly label: string; readonly self?: boolean; readonly memberId?: string }>>>('SCOPES');
+
+/** Task briefings served by the backend (the patient's, built from her own record). */
+export interface TaskQueue {
+  readonly title: string;
+  readonly items: ReadonlyArray<{ readonly n: number; readonly label: string; readonly tone: 'warning' | 'critical' | 'neutral' }>;
+  readonly first: string;
+  readonly button: { readonly label: string; readonly href: string };
+}
+export const TASKS = C<Readonly<Record<string, TaskQueue>>>('TASKS');
+
+/**
+ * The patient persona's own record, computed by the backend from her rows only
+ * (rain-api/metrics_personas_v4.py). A patient persona reads nothing else.
+ */
+export interface PatientRecord {
+  readonly memberId: string; readonly name: string; readonly first: string; readonly age: number; readonly language: string;
+  readonly town: string; readonly site: string; readonly siteAddress: string; readonly county: string; readonly driveMin: number; readonly plan: string;
+  readonly next: { readonly appointmentId: string; readonly when: string; readonly day: string; readonly date: string; readonly time: string; readonly es: string; readonly mode: string; readonly modeA: string; readonly where: string; readonly provider: string; readonly visitType: string; readonly link: string; readonly daysAway: number; readonly status: string };
+  readonly upcoming: number; readonly unconfirmed: number; readonly status: string; readonly noShowBand: string; readonly noShowRiskPct: number;
+  readonly reminders: { readonly planned: number; readonly sent: number; readonly toCome: number; readonly replies: number; readonly noReply: number; readonly offsets: string; readonly channel: string; readonly language: string; readonly offersVideo: boolean; readonly videoOffer: string };
+  readonly contact: { readonly channels: string; readonly channelCount: number; readonly bestTime: string; readonly quietHours: string; readonly phoneNote: string; readonly frontDesk: string; readonly clinical: string; readonly messages: number; readonly openMessages: number };
+  readonly readings: { readonly count: number; readonly latest: string; readonly latestDate: string; readonly under: number; readonly latestUnder: boolean };
+  readonly checks: { readonly open: number; readonly closed: number; readonly names: string };
+  readonly history: { readonly visits: number; readonly completed: number; readonly missed: number; readonly missedWord: string; readonly windowMonths: number };
+  readonly coverage: { readonly status: string; readonly checked: string; readonly payer: string };
+  readonly videoSlotsOpen: number;
+}
+export const PATIENTS = C<Readonly<Record<'linda', PatientRecord>>>('PATIENTS');

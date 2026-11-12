@@ -10,7 +10,7 @@ export const CLIENTS = {
     name: 'RAIN',
     shortName: 'RAIN',
     nameLines: ['RAIN', 'University of Nevada, Reno'],
-    tagline: 'Value-Based Care Intelligence',
+    tagline: 'Value-Based Care and Population Health Intelligence',
     logo: '/logos/rain-logo.svg',
     favicon: '/logos/rain-logo.svg',
     primaryColor: '#003366',

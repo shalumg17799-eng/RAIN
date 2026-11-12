@@ -23,6 +23,26 @@ DATASETS = [  # (table, file, delimiter)
     ("providers",           PUB / "nppes/nv_tn_providers.csv", ","),
     ("rucc_county",         PUB / "rucc/nv_tn_rucc_2023.csv", ","),
     ("zcta_centroids",      PUB / "census/2023_Gaz_zcta_national.txt", "\t"),
+    # PRD v0.4 additions (.data/public/MANIFEST.md has the URL, release and download date of each)
+    ("acs_county",          PUB / "census_acs/nv_tn_acs5_2024_county.csv", ","),
+    ("acs_variables",       PUB / "census_acs/variables.csv", ","),
+    ("zcta_county",         PUB / "census_geo/nv_tn_zcta520_county20_rel.csv", ","),
+    ("county_boundaries",   PUB / "census_geo/nv_tn_counties_2024.geojson", "geojson"),
+    ("forhp_rural_tracts",  PUB / "forhp_rural/nv_tn_forhp_rural_areas.csv", ","),
+    ("forhp_county_status", PUB / "forhp_rural/nv_tn_forhp_county_rural_status.csv", ","),
+    ("cms_hospitals",       PUB / "cms_hospitals/nv_tn_hospital_general_information.csv", ","),
+    ("cms_unplanned_visits", PUB / "cms_hospitals/nv_tn_unplanned_hospital_visits_hospital.csv", ","),
+    ("cms_pos_facilities",  PUB / "cms_pos/nv_tn_pos_cms_approved_facilities_hrsa.csv", ","),
+    ("uds_health_center_cqm", PUB / "hrsa_uds/nv_tn_uds_2025_health_center_cqm.csv", ","),
+    ("uds_state_national_summary", PUB / "hrsa_uds/uds_2021_2025_state_national_summary.csv", ","),
+    ("uds_state_national_cqm", PUB / "hrsa_uds/uds_2021_2025_state_national_cqm_focus.csv", ","),
+    ("ecqm_measures",       PUB / "cms_ecqm/ecqm_measures.csv", ","),
+    ("osrm_drive_times",    PUB / "osrm/nv_tn_zcta_site_drive_times.csv", ","),
+    ("osrm_nearest_site",   PUB / "osrm/nv_tn_zcta_nearest_site.csv", ","),
+    # Blocked for now (MANIFEST.md): FCC broadband, CMS Geographic Variation, County Health Rankings.
+    ("fcc_broadband_county", PUB / "fcc_broadband/nv_tn_fcc_bdc_county.csv", ","),
+    ("cms_geo_variation",   PUB / "cms_geo_variation/nv_tn_geo_variation.csv", ","),
+    ("county_health_rankings", PUB / "county_health_rankings/nv_tn_chr_2025.csv", ","),
 ]
 
 
@@ -52,6 +72,12 @@ def sniff_type(values):
 
 
 def read_rows(path, delim):
+    if delim == "geojson":  # one row per feature: its properties plus the geometry as JSON text
+        import json
+        fc = json.loads(path.read_text(encoding="utf-8"))
+        keys = list(fc["features"][0]["properties"])
+        return keys + ["geometry_json"], [[str(f["properties"].get(k, "")) for k in keys] + [json.dumps(f["geometry"])]
+                                          for f in fc["features"]]
     with open(path, newline="", encoding="utf-8-sig", errors="replace") as f:
         rd = csv.reader(f, delimiter=delim)
         header = next(rd)
@@ -67,6 +93,9 @@ cur.execute("CREATE SCHEMA IF NOT EXISTS public_data")
 
 done = {}
 for table, path, delim in DATASETS:
+    if not path.is_file():  # a blocked or not-yet-downloaded source (MANIFEST.md says which)
+        print(f"skipped {path.relative_to(PUB)}: not downloaded")
+        continue
     header, rows = read_rows(path, delim)
     seen = set()
     cols = [col_name(h, seen) for h in header]

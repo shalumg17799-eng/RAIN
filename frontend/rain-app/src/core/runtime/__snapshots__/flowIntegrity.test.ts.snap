@@ -10,4 +10,6 @@ exports[`scripted flows are wired end to end > rain/rain_cio 1`] = `[]`;
 
 exports[`scripted flows are wired end to end > rain/rain_cmo 1`] = `[]`;
 
+exports[`scripted flows are wired end to end > rain/rain_linda 1`] = `[]`;
+
 exports[`scripted flows are wired end to end > rain/rain_state 1`] = `[]`;

@@ -1,19 +1,46 @@
 /**
- * Use Case B visuals (Teresa and Brandon): the task briefing that lands them
- * on today's work and the button into their main workbench.
+ * Use Case B visuals: the task briefing that lands the care team on today's
+ * work and the button into their main workbench. Teresa and Brandon have
+ * bespoke queues; the patient Linda Garcia reads hers from the backend's TASKS
+ * constant.
  */
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, MessageSquare, PhoneCall, Sparkles } from 'lucide-react';
-import { CARE, LINDA, TERESA_SITES, siteById } from '@/data/rain/_shared/constants';
+import { CARE, LINDA, TASKS, TERESA_SITES, siteById } from '@/data/rain/_shared/constants';
 import { getTeresaWorklist } from '@/data/rain/_shared/records';
 import { Button, RainCard } from '../shell/rainKit';
 import { useRainState } from '../shell/store';
 import { CampaignProgress } from './quality';
 
 /** Today's work for the care team (no insights, no capability tags). */
-export function TaskBriefing({ role }: { role: 'chw' | 'access' }) {
+export function TaskBriefing({ role }: { role: 'chw' | 'access' | 'linda' }) {
   const navigate = useNavigate();
   const { approved } = useRainState();
+  const queue = role === 'chw' || role === 'access' ? null : TASKS[role];
+  if (queue) {
+    const tone = { warning: 'text-warning-700', critical: 'text-critical-700', neutral: 'text-text' } as const;
+    return (
+      <RainCard eyebrow="Today's queue" title={queue.title}>
+        <ul className="grid gap-2 @lg:grid-cols-3">
+          {queue.items.map((t) => (
+            <li key={t.label} className="rounded-xl bg-surface-2/70 px-3 py-2">
+              <p className={`text-[20px] font-bold tabular-nums ${tone[t.tone]}`}>{t.n}</p>
+              <p className="text-[12px] text-text-muted">{t.label}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-3 flex items-start gap-2 text-[13px]">
+          <PhoneCall className="mt-0.5 h-4 w-4 flex-shrink-0 text-brand" aria-hidden="true" />
+          <span>{queue.first}</span>
+        </p>
+        <div className="mt-3">
+          <Button variant="primary" onClick={() => navigate(queue.button.href)}>
+            {queue.button.label} <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+          </Button>
+        </div>
+      </RainCard>
+    );
+  }
   if (role === 'chw') {
     const list = getTeresaWorklist();
     return (

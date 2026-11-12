@@ -1,4 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
+import { CHART_START } from '@/components/charts/chartStart'
 
 /** Props: { riskExtras } — the fixture this chart/table draws, passed by its container. */
 export default function ComplaintTrajectory({ riskExtras }) {
@@ -10,7 +11,7 @@ export default function ComplaintTrajectory({ riskExtras }) {
     <div className="bg-surface rounded-xl border border-border-subtle p-5">
       <h3 className="text-sm font-semibold text-text mb-1">90-Day Complaint Trajectory</h3>
       <p className="text-xs text-text-subtle mb-4">Member complaints trending upward</p>
-      <ResponsiveContainer width="100%" height={200}>
+      <ResponsiveContainer initialDimension={CHART_START} width="100%" height={200}>
         <AreaChart data={data} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
           <defs>
             <linearGradient id="complaintGrad" x1="0" y1="0" x2="0" y2="1">

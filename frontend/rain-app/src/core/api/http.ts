@@ -7,7 +7,7 @@
  */
 import { aiTurnSchema } from '../contract/aiTurn';
 import { ApiError } from './recorded';
-import { logBackendCall } from './proof';
+import { logBackendCall, logBackendFailure } from './proof';
 import type { ActionResponse, BriefingResponse, ContextResponse, UltraApi } from './types';
 
 export function createHttpApi(base: string, fetchImpl: typeof fetch = globalThis.fetch.bind(globalThis)): UltraApi {
@@ -15,13 +15,19 @@ export function createHttpApi(base: string, fetchImpl: typeof fetch = globalThis
   async function call<T>(method: 'GET' | 'POST', path: string, body?: unknown, query?: Record<string, string>): Promise<T> {
     const qs = query ? `?${new URLSearchParams(query).toString()}` : '';
     const t0 = performance.now();
-    const res = await fetchImpl(`${root}${path}${qs}`, {
-      method,
-      headers: body ? { 'Content-Type': 'application/json' } : undefined,
-      body: body ? JSON.stringify(body) : undefined,
-    });
-    // Proof in the console: every answer names the backend that served it.
-    if (res.headers) logBackendCall(method, `${root}${path}${qs}`, res, Math.round(performance.now() - t0));
+    let res: Response;
+    try {
+      res = await fetchImpl(`${root}${path}${qs}`, {
+        method,
+        headers: body ? { 'Content-Type': 'application/json' } : undefined,
+        body: body ? JSON.stringify(body) : undefined,
+      });
+    } catch (err) {
+      logBackendFailure(method, `${root}${path}${qs}`, err, Math.round(performance.now() - t0), body);
+      throw err;
+    }
+    // The console shows every backend call: method, path, status, time, and the backend's proof headers.
+    if (res.headers) logBackendCall(method, `${root}${path}${qs}`, res, Math.round(performance.now() - t0), body);
     if (!res.ok) throw new ApiError(res.status, `${method} ${path} → ${res.status}`);
     return (await res.json()) as T;
   }

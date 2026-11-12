@@ -1,7 +1,7 @@
 /**
  * The six capability tags for RAIN's Use Case A conversations: the callout each
  * tag opens, and the copy for each capability's architecture deep-dive. Served
- * by the backend (GET /api/v3/ui/data → section "capabilities").
+ * by the backend (GET /api/v4/ui/data → section "capabilities").
  */
 import { rainValue } from './backendData';
 

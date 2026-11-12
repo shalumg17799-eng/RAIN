@@ -3,10 +3,11 @@
  * Nevada, Reno), the value-based care prototype v2. Shown through a fictional
  * FQHC network (Sierra Basin Community Health) at its Q3 contract checkpoint.
  *
- * Six operator personas in the spec's dropdown order, Gregory Haskins first
- * and default. Every one lands on Ask Cockpit.AI; the left navigation lists
- * only that persona's workbenches. The patient (Linda Garcia) is the /patient
- * view, not a switcher persona.
+ * Seven personas in switcher order, Gregory Haskins first and default: the six
+ * operators (Haskins, Castellanos, Malhotra, Pike, Lopez, Kee), then the patient
+ * Linda Garcia. Every one lands on Ask Cockpit.AI; the left navigation lists
+ * only that persona's workbenches. The patient is a switcher persona: she sees
+ * only her own record, and her one workbench is her own /patient thread.
  *
  * Branding keeps v1's RAIN mark and the UNR wordmark in text (no UNR logo file
  * was supplied), on the spec's navy #003366 (12.6:1 on white). The theme
@@ -23,6 +24,7 @@ import { rainCioPersona } from './personas/cio';
 import { rainStatePersona } from './personas/state';
 import { rainChwPersona } from './personas/chw';
 import { rainAccessPersona } from './personas/access';
+import { rainLindaPersona } from './personas/linda';
 
 export const rainClient: ClientManifest = {
   id: 'rain',
@@ -31,7 +33,7 @@ export const rainClient: ClientManifest = {
     name: 'RAIN',
     shortName: 'RAIN',
     nameLines: ['RAIN', 'University of Nevada, Reno'],
-    tagline: 'Value-Based Care Intelligence',
+    tagline: 'Value-Based Care and Population Health Intelligence',
     logo: '/logos/rain-logo.svg',
     favicon: '/logos/rain-logo.svg',
     primaryColor: '#003366',
@@ -39,7 +41,15 @@ export const rainClient: ClientManifest = {
       ask: 'Ask AI',
     },
   },
-  personas: [rainCeoPersona, rainCmoPersona, rainCioPersona, rainStatePersona, rainChwPersona, rainAccessPersona],
+  personas: [
+    rainCeoPersona,
+    rainCmoPersona,
+    rainCioPersona,
+    rainStatePersona,
+    rainChwPersona,
+    rainAccessPersona,
+    rainLindaPersona,
+  ],
   defaultPersonaId: 'rain_ceo',
   theme: {
     light: {

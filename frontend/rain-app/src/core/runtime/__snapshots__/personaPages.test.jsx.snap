@@ -95,6 +95,25 @@ exports[`shared pages render identically per persona > rain/rain_cmo 1`] = `
 }
 `;
 
+exports[`shared pages render identically per persona > rain/rain_linda 1`] = `
+{
+  "actionDiagram": "d9454770f6",
+  "agentInventory": "fc48bf85ea",
+  "agentObservability": "d20ba27473",
+  "anomalyDiagram": "96ba7f63f4",
+  "dataSources": "da39a3ee5e",
+  "governance": "ad1a510b97",
+  "journey": "8c18a90618",
+  "myReports": "aa776c8e0f",
+  "predictiveDiagram": "6e39c8b416",
+  "proactiveDiagram": "d2f83998af",
+  "risk": "85f325aa8b",
+  "segmentationDiagram": "1cb99b2bd0",
+  "stats": "23c58c2606",
+  "talkToDataDiagram": "6f99a3be21",
+}
+`;
+
 exports[`shared pages render identically per persona > rain/rain_state 1`] = `
 {
   "actionDiagram": "fa65395520",

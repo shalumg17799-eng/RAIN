@@ -1,5 +1,5 @@
 /**
- * The six persona contracts, typed. Served by the backend (GET /api/v3/ui/data →
+ * The seven persona contracts, typed. Served by the backend (GET /api/v4/ui/data →
  * section "contracts"); this module only indexes them (every launch by step id,
  * every hand-off by id) so a card can name its step or hand-off by id alone.
  */
@@ -16,6 +16,7 @@ export const CONTRACTS: Record<PersonaKey, RainContract> = {
   state: contract('state'),
   chw: contract('chw'),
   access: contract('access'),
+  linda: contract('linda'),
 };
 
 const all = Object.values(CONTRACTS);

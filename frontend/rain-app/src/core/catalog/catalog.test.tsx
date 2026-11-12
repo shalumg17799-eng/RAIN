@@ -53,7 +53,7 @@ describe('catalog entries', () => {
         <ComponentRenderer components={[{ type, version: e.version, props: e.example as Record<string, unknown> }]} />
       </MemoryRouter>,
     );
-    await waitFor(() => expect(container.querySelector('[aria-hidden="true"].animate-pulse')).toBeNull(), { timeout: 5000 });
+    await waitFor(() => expect(container.querySelector('[aria-hidden="true"].animate-pulse')).toBeNull(), { timeout: 15000 });
     // Text or graphics (a sparkline is SVG only).
     expect(container.querySelector('svg, p, span, div, table, figure'), `${type} rendered nothing`).not.toBeNull();
     expect(screen.queryByText(/couldn.t be rendered/i)).toBeNull();

@@ -1,7 +1,7 @@
 /**
  * Persona: Chief Information Officer and Data and AI Governance Lead (Raj Malhotra). Use Case A (data trust): the impactability model fails its subgroup check on frontier ZIPs; the access-adjusted fix, the governance packet and sign-off.
  *
- * The whole persona comes from the backend (GET /api/v3/ui/data): its contract
+ * The whole persona comes from the backend (GET /api/v4/ui/data): its contract
  * (section "contracts": signals, kpis, steps, queries, viz, handoffs, workbenches)
  * and its identity, copy and notifications (section "personas"), built by the
  * shared RAIN builder.

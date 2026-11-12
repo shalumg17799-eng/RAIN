@@ -2,7 +2,7 @@
  * Map geometry for RAIN's county maps: the state, the six network counties,
  * the seven sites and the frontier places (simplified lon/lat polygons, drawn
  * as inline SVG; illustrative shapes near the real ones, not legal boundaries).
- * The shapes come from the backend (GET /api/v3/ui/data → section "geo");
+ * The shapes come from the backend (GET /api/v4/ui/data → section "geo");
  * this module keeps only the projection math.
  */
 import type { CountyId } from './constants';

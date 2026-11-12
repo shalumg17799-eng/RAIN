@@ -57,6 +57,12 @@ const NOTE = 'Synthetic data for a demo; every person and organization is fictio
  * node carries its version.
  */
 function toSpec(v: RainVizSpec): ContractSpec {
+  // PRD v0.4: a `query_table` is answered live by the backend (chat_v4 runs the pack query against
+  // rain_v4 and returns a data_table). Without the backend, say where the rows come from.
+  if (v.type === 'query_table') {
+    const { query, caption } = v.props as { query?: string; caption?: string };
+    return spec('callout', { title: caption ?? `Query ${query}`, body: `Answered live by the backend: persona query ${query} runs against rain_v4 when this is asked.`, status: 'info' });
+  }
   const { dataset, ...rest } = v.props as Record<string, unknown> & { dataset?: string };
   const props = { ...(dataset ? DATASETS[dataset]() : {}), ...rest } as Record<string, unknown>;
   if (Array.isArray(props.children)) props.children = (props.children as Array<RainVizSpec | ContractSpec>).map((c) => ('version' in c ? c : toSpec(c as RainVizSpec)));

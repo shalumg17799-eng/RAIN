@@ -1,0 +1,20 @@
+// Click "Break down the gap" as the CEO and report the answer text shown (after a direct Postgres edit).
+import { chromium } from "playwright-core";
+const BASE = "http://localhost:8183";
+const OUT = new URL("./", import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1");
+const tag = process.argv[2] || "before";
+const browser = await chromium.launch({ executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: true });
+const page = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+let line = "";
+page.on("console", async (m) => { const a = await m.args()[0]?.jsonValue().catch(() => null); if (typeof a === "string" && a.includes("/ui/ask")) line = a.replace(/%c/g, ""); });
+await page.goto(`${BASE}/login/rain/?access=rain@9705`, { waitUntil: "networkidle" });
+await page.goto(`${BASE}/ask?persona=rain_ceo`, { waitUntil: "networkidle" });
+await page.waitForTimeout(800);
+await page.getByRole("button", { name: "Break down the gap", exact: true }).last().click();
+await page.waitForTimeout(3000);
+const body = await page.innerText("main");
+const answer = body.split("Break down the gap").slice(-1)[0].trim().split("\n").filter(Boolean)[1] ?? "";
+await page.screenshot({ path: `${OUT}data-driven-${tag}.png` });
+console.log(`[${tag}] answer shown: ${answer}`);
+console.log(`[${tag}] console: ${line}`);
+await browser.close();

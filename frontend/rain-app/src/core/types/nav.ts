@@ -93,4 +93,6 @@ export type NavKey =
   | 'worklist'
   | 'scheduling'
   | 'reminders'
+  // PRD v0.4: the patient persona's own text thread (the /patient view; Linda Garcia).
+  | 'patientView'
   | 'dataSources';

@@ -349,6 +349,42 @@ exports[`persona chat cards render identically > rain/rain_cmo 1`] = `
 }
 `;
 
+exports[`persona chat cards render identically > rain/rain_linda 1`] = `
+{
+  "lg_brief": [
+    "div#41c0a5e8ad",
+  ],
+  "lg_checks": [
+    "Stack#2c8f6600d5",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "lg_contact": [
+    "Stack#bd7b19b491",
+    "Stack#21bedf280c",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "lg_missed": [
+    "Stack#8ba9d9c36e",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "lg_open": [
+    "div#8b5804c9e3",
+  ],
+  "lg_reading": [
+    "Stack#f3cb480da5",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "lg_reminders": [
+    "Stack#97e77c24ac",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+  "lg_visit": [
+    "Stack#59f94bb98b",
+    "IllustrativeDataChip#9dfac96c4f",
+  ],
+}
+`;
+
 exports[`persona chat cards render identically > rain/rain_state 1`] = `
 {
   "st_12m": [

@@ -3,6 +3,7 @@
  * from the chart tokens, so a compose chart wears each tenant's palette.
  */
 import { Bar, BarChart, CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { CHART_START } from '@/components/charts/chartStart';
 
 export interface ChartSeries {
   name: string;
@@ -28,7 +29,7 @@ export function Chart({ kind, series, unit = '', title, height = 220 }: ChartPro
     <figure className="rounded-xl border border-border bg-surface p-4">
       {title && <figcaption className="mb-2 text-[13px] font-semibold text-text">{title}</figcaption>}
       <div>
-        <ResponsiveContainer width="100%" height={height}>
+        <ResponsiveContainer initialDimension={CHART_START} width="100%" height={height}>
           {kind === 'bar' ? (
             <BarChart data={data}>
               <CartesianGrid stroke="var(--color-chart-grid)" vertical={false} />

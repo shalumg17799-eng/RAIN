@@ -10,6 +10,7 @@ import { FEATURES, SUBGROUP, getAccessPoints, getSwaps } from '@/data/rain/_shar
 import { Pill, RainCard, ResponsiveTable } from '../shell/rainKit';
 import { categoryAxis, useWidth } from '../shell/useWidth';
 import { useRainState } from '../shell/store';
+import { CHART_START } from '@/components/charts/chartStart';
 
 const AXIS = { stroke: 'var(--color-chart-axis)', fontSize: 11, tickLine: false } as const;
 
@@ -57,7 +58,7 @@ export function SubgroupBars({ points, after }: { points?: string[]; after?: boo
   return (
     <RainCard eyebrow="Subgroup check" title="Average risk rank by condition group (percentile)" points={points}>
       <div ref={ref} className="h-[250px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer initialDimension={CHART_START} width="100%" height="100%">
           <BarChart data={data} margin={{ top: 6, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid stroke="var(--color-chart-grid)" vertical={false} />
             <XAxis dataKey="label" {...AXIS} {...categoryAxis(width, (l) => l.replace('COPD or asthma', 'COPD/asthma'))} />
@@ -81,7 +82,7 @@ export function DriveScatter({ points }: { points?: string[] }) {
   return (
     <RainCard eyebrow="Access" title="Drive time vs. primary care visits, last 12 months" points={points}>
       <div className="h-[220px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer initialDimension={CHART_START} width="100%" height="100%">
           <ScatterChart margin={{ top: 6, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid stroke="var(--color-chart-grid)" />
             <XAxis type="number" dataKey="driveMin" name="Drive" unit=" min" {...AXIS} />

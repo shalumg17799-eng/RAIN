@@ -1,0 +1,7 @@
+{
+  "name": "rain-v4-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Browser checks for the RAIN v0.4 stack (playwright-core driving the installed Chrome)",
+  "dependencies": { "playwright-core": "1.49.1" }
+}

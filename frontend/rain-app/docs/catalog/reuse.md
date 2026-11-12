@@ -3,13 +3,13 @@
 
 Every answer component of every scripted turn, counted by where it comes from: the catalog (tiers 2–3, steps 1–3 of the gap ladder: pick, extend, compose) or a tenant's bespoke type (tier 4, step 4: create). The number to watch is the catalog share; each bespoke type is a candidate to promote or retire.
 
-**Catalog share of answer components: 81%** (253 catalog, 60 bespoke) across 6 personas. Catalog types: 25 (tier 2: 14, tier 3: 11). Bespoke types: 22.
+**Catalog share of answer components: 82%** (280 catalog, 62 bespoke) across 7 personas. Catalog types: 25 (tier 2: 14, tier 3: 11). Bespoke types: 22.
 
 ## By client
 
 | Client | Personas | Catalog | Bespoke | Catalog share |
 |---|---:|---:|---:|---:|
-| rain | 6 | 253 | 60 | 81% |
+| rain | 7 | 280 | 62 | 82% |
 
 ## By persona
 
@@ -21,6 +21,7 @@ Every answer component of every scripted turn, counted by where it comes from: t
 | rain | rain_state | 19 | 18 | 49 | 11 | 82% |
 | rain | rain_chw | 12 | 11 | 33 | 4 | 89% |
 | rain | rain_access | 9 | 8 | 19 | 3 | 86% |
+| rain | rain_linda | 10 | 8 | 27 | 2 | 93% |
 
 ## Catalog types in use
 

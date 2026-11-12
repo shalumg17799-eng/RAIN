@@ -1,7 +1,7 @@
 /**
  * Persona: Chief Executive Officer (Gregory Haskins, MBA), default persona. Use Case A: the Q3 contract checkpoint seen as money: the $26 gap, what is recoverable by December 31, and the board brief with two hand-offs.
  *
- * The whole persona comes from the backend (GET /api/v3/ui/data): its contract
+ * The whole persona comes from the backend (GET /api/v4/ui/data): its contract
  * (section "contracts": signals, kpis, steps, queries, viz, handoffs, workbenches)
  * and its identity, copy and notifications (section "personas"), built by the
  * shared RAIN builder.

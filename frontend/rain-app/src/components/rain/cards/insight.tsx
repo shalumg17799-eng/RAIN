@@ -9,6 +9,7 @@ import { Bar as RBar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Re
 import { BP, CODING, CONTRACT, COHORT, GAP, GAP_TOTAL, LOW_VALUE, LV_MEASURES, MEASURES, MODEL, PMPM_TREND, SEGMENTS, SITES, SITE_SOCIAL, isMet, num, usd, usdK, usdM } from '@/data/rain/_shared/constants';
 import { Meter, RainCard, Pill } from '../shell/rainKit';
 import { categoryAxis, useWidth } from '../shell/useWidth';
+import { CHART_START } from '@/components/charts/chartStart';
 
 const AXIS = { stroke: 'var(--color-chart-axis)', fontSize: 11, tickLine: false } as const;
 const chart = (i: number) => `var(--color-chart-${(i % 8) + 1})`;
@@ -18,7 +19,7 @@ export function PmpmTrend({ title = 'PMPM, actual vs expected, by month since Ja
   return (
     <RainCard eyebrow="Cost against expected" title={title} points={points}>
       <div className={compact ? 'h-[150px]' : 'h-[200px]'}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer initialDimension={CHART_START} width="100%" height="100%">
           <LineChart data={data} margin={{ top: 6, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid stroke="var(--color-chart-grid)" vertical={false} />
             <XAxis dataKey="label" {...AXIS} />
@@ -210,7 +211,7 @@ export function SiteCompare({ metric = 'pmpm', points, onSelect, selected }: { m
   return (
     <RainCard eyebrow={m.eyebrow} title={m.title} points={points}>
       <div ref={ref} className="h-[230px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer initialDimension={CHART_START} width="100%" height="100%">
           <BarChart data={data} margin={{ top: 6, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid stroke="var(--color-chart-grid)" vertical={false} />
             <XAxis dataKey="label" {...AXIS} {...categoryAxis(width, (l) => l.replace('Battle Mountain', 'Battle Mtn'))} />

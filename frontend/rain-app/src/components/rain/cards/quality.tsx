@@ -9,6 +9,7 @@ import { getCampaignMembers } from '@/data/rain/_shared/records';
 import { Meter, Pill, RainCard, ResponsiveTable } from '../shell/rainKit';
 import { memberColumns } from './columns';
 import { useRainState } from '../shell/store';
+import { CHART_START } from '@/components/charts/chartStart';
 
 const AXIS = { stroke: 'var(--color-chart-axis)', fontSize: 11, tickLine: false } as const;
 
@@ -18,7 +19,7 @@ export function AnnotatedTrend({ points }: { points?: string[] }) {
   return (
     <RainCard eyebrow="Winnemucca" title="Low back pain imaging rate by month" points={points}>
       <div className="h-[190px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer initialDimension={CHART_START} width="100%" height="100%">
           <LineChart data={data} margin={{ top: 14, right: 10, left: 0, bottom: 0 }}>
             <CartesianGrid stroke="var(--color-chart-grid)" vertical={false} />
             <XAxis dataKey="label" {...AXIS} />
@@ -44,7 +45,7 @@ export function MeasureProjection({ points }: { points?: string[] }) {
   return (
     <RainCard eyebrow="Projection" title="Each measure by December 31" points={points}>
       <div className="h-[220px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer initialDimension={CHART_START} width="100%" height="100%">
           <BarChart data={data} margin={{ top: 6, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid stroke="var(--color-chart-grid)" vertical={false} />
             <XAxis dataKey="label" {...AXIS} />

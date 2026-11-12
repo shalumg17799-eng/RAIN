@@ -33,10 +33,15 @@ export default function Scheduling({ access, filter }: { access: Access; filter:
   const booked = store.bookings[member.id];
   const isLinda = member.id === LINDA.memberId;
 
-  // Linda's slots as listed; anyone else's in-person drive is their own.
-  const slots: Slot[] = getSlots().map((s) => (s.mode === 'In person' ? { ...s, driveMin: member.driveMin } : s.mode === 'Mobile clinic' && !isLinda ? { ...s, where: `Mobile clinic, ${member.site}` } : s));
+  // Linda's slots as listed; anyone else's in-person drive is their own. A slot that is not open is the one Linda
+  // already holds: only she is offered it (anyone else booking it gets a 409 from the backend and nothing is saved).
+  const slots: Slot[] = getSlots()
+    .filter((s) => isLinda || (s.status ?? 'open') === 'open')
+    .map((s) => (s.mode === 'In person' ? { ...s, driveMin: member.driveMin } : s.mode === 'Mobile clinic' && !isLinda ? { ...s, where: `Mobile clinic, ${member.site}` } : s));
   const sorted = slots.filter((s) => mode === 'all' || s.mode === mode).sort((a, b) => a.driveMin - b.driveMin);
-  const slot = slots.find((s) => s.id === (slotId ?? (member.mode === 'Telehealth' ? 'S1' : null)));
+  // a telehealth patient starts on the first video slot they can take (S1 for Linda)
+  const firstVideo = slots.find((s) => s.mode === 'Telehealth (video)')?.id ?? null;
+  const slot = slots.find((s) => s.id === (slotId ?? (member.mode === 'Telehealth' ? firstVideo : null)));
 
   usePaneContext({
     label: `Booking: ${member.name}, ${member.mode === 'Telehealth' ? 'telehealth recheck' : 'in-person recheck'}`,

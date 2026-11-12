@@ -1,7 +1,7 @@
 /**
  * Persona: Patient Access Coordinator, the scheduler (Brandon Kee). Use Case B: a task briefing, then Scheduling (slots by drive time and mode, eligibility, booking, reminder plan) and Reminders.
  *
- * The whole persona comes from the backend (GET /api/v3/ui/data): its contract
+ * The whole persona comes from the backend (GET /api/v4/ui/data): its contract
  * (section "contracts": signals, kpis, steps, queries, viz, handoffs, workbenches)
  * and its identity, copy and notifications (section "personas"), built by the
  * shared RAIN builder.
