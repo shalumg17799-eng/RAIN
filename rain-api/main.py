@@ -113,6 +113,8 @@ _OPENAPI_TAGS = [
      "description": "Ultra API v1 for the PRD v0.4 frontend at `/api/v4/ui/...`: context, briefing, ask for the 7 personas (6 operators and the patient Linda Garcia), every answer built per request from Postgres `rain_v4` (persona queries and `query_table` visuals run live)."},
     {"name": "ui-data-v4",
      "description": "Every value the v0.4 UI shows (`/api/v4/ui/data`), computed per request by SQL over `rain_v4.synthetic` (row-level synthetic data) and `rain_v4.public_data` (rain-api/metrics_v4.py); persona contracts are templates in `rain_v4.ui_v4.dataset` rendered against it. No number is stored. Proof headers: X-RAIN-Request-Id, X-RAIN-Data-Sha256, X-RAIN-Data-Source, Server-Timing."},
+    {"name": "ultra-v4-ui2",
+     "description": "The new Ultra UI (frontend/ultra-rain-v2) at `/api/v4/ui2/...`: `data`, `context`, `briefing`, `ask`, `actions`, `catalog`. The v0.4 data computed exactly as `/api/v4/ui` serves it, plus the new UI's extras (stack datasets, Linda's bilingual patient contract `rain_patient`, four patient-side synthetic sources, PC_TREND) from `ui_v4.dataset` rows with client_id `rain_ui2`."},
     {"name": "flow-v4",
      "description": "The v0.4 write-back flow (`/api/v4/flow/...`): book, contact, reply, reading, handoff, signoff, note; each change is a row in `rain_v4.synthetic` (undo log in `synthetic.flow_event`), the next `/api/v4/ui/data` is recomputed from it; `reset` undoes all."},
     {"name": "persona-queries-v4",
@@ -168,6 +170,10 @@ from persona_queries_v4 import router as persona_queries_v4_router  # noqa: E402
 app.include_router(persona_queries_v4_router, prefix="/api/v4/queries")
 from flow_v4 import router as flow_v4_router  # noqa: E402
 app.include_router(flow_v4_router, prefix="/api/v4/flow")
+# The new Ultra UI (frontend/ultra-rain-v2): the same v0.4 data and chat with the new UI's extras
+# (rain_ui2 rows in ui_v4.dataset), at /api/v4/ui2. Additive: /api/v4/ui is unchanged.
+from ui2_v4 import router as ui2_v4_router  # noqa: E402
+app.include_router(ui2_v4_router, prefix="/api/v4/ui2")
 # expose_headers lets the browser's fetch() read the proof headers, which the
 # frontend logs to the console as proof a response came from this server.
 _HOSTNAME = socket.gethostname()

@@ -1,0 +1,92 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`shared pages render identically per persona > rain/rain_access 1`] = `
+{
+  "actionDiagram": "8748283504",
+  "anomalyDiagram": "bcf79192ed",
+  "dataSources": "da39a3ee5e",
+  "predictiveDiagram": "5a8e0bc63b",
+  "proactiveDiagram": "5b26a53f14",
+  "segmentationDiagram": "84dde0d376",
+  "stats": "7521368d8c",
+  "talkToDataDiagram": "913de68857",
+}
+`;
+
+exports[`shared pages render identically per persona > rain/rain_ceo 1`] = `
+{
+  "actionDiagram": "689dff91b6",
+  "anomalyDiagram": "b5ad345101",
+  "dataSources": "!error window.matchMedia is not a function",
+  "predictiveDiagram": "ff52729749",
+  "proactiveDiagram": "1012417d77",
+  "segmentationDiagram": "b3a6157702",
+  "stats": "489568ec2b",
+  "talkToDataDiagram": "b7c6bd129a",
+}
+`;
+
+exports[`shared pages render identically per persona > rain/rain_chw 1`] = `
+{
+  "actionDiagram": "8748283504",
+  "anomalyDiagram": "bcf79192ed",
+  "dataSources": "da39a3ee5e",
+  "predictiveDiagram": "5a8e0bc63b",
+  "proactiveDiagram": "5b26a53f14",
+  "segmentationDiagram": "84dde0d376",
+  "stats": "0191859f9e",
+  "talkToDataDiagram": "913de68857",
+}
+`;
+
+exports[`shared pages render identically per persona > rain/rain_cio 1`] = `
+{
+  "actionDiagram": "689dff91b6",
+  "anomalyDiagram": "b5ad345101",
+  "dataSources": "!error window.matchMedia is not a function",
+  "predictiveDiagram": "ff52729749",
+  "proactiveDiagram": "1012417d77",
+  "segmentationDiagram": "b3a6157702",
+  "stats": "11cc11bec5",
+  "talkToDataDiagram": "b7c6bd129a",
+}
+`;
+
+exports[`shared pages render identically per persona > rain/rain_cmo 1`] = `
+{
+  "actionDiagram": "689dff91b6",
+  "anomalyDiagram": "b5ad345101",
+  "dataSources": "da39a3ee5e",
+  "predictiveDiagram": "ff52729749",
+  "proactiveDiagram": "1012417d77",
+  "segmentationDiagram": "b3a6157702",
+  "stats": "56da1f6666",
+  "talkToDataDiagram": "b7c6bd129a",
+}
+`;
+
+exports[`shared pages render identically per persona > rain/rain_patient 1`] = `
+{
+  "actionDiagram": "8748283504",
+  "anomalyDiagram": "bcf79192ed",
+  "dataSources": "c40ddd78cf",
+  "predictiveDiagram": "5a8e0bc63b",
+  "proactiveDiagram": "5b26a53f14",
+  "segmentationDiagram": "84dde0d376",
+  "stats": "da39a3ee5e",
+  "talkToDataDiagram": "913de68857",
+}
+`;
+
+exports[`shared pages render identically per persona > rain/rain_state 1`] = `
+{
+  "actionDiagram": "689dff91b6",
+  "anomalyDiagram": "b5ad345101",
+  "dataSources": "da39a3ee5e",
+  "predictiveDiagram": "ff52729749",
+  "proactiveDiagram": "1012417d77",
+  "segmentationDiagram": "b3a6157702",
+  "stats": "fef44fafa7",
+  "talkToDataDiagram": "b7c6bd129a",
+}
+`;

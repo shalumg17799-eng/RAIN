@@ -1,0 +1,815 @@
+{
+  "clientId": "rain_ui2",
+  "about": "The new Ultra UI's extras (frontend/ultra-rain-v2), served by rain-api/ui2_v4.py at /api/v4/ui2 on top of the computed v0.4 data. Configuration and templates only: every number in a template is a placeholder rendered against the computed data. Loaded by deploy/scripts/load_ui2_data_v4.py under client_id rain_ui2, which /api/v4/ui never reads.",
+  "sections": {
+    "config": {
+      "personas": {
+        "drop": [
+          "linda"
+        ],
+        "patientId": "rain_patient"
+      },
+      "linda": {
+        "clinic": "Winnemucca",
+        "languages": "English or Spanish, her choice",
+        "goal": {
+          "sys": 140,
+          "dia": 90
+        },
+        "earlier": {
+          "sys": 152,
+          "dia": 94
+        },
+        "home": {
+          "sys": 142,
+          "dia": 88
+        },
+        "visitReading": {
+          "sys": 136,
+          "dia": 84
+        },
+        "urgent": {
+          "sys": 180,
+          "dia": 110
+        },
+        "refill": {
+          "drug": "metformin",
+          "due": "Sunday, Nov 8",
+          "arrives": "Saturday"
+        },
+        "mobileClinic": {
+          "day": "Tuesday",
+          "date": "Nov 10",
+          "time": "10:00 AM",
+          "driveMin": 10
+        },
+        "site": "mycare.sierrabasin.example"
+      },
+      "synthetic_sources": [
+        {
+          "id": "rain-mobileClinic",
+          "name": "Synthetic mobile clinic calendar",
+          "provides": "Mobile clinic days and stops by town",
+          "usedFor": "Patient visit options",
+          "description": "Mobile clinic days and stops by town",
+          "freshness": "This month",
+          "recordCount": 64,
+          "status": "connected",
+          "kind": "Synthetic",
+          "icon": "database"
+        },
+        {
+          "id": "rain-rides",
+          "name": "Synthetic ride benefit (non-emergency medical transport)",
+          "provides": "Covered rides through the health plan",
+          "usedFor": "Patient visit options",
+          "description": "Covered rides through the health plan",
+          "freshness": "Today",
+          "recordCount": 1180,
+          "status": "connected",
+          "kind": "Synthetic",
+          "icon": "database"
+        },
+        {
+          "id": "rain-pharmacy",
+          "name": "Synthetic pharmacy and mail-order refills",
+          "provides": "Refill dates and shipment status",
+          "usedFor": "Patient refills",
+          "description": "Refill dates and shipment status",
+          "freshness": "Today",
+          "recordCount": 21600,
+          "status": "connected",
+          "kind": "Synthetic",
+          "icon": "database"
+        },
+        {
+          "id": "rain-avs",
+          "name": "Synthetic after-visit summaries",
+          "provides": "Clinician-written instructions in English and Spanish",
+          "usedFor": "Patient after-visit summary",
+          "description": "Clinician-written instructions in English and Spanish",
+          "freshness": "Today",
+          "recordCount": 7450,
+          "status": "connected",
+          "kind": "Synthetic",
+          "icon": "database"
+        }
+      ],
+      "pc_trend": {
+        "months": [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep"
+        ],
+        "landerPershing": [
+          100,
+          97,
+          95,
+          93,
+          91,
+          89,
+          88,
+          87,
+          "{{ 100 - constants.STATE.pcVisitDropPct | native }}"
+        ],
+        "otherFour": [
+          100,
+          99,
+          98,
+          98,
+          97,
+          97,
+          97,
+          96,
+          "{{ 100 + sum(constants.COUNTIES[id!=lander,id!=pershing].pcVisitChangePct) / count(constants.COUNTIES[id!=lander,id!=pershing]) | round | native }}"
+        ]
+      }
+    },
+    "templates": {
+      "contract_overrides": {
+        "ceo": {
+          "viz": {
+            "v_gate": {
+              "type": "stack",
+              "props": {
+                "dataset": "quality_gate"
+              }
+            },
+            "v_pmpm_trend": {
+              "type": "stack",
+              "props": {
+                "dataset": "pmpm_trend"
+              }
+            }
+          }
+        },
+        "cmo": {
+          "viz": {
+            "v_gate": {
+              "type": "stack",
+              "props": {
+                "dataset": "quality_gate"
+              }
+            },
+            "v_winnemucca_trend": {
+              "type": "stack",
+              "props": {
+                "dataset": "winnemucca_trend"
+              }
+            }
+          }
+        },
+        "cio": {
+          "viz": {
+            "v_banner": {
+              "type": "stack",
+              "props": {
+                "dataset": "banner_pending_fix"
+              }
+            },
+            "v_freshness_banner": {
+              "type": "stack",
+              "props": {
+                "dataset": "banner_freshness"
+              }
+            }
+          },
+          "kpis": {
+            "sources": {
+              "value": "{{constants.MODEL.publicSources}} public + {{constants.MODEL.syntheticSources}} synthetic"
+            }
+          }
+        },
+        "state": {
+          "viz": {
+            "v_trend": {
+              "type": "stack",
+              "props": {
+                "dataset": "pc_trend"
+              }
+            }
+          }
+        }
+      },
+      "patient_contract": {
+        "signals": [
+          {
+            "id": "wk_bp",
+            "icon": "heart-pulse",
+            "title": {
+              "en": "Take your blood pressure",
+              "es": "Tómese la presión"
+            },
+            "when": {
+              "en": "Today",
+              "es": "Hoy"
+            },
+            "text": {
+              "en": "Your care team asked for a reading before Thursday.",
+              "es": "Su equipo de salud pidió una lectura antes del jueves."
+            },
+            "chip": "pt_bp"
+          },
+          {
+            "id": "wk_visit",
+            "icon": "video",
+            "title": {
+              "en": "Video visit",
+              "es": "Cita por video"
+            },
+            "when": {
+              "en": "{{constants.LINDA.visit.day}}, {{constants.LINDA.visit.date}}, {{constants.LINDA.visit.time}}",
+              "es": "{{constants.LINDA.visit.esDay | cap}} {{constants.LINDA.visit.esDate}}, {{constants.LINDA.visit.time}}"
+            },
+            "text": {
+              "en": "Join from this phone. No drive needed.",
+              "es": "Entre desde este teléfono. No tiene que manejar."
+            },
+            "chip": "pt_visit"
+          },
+          {
+            "id": "wk_refill",
+            "icon": "pill",
+            "title": {
+              "en": "Metformin refill",
+              "es": "Renovar metformina"
+            },
+            "when": {
+              "en": "Due Sunday, Nov 8",
+              "es": "Vence el domingo 8 de nov."
+            },
+            "text": {
+              "en": "We can mail it to you.",
+              "es": "Se la podemos mandar por correo."
+            },
+            "chip": "pt_refill"
+          }
+        ],
+        "kpis": [],
+        "steps": {
+          "pt_week": {
+            "step": 1,
+            "label": {
+              "en": "What is coming up this week?",
+              "es": "¿Qué tengo esta semana?"
+            },
+            "asks": [
+              "this week",
+              "esta semana",
+              "to do",
+              "pendientes"
+            ],
+            "ai": {
+              "en": "Hi Linda! Here is what is coming up this week: 1) Take your blood pressure today. 2) Video visit with your care team on {{constants.LINDA.visit.day}} at {{constants.LINDA.visit.time}}. No drive needed. 3) Your metformin refill is due Sunday. What would you like to do first?",
+              "es": "¡Hola Linda! Esto es lo que tiene esta semana: 1) Tómese la presión hoy. 2) Cita por video con su equipo de salud el {{constants.LINDA.visit.esDay}} a las {{constants.LINDA.visit.time}}. No tiene que manejar. 3) Su metformina se renueva el domingo. ¿Qué quiere hacer primero?"
+            },
+            "card": "week",
+            "sources": [
+              "Scheduling",
+              "Reminders",
+              "Pharmacy (synthetic)"
+            ],
+            "chips": [
+              "pt_bp",
+              "pt_visit",
+              "pt_refill"
+            ],
+            "connects": [
+              "c_read"
+            ]
+          },
+          "pt_bp": {
+            "step": 2,
+            "label": {
+              "en": "Add my blood pressure",
+              "es": "Agregar mi presión"
+            },
+            "asks": [
+              "blood pressure",
+              "add a reading",
+              "my reading",
+              "presión",
+              "presion",
+              "agregar"
+            ],
+            "ai": {
+              "en": "Please type the two numbers from your cuff, top number first. Or tap Sync my cuff.",
+              "es": "Escriba los dos números de su monitor, primero el de arriba. O toque Sincronizar mi monitor."
+            },
+            "card": "bpForm",
+            "sources": [
+              "Remote BP Readings",
+              "EHR (synthetic)"
+            ],
+            "chips": []
+          },
+          "pt_bp_result": {
+            "step": 2,
+            "label": {
+              "en": "My reading",
+              "es": "Mi lectura"
+            },
+            "asks": [],
+            "ai": {
+              "en": "Thank you, Linda. Your reading is 142 over 88. That is better than your last one in {{constants.LINDA.last.month.en}} ({{constants.LINDA.last.sys}} over {{constants.LINDA.last.dia}}). Your goal is under 140 over 90, so you are close. Your care team will see this before your video visit on Thursday.",
+              "es": "Gracias, Linda. Su presión es 142 sobre 88. Está mejor que la última vez en {{constants.LINDA.last.month.es}} ({{constants.LINDA.last.sys}} sobre {{constants.LINDA.last.dia}}). Su meta es menos de 140 sobre 90, así que está cerca. Su equipo de salud la verá antes de su cita del jueves."
+            },
+            "card": "bpResult",
+            "sources": [
+              "Remote BP Readings",
+              "EHR (synthetic)"
+            ],
+            "chips": [
+              "pt_drive",
+              "pt_readings",
+              "pt_refill"
+            ],
+            "connects": [
+              "c_reading",
+              "c_alert"
+            ]
+          },
+          "pt_drive": {
+            "step": 3,
+            "label": {
+              "en": "Can I see the doctor without driving?",
+              "es": "¿Puedo ver al doctor sin manejar?"
+            },
+            "asks": [
+              "without driving",
+              "without a drive",
+              "no drive",
+              "drive",
+              "sin manejar",
+              "manejar",
+              "mobile clinic",
+              "clínica móvil",
+              "clinica movil"
+            ],
+            "ai": {
+              "en": "Yes. You already have a video visit on {{constants.LINDA.visit.day}} at {{constants.LINDA.visit.time}}, and you can join from this phone. If you would rather see someone in person, the mobile clinic is in Battle Mountain next Tuesday, about 10 minutes from you. If you need to go to the clinic in Winnemucca, your health plan covers a free ride. Do you want to keep Thursday, switch to the mobile clinic, or ask for a ride?",
+              "es": "Sí. Ya tiene una cita por video el {{constants.LINDA.visit.esDay}} a las {{constants.LINDA.visit.time}} y puede entrar desde este teléfono. Si prefiere ver a alguien en persona, la clínica móvil estará en Battle Mountain el próximo martes, a unos 10 minutos de usted. Si necesita ir a la clínica en Winnemucca, su plan de salud cubre un viaje gratis. ¿Quiere mantener la cita del jueves, cambiar a la clínica móvil o pedir un viaje?"
+            },
+            "card": "options",
+            "sources": [
+              "Scheduling",
+              "Mobile Clinic Calendar",
+              "Ride Benefit (synthetic)",
+              "Travel Time (OpenStreetMap)"
+            ],
+            "chips": [
+              "pt_keep",
+              "pt_mobile",
+              "pt_ride"
+            ]
+          },
+          "pt_keep": {
+            "step": 3,
+            "label": {
+              "en": "Keep Thursday",
+              "es": "Mantener el jueves"
+            },
+            "asks": [
+              "keep thursday",
+              "keep my visit",
+              "mantener"
+            ],
+            "ai": {
+              "en": "Done. Your video visit stays on {{constants.LINDA.visit.day}} at {{constants.LINDA.visit.time}}. Your care team can see that you confirmed.",
+              "es": "Listo. Su cita por video sigue el {{constants.LINDA.visit.esDay}} a las {{constants.LINDA.visit.time}}. Su equipo de salud ya sabe que usted confirmó."
+            },
+            "sources": [
+              "Scheduling"
+            ],
+            "chips": [
+              "pt_join",
+              "pt_refill",
+              "pt_readings"
+            ],
+            "connects": [
+              "c_visit"
+            ]
+          },
+          "pt_mobile": {
+            "step": 3,
+            "label": {
+              "en": "Switch to the mobile clinic",
+              "es": "Cambiar a la clínica móvil"
+            },
+            "asks": [
+              "switch",
+              "cambiar"
+            ],
+            "ai": {
+              "en": "I asked the clinic to move your visit to the mobile clinic in Battle Mountain on Tuesday, Nov 10 at 10:00 AM. The clinic will text you when it is confirmed.",
+              "es": "Le pedí a la clínica cambiar su cita a la clínica móvil en Battle Mountain el martes 10 de nov. a las 10:00 AM. La clínica le mandará un texto cuando esté confirmada."
+            },
+            "sources": [
+              "Scheduling",
+              "Mobile Clinic Calendar"
+            ],
+            "chips": [
+              "pt_keep",
+              "pt_refill",
+              "pt_care"
+            ],
+            "connects": [
+              "c_visit"
+            ]
+          },
+          "pt_ride": {
+            "step": 3,
+            "label": {
+              "en": "Ask for a ride",
+              "es": "Pedir un viaje"
+            },
+            "asks": [
+              "ride",
+              "i need a ride",
+              "viaje",
+              "necesito un viaje"
+            ],
+            "ai": {
+              "en": "I asked for a free ride to the clinic in Winnemucca. Your health plan covers it. The clinic will call you to set the day and time.",
+              "es": "Pedí un viaje gratis a la clínica en Winnemucca. Su plan de salud lo cubre. La clínica le llamará para fijar el día y la hora."
+            },
+            "sources": [
+              "Scheduling",
+              "Ride Benefit (synthetic)"
+            ],
+            "chips": [
+              "pt_keep",
+              "pt_refill",
+              "pt_care"
+            ],
+            "connects": [
+              "c_visit"
+            ]
+          },
+          "pt_after": {
+            "step": 4,
+            "label": {
+              "en": "After my visit",
+              "es": "Después de mi cita"
+            },
+            "asks": [],
+            "ai": {
+              "en": "Thank you for your visit, Linda. Here is your summary from your care team: Your blood pressure today was 136 over 84. That meets your goal. Keep taking your medicine the same way. Your metformin refill is on its way by mail and should arrive Saturday. Next step: take your blood pressure once a week and add it here. We will remind you.",
+              "es": "Gracias por su cita, Linda. Este es el resumen de su equipo de salud: Su presión hoy fue 136 sobre 84. Eso cumple su meta. Siga tomando su medicina igual. Su metformina ya va en camino por correo y debe llegar el sábado. Siguiente paso: tómese la presión una vez por semana y anótela aquí. Le vamos a recordar."
+            },
+            "card": "summary",
+            "sources": [
+              "EHR Visit Summary",
+              "Pharmacy",
+              "Reminders (synthetic)"
+            ],
+            "chips": [
+              "pt_readings",
+              "pt_next",
+              "pt_care"
+            ],
+            "connects": [
+              "c_gap"
+            ]
+          },
+          "pt_visit": {
+            "label": {
+              "en": "About my video visit",
+              "es": "Sobre mi cita por video"
+            },
+            "asks": [
+              "video visit",
+              "my visit",
+              "cita por video",
+              "mi cita"
+            ],
+            "ai": {
+              "en": "Your video visit is {{constants.LINDA.visit.day}}, {{constants.LINDA.visit.date}} at {{constants.LINDA.visit.time}} with your care team. You can join from this phone. No drive needed. Have your blood pressure cuff with you.",
+              "es": "Su cita por video es {{constants.LINDA.visit.es}} con su equipo de salud. Puede entrar desde este teléfono. No tiene que manejar. Tenga a mano su monitor de presión."
+            },
+            "sources": [
+              "Scheduling"
+            ],
+            "chips": [
+              "pt_join",
+              "pt_drive",
+              "pt_bp"
+            ]
+          },
+          "pt_join": {
+            "label": {
+              "en": "How do I join my video visit?",
+              "es": "¿Cómo entro a mi cita por video?"
+            },
+            "asks": [
+              "join",
+              "how do i join",
+              "cómo entro",
+              "como entro",
+              "entrar"
+            ],
+            "ai": {
+              "en": "At {{constants.LINDA.visit.time}} on {{constants.LINDA.visit.day}}, tap the link in your text or open this page. The video starts in this browser. You do not need an app.",
+              "es": "El {{constants.LINDA.visit.esDay}} a las {{constants.LINDA.visit.time}}, toque el enlace de su texto o abra esta página. El video empieza en este navegador. No necesita una aplicación."
+            },
+            "sources": [
+              "Scheduling"
+            ],
+            "chips": [
+              "pt_bp",
+              "pt_refill",
+              "pt_care"
+            ]
+          },
+          "pt_next": {
+            "label": {
+              "en": "When is my next visit?",
+              "es": "¿Cuándo es mi próxima cita?"
+            },
+            "asks": [
+              "next visit",
+              "when is my",
+              "próxima cita",
+              "proxima cita",
+              "cuándo",
+              "cuando"
+            ],
+            "ai": {
+              "en": "Your next visit is a video visit on {{constants.LINDA.visit.day}}, {{constants.LINDA.visit.date}} at {{constants.LINDA.visit.time}}. You can join from this phone.",
+              "es": "Su próxima cita es por video {{constants.LINDA.visit.es}}. Puede entrar desde este teléfono."
+            },
+            "aiAfter": {
+              "en": "Your care team will set your next visit and send you a text. Until then, take your blood pressure once a week and add it here.",
+              "es": "Su equipo de salud va a fijar su próxima cita y le mandará un texto. Mientras tanto, tómese la presión una vez por semana y anótela aquí."
+            },
+            "sources": [
+              "Scheduling"
+            ],
+            "chips": [
+              "pt_join",
+              "pt_readings",
+              "pt_care"
+            ],
+            "aiMobile": {
+              "en": "Your next visit is at the mobile clinic in Battle Mountain on Tuesday, Nov 10 at 10:00 AM. It is about 10 minutes from you.",
+              "es": "Su próxima cita es en la clínica móvil en Battle Mountain el martes 10 de nov. a las 10:00 AM. Está a unos 10 minutos de usted."
+            }
+          },
+          "pt_refill": {
+            "label": {
+              "en": "Refill my medicine",
+              "es": "Renovar mi medicina"
+            },
+            "asks": [
+              "refill",
+              "medicine",
+              "metformin",
+              "renovar",
+              "medicina",
+              "metformina"
+            ],
+            "ai": {
+              "en": "Your metformin refill is due Sunday, Nov 8. We will mail it to you, so you do not need to make a trip. It should arrive Saturday.",
+              "es": "Su metformina se renueva el domingo 8 de nov. Se la mandamos por correo, así no tiene que hacer un viaje. Debe llegar el sábado."
+            },
+            "aiAfter": {
+              "en": "Your metformin refill is on its way by mail and should arrive Saturday.",
+              "es": "Su metformina ya va en camino por correo y debe llegar el sábado."
+            },
+            "card": "refill",
+            "sources": [
+              "Pharmacy (synthetic)"
+            ],
+            "chips": [
+              "pt_bp",
+              "pt_visit",
+              "pt_care"
+            ]
+          },
+          "pt_readings": {
+            "label": {
+              "en": "Show my readings",
+              "es": "Ver mis lecturas"
+            },
+            "asks": [
+              "readings",
+              "show my",
+              "lecturas",
+              "ver mis"
+            ],
+            "ai": {
+              "en": "Here are your recent blood pressure readings. Your goal is under 140 over 90.",
+              "es": "Estas son sus lecturas recientes de presión. Su meta es menos de 140 sobre 90."
+            },
+            "card": "readings",
+            "sources": [
+              "Remote BP Readings",
+              "EHR (synthetic)"
+            ],
+            "chips": [
+              "pt_bp",
+              "pt_next",
+              "pt_care"
+            ]
+          },
+          "pt_care": {
+            "label": {
+              "en": "Talk to my care team",
+              "es": "Hablar con mi equipo de salud"
+            },
+            "asks": [
+              "care team",
+              "talk to",
+              "call me",
+              "equipo de salud",
+              "hablar"
+            ],
+            "ai": {
+              "en": "I sent your message to your care team at Sierra Basin. They will call you back. If this is an emergency, call 911.",
+              "es": "Mandé su mensaje a su equipo de salud en Sierra Basin. Le van a llamar. Si es una emergencia, llame al 911."
+            },
+            "sources": [
+              "Care team inbox (synthetic)"
+            ],
+            "chips": [
+              "pt_next",
+              "pt_readings",
+              "pt_refill"
+            ],
+            "connects": [
+              "c_message"
+            ]
+          },
+          "pt_clinical": {
+            "label": {
+              "en": "A question for my care team",
+              "es": "Una pregunta para mi equipo de salud"
+            },
+            "asks": [],
+            "ai": {
+              "en": "That is a good question for your care team. I sent it to them, and they will call you. I cannot give medical advice.",
+              "es": "Esa es una buena pregunta para su equipo de salud. Se la mandé y le van a llamar. Yo no puedo dar consejos médicos."
+            },
+            "sources": [
+              "Care team inbox (synthetic)"
+            ],
+            "chips": [
+              "pt_next",
+              "pt_readings",
+              "pt_refill"
+            ],
+            "connects": [
+              "c_message"
+            ]
+          },
+          "pt_fallback": {
+            "label": {
+              "en": "Something else",
+              "es": "Otra cosa"
+            },
+            "asks": [],
+            "ai": {
+              "en": "I can help with your visits, your blood pressure readings and your refills. For anything else, I can send a message to your care team.",
+              "es": "Le puedo ayudar con sus citas, sus lecturas de presión y sus medicinas. Para otra cosa, puedo mandar un mensaje a su equipo de salud."
+            },
+            "sources": [],
+            "chips": [
+              "pt_next",
+              "pt_bp",
+              "pt_care"
+            ]
+          }
+        },
+        "queries": [
+          {
+            "en": "When is my next visit?",
+            "es": "¿Cuándo es mi próxima cita?",
+            "to": "pt_next"
+          },
+          {
+            "en": "How do I join my video visit?",
+            "es": "¿Cómo entro a mi cita por video?",
+            "to": "pt_join"
+          },
+          {
+            "en": "I need a ride",
+            "es": "Necesito un viaje",
+            "to": "pt_drive"
+          },
+          {
+            "en": "Refill my medicine",
+            "es": "Renovar mi medicina",
+            "to": "pt_refill"
+          },
+          {
+            "en": "Show my blood pressure readings",
+            "es": "Ver mis lecturas de presión",
+            "to": "pt_readings"
+          },
+          {
+            "en": "Talk to my care team",
+            "es": "Hablar con mi equipo de salud",
+            "to": "pt_care"
+          }
+        ],
+        "viz": {
+          "week": {
+            "type": "rain.patient_week",
+            "props": {
+              "cards": [
+                "wk_bp",
+                "wk_visit",
+                "wk_refill"
+              ]
+            }
+          },
+          "readings": {
+            "type": "rain.patient_readings",
+            "props": {
+              "goal": "140/90",
+              "count": 3
+            }
+          }
+        },
+        "handoffs": [
+          {
+            "id": "c_read",
+            "title": "72-hour reminder read",
+            "count": 1,
+            "to": "Brandon Kee",
+            "workbench": "reminders",
+            "detail": "Opening the link marks Linda's 72-hour reminder as read."
+          },
+          {
+            "id": "c_reading",
+            "title": "New home reading",
+            "count": 1,
+            "to": "Teresa Lopez, CHW",
+            "workbench": "worklist",
+            "detail": "Linda's home reading shows on her Worklist row. 142 over 88 does not close her BP gap."
+          },
+          {
+            "id": "c_alert",
+            "title": "High reading alert",
+            "count": 1,
+            "to": "Teresa Lopez, CHW",
+            "workbench": "worklist",
+            "detail": "A reading of 180 over 110 or higher alerts the care team on the Worklist."
+          },
+          {
+            "id": "c_visit",
+            "title": "Visit confirmed or changed",
+            "count": 1,
+            "to": "Brandon Kee",
+            "workbench": "scheduling",
+            "detail": "Keeping Thursday shows Confirmed by patient. A mobile clinic switch or a ride waits for staff approval."
+          },
+          {
+            "id": "c_message",
+            "title": "Message for the care team",
+            "count": 1,
+            "to": "Teresa Lopez, CHW",
+            "workbench": "worklist",
+            "detail": "Linda asked her care team to call her back."
+          },
+          {
+            "id": "c_gap",
+            "title": "BP gap closed",
+            "count": 1,
+            "to": "Dr. Naomi Castellanos",
+            "workbench": "qualityGate",
+            "detail": "The 136 over 84 visit reading closes Linda's CMS165 gap: Teresa's campaign and the quality tracker go up by one."
+          }
+        ],
+        "workbenches": []
+      },
+      "patient_persona": {
+        "identity": {
+          "name": "Linda Garcia",
+          "initials": "LG",
+          "role": "Rural patient",
+          "greeting": "Linda"
+        },
+        "inputPlaceholder": "Linda's conversation is on her phone.",
+        "greetingSubtitle": "Linda's experience opens on her phone.",
+        "notifications": [],
+        "dataSourceIds": [
+          "rain-ops",
+          "rain-rpm",
+          "rain-ehr",
+          "rain-mobileClinic",
+          "rain-rides",
+          "rain-pharmacy",
+          "rain-avs",
+          "rain-osm"
+        ]
+      }
+    }
+  }
+}

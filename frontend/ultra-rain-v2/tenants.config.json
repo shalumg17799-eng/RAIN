@@ -1,0 +1,30 @@
+{
+  "$comment": "Who is a tenant, in one place. clientNames: client ids. tenantFolders: each client's folder under src/data (and its client folder under src/markets). componentOwners: purpose folders under src/components that hold one client's own components. eslint.config.js (rule 9: shared code names no client) and scripts/standard-audit.mjs read this file; src/core/runtime/tenants.test.ts fails when a registered client, a data folder or a component folder is missing from it. npm run scaffold:client adds a new client here.",
+  "clientNames": [
+    "rain"
+  ],
+  "tenantFolders": [
+    "rain"
+  ],
+  "tenantFoldersComment": "src/data holds exactly one folder per registered client, named after its id with '_' as '-' (the same name as its folder under src/markets).",
+  "componentOwnersComment": "Components are filed by purpose, never by client (no folder under src/components is named after a client). A client's own components live in purpose folders it owns: folder (under src/components) → owning client. Lint, the standard audit, the catalog exporter and the scaffolds read this map; shared library folders are sharedComponentFolders.",
+  "componentOwners": {
+    "value-based-care": "rain"
+  },
+  "sharedComponentFolders": [
+    "briefing",
+    "capabilities",
+    "cards",
+    "charts",
+    "chat",
+    "common",
+    "compose",
+    "intelligence",
+    "kpi",
+    "layout",
+    "pages",
+    "process",
+    "workspace"
+  ],
+  "otherComponentFolders": {}
+}

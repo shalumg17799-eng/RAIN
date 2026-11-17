@@ -1,0 +1,9 @@
+# Build context hygiene for the frontend image (context is this folder).
+node_modules
+dist
+.env
+.env.*
+!.env.example
+.claude
+docs
+*.md

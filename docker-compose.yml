@@ -11,7 +11,8 @@
 #   frontend/rain-app/Dockerfile  bakes VITE_ULTRA_API_MODE=http + VITE_ULTRA_API_BASE=/api/v3/ui
 #                                 (same-origin through nginx), overriding any .env.local
 #
-# URLs: frontend http://localhost:8181 - backend http://localhost:8000 - neo4j http://localhost:17474
+# URLs: frontend http://localhost:8181 - new Ultra UI (frontend-v2) http://localhost:8191
+#       - backend http://localhost:8000 - neo4j http://localhost:17474
 # Postgres is on host port 55433 (the container seeds itself on FIRST start; reset: compose down -v).
 name: rain
 
@@ -100,6 +101,18 @@ services:
     restart: unless-stopped
     ports:
       - "${FRONTEND_PORT:-8181}:80"
+    depends_on:
+      - backend
+
+  # The new Ultra UI (frontend/ultra-rain-v2), side by side with the UI above, on the same backend:
+  # every value from /api/v4/ui2 (rain-api/ui2_v4.py), write-back through /api/v4/flow. Start it alone with
+  #   docker compose up -d --no-deps --build frontend-v2
+  frontend-v2:
+    build:
+      context: ./frontend/ultra-rain-v2
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_V2_PORT:-8191}:80"
     depends_on:
       - backend
 

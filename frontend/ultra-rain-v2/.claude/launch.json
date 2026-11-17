@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "RAIN Value-Based Care Intelligence",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--port", "5550", "--strictPort"],
+      "port": 5550
+    }
+  ]
+}
